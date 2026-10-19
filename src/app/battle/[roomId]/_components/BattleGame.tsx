@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { getPusherClient, sendPusherEvent } from "~/lib/pusher-client";
-import {
-  fetchQuestionsByType,
-} from "~/lib/load-questions";
+import { fetchQuestionsByType } from "~/lib/load-questions";
 import { getGameMode, isQuestionType } from "~/lib/game-mode";
 import { getTimelineBounds } from "~/lib/question-utils";
 import {
@@ -75,6 +73,7 @@ import {
   isFunfactQuestion,
   type QuestionType,
 } from "~/types/question";
+import { PRODUCT_EVENTS, trackProductEvent } from "~/lib/product-analytics";
 import { GameMap } from "~/app/game/_components/GameMap";
 import { EventCard } from "~/app/game/_components/EventCard";
 import { TimelineSlider } from "~/app/game/_components/TimelineSlider";
@@ -515,6 +514,7 @@ export function BattleGame({
   const pusherPendingPlayersRef = useRef<Record<string, number>>({});
   const questionsLockedRef = useRef(false);
   const syncedQuestionDeckKeyRef = useRef<string | null>(null);
+  const battleStartTrackedRef = useRef(false);
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -844,10 +844,7 @@ export function BattleGame({
     }
 
     if (!questionsLockedRef.current && questionsRef.current.length === 0) {
-      await syncQuestionDeckFromServer(
-        snapshot.roundIndex,
-        snapshot.startTime,
-      );
+      await syncQuestionDeckFromServer(snapshot.roundIndex, snapshot.startTime);
     }
 
     syncRoomPlayState(snapshot);
@@ -921,6 +918,12 @@ export function BattleGame({
     roundReadyRef.current = {};
     setRoundReady({});
     setPhase("playing");
+    if (roundIndex === 0 && !battleStartTrackedRef.current) {
+      battleStartTrackedRef.current = true;
+      trackProductEvent(PRODUCT_EVENTS.battleStarted, {
+        rounds: settingsRef.current.rounds,
+      });
+    }
   }
 
   async function handleNextRoundInternal() {
@@ -971,9 +974,7 @@ export function BattleGame({
   }
 
   function checkAllReadyAfterElimination() {
-    if (
-      !areBattlePlayersReady(playersRef.current, roundReadyRef.current)
-    ) {
+    if (!areBattlePlayersReady(playersRef.current, roundReadyRef.current)) {
       return;
     }
 
@@ -1581,9 +1582,7 @@ export function BattleGame({
         ...startedPayload,
       });
       const serverQuestions = startedSnapshot?.questions;
-      if (
-        !isCompleteBattleQuestionDeck(serverQuestions, nextSettings.rounds)
-      ) {
+      if (!isCompleteBattleQuestionDeck(serverQuestions, nextSettings.rounds)) {
         setLobbyError(copy.syncQuestionFailedRestart);
         setGameSyncing(false);
         setIsStarting(false);

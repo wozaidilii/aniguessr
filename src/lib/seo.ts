@@ -1,3 +1,4 @@
+import { type Metadata } from "next";
 import {
   ANIME_LOCALES,
   DEFAULT_ANIME_LOCALE,
@@ -5,35 +6,10 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { resolveSiteUrl } from "~/lib/site-url";
 
-/**
- * 站点对外正式域名。优先级：
- * 1. 显式配置的 NEXT_PUBLIC_SITE_URL（自定义域名时最稳妥）
- * 2. Vercel 注入的部署域名 VERCEL_URL（预览环境自动生效）
- * 3. 兜底使用生产域名
- */
-const PRODUCTION_URL = "https://aniguessr.loamly.net";
-
-function normalizeBaseUrl(raw: string | undefined | null): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (trimmed.length === 0) return null;
-  const withProtocol = /^https?:\/\//i.test(trimmed)
-    ? trimmed
-    : `https://${trimmed}`;
-  try {
-    const url = new URL(withProtocol);
-    return url.origin;
-  } catch {
-    return null;
-  }
-}
-
-export const SITE_URL: string =
-  normalizeBaseUrl(process.env.NEXT_PUBLIC_SITE_URL) ??
-  normalizeBaseUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
-  normalizeBaseUrl(process.env.VERCEL_URL) ??
-  PRODUCTION_URL;
+/** Canonical origin from NEXT_PUBLIC_SITE_URL, otherwise the production default. */
+export const SITE_URL: string = resolveSiteUrl();
 
 export const SITE_NAME = "AniGuessr";
 
@@ -58,8 +34,29 @@ export function localeAlternates(path = "/"): Record<string, string> {
   });
   return {
     ...Object.fromEntries(entries),
-    "x-default": absoluteUrl(
-      withAnimeLocale(barePath, DEFAULT_ANIME_LOCALE),
-    ),
+    "x-default": absoluteUrl(withAnimeLocale(barePath, DEFAULT_ANIME_LOCALE)),
+  };
+}
+
+/** Locale canonical + hreflang, with an absolute title so the root template is not appended. */
+export function localizedPageMetadata(
+  locale: AnimeLocale,
+  path: string,
+  title: string,
+  description: string,
+): Metadata {
+  const canonical = withAnimeLocale(path, locale);
+  return {
+    title: { absolute: title },
+    description,
+    alternates: {
+      canonical,
+      languages: localeAlternates(path),
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+    },
   };
 }

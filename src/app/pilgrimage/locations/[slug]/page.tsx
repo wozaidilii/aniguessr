@@ -1,9 +1,13 @@
 import { type Metadata } from "next";
 import { notFound } from "next/navigation";
+import { JsonLd } from "~/components/JsonLd";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { localeAlternates } from "~/lib/seo";
+import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
+import { toFilmingLocation } from "~/server/data/filming-jsonld";
 import {
   getLocationBySlug,
   getPilgrimageSeoIndex,
@@ -32,23 +36,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const location = getLocationBySlug(slug);
   if (!location) return { title: "Not found" };
 
-  const copy = getPilgrimageCopy(locale);
-  const path = `/pilgrimage/locations/${location.slug}`;
-  const title = copy.seoLocationTitle(location.name, location.spotCount);
-  const description = copy.seoLocationDescription(
-    location.name,
-    location.spotCount,
+  const seo = buildLocationPageSeo(locale, {
+    name: location.name,
+    count: location.spotCount,
+  });
+  return localizedPageMetadata(
+    locale,
+    `/pilgrimage/locations/${location.slug}`,
+    seo.title,
+    seo.description,
   );
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: withAnimeLocale(path, locale),
-      languages: localeAlternates(path),
-    },
-    openGraph: { title, description, url: withAnimeLocale(path, locale) },
-  };
 }
 
 export default async function PilgrimageLocationPage({ params }: Props) {
@@ -59,6 +56,23 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   if (!location) notFound();
 
   const spots = listSpotsForLocation(location.slug).slice(0, 120);
+  const seo = buildLocationPageSeo(locale, {
+    name: location.name,
+    count: location.spotCount,
+  });
+  const listed = spots.slice(0, 24);
+  const jsonLd = buildPlaceCollectionJsonLd({
+    name: location.name,
+    description: seo.description,
+    url: absoluteUrl(
+      withAnimeLocale(`/pilgrimage/locations/${location.slug}`, locale),
+    ),
+    latitude: listed[0]?.lat,
+    longitude: listed[0]?.lng,
+    places: listed.map((spot) =>
+      toFilmingLocation(spot, locale, seo.description),
+    ),
+  });
 
   return (
     <PilgrimageShell
@@ -70,6 +84,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
         location.spotCount,
       )}
     >
+      <JsonLd data={jsonLd} />
       <PilgrimageSpotList
         locale={locale}
         spots={spots.map((spot) => ({

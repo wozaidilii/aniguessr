@@ -7,6 +7,8 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { shouldBypassLocale } from "~/lib/locale-exempt";
+import { legacyHostRedirectUrl } from "~/lib/site-url";
 
 /** 根据 Cookie 与 Accept-Language 推断首选语言。 */
 function pickPreferredLocale(request: NextRequest): AnimeLocale {
@@ -58,7 +60,37 @@ function applyLocaleContext(
   return response;
 }
 
+function requestHost(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-host");
+  return forwarded ?? request.headers.get("host") ?? request.nextUrl.host;
+}
+
+/** 旧生产域名 301 到 NEXT_PUBLIC_SITE_URL（默认 https://aniguessr.ayiora.com）。 */
+function redirectLegacyHost(request: NextRequest): NextResponse | null {
+  const destination = legacyHostRedirectUrl(
+    requestHost(request),
+    request.nextUrl.pathname,
+    request.nextUrl.search,
+  );
+  if (!destination) return null;
+  return NextResponse.redirect(destination, 301);
+}
+
 export function middleware(request: NextRequest) {
+  const hostRedirect = redirectLegacyHost(request);
+  if (hostRedirect) return hostRedirect;
+
+  // generateSitemaps() publishes /sitemap/0.xml but not the /sitemap.xml index.
+  if (request.nextUrl.pathname === "/sitemap.xml") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/sitemap-index";
+    return NextResponse.rewrite(url);
+  }
+
+  if (shouldBypassLocale(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   const legacyRedirect = redirectLegacyLangParam(request);
   if (legacyRedirect) return legacyRedirect;
 
@@ -87,7 +119,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|icon-192|icon-512|apple-touch-icon|og.png|images|backgrounds|characters).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image).*)"],
 };

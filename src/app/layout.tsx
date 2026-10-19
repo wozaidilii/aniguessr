@@ -5,7 +5,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { type Metadata, type Viewport } from "next";
 import { Geist } from "next/font/google";
 import { headers } from "next/headers";
+import { Suspense } from "react";
 
+import { CampaignAnalytics } from "~/components/CampaignAnalytics";
 import { PostHogRouteTracker } from "~/components/PostHogRouteTracker";
 import { PostHogScript } from "~/components/PostHogScript";
 import {
@@ -20,7 +22,10 @@ import {
   SITE_URL,
   localeAlternates,
 } from "~/lib/seo";
+import { BRAND_NAME } from "~/lib/site-url";
 import { TRPCReactProvider } from "~/trpc/react";
+
+const HOME_TITLE = `${BRAND_NAME} | Anime Street-View Guessing Game`;
 
 const OG_IMAGE = {
   url: "/og.png",
@@ -43,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: `${SITE_NAME} · Anime Street-View Guessing Game`,
+      default: HOME_TITLE,
       template: `%s · ${SITE_NAME}`,
     },
     description,
@@ -66,14 +71,14 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       siteName: SITE_NAME,
       locale,
-      title: `${SITE_NAME} · Anime Street-View Guessing Game`,
+      title: HOME_TITLE,
       description,
       url: canonicalPath,
       images: [OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${SITE_NAME} · Anime Street-View Guessing Game`,
+      title: HOME_TITLE,
       description,
       images: [OG_IMAGE.url],
     },
@@ -127,6 +132,9 @@ export default async function RootLayout({
         <PostHogScript />
         <TRPCReactProvider>
           <PostHogRouteTracker />
+          <Suspense fallback={null}>
+            <CampaignAnalytics />
+          </Suspense>
           {children}
         </TRPCReactProvider>
         <Analytics />

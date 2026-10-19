@@ -1,7 +1,8 @@
 import { type Metadata } from "next";
 import { withAnimeLocale } from "~/lib/anime-locale";
+import { buildAnimeIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { localeAlternates } from "~/lib/seo";
+import { localizedPageMetadata } from "~/lib/seo";
 import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
@@ -12,16 +13,16 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getPilgrimageRequestLocale();
-  const copy = getPilgrimageCopy(locale);
-  const path = "/pilgrimage/anime";
-  return {
-    title: copy.animeArchive,
-    description: copy.hubDescription,
-    alternates: {
-      canonical: withAnimeLocale(path, locale),
-      languages: localeAlternates(path),
-    },
-  };
+  const index = getPilgrimageSeoIndex();
+  const seo = buildAnimeIndexSeo(locale, {
+    animeCount: index?.animeCount ?? 0,
+  });
+  return localizedPageMetadata(
+    locale,
+    "/pilgrimage/anime",
+    seo.title,
+    seo.description,
+  );
 }
 
 export default async function PilgrimageAnimeIndexPage() {
