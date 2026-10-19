@@ -1,13 +1,18 @@
 import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "~/components/JsonLd";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
+import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { absoluteUrl, localeAlternates } from "~/lib/seo";
+import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
 import {
   getSpotById,
+  getSpotSeoVariant,
   pickLocalizedText,
+  type PilgrimageSpot,
 } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageShell,
@@ -21,62 +26,47 @@ interface Props {
 export const revalidate = 86_400;
 export const dynamicParams = true;
 
+function spotSeoFields(
+  spot: PilgrimageSpot,
+  locale: Awaited<ReturnType<typeof getPilgrimageRequestLocale>>,
+): SpotSeoFields {
+  return {
+    id: spot.id,
+    anime: pickLocalizedText(spot.animeTitle, locale),
+    place: pickLocalizedText(spot.answerName, locale),
+    area: pickLocalizedText(spot.location, locale),
+    episode: spot.episodeContext ?? "",
+    scene: pickLocalizedText(spot.title, locale),
+  };
+}
+
+function absoluteAssetUrl(url: string | undefined): string | null {
+  if (!url) return null;
+  return /^https?:\/\//i.test(url) ? url : absoluteUrl(url);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await getPilgrimageRequestLocale();
   const { id } = await params;
   const spot = getSpotById(id);
   if (!spot) return { title: "Not found" };
 
-  const copy = getPilgrimageCopy(locale);
-  const anime = pickLocalizedText(spot.animeTitle, locale);
-  const place = pickLocalizedText(spot.answerName, locale);
-  const location = pickLocalizedText(spot.location, locale);
+  const fields = spotSeoFields(spot, locale);
+  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
   const path = `/pilgrimage/spots/${id}`;
-  const title = copy.seoSpotTitle(anime, place);
-  const description = copy.seoSpotDescription(anime, place, location);
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
+  const metadata = localizedPageMetadata(
+    locale,
+    path,
+    seo.title,
+    seo.description,
+  );
 
   return {
-    title,
-    description,
-    alternates: {
-      canonical: withAnimeLocale(path, locale),
-      languages: localeAlternates(path),
-    },
+    ...metadata,
     openGraph: {
-      title,
-      description,
-      url: withAnimeLocale(path, locale),
-      images: imageUrl ? [{ url: imageUrl, alt: place }] : undefined,
-    },
-  };
-}
-
-function buildSpotJsonLd(
-  locale: Awaited<ReturnType<typeof getPilgrimageRequestLocale>>,
-  spot: NonNullable<ReturnType<typeof getSpotById>>,
-) {
-  const anime = pickLocalizedText(spot.animeTitle, locale);
-  const place = pickLocalizedText(spot.answerName, locale);
-  const description = pickLocalizedText(spot.description, locale);
-  const pagePath = withAnimeLocale(`/pilgrimage/spots/${spot.id}`, locale);
-  const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "TouristAttraction",
-    name: place,
-    description,
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: spot.lat,
-      longitude: spot.lng,
-    },
-    ...(imageUrl ? { image: imageUrl } : {}),
-    url: absoluteUrl(pagePath),
-    isRelatedTo: {
-      "@type": "CreativeWork",
-      name: anime,
+      ...metadata.openGraph,
+      images: imageUrl ? [{ url: imageUrl, alt: fields.place }] : undefined,
     },
   };
 }
@@ -96,7 +86,19 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
 
-  const jsonLd = buildSpotJsonLd(locale, spot);
+  const fields = spotSeoFields(spot, locale);
+  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  const jsonLd = buildTouristAttractionJsonLd({
+    name: fields.place,
+    description: pickLocalizedText(spot.description, locale) || seo.description,
+    url: absoluteUrl(withAnimeLocale(`/pilgrimage/spots/${spot.id}`, locale)),
+    image: absoluteAssetUrl(imageUrl),
+    latitude: spot.lat,
+    longitude: spot.lng,
+    area: fields.area,
+    anime: fields.anime,
+    episode: fields.episode,
+  });
 
   return (
     <PilgrimageShell
@@ -105,10 +107,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       title={copy.seoSpotTitle(anime, place)}
       description={description}
     >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="anime-panel p-5 sm:p-6">
@@ -122,14 +121,18 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           ) : null}
 
           <h2 className="text-lg font-black text-pink-100">{title}</h2>
-          <p className="mt-3 text-sm leading-7 text-pink-50/80">{description}</p>
+          <p className="mt-3 text-sm leading-7 text-pink-50/80">
+            {description}
+          </p>
 
           {spot.episodeContext ? (
             <section className="mt-6">
               <h3 className="text-xs font-black tracking-[0.16em] text-cyan-100/70 uppercase">
                 {copy.episode}
               </h3>
-              <p className="mt-2 text-sm text-pink-50/75">{spot.episodeContext}</p>
+              <p className="mt-2 text-sm text-pink-50/75">
+                {spot.episodeContext}
+              </p>
             </section>
           ) : null}
 

@@ -13,6 +13,7 @@ import {
   type AnimeLocale,
 } from "~/lib/anime-locale";
 import { AnimeDifficultySelector } from "~/components/AnimeDifficultySelector";
+import { HomeStructuredData } from "~/components/HomeStructuredData";
 import { AnimeRoundCountSelector } from "~/components/AnimeRoundCountSelector";
 import {
   ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
@@ -139,9 +140,12 @@ const COPY: Record<
     roundsOption: (rounds) => `${rounds} 轮`,
     difficultyLabel: "难度档位",
     difficultyOption: (tier) =>
-      ({ beginner: "入门", intermediate: "进阶", master: "大师", miracle: "神迹" })[
-        tier
-      ],
+      ({
+        beginner: "入门",
+        intermediate: "进阶",
+        master: "大师",
+        miracle: "神迹",
+      })[tier],
     difficultyHint: (tier) =>
       ({
         beginner: "仅包含难度 1 的题目。",
@@ -316,9 +320,8 @@ export default function Home() {
     useState<AnimeGuessrDifficultyTier>(ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER);
   const [selectedRoundCount, setSelectedRoundCount] =
     useState<AnimeGuessrRoundCount>(5);
-  const [difficultyTier, setDifficultyTier] = useState<AnimeGuessrDifficultyTier>(
-    ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
-  );
+  const [difficultyTier, setDifficultyTier] =
+    useState<AnimeGuessrDifficultyTier>(ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER);
   const [session, setSession] = useState<PlayerSession | null>(null);
   const [profileName, setProfileName] = useState("");
   const [profileCountryCode, setProfileCountryCode] = useState("");
@@ -416,7 +419,9 @@ export default function Home() {
     saveAnimeGuessrRoundCount(nextRoundCount);
   }
 
-  function handleDifficultyTierChange(nextDifficultyTier: AnimeGuessrDifficultyTier) {
+  function handleDifficultyTierChange(
+    nextDifficultyTier: AnimeGuessrDifficultyTier,
+  ) {
     setDifficultyTier(nextDifficultyTier);
     setLeaderboardDifficultyTier(nextDifficultyTier);
     saveAnimeGuessrDifficultyTier(nextDifficultyTier);
@@ -433,8 +438,7 @@ export default function Home() {
   function selectLocale(nextLocale: AnimeLocale) {
     saveAnimeLocale(nextLocale);
     const innerPath = stripLocalePrefix(pathname);
-    const search =
-      typeof window !== "undefined" ? window.location.search : "";
+    const search = typeof window !== "undefined" ? window.location.search : "";
     router.push(withAnimeLocale(`${innerPath}${search}`, nextLocale));
   }
 
@@ -468,6 +472,7 @@ export default function Home() {
 
   return (
     <main className="anime-shell min-h-screen overflow-x-hidden text-white">
+      <HomeStructuredData locale={locale} />
       <section className="relative min-h-screen px-5 py-5 sm:px-8 lg:px-12">
         <div className="absolute inset-0 -z-10">
           <div className="h-full w-full bg-[url('/images/anime-placeholder.jpg')] bg-cover bg-center opacity-35" />
@@ -689,31 +694,31 @@ export default function Home() {
                 onChange={handleRoundCountChange}
               />
               <div className="flex flex-wrap gap-3">
-              <Link
-                href={playUrl}
-                onClick={() =>
-                  capturePostHogEvent(POSTHOG_EVENTS.homeStartClicked, {
-                    locale,
-                    rounds: selectedRoundCount,
-                    difficulty: difficultyTier,
-                  })
-                }
-                className="anime-button"
-              >
-                {copy.start}
-              </Link>
-              <Link
-                href={battleUrl}
-                onClick={() =>
-                  capturePostHogEvent(POSTHOG_EVENTS.homeBattleClicked, {
-                    locale,
-                    loggedIn: Boolean(session),
-                  })
-                }
-                className="anime-button-secondary"
-              >
-                {copy.battle}
-              </Link>
+                <Link
+                  href={playUrl}
+                  onClick={() =>
+                    capturePostHogEvent(POSTHOG_EVENTS.homeStartClicked, {
+                      locale,
+                      rounds: selectedRoundCount,
+                      difficulty: difficultyTier,
+                    })
+                  }
+                  className="anime-button"
+                >
+                  {copy.start}
+                </Link>
+                <Link
+                  href={battleUrl}
+                  onClick={() =>
+                    capturePostHogEvent(POSTHOG_EVENTS.homeBattleClicked, {
+                      locale,
+                      loggedIn: Boolean(session),
+                    })
+                  }
+                  className="anime-button-secondary"
+                >
+                  {copy.battle}
+                </Link>
               </div>
             </div>
 
@@ -859,7 +864,9 @@ export default function Home() {
                     <button
                       key={tier}
                       type="button"
-                      onClick={() => handleLeaderboardDifficultyTierChange(tier)}
+                      onClick={() =>
+                        handleLeaderboardDifficultyTierChange(tier)
+                      }
                       className={`px-2.5 py-1 text-[11px] font-black transition sm:px-3 sm:text-xs ${
                         leaderboardDifficultyTier === tier
                           ? "bg-pink-300/20 text-pink-50"

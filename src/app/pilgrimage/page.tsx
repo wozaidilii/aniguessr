@@ -1,8 +1,9 @@
 import { type Metadata } from "next";
 import Link from "next/link";
-import { type AnimeLocale, withAnimeLocale } from "~/lib/anime-locale";
+import { withAnimeLocale } from "~/lib/anime-locale";
+import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { localeAlternates } from "~/lib/seo";
+import { localizedPageMetadata } from "~/lib/seo";
 import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
@@ -13,16 +14,18 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getPilgrimageRequestLocale();
-  const copy = getPilgrimageCopy(locale);
-  const path = "/pilgrimage";
-  return {
-    title: copy.hubTitle,
-    description: copy.hubDescription,
-    alternates: {
-      canonical: withAnimeLocale(path, locale),
-      languages: localeAlternates(path),
-    },
-  };
+  const index = getPilgrimageSeoIndex();
+  const seo = buildPilgrimageHubSeo(locale, {
+    spotCount: index?.spotCount ?? 0,
+    animeCount: index?.animeCount ?? 0,
+    locationCount: index?.locationCount ?? 0,
+  });
+  return localizedPageMetadata(
+    locale,
+    "/pilgrimage",
+    seo.title,
+    seo.description,
+  );
 }
 
 export default async function PilgrimageHubPage() {

@@ -438,6 +438,27 @@ if (snapshot.roundStatus !== "round-result") return cloneSnapshot(snapshot);
 
 ---
 
+### Scenario: Canonical origin, locale middleware, and public metadata routes
+
+#### 1. Scope / Trigger
+
+- Trigger: changing the public site origin, locale middleware matcher, `robots.txt`, `sitemap.xml`, or hreflang / canonical metadata.
+- Applies to `src/lib/site-url.ts`, `src/lib/seo.ts`, `src/middleware.ts`, `src/lib/locale-exempt.ts`, and `src/app/{robots,sitemap,layout}.ts`.
+
+#### 2. Contracts
+
+- `NEXT_PUBLIC_SITE_URL` is the only canonical origin. When it is unset, use `DEFAULT_SITE_URL` (`https://aniguessr.ayiora.com`). Do not fall back to `VERCEL_URL` for canonical, hreflang, sitemap, or Open Graph URLs.
+- Sitemap, robots, canonical, and hreflang all go through `absoluteUrl` / `localeAlternates`.
+- Locale middleware must not redirect or rewrite metadata and static files (`/robots.txt`, `/sitemap.xml`, `/sitemap/*`, `/manifest.webmanifest`, icons, `/og.png`, `/images`, `/data`, `/api`). Those paths return 200 at the requested URL.
+- `aniguessr.loamly.net` 301s to the canonical origin, preserving path and query. The redirect target is `resolveSiteUrl()`, not a second hardcoded host.
+
+#### 3. Validation
+
+- Unit-test exempt paths and the legacy-host redirect.
+- After a production build, `curl -I` `/robots.txt` and `/sitemap.xml` and expect 200 with no `Location` header.
+
+---
+
 ## Testing Requirements
 
 <!-- What level of testing is expected -->

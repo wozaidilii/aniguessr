@@ -64,6 +64,7 @@ import {
   type GuestProgress,
 } from "~/lib/guest-progress";
 import { capturePostHogEvent, POSTHOG_EVENTS } from "~/lib/posthog";
+import { PRODUCT_EVENTS, trackProductEvent } from "~/lib/product-analytics";
 import { api } from "~/trpc/react";
 
 type Phase = "playing" | "result" | "final";
@@ -767,10 +768,7 @@ export default function AnimeGuessrPage() {
   const homeUrl = useMemo(() => withAnimeLocale("/", locale), [locale]);
   const loginUrl = useMemo(
     () =>
-      withAnimeLocale(
-        `/login?next=${encodeURIComponent(gameNextUrl)}`,
-        locale,
-      ),
+      withAnimeLocale(`/login?next=${encodeURIComponent(gameNextUrl)}`, locale),
     [gameNextUrl, locale],
   );
 
@@ -977,6 +975,10 @@ export default function AnimeGuessrPage() {
         { rounds: questions.length, auth_state: "logged_in" },
         session.user.id,
       );
+      trackProductEvent(PRODUCT_EVENTS.gameStarted, {
+        rounds: questions.length,
+        auth_state: "logged_in",
+      });
       return;
     }
 
@@ -998,6 +1000,10 @@ export default function AnimeGuessrPage() {
       rounds: questions.length,
       auth_state: "guest",
       games_remaining: getGuestGamesRemaining(nextProgress),
+    });
+    trackProductEvent(PRODUCT_EVENTS.gameStarted, {
+      rounds: questions.length,
+      auth_state: "guest",
     });
   }, [loadState, questions, recordActivity, reloadKey, session]);
 
@@ -1170,6 +1176,11 @@ export default function AnimeGuessrPage() {
         },
         session.user.id,
       );
+      trackProductEvent(PRODUCT_EVENTS.gameFinished, {
+        score: totalScore,
+        rounds: roundCount,
+        auth_state: "logged_in",
+      });
       return;
     }
 
@@ -1190,6 +1201,11 @@ export default function AnimeGuessrPage() {
       auth_state: "guest",
       is_new_best: saved.isNewBest,
       difficulty: difficultyTier,
+    });
+    trackProductEvent(PRODUCT_EVENTS.gameFinished, {
+      score: totalScore,
+      rounds: roundCount,
+      auth_state: "guest",
     });
 
     if (saved.isNewBest) {
@@ -1267,10 +1283,7 @@ export default function AnimeGuessrPage() {
             >
               {copy.googleContinue}
             </Link>
-            <Link
-              href={loginUrl}
-              className="anime-button-secondary"
-            >
+            <Link href={loginUrl} className="anime-button-secondary">
               {copy.emailContinue}
             </Link>
             <Link href={homeUrl} className="text-sm font-bold text-cyan-100/70">
@@ -1484,7 +1497,10 @@ export default function AnimeGuessrPage() {
             >
               {copy.playAgain}
             </button>
-            <Link href={homeUrl} className="anime-button-secondary sm:col-span-2">
+            <Link
+              href={homeUrl}
+              className="anime-button-secondary sm:col-span-2"
+            >
               {copy.home}
             </Link>
           </div>
