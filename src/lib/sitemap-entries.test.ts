@@ -29,9 +29,10 @@ describe("sitemap entries", () => {
     }
   });
 
-  it("splits files before Google's 50,000 URL limit", () => {
+  it("splits files into about 5,000 URLs so each ISR body stays under 20 MB", () => {
+    expect(SITEMAP_URL_LIMIT).toBe(5_000);
     expect(SITEMAP_PATHS_PER_FILE * 3).toBeLessThanOrEqual(SITEMAP_URL_LIMIT);
-    expect(SITEMAP_URL_LIMIT).toBeLessThanOrEqual(50_000);
+    expect(SITEMAP_PATHS_PER_FILE * 3).toBeGreaterThan(4_000);
     expect(sitemapFileCount(1)).toBe(1);
     expect(sitemapFileCount(SITEMAP_PATHS_PER_FILE + 1)).toBe(2);
   });
