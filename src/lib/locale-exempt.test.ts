@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
+import {
+  PILGRIMAGE_REVALIDATE_SECONDS,
+  isLocalePrefixedPilgrimagePath,
+} from "~/lib/pilgrimage-cache";
 import { middleware } from "~/middleware";
 
 function request(pathname: string, host = "aniguessr.ayiora.com") {
@@ -44,6 +48,35 @@ describe("locale middleware exemptions", () => {
     expect(response.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/en/pilgrimage",
     );
+  });
+
+  it("keeps the pilgrimage ISR window at one day", () => {
+    expect(PILGRIMAGE_REVALIDATE_SECONDS).toBe(86_400);
+  });
+
+  it("serves locale-prefixed pilgrimage URLs without rewrite or Set-Cookie", () => {
+    for (const pathname of [
+      "/ja/pilgrimage",
+      "/zh/pilgrimage/locations",
+      "/en/pilgrimage/spots/anitabi_1_2",
+      "/ja/pilgrimage/anime/123-title",
+    ]) {
+      expect(isLocalePrefixedPilgrimagePath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
+  });
+
+  it("still rewrites other locale-prefixed pages", () => {
+    const response = middleware(request("/ja/game/anime"));
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/game/anime",
+    );
+    expect(response.headers.get("set-cookie")).toContain("aniguessr_locale=ja");
   });
 
   it("redirects the old production host with 301", () => {
