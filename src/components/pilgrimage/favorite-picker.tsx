@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
 
 export interface FavoriteAnimeOption {
@@ -17,7 +17,7 @@ export function FavoritePicker({
   locale,
   animes,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   animes: FavoriteAnimeOption[];
 }) {
   const copy = getPilgrimageCopy(locale);
@@ -87,7 +87,7 @@ export function FavoritePicker({
                   </span>
                 </label>
                 <Link
-                  href={withAnimeLocale(
+                  href={withPilgrimageLocale(
                     `/pilgrimage/anime/${anime.slug}`,
                     locale,
                   )}

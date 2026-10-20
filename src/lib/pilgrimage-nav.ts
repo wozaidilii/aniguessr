@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 export const ANITABI_SITE = "https://anitabi.cn";
 export const CC_BY_NC_SA_4_URL =
@@ -10,6 +10,7 @@ export interface NavText {
   zh: string;
   ja: string;
   en: string;
+  tw?: string;
 }
 
 export interface NavSpot {
@@ -33,11 +34,11 @@ export interface NearbySpot extends NavSpot {
 const EMPTY_TEXT: NavText = { zh: "", ja: "", en: "" };
 
 export function anitabiUrlFromSpotId(id: string, subjectId: string): string {
-  const prefix = `anitabi_${subjectId}_`;
-  if (!subjectId || !id.startsWith(prefix)) return ANITABI_SITE;
-  const pid = id.slice(prefix.length);
-  if (!pid) return ANITABI_SITE;
-  return `https://anitabi.cn/map?bangumiId=${encodeURIComponent(subjectId)}&pid=${encodeURIComponent(pid)}`;
+  const embedded = /^anitabi_(\d+)_(.+)$/u.exec(id);
+  const bangumiId = embedded?.[1] ?? subjectId;
+  const pid = embedded?.[2] ?? "";
+  if (!bangumiId || !pid) return ANITABI_SITE;
+  return `https://anitabi.cn/map?bangumiId=${encodeURIComponent(bangumiId)}&pid=${encodeURIComponent(pid)}`;
 }
 
 export function anitabiAnimeUrl(subjectId: string): string {
@@ -53,6 +54,26 @@ export function anitabiSourceUrl(sourceUrl?: string | null): string {
 
 export function googleMapsDirectionsUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+}
+
+/** Official Maps URLs API panorama link. No key and no extra request. */
+export function googleStreetViewUrl(lat: number, lng: number): string {
+  return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
+}
+
+function firstFilled(values: Array<string | undefined>): string {
+  for (const value of values) {
+    if (value?.trim()) return value;
+  }
+  return "";
+}
+
+export function localizedNavText(
+  text: NavText,
+  locale: PilgrimageLocale,
+): string {
+  if (locale === "zh-tw") return firstFilled([text.tw, text.ja, text.en]);
+  return firstFilled([text[locale], text.en, text.zh, text.ja]);
 }
 
 export function haversineKm(
@@ -76,7 +97,13 @@ function asText(value: unknown): string {
 
 function tupleToText(value: unknown): NavText | null {
   if (!Array.isArray(value) || value.length < 3) return null;
-  return { zh: asText(value[0]), ja: asText(value[1]), en: asText(value[2]) };
+  const text: NavText = {
+    zh: asText(value[0]),
+    ja: asText(value[1]),
+    en: asText(value[2]),
+  };
+  if (value.length > 3) text.tw = asText(value[3]);
+  return text;
 }
 
 export function parseNavCatalog(value: unknown): NavCatalog {
@@ -118,6 +145,7 @@ export function parseNavCatalog(value: unknown): NavCatalog {
         zh: asText(row[5]),
         ja: asText(row[6]),
         en: asText(row[7]),
+        tw: row.length > 8 ? asText(row[8]) : "",
       },
     });
   }
@@ -173,10 +201,9 @@ export function rankNearbySpots(
 export function animeTitle(
   animes: Record<string, NavText>,
   subjectId: string,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
 ): string {
-  const text = animes[subjectId] ?? EMPTY_TEXT;
-  return text[locale] || text.en || text.zh || text.ja || "";
+  return localizedNavText(animes[subjectId] ?? EMPTY_TEXT, locale);
 }
 
 let catalogRequest: Promise<NavCatalog> | null = null;

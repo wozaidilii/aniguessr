@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { BRAND_NAME } from "~/lib/site-url";
 
 /**
@@ -9,7 +9,7 @@ import { BRAND_NAME } from "~/lib/site-url";
  * {count} {spotCount} {animeCount} {locationCount}
  */
 export const PILGRIMAGE_SEO_TEMPLATES: Record<
-  AnimeLocale,
+  PilgrimageLocale,
   {
     spotTitle: string;
     spotTitleWithEpisode: string;
@@ -34,36 +34,36 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
   }
 > = {
   en: {
-    spotTitle: "{anime} {place} filming location | {brand}",
+    spotTitle: "{anime} {place} real life location | {brand}",
     spotTitleWithEpisode:
-      "{anime} {place} ({episode}) filming location | {brand}",
-    spotTitleWithScene: "{anime} {place} — {scene} filming location | {brand}",
-    spotTitleWithId: "{anime} {place} filming location ({id}) | {brand}",
-    spotDescription:
-      "Real-world filming location for {anime} at {place} in {area}.",
+      "{anime} {place} ({episode}) real life location | {brand}",
+    spotTitleWithScene:
+      "{anime} {place} — {scene} real life location | {brand}",
+    spotTitleWithId: "{anime} {place} real life location ({id}) | {brand}",
+    spotDescription: "Real life location for {anime} at {place} in {area}.",
     spotDescriptionWithEpisode:
-      "Real-world filming location for {anime} at {place} in {area}. Appears in {episode}.",
+      "Real life location for {anime} at {place} in {area}. Appears in {episode}.",
     spotDescriptionWithScene:
-      "Real-world filming location for {anime} at {place} in {area}. Scene: {scene}.",
+      "Real life location for {anime} at {place} in {area}. Scene: {scene}.",
     spotDescriptionWithId:
-      "Real-world filming location for {anime} at {place} in {area}. Reference {id}.",
-    animeTitle: "{anime} filming locations | {brand}",
-    animeTitleWithId: "{anime} ({id}) filming locations | {brand}",
+      "Real life location for {anime} at {place} in {area}. Reference {id}.",
+    animeTitle: "{anime} Real Life Locations | {brand}",
+    animeTitleWithId: "{anime} ({id}) Real Life Locations | {brand}",
     animeDescription:
-      "{count} real-world filming locations for {anime}, with coordinates and scene notes.",
+      "{count} real life locations for {anime}, with coordinates and scene notes.",
     animeDescriptionWithId:
-      "{count} real-world filming locations for {anime} ({id}), with coordinates and scene notes.",
-    locationTitle: "{area} anime filming locations | {brand}",
-    locationDescription: "{count} anime filming locations in {area}.",
-    hubTitle: "Anime filming locations | {brand}",
+      "{count} real life locations for {anime} ({id}), with coordinates and scene notes.",
+    locationTitle: "{area} anime real life locations | {brand}",
+    locationDescription: "{count} anime real life locations in {area}.",
+    hubTitle: "Anime real life locations | {brand}",
     hubDescription:
-      "Browse {spotCount} anime pilgrimage filming locations from {animeCount} series across {locationCount} regions.",
+      "Browse {spotCount} anime real life locations from {animeCount} series across {locationCount} regions.",
     animeIndexTitle: "Anime pilgrimage index | {brand}",
     animeIndexDescription:
-      "{animeCount} anime series with mapped filming locations.",
-    locationIndexTitle: "Anime filming locations by region | {brand}",
+      "{animeCount} anime series with mapped real life locations.",
+    locationIndexTitle: "Anime real life locations by region | {brand}",
     locationIndexDescription:
-      "{locationCount} regions with mapped anime filming locations.",
+      "{locationCount} regions with mapped anime real life locations.",
   },
   ja: {
     spotTitle: "{anime} {place} 撮影地 | {brand}",
@@ -117,6 +117,34 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     animeIndexDescription: "已收录取景地的动漫作品共 {animeCount} 部。",
     locationIndexTitle: "按地区浏览动漫取景地 | {brand}",
     locationIndexDescription: "已收录动漫取景地的地区共 {locationCount} 个。",
+  },
+  // OpenCC s2twp of zh. zh-TW document <title> and meta description do not
+  // use these templates; they come only from PILGRIMAGE_SEO_OVERRIDES.
+  "zh-tw": {
+    spotTitle: "{anime} {place} 取景地 | {brand}",
+    spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",
+    spotTitleWithScene: "{anime} {place}·{scene} 取景地 | {brand}",
+    spotTitleWithId: "{anime} {place} 取景地（{id}） | {brand}",
+    spotDescription: "{anime} 在{area}的取景地「{place}」。",
+    spotDescriptionWithEpisode:
+      "{anime} 在{area}的取景地「{place}」。出現場景：{episode}。",
+    spotDescriptionWithScene:
+      "{anime} 在{area}的取景地「{place}」。場景：{scene}。",
+    spotDescriptionWithId: "{anime} 在{area}的取景地「{place}」。編號 {id}。",
+    animeTitle: "{anime} 取景地 | {brand}",
+    animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
+    animeDescription: "{anime} 的實景取景地共 {count} 處，含座標與場景資訊。",
+    animeDescriptionWithId:
+      "{anime}（{id}）的實景取景地共 {count} 處，含座標與場景資訊。",
+    locationTitle: "{area} 動漫取景地 | {brand}",
+    locationDescription: "{area} 的動漫取景地共 {count} 處。",
+    hubTitle: "動漫取景地與聖地巡禮 | {brand}",
+    hubDescription:
+      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動漫取景地。",
+    animeIndexTitle: "按作品瀏覽動漫取景地 | {brand}",
+    animeIndexDescription: "已收錄取景地的動漫作品共 {animeCount} 部。",
+    locationIndexTitle: "按地區瀏覽動漫取景地 | {brand}",
+    locationIndexDescription: "已收錄動漫取景地的地區共 {locationCount} 個。",
   },
 };
 
@@ -213,7 +241,7 @@ function spotVars(fields: SpotSeoFields): Record<string, string> {
 }
 
 export function buildSpotSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   fields: SpotSeoFields,
   variant: SpotSeoVariant,
 ): RenderedSeo {
@@ -238,7 +266,7 @@ export function buildSpotSeo(
 }
 
 export function buildAnimePageSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   anime: { id: string; title: string; count: number },
   ambiguous: boolean,
 ): RenderedSeo {
@@ -262,7 +290,7 @@ export function buildAnimePageSeo(
 }
 
 export function buildLocationPageSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   location: { name: string; count: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -278,7 +306,7 @@ export function buildLocationPageSeo(
 }
 
 export function buildPilgrimageHubSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { spotCount: number; animeCount: number; locationCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -290,7 +318,7 @@ export function buildPilgrimageHubSeo(
 }
 
 export function buildAnimeIndexSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { animeCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -302,7 +330,7 @@ export function buildAnimeIndexSeo(
 }
 
 export function buildLocationIndexSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { locationCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];

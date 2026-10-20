@@ -1,16 +1,17 @@
-import { type AnimeLocale, withAnimeLocale } from "~/lib/anime-locale";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
+import { pickLocalizedText, pickMaybeLocalizedText } from "~/lib/localized-text";
+import {
+  withPilgrimageLocale,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { absoluteUrl } from "~/lib/seo";
 import { type FilmingLocationInput } from "~/lib/structured-data";
-import {
-  pickLocalizedText,
-  type PilgrimageSpot,
-} from "~/server/data/pilgrimage-seo";
+import { type PilgrimageSpot } from "~/server/data/pilgrimage-seo";
 
 export function toFilmingLocation(
   spot: PilgrimageSpot,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   fallbackDescription = "",
 ): FilmingLocationInput {
   const image = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
@@ -20,7 +21,10 @@ export function toFilmingLocation(
     name: pickLocalizedText(spot.answerName, locale),
     description,
     url: absoluteUrl(
-      withAnimeLocale(`/pilgrimage/spots/${encodeSpotId(spot.id)}`, locale),
+      withPilgrimageLocale(
+        `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
+        locale,
+      ),
     ),
     image: image
       ? /^https?:\/\//i.test(image)
@@ -31,6 +35,6 @@ export function toFilmingLocation(
     longitude: spot.lng,
     area: pickLocalizedText(spot.location, locale),
     anime: pickLocalizedText(spot.animeTitle, locale),
-    episode: spot.episodeContext,
+    episode: pickMaybeLocalizedText(spot.episodeContext, locale),
   };
 }

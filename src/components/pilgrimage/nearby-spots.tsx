@@ -4,14 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   animeTitle,
   anitabiUrlFromSpotId,
   googleMapsDirectionsUrl,
+  googleStreetViewUrl,
   loadNavCatalog,
+  localizedNavText,
   rankNearbySpots,
   type NavCatalog,
   type NearbySpot,
@@ -25,7 +27,7 @@ type Status =
   | "unavailable"
   | "error";
 
-export function NearbySpots({ locale }: { locale: AnimeLocale }) {
+export function NearbySpots({ locale }: { locale: PilgrimageLocale }) {
   const copy = getPilgrimageCopy(locale);
   const { ids } = useFavoriteAnime();
   const [status, setStatus] = useState<Status>("idle");
@@ -121,7 +123,7 @@ function SpotGroup({
   spots,
   animes,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   heading?: string;
   spots: NearbySpot[];
   animes: Parameters<typeof animeTitle>[0];
@@ -136,11 +138,11 @@ function SpotGroup({
       ) : null}
       <ol className="grid gap-2" data-testid="near-me-list">
         {spots.map((spot) => {
-          const href = withAnimeLocale(
+          const href = withPilgrimageLocale(
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           );
-          const title = spot.name[locale] || spot.name.en || spot.name.zh;
+          const title = localizedNavText(spot.name, locale);
           return (
             <li
               key={spot.id}
@@ -168,6 +170,14 @@ function SpotGroup({
                   className="anime-button px-3 py-2 text-xs"
                 >
                   {copy.navigate}
+                </a>
+                <a
+                  href={googleStreetViewUrl(spot.lat, spot.lng)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="anime-button-secondary px-3 py-2 text-xs"
+                >
+                  {copy.streetView}
                 </a>
                 <a
                   href={anitabiUrlFromSpotId(spot.id, spot.subjectId)}

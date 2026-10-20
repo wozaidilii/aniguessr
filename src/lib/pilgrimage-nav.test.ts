@@ -14,7 +14,9 @@ import {
   anitabiUrlFromSpotId,
   filterNavSpots,
   googleMapsDirectionsUrl,
+  googleStreetViewUrl,
   haversineKm,
+  localizedNavText,
   parseNavCatalog,
   rankNearbySpots,
   type NavSpot,
@@ -56,6 +58,29 @@ describe("pilgrimage navigation", () => {
   it("builds a Google Maps directions link without an API key", () => {
     expect(googleMapsDirectionsUrl(35.1, 139.2)).toBe(
       "https://www.google.com/maps/dir/?api=1&destination=35.1,139.2",
+    );
+  });
+
+  it("builds a Street View panorama link without an API key", () => {
+    expect(googleStreetViewUrl(35.2998, 139.4806)).toBe(
+      "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=35.2998,139.4806",
+    );
+    expect(googleStreetViewUrl(35.2998, 139.4806)).not.toMatch(/[?&]key=/);
+    expect(getPilgrimageCopy("ja").streetView).toBe("ストリートビュー");
+    expect(getPilgrimageCopy("zh").streetView).toBe("街景");
+    expect(getPilgrimageCopy("en").streetView).toBe("Street View");
+    expect(getPilgrimageCopy("zh-tw").streetView).toBe("街景服務");
+    expect(
+      localizedNavText(
+        { zh: "片濑", ja: "片瀬", en: "Katase", tw: "片瀨" },
+        "zh-tw",
+      ),
+    ).toBe("片瀨");
+  });
+
+  it("keeps the anitabi id embedded in a spot when favorites use the merged work", () => {
+    expect(anitabiUrlFromSpotId("anitabi_467930_abc", "240038")).toBe(
+      "https://anitabi.cn/map?bangumiId=467930&pid=abc",
     );
   });
 

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { fillAnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   PILGRIMAGE_MAP_STYLE,
@@ -13,7 +13,9 @@ import {
   anitabiUrlFromSpotId,
   filterNavSpots,
   googleMapsDirectionsUrl,
+  googleStreetViewUrl,
   loadNavCatalog,
+  localizedNavText,
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
@@ -31,7 +33,7 @@ export function PilgrimageMap({
   subjectId,
   locationSlug,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   subjectId?: string;
   locationSlug?: string;
 }) {
@@ -237,7 +239,7 @@ export function PilgrimageMap({
           id: spot.id,
           subjectId: spot.subjectId,
           fav: favoriteSet.has(spot.subjectId) ? 1 : 0,
-          name: spot.name[locale] || spot.name.en || spot.name.zh,
+          name: localizedNavText(spot.name, locale),
           anime: animeTitle(catalog.animes, spot.subjectId, locale),
         },
       })),
@@ -366,10 +368,25 @@ function boundsFor(spots: readonly NavSpot[]) {
   return count > 0 ? bounds : null;
 }
 
+function popupAction(href: string, label: string): HTMLAnchorElement {
+  const link = document.createElement("a");
+  link.href = href;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = label;
+  link.style.display = "inline-block";
+  link.style.fontWeight = "800";
+  link.style.color = "#0a0612";
+  link.style.background = "#f9a8d4";
+  link.style.borderRadius = "8px";
+  link.style.padding = "6px 10px";
+  return link;
+}
+
 function showSpotPopup(
   map: maplibregl.Map,
   popupRef: { current: maplibregl.Popup | null },
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   spot: {
     id: string;
     subjectId: string;
@@ -382,7 +399,7 @@ function showSpotPopup(
   const copy = getPilgrimageCopy(locale);
   const root = document.createElement("div");
   const title = document.createElement("a");
-  title.href = withAnimeLocale(
+  title.href = withPilgrimageLocale(
     `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
     locale,
   );
@@ -397,19 +414,16 @@ function showSpotPopup(
     meta.style.color = "rgba(252, 231, 243, 0.75)";
     root.append(meta);
   }
-  const navigate = document.createElement("a");
-  navigate.href = googleMapsDirectionsUrl(spot.lat, spot.lng);
-  navigate.target = "_blank";
-  navigate.rel = "noopener noreferrer";
-  navigate.textContent = copy.navigate;
-  navigate.style.display = "inline-block";
-  navigate.style.marginTop = "8px";
-  navigate.style.fontWeight = "800";
-  navigate.style.color = "#0a0612";
-  navigate.style.background = "#f9a8d4";
-  navigate.style.borderRadius = "8px";
-  navigate.style.padding = "6px 10px";
-  root.append(navigate);
+  const actions = document.createElement("div");
+  actions.style.display = "flex";
+  actions.style.flexWrap = "wrap";
+  actions.style.gap = "8px";
+  actions.style.marginTop = "8px";
+  actions.append(
+    popupAction(googleMapsDirectionsUrl(spot.lat, spot.lng), copy.navigate),
+    popupAction(googleStreetViewUrl(spot.lat, spot.lng), copy.streetView),
+  );
+  root.append(actions);
   fillAnitabiCredit(
     root,
     locale,

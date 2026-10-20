@@ -1,24 +1,27 @@
 import { type Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
-import { withAnimeLocale } from "~/lib/anime-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { isZhTwCoveredLocationSlug, type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
+import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
 import {
-  getLocationBySlug,
   listSpotsForLocation,
   pickLocalizedText,
+  resolveLocationSlug,
+  type PilgrimageLocationSummary,
 } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageShell,
   PilgrimageSpotList,
+  pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
 
@@ -33,21 +36,48 @@ export function generateStaticParams() {
   return [];
 }
 
+function redirectLocationSlug(
+  locale: PilgrimageLocale,
+  resolved: { location: PilgrimageLocationSummary; redirect: boolean },
+) {
+  if (!resolved.redirect) return;
+  permanentRedirect(
+    pilgrimageHref(`/pilgrimage/locations/${resolved.location.slug}`, locale),
+  );
+}
+
+function assertZhTwLocation(locale: PilgrimageLocale, slug: string) {
+  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(slug)) notFound();
+}
+
+function locationPageSeo(
+  locale: PilgrimageLocale,
+  location: PilgrimageLocationSummary,
+) {
+  const name = pickLocalizedText(location.name, locale);
+  return applyPilgrimageSeoOverride(
+    "location",
+    location.slug,
+    locale,
+    buildLocationPageSeo(locale, { name, count: location.spotCount }),
+  );
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: localeParam, slug } = await params;
   const locale = pilgrimageLocale(localeParam);
-  const location = getLocationBySlug(slug);
-  if (!location) return { title: "Not found" };
+  const resolved = resolveLocationSlug(slug);
+  if (!resolved) return { title: "Not found" };
+  redirectLocationSlug(locale, resolved);
+  assertZhTwLocation(locale, resolved.location.slug);
 
-  const seo = buildLocationPageSeo(locale, {
-    name: location.name,
-    count: location.spotCount,
-  });
-  return localizedPageMetadata(
+  const seo = locationPageSeo(locale, resolved.location);
+  return pilgrimagePageMetadata(
     locale,
-    `/pilgrimage/locations/${location.slug}`,
+    `/pilgrimage/locations/${resolved.location.slug}`,
     seo.title,
     seo.description,
+    isZhTwCoveredLocationSlug(resolved.location.slug),
   );
 }
 
@@ -55,25 +85,40 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const { locale: localeParam, slug } = await params;
   const locale = pilgrimageLocale(localeParam);
   const copy = getPilgrimageCopy(locale);
-  const location = getLocationBySlug(slug);
-  if (!location) notFound();
+  const resolved = resolveLocationSlug(slug);
+  if (!resolved) notFound();
+  redirectLocationSlug(locale, resolved);
+  assertZhTwLocation(locale, resolved.location.slug);
+  const location = resolved.location;
+  const name = pickLocalizedText(location.name, locale);
 
   const spots = listSpotsForLocation(location.slug).slice(0, 120);
-  const seo = buildLocationPageSeo(locale, {
-    name: location.name,
-    count: location.spotCount,
-  });
+  const seo = locationPageSeo(locale, location);
   const listed = spots.slice(0, 24);
+  const visibleTitle = copy.spotsInLocation(name, location.spotCount);
+  const visibleDescription = copy.seoLocationDescription(
+    name,
+    location.spotCount,
+  );
   const jsonLd = buildPlaceCollectionJsonLd({
-    name: location.name,
-    description: seo.description,
+    name: locale === "zh-tw" ? seo.title || visibleTitle : name,
+    description:
+      locale === "zh-tw"
+        ? seo.description || visibleDescription
+        : seo.description,
     url: absoluteUrl(
-      withAnimeLocale(`/pilgrimage/locations/${location.slug}`, locale),
+      pilgrimageHref(`/pilgrimage/locations/${location.slug}`, locale),
     ),
     latitude: listed[0]?.lat,
     longitude: listed[0]?.lng,
     places: listed.map((spot) =>
-      toFilmingLocation(spot, locale, seo.description),
+      toFilmingLocation(
+        spot,
+        locale,
+        locale === "zh-tw"
+          ? seo.description || visibleDescription
+          : seo.description,
+      ),
     ),
   });
 
@@ -81,11 +126,8 @@ export default async function PilgrimageLocationPage({ params }: Props) {
     <PilgrimageShell
       locale={locale}
       kicker={copy.locationArchive}
-      title={copy.spotsInLocation(location.name, location.spotCount)}
-      description={copy.seoLocationDescription(
-        location.name,
-        location.spotCount,
-      )}
+      title={visibleTitle}
+      description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
       <PilgrimageMapPanel locale={locale} locationSlug={location.slug} />
@@ -94,7 +136,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
         locale={locale}
         spots={spots.map((spot) => ({
           id: spot.id,
-          href: withAnimeLocale(
+          href: pilgrimageHref(
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           ),

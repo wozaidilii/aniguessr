@@ -22,6 +22,15 @@ export function slugifyAnime(subjectId: string, animeTitle: string): string {
   return suffix ? `${subjectId}-${suffix}` : `anime-${subjectId}`;
 }
 
+/**
+ * Dynamic params sometimes keep a percent-encoded CJK slug.
+ * Treat that as the same canonical slug so the page does not 308 to itself.
+ */
+export function animeSlugMatches(requested: string, canonical: string): boolean {
+  if (requested === canonical) return true;
+  return parseLocationSlug(requested) === canonical;
+}
+
 export function parseAnimeSlug(slug: string): string | null {
   const match = /^(\d+)(?:-.*)?$/u.exec(slug.trim());
   if (match?.[1]) return match[1];

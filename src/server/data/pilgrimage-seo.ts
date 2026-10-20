@@ -2,29 +2,48 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { ANIME_LOCALES, type AnimeLocale } from "~/lib/anime-locale";
+import { ANIME_LOCALES } from "~/lib/anime-locale";
+import {
+  isZhTwCoveredLocationSlug,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import {
   assignSpotSeoVariants,
   type SpotSeoFields,
   type SpotSeoVariant,
 } from "~/lib/pilgrimage-seo-meta";
 import {
+  pickLocalizedText,
+  pickMaybeLocalizedText,
+  type LocalizedLines,
+  type LocalizedText,
+} from "~/lib/localized-text";
+import {
   decodeSpotId,
   parseAnimeSlug,
   parseLocationSlug,
 } from "~/lib/pilgrimage-slug";
 
-export interface LocalizedText {
-  zh: string;
-  ja: string;
-  en: string;
+export type { LocalizedLines, LocalizedText };
+export { pickLocalizedText };
+
+export interface ZhTwAnimeEntry {
+  anime: PilgrimageAnimeSummary;
+  spotCount: number;
+}
+
+export interface ZhTwCatalog {
+  locations: PilgrimageLocationSummary[];
+  animes: ZhTwAnimeEntry[];
+  spotCount: number;
+  animeIds: Set<string>;
 }
 
 export interface PilgrimageAnimeSummary {
   subjectId: string;
+  subjectIds?: string[];
   slug: string;
-  animeTitle: string;
-  titles?: LocalizedText;
+  animeTitle: LocalizedText;
   spotCount: number;
   locationCount: number;
   years: number[];
@@ -32,7 +51,7 @@ export interface PilgrimageAnimeSummary {
 
 export interface PilgrimageLocationSummary {
   slug: string;
-  name: string;
+  name: LocalizedText;
   spotCount: number;
   animeCount: number;
 }
@@ -40,8 +59,10 @@ export interface PilgrimageLocationSummary {
 export interface PilgrimageSpot {
   id: string;
   subjectId: string;
+  workSubjectId?: string;
   subjectSlug: string;
   locationSlug: string;
+  redirectTo?: string | null;
   lat: number;
   lng: number;
   year: number | null;
@@ -55,8 +76,8 @@ export interface PilgrimageSpot {
   location: LocalizedText;
   answerName: LocalizedText;
   aspect: string | null;
-  episodeContext: string | null;
-  funfact: string[];
+  episodeContext: LocalizedText | string | null;
+  funfact: LocalizedLines | string[];
 }
 
 export interface PilgrimageSeoIndex {
@@ -67,6 +88,7 @@ export interface PilgrimageSeoIndex {
   locationCount: number;
   animes: PilgrimageAnimeSummary[];
   locations: PilgrimageLocationSummary[];
+  locationRedirects?: Record<string, string>;
   spotIds: string[];
   spots: Record<string, PilgrimageSpot>;
 }
@@ -101,20 +123,16 @@ export function getPilgrimageSeoIndex(): PilgrimageSeoIndex | null {
   }
 }
 
-export function pickLocalizedText(
-  text: LocalizedText | undefined,
-  locale: AnimeLocale,
-): string {
-  if (!text) return "";
-  return text[locale] || text.en || text.zh || text.ja || "";
-}
-
 export function getAnimeBySlug(slug: string): PilgrimageAnimeSummary | null {
   const index = getPilgrimageSeoIndex();
   if (!index) return null;
   const subjectId = parseAnimeSlug(slug);
   if (subjectId) {
-    return index.animes.find((item) => item.subjectId === subjectId) ?? null;
+    const match = index.animes.find(
+      (item) =>
+        item.subjectId === subjectId || item.subjectIds?.includes(subjectId),
+    );
+    if (match) return match;
   }
   return index.animes.find((item) => item.slug === slug) ?? null;
 }
@@ -122,13 +140,35 @@ export function getAnimeBySlug(slug: string): PilgrimageAnimeSummary | null {
 export function getLocationBySlug(
   slug: string,
 ): PilgrimageLocationSummary | null {
+  return resolveLocationSlug(slug)?.location ?? null;
+}
+
+/** Current location, plus whether this slug should 301 to `location.slug`. */
+export function resolveLocationSlug(slug: string): {
+  location: PilgrimageLocationSummary;
+  redirect: boolean;
+} | null {
   const index = getPilgrimageSeoIndex();
   if (!index) return null;
-  return (
-    index.locations.find((item) => item.slug === slug) ??
-    index.locations.find((item) => item.name === parseLocationSlug(slug)) ??
-    null
-  );
+  const decoded = parseLocationSlug(slug);
+  const direct =
+    index.locations.find(
+      (item) => item.slug === slug || item.slug === decoded,
+    ) ?? null;
+  if (direct) {
+    return {
+      location: direct,
+      redirect: slug !== direct.slug && decoded !== direct.slug,
+    };
+  }
+  const target =
+    index.locationRedirects?.[slug] ??
+    index.locationRedirects?.[decoded] ??
+    index.locationRedirects?.[encodeURIComponent(decoded)];
+  if (!target) return null;
+  const location = index.locations.find((item) => item.slug === target);
+  if (!location) return null;
+  return { location, redirect: true };
 }
 
 export function getSpotById(encodedId: string): PilgrimageSpot | null {
@@ -145,8 +185,8 @@ export function listSpotsForAnime(subjectId: string): PilgrimageSpot[] {
   return index.spotIds
     .map((id) => index.spots[id])
     .filter((spot): spot is PilgrimageSpot => {
-      if (!spot) return false;
-      return spot.subjectId === subjectId;
+      if (!spot || spot.redirectTo) return false;
+      return spot.workSubjectId === subjectId || spot.subjectId === subjectId;
     });
 }
 
@@ -157,9 +197,10 @@ export function listSpotsForLocation(locationSlug: string): PilgrimageSpot[] {
   return index.spotIds
     .map((id) => index.spots[id])
     .filter((spot): spot is PilgrimageSpot => {
-      if (!spot) return false;
+      if (!spot || spot.redirectTo) return false;
       return (
         spot.locationSlug === locationSlug ||
+        spot.locationSlug === decodedName ||
         pickLocalizedText(spot.location, "zh") === decodedName
       );
     });
@@ -167,25 +208,35 @@ export function listSpotsForLocation(locationSlug: string): PilgrimageSpot[] {
 
 let spotVariantCache: Map<string, SpotSeoVariant> | null = null;
 let ambiguousAnimeTitles: Set<string> | null = null;
+let zhTwCatalog: ZhTwCatalog | null = null;
 
-function spotFields(spot: PilgrimageSpot, locale: AnimeLocale): SpotSeoFields {
+function spotFields(
+  spot: PilgrimageSpot,
+  locale: PilgrimageLocale,
+): SpotSeoFields {
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
     place: pickLocalizedText(spot.answerName, locale),
     area: pickLocalizedText(spot.location, locale),
-    episode: spot.episodeContext ?? "",
+    episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),
   };
 }
 
+const SEO_LOCALES: readonly PilgrimageLocale[] = [...ANIME_LOCALES, "zh-tw"];
+
 function ensureSpotVariantCache(index: PilgrimageSeoIndex) {
   if (spotVariantCache) return;
   const cache = new Map<string, SpotSeoVariant>();
-  for (const locale of ANIME_LOCALES) {
+  for (const locale of SEO_LOCALES) {
     const fields = index.spotIds.flatMap((id) => {
       const spot = index.spots[id];
-      return spot ? [spotFields(spot, locale)] : [];
+      if (!spot) return [];
+      if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(spot.locationSlug)) {
+        return [];
+      }
+      return [spotFields(spot, locale)];
     });
     for (const [id, variant] of assignSpotSeoVariants(fields)) {
       cache.set(`${locale}:${id}`, variant);
@@ -194,9 +245,48 @@ function ensureSpotVariantCache(index: PilgrimageSeoIndex) {
   spotVariantCache = cache;
 }
 
+export function getZhTwCatalog(): ZhTwCatalog | null {
+  const index = getPilgrimageSeoIndex();
+  if (!index) return null;
+  if (zhTwCatalog) return zhTwCatalog;
+  const counts = new Map<string, number>();
+  let spotCount = 0;
+  for (const id of index.spotIds) {
+    const spot = index.spots[id];
+    if (!spot || spot.redirectTo) continue;
+    if (!isZhTwCoveredLocationSlug(spot.locationSlug)) continue;
+    spotCount += 1;
+    const subjectId = spot.workSubjectId ?? spot.subjectId;
+    counts.set(subjectId, (counts.get(subjectId) ?? 0) + 1);
+  }
+  const animes = index.animes.flatMap((anime) => {
+    const count = counts.get(anime.subjectId) ?? 0;
+    return count > 0 ? [{ anime, spotCount: count }] : [];
+  });
+  zhTwCatalog = {
+    locations: index.locations.filter((location) =>
+      isZhTwCoveredLocationSlug(location.slug),
+    ),
+    animes,
+    spotCount,
+    animeIds: new Set(animes.map((entry) => entry.anime.subjectId)),
+  };
+  return zhTwCatalog;
+}
+
+export function animeHasZhTwPage(subjectId: string): boolean {
+  return getZhTwCatalog()?.animeIds.has(subjectId) ?? false;
+}
+
+export function listZhTwSpotsForAnime(subjectId: string): PilgrimageSpot[] {
+  return listSpotsForAnime(subjectId).filter((spot) =>
+    isZhTwCoveredLocationSlug(spot.locationSlug),
+  );
+}
+
 export function getSpotSeoVariant(
   spot: PilgrimageSpot,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
 ): SpotSeoVariant {
   const index = getPilgrimageSeoIndex();
   if (!index) return "base";
@@ -210,7 +300,15 @@ export function animeTitleIsAmbiguous(title: string): boolean {
   if (!ambiguousAnimeTitles) {
     const counts = new Map<string, number>();
     for (const anime of index.animes) {
-      counts.set(anime.animeTitle, (counts.get(anime.animeTitle) ?? 0) + 1);
+      for (const title of [
+        anime.animeTitle.zh,
+        anime.animeTitle.ja,
+        anime.animeTitle.en,
+        anime.animeTitle.tw,
+      ]) {
+        if (!title) continue;
+        counts.set(title, (counts.get(title) ?? 0) + 1);
+      }
     }
     ambiguousAnimeTitles = new Set(
       [...counts.entries()]

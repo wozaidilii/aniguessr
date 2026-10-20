@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 const PilgrimageMap = dynamic(
   () =>
@@ -23,7 +23,7 @@ export function PilgrimageMapLoader({
   subjectId,
   locationSlug,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   subjectId?: string;
   locationSlug?: string;
 }) {

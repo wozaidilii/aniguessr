@@ -29,10 +29,10 @@ describe("sitemap entries", () => {
     }
   });
 
-  it("splits files into about 5,000 URLs so each ISR body stays under 20 MB", () => {
-    expect(SITEMAP_URL_LIMIT).toBe(5_000);
+  it("splits files at 2,000 URLs so a response stays under the 4.5 MB limit", () => {
+    expect(SITEMAP_URL_LIMIT).toBe(2_000);
     expect(SITEMAP_PATHS_PER_FILE * 3).toBeLessThanOrEqual(SITEMAP_URL_LIMIT);
-    expect(SITEMAP_PATHS_PER_FILE * 3).toBeGreaterThan(4_000);
+    expect(SITEMAP_PATHS_PER_FILE * 3).toBeGreaterThan(1_500);
     expect(sitemapFileCount(1)).toBe(1);
     expect(sitemapFileCount(SITEMAP_PATHS_PER_FILE + 1)).toBe(2);
   });

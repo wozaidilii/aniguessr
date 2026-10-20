@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { anitabiSourceUrl, CC_BY_NC_SA_4_URL } from "~/lib/pilgrimage-nav";
 
@@ -10,7 +10,7 @@ export function AnitabiCredit({
   sourceUrl,
   className,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   sourceUrl?: string | null;
   className?: string;
 }) {
@@ -55,7 +55,7 @@ function externalLink(label: string, href: string, license = false) {
 /** Popup caption. Uses text nodes so spot names cannot inject markup. */
 export function fillAnitabiCredit(
   parent: HTMLElement,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   sourceUrl?: string | null,
 ) {
   const copy = getPilgrimageCopy(locale);
