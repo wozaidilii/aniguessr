@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildAnimePageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
@@ -42,7 +42,7 @@ function redirectMergedAnime(
   slug: string,
   anime: PilgrimageAnimeSummary,
 ) {
-  if (slug === anime.slug) return;
+  if (animeSlugMatches(slug, anime.slug)) return;
   permanentRedirect(pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale));
 }
 

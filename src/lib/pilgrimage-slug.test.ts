@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  animeSlugMatches,
   parseAnimeSlug,
   parseLocationSlug,
   slugifyAnime,
@@ -18,6 +19,15 @@ describe("pilgrimage-slug", () => {
     expect(parseAnimeSlug("51-clannad")).toBe("51");
     expect(parseAnimeSlug("anime-999")).toBe("999");
     expect(parseAnimeSlug("invalid")).toBeNull();
+  });
+
+  it("treats a percent-encoded CJK slug as the canonical anime slug", () => {
+    const canonical = slugifyAnime("328609", "孤独摇滚");
+    expect(animeSlugMatches(canonical, canonical)).toBe(true);
+    expect(animeSlugMatches(encodeURIComponent(canonical), canonical)).toBe(
+      true,
+    );
+    expect(animeSlugMatches("328609-other", canonical)).toBe(false);
   });
 
   it("地点 slug 往返", () => {
