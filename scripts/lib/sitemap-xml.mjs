@@ -51,11 +51,17 @@ export function buildSitemapIndexXml(urls) {
   return `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</sitemapindex>`;
 }
 
+/**
+ * @param {{ zhTw?: boolean }} [options]
+ * zhTw adds /zh-tw plus hreflang zh-Hant and zh-TW on every locale of this path.
+ * Leave it false for pages that have no Traditional version.
+ */
 export function buildLocalizedSitemapEntries(
   origin,
   path,
   priority,
   lastModified,
+  options = {},
 ) {
   const languages = Object.fromEntries(
     ANIME_LOCALES.map((locale) => [
@@ -64,13 +70,66 @@ export function buildLocalizedSitemapEntries(
     ]),
   );
   languages["x-default"] = `${origin}${withLocale(path, DEFAULT_LOCALE)}`;
-  return ANIME_LOCALES.map((locale) => ({
+  const locales = [...ANIME_LOCALES];
+  if (options.zhTw) {
+    const zhTwUrl = `${origin}${withLocale(path, "zh-tw")}`;
+    languages["zh-Hant"] = zhTwUrl;
+    languages["zh-TW"] = zhTwUrl;
+    locales.push("zh-tw");
+  }
+  return locales.map((locale) => ({
     loc: `${origin}${withLocale(path, locale)}`,
     lastModified,
     changefreq: "weekly",
     priority,
     languages,
   }));
+}
+
+/** A document that exists only in zh-TW. Not an alternate of the zh/ja/en page. */
+export function buildZhTwOnlySitemapEntries(
+  origin,
+  path,
+  priority,
+  lastModified,
+) {
+  const loc = `${origin}${withLocale(path, "zh-tw")}`;
+  return [
+    {
+      loc,
+      lastModified,
+      changefreq: "weekly",
+      priority,
+      languages: {
+        "zh-Hant": loc,
+        "zh-TW": loc,
+      },
+    },
+  ];
+}
+
+export function sitemapEntryCount(item) {
+  if (item.zhTwOnly) return 1;
+  return item.zhTw ? ANIME_LOCALES.length + 1 : ANIME_LOCALES.length;
+}
+
+/** Chunk by URL count so a covered path's extra zh-TW URL cannot push a file over the cap. */
+export function chunkSitemapPaths(items, limit = SITEMAP_URL_LIMIT) {
+  const chunks = [];
+  let current = [];
+  let count = 0;
+  for (const item of items) {
+    const size = sitemapEntryCount(item);
+    if (current.length > 0 && count + size > limit) {
+      chunks.push(current);
+      current = [];
+      count = 0;
+    }
+    current.push(item);
+    count += size;
+  }
+  if (current.length > 0 || chunks.length === 0) chunks.push(current);
+  return chunks;
 }
 
 export function buildUrlSetXml(entries) {

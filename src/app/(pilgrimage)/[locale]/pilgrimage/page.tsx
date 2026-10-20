@@ -1,17 +1,21 @@
 import { type Metadata } from "next";
 import Link from "next/link";
-import { withAnimeLocale } from "~/lib/anime-locale";
+import { FavoritePicker } from "~/components/pilgrimage/favorite-picker";
+import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
+import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
+import { ZH_TW_AREA_COPY, getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
-import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { localizedPageMetadata } from "~/lib/seo";
+import { localizedPageMetadata, zhTwOnlyPageMetadata } from "~/lib/seo";
 import {
   getPilgrimageSeoIndex,
+  getZhTwCatalog,
   pickLocalizedText,
 } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
   PilgrimageShell,
+  pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
 
@@ -24,6 +28,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: localeParam } = await params;
   const locale = pilgrimageLocale(localeParam);
+  if (locale === "zh-tw") {
+    return zhTwOnlyPageMetadata(
+      "/pilgrimage",
+      ZH_TW_AREA_COPY.title,
+      ZH_TW_AREA_COPY.description,
+    );
+  }
   const index = getPilgrimageSeoIndex();
   const seo = buildPilgrimageHubSeo(locale, {
     spotCount: index?.spotCount ?? 0,
@@ -61,39 +72,64 @@ export default async function PilgrimageHubPage({
     );
   }
 
-  const topAnime = index.animes.slice(0, 12);
-  const topLocations = index.locations.slice(0, 12);
+  const zhTw = locale === "zh-tw" ? getZhTwCatalog() : null;
+  const topAnime = zhTw
+    ? zhTw.animes.slice(0, 12)
+    : index.animes.slice(0, 12).map((anime) => ({ anime, spotCount: anime.spotCount }));
+  const topLocations = zhTw
+    ? zhTw.locations.slice(0, 12)
+    : index.locations.slice(0, 12);
+  const spotCount = zhTw ? zhTw.spotCount : index.spotCount;
+  const animeCount = zhTw ? zhTw.animes.length : index.animeCount;
+  const locationCount = zhTw ? zhTw.locations.length : index.locationCount;
 
   return (
     <PilgrimageShell
       locale={locale}
       kicker={copy.siteKicker}
-      title={copy.hubTitle}
-      description={copy.hubDescription}
+      title={zhTw ? ZH_TW_AREA_COPY.title : copy.hubTitle}
+      description={zhTw ? ZH_TW_AREA_COPY.description : copy.hubDescription}
     >
       <section className="mb-10 grid gap-4 sm:grid-cols-3">
-        <StatCard label={copy.spotCountLabel(index.spotCount)} />
-        <StatCard label={copy.animeCountLabel(index.animeCount)} />
-        <StatCard label={copy.locationCountLabel(index.locationCount)} />
+        <StatCard label={copy.spotCountLabel(spotCount)} />
+        <StatCard label={copy.animeCountLabel(animeCount)} />
+        <StatCard label={copy.locationCountLabel(locationCount)} />
       </section>
+
+      <PilgrimageMapPanel locale={locale} />
+      <NearbySpots locale={locale} />
+      <FavoritePicker
+        locale={locale}
+        animes={index.animes.map((anime) => ({
+          id: anime.subjectId,
+          slug: anime.slug,
+          title:
+            locale === "zh-tw"
+              ? pickLocalizedText(anime.animeTitle, locale) ||
+                anime.animeTitle.ja ||
+                anime.animeTitle.en
+              : pickLocalizedText(anime.animeTitle, locale),
+          spotCount: anime.spotCount,
+        }))}
+      />
 
       <section className="mb-10">
         <div className="mb-4 flex items-end justify-between gap-3">
           <h2 className="text-xl font-black text-white">{copy.animeArchive}</h2>
           <Link
-            href={withAnimeLocale("/pilgrimage/anime", locale)}
+            href={pilgrimageHref("/pilgrimage/anime", locale)}
             className="text-sm font-bold text-cyan-100/80 hover:text-cyan-50"
           >
             {copy.backAnime} →
           </Link>
         </div>
         <PilgrimageCardGrid>
-          {topAnime.map((anime) => (
+          {topAnime.map(({ anime, spotCount: count }) => (
             <PilgrimageCard
               key={anime.subjectId}
-              href={withAnimeLocale(`/pilgrimage/anime/${anime.slug}`, locale)}
+              href={pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale)}
               title={pickLocalizedText(anime.animeTitle, locale)}
-              meta={copy.spotCountLabel(anime.spotCount)}
+              meta={copy.spotCountLabel(count)}
             />
           ))}
         </PilgrimageCardGrid>
@@ -105,7 +141,7 @@ export default async function PilgrimageHubPage({
             {copy.locationArchive}
           </h2>
           <Link
-            href={withAnimeLocale("/pilgrimage/locations", locale)}
+            href={pilgrimageHref("/pilgrimage/locations", locale)}
             className="text-sm font-bold text-cyan-100/80 hover:text-cyan-50"
           >
             {copy.backLocation} →
@@ -115,7 +151,7 @@ export default async function PilgrimageHubPage({
           {topLocations.map((location) => (
             <PilgrimageCard
               key={location.slug}
-              href={withAnimeLocale(
+              href={pilgrimageHref(
                 `/pilgrimage/locations/${location.slug}`,
                 locale,
               )}

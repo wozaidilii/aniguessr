@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 
 import { rootFontClassName } from "~/app/fonts";
+import { RegisterServiceWorker } from "~/components/RegisterServiceWorker";
 import { CampaignAnalytics } from "~/components/CampaignAnalytics";
 import { PostHogRouteTracker } from "~/components/PostHogRouteTracker";
 import { PostHogScript } from "~/components/PostHogScript";
@@ -28,6 +29,7 @@ export function RootDocument({
         </TRPCReactProvider>
         <Analytics />
         <SpeedInsights />
+        <RegisterServiceWorker />
       </body>
     </html>
   );

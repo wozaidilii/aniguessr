@@ -6,6 +6,10 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import {
+  withPilgrimageLocale,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { resolveSiteUrl } from "~/lib/site-url";
 
 /** Canonical origin from NEXT_PUBLIC_SITE_URL, otherwise the production default. */
@@ -52,6 +56,73 @@ export function localizedPageMetadata(
     alternates: {
       canonical,
       languages: localeAlternates(path),
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+    },
+  };
+}
+
+/**
+ * Pilgrimage hreflang. zh-Hant and zh-TW are added only when that URL has a
+ * Traditional page. Other pilgrimage URLs keep zh/ja/en/x-default.
+ */
+export function pilgrimagePageMetadata(
+  locale: PilgrimageLocale,
+  path: string,
+  title: string,
+  description: string,
+  includeZhTw: boolean,
+): Metadata {
+  const canonical = withPilgrimageLocale(path, locale);
+  const languages: Record<string, string> = localeAlternates(path);
+  if (includeZhTw) {
+    const zhTwUrl = absoluteUrl(withPilgrimageLocale(path, "zh-tw"));
+    languages["zh-Hant"] = zhTwUrl;
+    languages["zh-TW"] = zhTwUrl;
+  }
+  const metadata: Metadata = {
+    alternates: {
+      canonical,
+      languages,
+    },
+    openGraph: {
+      url: canonical,
+    },
+  };
+  if (title.trim()) {
+    metadata.title = { absolute: title };
+    metadata.openGraph = { ...metadata.openGraph, title };
+  }
+  if (description.trim()) {
+    metadata.description = description;
+    metadata.openGraph = { ...metadata.openGraph, description };
+  }
+  return metadata;
+}
+
+/**
+ * A zh-TW-only document, such as the Kamakura/Enoshima index.
+ * It is not an alternate of the full zh/ja/en hub.
+ */
+export function zhTwOnlyPageMetadata(
+  path: string,
+  title: string,
+  description: string,
+): Metadata {
+  const canonical = withPilgrimageLocale(path, "zh-tw");
+  const url = absoluteUrl(canonical);
+  return {
+    title: { absolute: title },
+    description,
+    alternates: {
+      canonical,
+      languages: {
+        "zh-Hant": url,
+        "zh-TW": url,
+      },
     },
     openGraph: {
       title,

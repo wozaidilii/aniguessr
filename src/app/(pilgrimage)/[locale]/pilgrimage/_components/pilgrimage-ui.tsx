@@ -1,16 +1,31 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandLockup } from "~/components/brand/BrandLockup";
-import {
-  isAnimeLocale,
-  withAnimeLocale,
-  type AnimeLocale,
-} from "~/lib/anime-locale";
+import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
+import { withAnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import {
+  isPilgrimageLocale,
+  pilgrimageSiteLocale,
+  withPilgrimageLocale,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 
-export function pilgrimageLocale(value: string): AnimeLocale {
-  if (!isAnimeLocale(value)) notFound();
+export function pilgrimageLocale(value: string): PilgrimageLocale {
+  if (!isPilgrimageLocale(value)) notFound();
   return value;
+}
+
+export function pilgrimageHref(path: string, locale: PilgrimageLocale): string {
+  return withPilgrimageLocale(path, locale);
+}
+
+/** Home and the game stay on zh/ja/en. /zh-tw does not have those routes. */
+export function pilgrimageSiteHref(
+  path: string,
+  locale: PilgrimageLocale,
+): string {
+  return withAnimeLocale(path, pilgrimageSiteLocale(locale));
 }
 
 export function PilgrimageShell({
@@ -20,16 +35,16 @@ export function PilgrimageShell({
   description,
   children,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   kicker: string;
   title: string;
   description?: string;
   children: React.ReactNode;
 }) {
   const copy = getPilgrimageCopy(locale);
-  const homeUrl = withAnimeLocale("/", locale);
-  const hubUrl = withAnimeLocale("/pilgrimage", locale);
-  const playUrl = withAnimeLocale("/game/anime", locale);
+  const homeUrl = pilgrimageSiteHref("/", locale);
+  const hubUrl = pilgrimageHref("/pilgrimage", locale);
+  const playUrl = pilgrimageSiteHref("/game/anime", locale);
 
   return (
     <main className="anime-shell min-h-screen text-white">
@@ -62,7 +77,7 @@ export function PilgrimageShell({
           ) : null}
         </header>
 
-        {children}
+        <PilgrimageFavoritesProvider>{children}</PilgrimageFavoritesProvider>
       </div>
     </main>
   );
@@ -102,7 +117,7 @@ export function PilgrimageSpotList({
   locale,
   spots,
 }: {
-  locale: AnimeLocale;
+  locale: PilgrimageLocale;
   spots: Array<{
     id: string;
     href: string;

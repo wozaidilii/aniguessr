@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { type RenderedSeo } from "~/lib/pilgrimage-seo-meta";
 import { BRAND_NAME } from "~/lib/site-url";
 
@@ -11,11 +11,15 @@ export interface SeoOverride {
  * Optional metadata overrides keyed by the public slug.
  * Anime slugs stay `{subjectId}-{suffix}` (`/pilgrimage/anime/{slug}`).
  * Location slugs are `{city}-{prefecture}` from the geocoder.
- * Leave a locale blank to keep the generated template.
+ * Spot keys are spot ids.
+ * Leave en, ja, or zh blank to keep the generated template.
+ * zh-TW document titles and descriptions come only from this map.
+ * A missing or blank zh-TW entry stays empty until copy is supplied.
  */
 export const PILGRIMAGE_SEO_OVERRIDES: {
-  anime: Record<string, Partial<Record<AnimeLocale, SeoOverride>>>;
-  location: Record<string, Partial<Record<AnimeLocale, SeoOverride>>>;
+  anime: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
+  location: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
+  spot: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
 } = {
   anime: {},
   location: {
@@ -37,15 +41,22 @@ export const PILGRIMAGE_SEO_OVERRIDES: {
       },
     },
   },
+  spot: {},
 };
 
 export function applyPilgrimageSeoOverride(
-  kind: "anime" | "location",
+  kind: "anime" | "location" | "spot",
   slug: string,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   seo: RenderedSeo,
 ): RenderedSeo {
   const entry = PILGRIMAGE_SEO_OVERRIDES[kind][slug]?.[locale];
+  if (locale === "zh-tw") {
+    return {
+      title: nonempty(entry?.title) ?? "",
+      description: nonempty(entry?.description) ?? "",
+    };
+  }
   if (!entry) return seo;
   return {
     title: nonempty(entry.title) ?? seo.title,

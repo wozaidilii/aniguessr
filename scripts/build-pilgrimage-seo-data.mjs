@@ -12,13 +12,18 @@ import {
   localizedField,
   localizedList,
 } from "./lib/pilgrimage-group.mjs";
+import { zhTwAnimeTitle } from "./lib/zh-tw-anime-title.mjs";
+import { reviewCsv, reviewRow } from "./lib/zh-tw-review.mjs";
+import { toZhTw } from "./lib/zh-tw.mjs";
+import zhTwCoverage from "../src/lib/zh-tw-coverage.json" with { type: "json" };
 import {
-  SITEMAP_PATHS_PER_FILE,
   buildLocalizedSitemapEntries,
   buildSitemapIndexXml,
   buildUrlSetXml,
+  buildZhTwOnlySitemapEntries,
+  chunkSitemapPaths,
   resolveSiteOrigin,
-  sitemapFileCount,
+  sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 
 const SOURCE_PATH = path.join(
@@ -30,6 +35,7 @@ const AREA_PATH = path.join(
   "scripts/data/japan-municipalities.json",
 );
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/seo");
+const NAV_PATH = path.join(OUTPUT_DIR, "spots-nav.json");
 const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
 
 const PUBLIC_ROUTES = [
@@ -497,6 +503,114 @@ async function main() {
     locationRedirects[oldLocation] = target;
   }
 
+  const zhTwLocationSlugs = new Set(zhTwCoverage.locationSlugs);
+  const zhTwAnimeIds = new Set();
+  let zhTwSpotCount = 0;
+  /** @type {ReturnType<typeof reviewRow>[]} */
+  const reviewRows = [];
+
+  const attachTw = (record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    record.tw = toZhTw(record.zh ?? "");
+  };
+  const attachTwLines = (record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    record.tw = (record.zh ?? []).map((line) => toZhTw(line));
+  };
+  const remember = (kind, id, field, source, zh, zhTw) => {
+    const left = zh ?? "";
+    const right = zhTw ?? "";
+    if (!left && !right) return;
+    reviewRows.push(
+      reviewRow({ kind, id, field, source, zh: left, zhTw: right }),
+    );
+  };
+  const rememberField = (kind, id, field, record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    remember(kind, id, field, "opencc", record.zh ?? "", record.tw ?? "");
+  };
+  const rememberLines = (kind, id, field, record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    const zhLines = Array.isArray(record.zh) ? record.zh : [];
+    const twLines = Array.isArray(record.tw) ? record.tw : [];
+    const count = Math.max(zhLines.length, twLines.length);
+    for (let index = 0; index < count; index += 1) {
+      remember(
+        kind,
+        id,
+        `${field}[${index}]`,
+        "opencc",
+        zhLines[index] ?? "",
+        twLines[index] ?? "",
+      );
+    }
+  };
+
+  for (const spot of Object.values(spots)) {
+    if (!zhTwLocationSlugs.has(spot.locationSlug) || spot.redirectTo) continue;
+    zhTwSpotCount += 1;
+    zhTwAnimeIds.add(spot.workSubjectId);
+    attachTw(spot.title);
+    attachTw(spot.description);
+    attachTw(spot.location);
+    attachTw(spot.answerName);
+    if (spot.episodeContext && typeof spot.episodeContext === "object") {
+      attachTw(spot.episodeContext);
+    }
+    attachTwLines(spot.funfact);
+    const chosen = zhTwAnimeTitle(
+      [spot.workSubjectId, spot.subjectId],
+      spot.animeTitle,
+    );
+    spot.animeTitle.tw = chosen.text;
+    rememberField("spot", spot.id, "title", spot.title);
+    rememberField("spot", spot.id, "description", spot.description);
+    rememberField("spot", spot.id, "answerName", spot.answerName);
+    rememberField("spot", spot.id, "location", spot.location);
+    rememberField("spot", spot.id, "episodeContext", spot.episodeContext);
+    rememberLines("spot", spot.id, "funfact", spot.funfact);
+    remember(
+      "spot",
+      spot.id,
+      "animeTitle",
+      chosen.source,
+      spot.animeTitle?.zh ?? "",
+      chosen.text,
+    );
+  }
+  for (const anime of animes) {
+    if (!zhTwAnimeIds.has(anime.subjectId)) continue;
+    const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
+    anime.animeTitle.tw = chosen.text;
+    remember(
+      "anime",
+      anime.subjectId,
+      "animeTitle",
+      chosen.source,
+      anime.animeTitle?.zh ?? "",
+      chosen.text,
+    );
+  }
+  for (const location of locations) {
+    if (!zhTwLocationSlugs.has(location.slug)) continue;
+    attachTw(location.name);
+    rememberField("location", location.slug, "name", location.name);
+  }
+  reviewRows.sort(
+    (a, b) =>
+      a.kind.localeCompare(b.kind) ||
+      String(a.id).localeCompare(String(b.id)) ||
+      a.field.localeCompare(b.field),
+  );
+  const zhTwReview = {
+    rows: reviewRows.length,
+    flagged: reviewRows.filter((row) => row.flagged === "yes").length,
+  };
+
+  const zhTwAnimeSlugs = animes
+    .filter((anime) => zhTwAnimeIds.has(anime.subjectId))
+    .map((anime) => anime.slug);
+
   const spotIds = Object.keys(spots).sort();
   for (const spot of Object.values(spots)) {
     delete spot.oldLocation;
@@ -536,44 +650,79 @@ async function main() {
     animes,
     locations,
     locationRedirects,
+    zhTw: {
+      locationSlugs: [...zhTwLocationSlugs],
+      animeSlugs: zhTwAnimeSlugs,
+      spotCount: zhTwSpotCount,
+      animeCount: zhTwAnimeSlugs.length,
+      review: zhTwReview,
+    },
     spotIds,
     spots,
   };
 
   const canonicalPaths = [
     ...PUBLIC_ROUTES.map(([route, priority]) => ({ path: route, priority })),
+    {
+      path: "/pilgrimage",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
+    {
+      path: "/pilgrimage/anime",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
+    {
+      path: "/pilgrimage/locations",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
   ];
   for (const anime of animes) {
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,
       priority: 0.75,
+      zhTw: zhTwAnimeIds.has(anime.subjectId),
     });
   }
   for (const location of locations) {
     canonicalPaths.push({
       path: `/pilgrimage/locations/${location.slug}`,
       priority: 0.7,
+      zhTw: zhTwLocationSlugs.has(location.slug),
     });
   }
   for (const spot of visibleSpots) {
     canonicalPaths.push({
       path: `/pilgrimage/spots/${encodeURIComponent(spot.id)}`,
       priority: 0.6,
+      zhTw: zhTwLocationSlugs.has(spot.locationSlug),
     });
   }
 
   const origin = resolveSiteOrigin();
   const lastModified = generatedAt.slice(0, 10);
-  const fileCount = sitemapFileCount(canonicalPaths.length);
+  const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
   const sitemapUrls = [];
-  for (let file = 0; file < fileCount; file += 1) {
-    const chunk = canonicalPaths.slice(
-      file * SITEMAP_PATHS_PER_FILE,
-      (file + 1) * SITEMAP_PATHS_PER_FILE,
-    );
-    const entries = chunk.flatMap(({ path: route, priority }) =>
-      buildLocalizedSitemapEntries(origin, route, priority, lastModified),
+  for (let file = 0; file < sitemapChunks.length; file += 1) {
+    const chunk = sitemapChunks[file];
+    const entries = chunk.flatMap((item) =>
+      item.zhTwOnly
+        ? buildZhTwOnlySitemapEntries(
+            origin,
+            item.path,
+            item.priority,
+            lastModified,
+          )
+        : buildLocalizedSitemapEntries(
+            origin,
+            item.path,
+            item.priority,
+            lastModified,
+            { zhTw: Boolean(item.zhTw) },
+          ),
     );
     const xml = buildUrlSetXml(entries);
     await writeFile(path.join(SITEMAP_DIR, `${file}.xml`), xml);
@@ -614,10 +763,14 @@ async function main() {
     locations: locations.length,
     locationRedirects: Object.keys(locationRedirects).length,
     sitemap: {
-      files: fileCount,
+      files: sitemapChunks.length,
       paths: canonicalPaths.length,
-      urls: canonicalPaths.length * 3,
+      urls: canonicalPaths.reduce(
+        (sum, item) => sum + sitemapEntryCount(item),
+        0,
+      ),
     },
+    zhTw: output.zhTw,
     redirects: {
       animeSubjects: Object.keys(redirectMap.animeBySubjectId).length,
       locations: Object.keys(redirectMap.locations).length,
@@ -625,8 +778,42 @@ async function main() {
     },
   };
 
+  const nav = {
+    version: 1,
+    animes: Object.fromEntries(
+      animes.map((anime) => {
+        const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
+        return [
+          anime.subjectId,
+          [
+            anime.animeTitle?.zh ?? "",
+            anime.animeTitle?.ja ?? "",
+            anime.animeTitle?.en ?? "",
+            chosen.text,
+          ],
+        ];
+      }),
+    ),
+    spots: visibleSpots.map((spot) => [
+      spot.id,
+      spot.workSubjectId || spot.subjectId,
+      spot.locationSlug,
+      Math.round(spot.lat * 1e6) / 1e6,
+      Math.round(spot.lng * 1e6) / 1e6,
+      spot.answerName?.zh ?? "",
+      spot.answerName?.ja ?? "",
+      spot.answerName?.en ?? "",
+      toZhTw(spot.answerName?.zh ?? ""),
+    ]),
+  };
+
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(path.join(OUTPUT_DIR, "index.json"), JSON.stringify(output));
+  await writeFile(NAV_PATH, JSON.stringify(nav));
+  await writeFile(
+    path.join(OUTPUT_DIR, "zh-tw-review.csv"),
+    reviewCsv(reviewRows),
+  );
   await writeFile(
     path.join(OUTPUT_DIR, "build-report.json"),
     JSON.stringify(report, null, 2),
@@ -643,6 +830,7 @@ async function main() {
         duplicates: report.duplicates,
         buta: report.anime.buta,
         sitemap: report.sitemap,
+        zhTw: report.zhTw,
         mergedGroupCount: report.anime.mergedGroups,
       },
       null,

@@ -9,6 +9,7 @@ import {
 } from "~/lib/anime-locale";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
+import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { pilgrimageRedirectPath } from "~/lib/pilgrimage-redirects";
 import { legacyHostRedirectUrl } from "~/lib/site-url";
 
@@ -100,6 +101,27 @@ export function middleware(request: NextRequest) {
   // Static XML from the data build. This does not look at User-Agent.
   const sitemapRewrite = rewriteStaticSitemap(request);
   if (sitemapRewrite) return sitemapRewrite;
+
+  // /zh-tw is pilgrimage-only. Do not 307 it onto /en/zh-tw, and do not
+  // Set-Cookie: partial Traditional coverage must stay CDN-cacheable.
+  const zhTw = splitLocalePath(request.nextUrl.pathname);
+  if (zhTw.locale === "zh-tw") {
+    if (isLocalePrefixedPilgrimagePath(request.nextUrl.pathname)) {
+      const seoRedirect = pilgrimageRedirectPath(
+        request.nextUrl.pathname,
+        "zh-tw",
+      );
+      if (seoRedirect) {
+        const url = request.nextUrl.clone();
+        const parsed = new URL(seoRedirect, request.url);
+        url.pathname = parsed.pathname;
+        url.search = parsed.search;
+        url.hash = parsed.hash;
+        return NextResponse.redirect(url, 301);
+      }
+    }
+    return NextResponse.next();
+  }
 
   const { locale: pathLocale, pathname: innerPath } = parseLocaleFromPathname(
     request.nextUrl.pathname,

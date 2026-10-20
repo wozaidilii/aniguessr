@@ -34,4 +34,22 @@ describe("pilgrimage SEO overrides", () => {
       ),
     ).toEqual(generated);
   });
+
+  it("keeps zh-TW titles empty until the override map is filled", () => {
+    const template = { title: "TEMPLATE", description: "TEMPLATE" };
+    expect(
+      applyPilgrimageSeoOverride(
+        "location",
+        "fujisawa-kanagawa",
+        "zh-tw",
+        template,
+      ),
+    ).toEqual({ title: "", description: "" });
+    expect(
+      applyPilgrimageSeoOverride("anime", "240038-example", "zh-tw", template),
+    ).toEqual({ title: "", description: "" });
+    expect(
+      applyPilgrimageSeoOverride("spot", "anitabi_1", "zh-tw", template),
+    ).toEqual({ title: "", description: "" });
+  });
 });

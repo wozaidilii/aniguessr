@@ -2,13 +2,26 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
+import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
+import {
+  googleMapsDirectionsUrl,
+  googleStreetViewUrl,
+} from "~/lib/pilgrimage-nav";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
-import { pickLocalizedLines, pickLocalizedText } from "~/lib/localized-text";
+import {
+  pickLocalizedLines,
+  pickLocalizedText,
+  pickMaybeLocalizedText,
+} from "~/lib/localized-text";
+import {
+  isZhTwCoveredLocationSlug,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
+import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
 import {
   getSpotById,
@@ -17,7 +30,9 @@ import {
 } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageShell,
+  pilgrimageHref,
   pilgrimageLocale,
+  pilgrimageSiteHref,
 } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
 
 interface Props {
@@ -33,29 +48,43 @@ export function generateStaticParams() {
 
 function spotSeoFields(
   spot: PilgrimageSpot,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
 ): SpotSeoFields {
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
     place: pickLocalizedText(spot.answerName, locale),
     area: pickLocalizedText(spot.location, locale),
-    episode:
-      typeof spot.episodeContext === "string"
-        ? spot.episodeContext
-        : pickLocalizedText(spot.episodeContext, locale),
+    episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),
   };
 }
 
-function redirectDuplicateSpot(locale: AnimeLocale, spot: PilgrimageSpot) {
+function redirectDuplicateSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   if (!spot.redirectTo || spot.redirectTo === spot.id) return;
   permanentRedirect(
-    withAnimeLocale(
-      `/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`,
-      locale,
-    ),
+    pilgrimageHref(`/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`, locale),
   );
+}
+
+function assertZhTwSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
+  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(spot.locationSlug)) {
+    notFound();
+  }
+}
+
+function spotPageSeo(
+  locale: PilgrimageLocale,
+  spot: PilgrimageSpot,
+  fields: SpotSeoFields,
+) {
+  if (locale === "zh-tw") {
+    return applyPilgrimageSeoOverride("spot", spot.id, "zh-tw", {
+      title: "",
+      description: "",
+    });
+  }
+  return buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
 }
 
 function absoluteAssetUrl(url: string | undefined): string | null {
@@ -69,16 +98,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const spot = getSpotById(id);
   if (!spot) return { title: "Not found" };
   redirectDuplicateSpot(locale, spot);
+  assertZhTwSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);
-  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  const seo = spotPageSeo(locale, spot, fields);
   const path = `/pilgrimage/spots/${id}`;
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
-  const metadata = localizedPageMetadata(
+  const metadata = pilgrimagePageMetadata(
     locale,
     path,
     seo.title,
     seo.description,
+    isZhTwCoveredLocationSlug(spot.locationSlug),
   );
 
   return {
@@ -97,26 +128,30 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const spot = getSpotById(id);
   if (!spot) notFound();
   redirectDuplicateSpot(locale, spot);
+  assertZhTwSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
   const place = pickLocalizedText(spot.answerName, locale);
   const location = pickLocalizedText(spot.location, locale);
   const title = pickLocalizedText(spot.title, locale);
   const description = pickLocalizedText(spot.description, locale);
-  const episode =
-    typeof spot.episodeContext === "string"
-      ? spot.episodeContext
-      : pickLocalizedText(spot.episodeContext, locale);
+  const episode = pickMaybeLocalizedText(spot.episodeContext, locale);
   const facts = pickLocalizedLines(spot.funfact, locale);
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
+  const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
+  const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
 
   const fields = spotSeoFields(spot, locale);
-  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  const seo = spotPageSeo(locale, spot, fields);
+  const visibleDescription = pickLocalizedText(spot.description, locale);
   const jsonLd = buildTouristAttractionJsonLd({
     name: fields.place,
-    description: pickLocalizedText(spot.description, locale) || seo.description,
-    url: absoluteUrl(withAnimeLocale(`/pilgrimage/spots/${spot.id}`, locale)),
+    description:
+      locale === "zh-tw"
+        ? seo.description || visibleDescription
+        : visibleDescription || seo.description,
+    url: absoluteUrl(pilgrimageHref(`/pilgrimage/spots/${spot.id}`, locale)),
     image: absoluteAssetUrl(imageUrl),
     latitude: spot.lat,
     longitude: spot.lng,
@@ -137,13 +172,24 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="anime-panel p-5 sm:p-6">
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={title}
-              className="mb-5 aspect-video w-full rounded-xl border border-white/10 object-cover"
+            <figure className="mb-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={title}
+                className="aspect-video w-full rounded-xl border border-white/10 object-cover"
+              />
+              <figcaption className="mt-2">
+                <AnitabiCredit locale={locale} sourceUrl={spot.sourceUrl} />
+              </figcaption>
+            </figure>
+          ) : (
+            <AnitabiCredit
+              locale={locale}
+              sourceUrl={spot.sourceUrl}
+              className="mb-5"
             />
-          ) : null}
+          )}
 
           <h2 className="text-lg font-black text-pink-100">{title}</h2>
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
@@ -186,7 +232,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               </dt>
               <dd className="mt-1 font-black text-white">
                 <Link
-                  href={withAnimeLocale(
+                  href={pilgrimageHref(
                     `/pilgrimage/anime/${spot.subjectSlug}`,
                     locale,
                   )}
@@ -202,7 +248,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               </dt>
               <dd className="mt-1 font-black text-white">
                 <Link
-                  href={withAnimeLocale(
+                  href={pilgrimageHref(
                     `/pilgrimage/locations/${spot.locationSlug}`,
                     locale,
                   )}
@@ -229,11 +275,29 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           </dl>
 
           <div className="mt-5 grid gap-2">
+            <div className="flex gap-2">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="anime-button flex-1 text-center text-sm"
+              >
+                {copy.navigate}
+              </a>
+              <a
+                href={streetViewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="anime-button-secondary flex-1 text-center text-sm"
+              >
+                {copy.streetView}
+              </a>
+            </div>
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button block text-center text-sm"
+              className="anime-button-secondary block text-center text-sm"
             >
               {copy.openMaps}
             </a>
@@ -248,7 +312,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               </a>
             ) : null}
             <Link
-              href={withAnimeLocale("/game/anime", locale)}
+              href={pilgrimageSiteHref("/game/anime", locale)}
               className="block text-center text-xs font-bold text-cyan-100/70 hover:text-cyan-50"
             >
               {copy.playGame}

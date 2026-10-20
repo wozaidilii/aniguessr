@@ -1,8 +1,8 @@
 import {
-  parseLocaleFromPathname,
-  withAnimeLocale,
-  type AnimeLocale,
-} from "~/lib/anime-locale";
+  splitLocalePath,
+  withPilgrimageLocale,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import {
   decodeSpotId,
   parseAnimeSlug,
@@ -45,10 +45,12 @@ function safeDecode(value: string): string {
  */
 export function pilgrimageRedirectPath(
   pathname: string,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   map: PilgrimageRedirectMap = PILGRIMAGE_REDIRECT_MAP,
 ): string | null {
-  const { pathname: inner } = parseLocaleFromPathname(pathname);
+  const split = splitLocalePath(pathname);
+  const inner = split.pathname;
+  const targetLocale = split.locale ?? locale;
 
   const anime = /^\/pilgrimage\/anime\/([^/]+)$/u.exec(inner);
   if (anime?.[1]) {
@@ -56,7 +58,7 @@ export function pilgrimageRedirectPath(
     const subjectId = parseAnimeSlug(slug);
     const target = subjectId ? map.animeBySubjectId[subjectId] : undefined;
     if (!target || target === slug) return null;
-    return withAnimeLocale(`/pilgrimage/anime/${target}`, locale);
+    return withPilgrimageLocale(`/pilgrimage/anime/${target}`, targetLocale);
   }
 
   const location = /^\/pilgrimage\/locations\/([^/]+)$/u.exec(inner);
@@ -64,7 +66,10 @@ export function pilgrimageRedirectPath(
     const slug = parseLocationSlug(location[1]);
     const target = map.locations[slug] ?? map.locations[location[1]];
     if (!target || target === slug) return null;
-    return withAnimeLocale(`/pilgrimage/locations/${target}`, locale);
+    return withPilgrimageLocale(
+      `/pilgrimage/locations/${target}`,
+      targetLocale,
+    );
   }
 
   const spot = /^\/pilgrimage\/spots\/([^/]+)$/u.exec(inner);
@@ -72,9 +77,9 @@ export function pilgrimageRedirectPath(
     const id = decodeSpotId(spot[1]);
     const target = map.spots[id];
     if (!target || target === id) return null;
-    return withAnimeLocale(
+    return withPilgrimageLocale(
       `/pilgrimage/spots/${encodeURIComponent(target)}`,
-      locale,
+      targetLocale,
     );
   }
 

@@ -9,8 +9,10 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${SITE_NAME} · Anime Street-View Guessing`,
     short_name: SITE_NAME,
     description:
-      "Read the anime clue, interrogate the real street view, and pin the location on the world map.",
+      "Guess anime locations from Street View, then open the pilgrimage map and navigate real filming spots in Japan.",
+    id: "/",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#0a0612",
     theme_color: "#0a0612",
