@@ -8,6 +8,7 @@ import {
   type AnimeLocale,
 } from "~/lib/anime-locale";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
+import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
 import { legacyHostRedirectUrl } from "~/lib/site-url";
 
 /** 根据 Cookie 与 Accept-Language 推断首选语言。 */
@@ -93,6 +94,12 @@ export function middleware(request: NextRequest) {
 
   const legacyRedirect = redirectLegacyLangParam(request);
   if (legacyRedirect) return legacyRedirect;
+
+  // Locale is already in the path. Rewriting or Set-Cookie would make Vercel
+  // skip the CDN cache for these ISR pages.
+  if (isLocalePrefixedPilgrimagePath(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
 
   const { locale: pathLocale, pathname: innerPath } = parseLocaleFromPathname(
     request.nextUrl.pathname,

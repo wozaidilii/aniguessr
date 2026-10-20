@@ -37,7 +37,7 @@ Questions to answer:
 #### 1. Scope / Trigger
 
 - Trigger: adding or changing passive browser telemetry providers rendered at the app root, such as Vercel Web Analytics, Vercel Speed Insights, or PostHog capture bootstrapping.
-- Applies to `src/app/layout.tsx`, telemetry provider components under `src/components/`, `package.json`, and package lockfiles.
+- Applies to the root layouts `src/app/(site)/layout.tsx` and `src/app/(pilgrimage)/[locale]/layout.tsx` (both render `RootDocument`), telemetry provider components under `src/components/`, `package.json`, and package lockfiles.
 
 #### 2. Signatures
 
@@ -75,7 +75,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 #### 5. Good/Base/Bad Cases
 
-- Good: add the provider package, import its root component in `src/app/layout.tsx`, preserve existing PostHog components, then run check/test/build.
+- Good: add the provider package, import its root component in `src/app/root-document.tsx` so both root layouts mount it, preserve existing PostHog components, then run check/test/build.
 - Base: install one passive provider and verify the app layout still compiles.
 - Bad: merge an old provider PR branch directly when it reverts unrelated recent app changes, or remove existing tracking while adding a second provider.
 
@@ -117,7 +117,7 @@ Correct:
 #### 1. Scope / Trigger
 
 - Trigger: adding or changing the browser tab icon, app icon, touch icon, or social/site favicon assets.
-- Applies to `src/app/layout.tsx`, `public/favicon.ico`, `public/icon-*.png`, `public/apple-touch-icon.png`, and any future Next App Router icon metadata files.
+- Applies to `src/app/(site)/layout.tsx`, `src/app/(pilgrimage)/[locale]/layout.tsx`, `public/favicon.ico`, `public/icon-*.png`, `public/apple-touch-icon.png`, and any future Next App Router icon metadata files.
 
 #### 2. Signatures
 

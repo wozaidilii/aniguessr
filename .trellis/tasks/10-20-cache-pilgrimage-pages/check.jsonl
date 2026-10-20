@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Confirm telemetry still mounts from both root layouts"}
+{"file": ".trellis/spec/lessons.md", "reason": "Confirm pilgrimage routes do not call headers or cookies during render"}

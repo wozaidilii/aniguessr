@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Both root layouts must keep passive telemetry via RootDocument"}
+{"file": ".trellis/spec/lessons.md", "reason": "Pilgrimage HTML cannot read headers or Set-Cookie if it should stay CDN-cached"}

@@ -1,3 +1,10 @@
+## Pilgrimage HTML must not depend on request headers or Set-Cookie
+
+- 问题：搜索引擎抓取数千个 `/pilgrimage/spots/...`（以及 `/ja` `/zh` `/en` 前缀）时，每个 URL 都触发一次动态 SSR，Hobby 计划的函数调用被打满。
+- 根因：根 layout 和巡礼页用 `headers()` 读 `x-anime-locale`，middleware 又把语言前缀 rewrite 掉并 `Set-Cookie`。动态函数让页面无法 ISR；Vercel CDN 不缓存带 `Set-Cookie` 的响应。
+- 修复：巡礼路由放到独立根 layout，语言来自 `[locale]` 路径段；middleware 对这些 URL 不再 rewrite、不写 cookie。页面 `revalidate = 86400`，详情页 `generateStaticParams` 返回空数组，首次访问生成后由 CDN 缓存。语言 cookie 改到浏览器里写。
+- 预防：可缓存的公开页不要在服务端读 `headers()` / `cookies()`，middleware 也不要给这些响应 `Set-Cookie`。用户态放到客户端。
+
 ## 百度全景检索异常需要降级
 
 - 问题：百度地图全景脚本加载后，`PanoramaService` 构造或 `getPanoramaByLocation` 调用仍可能同步抛出第三方脚本内部异常，导致图寻随机点位生成直接失败。
