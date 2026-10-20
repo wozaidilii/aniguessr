@@ -1,6 +1,5 @@
 import type { AnimeLocale } from "~/lib/anime-locale";
 
-export const COMPANY_PROFILE_URL = "https://www.ayiora.com/company";
 export const COMPANY_SITE_URL = "https://www.ayiora.com";
 export const CONTACT_GENERAL_EMAIL = "aniguessr@ayiora.com";
 export const CONTACT_SUPPORT_EMAIL = "support@ayiora.com";
@@ -58,11 +57,7 @@ export interface HomeCopy {
   contactGeneralHint: string;
   contactSupportTitle: string;
   contactSupportHint: string;
-  contactCompanyTitle: string;
-  contactCompanyHint: string;
-  contactCompanyCta: string;
   footerBlurb: string;
-  footerCompany: string;
   footerBack: string;
   footerGame: string;
   footerBrand: string;
@@ -148,16 +143,12 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     contactGeneralHint: "作品・自治体・観光関連のコラボレーションなど",
     contactSupportTitle: "不具合・バグ報告",
     contactSupportHint: "表示の不具合、障害、問題の誤りなど",
-    contactCompanyTitle: "運営会社",
-    contactCompanyHint: "定園株式会社（Ayiora）",
-    contactCompanyCta: "会社概要を見る",
     footerBlurb:
-      "AniGuessr by Ayiora は定園株式会社（Ayiora）が運営しています。作品・画像の権利は各権利者に帰属します。",
-    footerCompany: "運営会社：定園株式会社",
+      "AniGuessr by Ayiora。作品・画像の権利は各権利者に帰属します。",
     footerBack: "www.ayiora.com へ",
     footerGame: "Game",
     footerBrand: "Ayiora",
-    footerCopy: "© 2026 定園株式会社",
+    footerCopy: "© 2026 Ayiora",
     profileTitle: "プレイヤー",
     username: "ユーザー名",
     country: "地域",
@@ -235,16 +226,11 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     contactGeneralHint: "作品、地方和旅游相关的合作",
     contactSupportTitle: "问题与故障",
     contactSupportHint: "显示异常、服务中断、题目错误",
-    contactCompanyTitle: "运营公司",
-    contactCompanyHint: "定園株式会社（Ayiora）",
-    contactCompanyCta: "查看公司简介",
-    footerBlurb:
-      "AniGuessr by Ayiora 由定園株式会社（Ayiora）运营。作品与图像的权利归各权利人所有。",
-    footerCompany: "运营公司：定園株式会社",
+    footerBlurb: "AniGuessr by Ayiora。作品与图像的权利归各权利人所有。",
     footerBack: "前往 www.ayiora.com",
     footerGame: "Game",
     footerBrand: "Ayiora",
-    footerCopy: "© 2026 定園株式会社",
+    footerCopy: "© 2026 Ayiora",
     profileTitle: "玩家资料",
     username: "用户名",
     country: "地区",
@@ -324,16 +310,12 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     contactGeneralHint: "Studios, cities, and tourism collaborations",
     contactSupportTitle: "Bugs and outages",
     contactSupportHint: "Display issues, downtime, and wrong answers",
-    contactCompanyTitle: "Company",
-    contactCompanyHint: "定園株式会社 (Ayiora)",
-    contactCompanyCta: "Company profile",
     footerBlurb:
-      "AniGuessr by Ayiora is operated by 定園株式会社 (Ayiora). Artwork and images belong to their respective rights holders.",
-    footerCompany: "Operating company: 定園株式会社",
+      "AniGuessr by Ayiora. Artwork and images belong to their respective rights holders.",
     footerBack: "www.ayiora.com",
     footerGame: "Game",
     footerBrand: "Ayiora",
-    footerCopy: "© 2026 定園株式会社",
+    footerCopy: "© 2026 Ayiora",
     profileTitle: "Player profile",
     username: "Username",
     country: "Region",

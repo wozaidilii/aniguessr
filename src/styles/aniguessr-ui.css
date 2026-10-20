@@ -707,7 +707,7 @@
 
 .ag-contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-top: 40px;
 }
@@ -760,20 +760,11 @@
   line-height: 1.9;
 }
 
-.ag-ftr-company {
-  display: inline-flex;
-  margin-top: 14px;
-  color: var(--ag-tx);
-  font-weight: 700;
-  text-decoration: none;
-}
-
 .ag-ftr-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-top: 16px;
-  margin-left: 16px;
   color: var(--ag-pink);
   font-weight: 700;
   text-decoration: none;

@@ -10,7 +10,6 @@ import { SiteHeader } from "~/components/brand/SiteHeader";
 import { HomeStructuredData } from "~/components/HomeStructuredData";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
 import {
-  COMPANY_PROFILE_URL,
   CONTACT_GENERAL_EMAIL,
   CONTACT_SUPPORT_EMAIL,
   HOME_COPY,
@@ -612,13 +611,6 @@ export default function Home() {
               <h3>{copy.contactSupportTitle}</h3>
               <p>{copy.contactSupportHint}</p>
               <b>{CONTACT_SUPPORT_EMAIL}</b>
-            </a>
-            <a className="ag-contact-card" href={COMPANY_PROFILE_URL}>
-              <h3>{copy.contactCompanyTitle}</h3>
-              <p>{copy.contactCompanyHint}</p>
-              <b>
-                {copy.contactCompanyCta} <ArrowIcon />
-              </b>
             </a>
           </div>
         </div>

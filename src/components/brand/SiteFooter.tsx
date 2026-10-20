@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { ArrowIcon } from "~/components/brand/ArrowIcon";
 import { BrandLockup } from "~/components/brand/BrandLockup";
-import {
-  COMPANY_PROFILE_URL,
-  COMPANY_SITE_URL,
-  HOME_COPY,
-} from "~/lib/aniguessr-copy";
+import { COMPANY_SITE_URL, HOME_COPY } from "~/lib/aniguessr-copy";
 import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 
 export function SiteFooter({ locale }: { locale: AnimeLocale }) {
@@ -21,9 +17,6 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
           <div>
             <BrandLockup href={homeHref} />
             <p className="ag-ftr-blurb">{copy.footerBlurb}</p>
-            <a className="ag-ftr-company" href={COMPANY_PROFILE_URL}>
-              {copy.footerCompany}
-            </a>
             <a className="ag-ftr-back" href={COMPANY_SITE_URL}>
               {copy.footerBack} <ArrowIcon />
             </a>
@@ -49,9 +42,6 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
             <div>
               <h2>{copy.footerBrand}</h2>
               <ul>
-                <li>
-                  <a href={COMPANY_PROFILE_URL}>{copy.contactCompanyCta}</a>
-                </li>
                 <li>
                   <Link href={`${homeHref}#contact`}>{copy.navContact}</Link>
                 </li>
