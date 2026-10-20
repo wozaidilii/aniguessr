@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { ZH_TW_AREA_COPY, getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildAnimeIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { localizedPageMetadata, zhTwOnlyPageMetadata } from "~/lib/seo";
@@ -83,6 +84,7 @@ export default async function PilgrimageAnimeIndexPage({
           ))}
         </PilgrimageCardGrid>
       )}
+      <AnitabiCredit locale={locale} className="mt-6" />
     </PilgrimageShell>
   );
 }

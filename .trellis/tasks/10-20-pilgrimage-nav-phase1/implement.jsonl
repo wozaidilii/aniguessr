@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Map SDK, image, and pilgrimage cache contracts"}
+{"file": ".trellis/spec/lessons.md", "reason": "Pilgrimage HTML must not depend on headers or Set-Cookie"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Favorites stay client-side while pages stay static"}
+{"file": ".trellis/tasks/10-20-pilgrimage-nav-phase1/prd.md", "reason": "Phase 1 scope, attribution, and cache rules"}
+{"file": ".trellis/tasks/10-20-pilgrimage-nav-phase1/research/nav-approach.md", "reason": "Catalog shape, map style, and deferred account sync"}

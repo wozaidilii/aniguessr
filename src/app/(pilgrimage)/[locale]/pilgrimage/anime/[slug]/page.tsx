@@ -1,8 +1,12 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
+import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
+import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
+import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
+import { anitabiAnimeUrl } from "~/lib/pilgrimage-nav";
+import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildAnimePageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
@@ -131,6 +135,12 @@ export default async function PilgrimageAnimePage({ params }: Props) {
       description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
+      <PilgrimageMapPanel
+        locale={locale}
+        subjectId={anime.subjectId}
+        sourceUrl={anitabiAnimeUrl(anime.subjectId)}
+      />
+      <NearbySpots locale={locale} />
       <PilgrimageSpotList
         locale={locale}
         spots={spots.map((spot) => ({
@@ -148,6 +158,11 @@ export default async function PilgrimageAnimePage({ params }: Props) {
           {spots.length} / {anime.spotCount} spots listed
         </p>
       ) : null}
+      <AnitabiCredit
+        locale={locale}
+        sourceUrl={anitabiAnimeUrl(anime.subjectId)}
+        className="mt-4"
+      />
     </PilgrimageShell>
   );
 }

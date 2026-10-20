@@ -2,6 +2,11 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
+import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
+import {
+  googleMapsDirectionsUrl,
+  googleStreetViewUrl,
+} from "~/lib/pilgrimage-nav";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
 import {
   pickLocalizedLines,
@@ -134,6 +139,8 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const facts = pickLocalizedLines(spot.funfact, locale);
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
+  const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
+  const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -165,13 +172,24 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="anime-panel p-5 sm:p-6">
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={title}
-              className="mb-5 aspect-video w-full rounded-xl border border-white/10 object-cover"
+            <figure className="mb-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={title}
+                className="aspect-video w-full rounded-xl border border-white/10 object-cover"
+              />
+              <figcaption className="mt-2">
+                <AnitabiCredit locale={locale} sourceUrl={spot.sourceUrl} />
+              </figcaption>
+            </figure>
+          ) : (
+            <AnitabiCredit
+              locale={locale}
+              sourceUrl={spot.sourceUrl}
+              className="mb-5"
             />
-          ) : null}
+          )}
 
           <h2 className="text-lg font-black text-pink-100">{title}</h2>
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
@@ -257,11 +275,29 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           </dl>
 
           <div className="mt-5 grid gap-2">
+            <div className="flex gap-2">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="anime-button flex-1 text-center text-sm"
+              >
+                {copy.navigate}
+              </a>
+              <a
+                href={streetViewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="anime-button-secondary flex-1 text-center text-sm"
+              >
+                {copy.streetView}
+              </a>
+            </div>
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button block text-center text-sm"
+              className="anime-button-secondary block text-center text-sm"
             >
               {copy.openMaps}
             </a>

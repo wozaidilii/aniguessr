@@ -35,6 +35,7 @@ const AREA_PATH = path.join(
   "scripts/data/japan-municipalities.json",
 );
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/seo");
+const NAV_PATH = path.join(OUTPUT_DIR, "spots-nav.json");
 const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
 
 const PUBLIC_ROUTES = [
@@ -777,8 +778,38 @@ async function main() {
     },
   };
 
+  const nav = {
+    version: 1,
+    animes: Object.fromEntries(
+      animes.map((anime) => {
+        const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
+        return [
+          anime.subjectId,
+          [
+            anime.animeTitle?.zh ?? "",
+            anime.animeTitle?.ja ?? "",
+            anime.animeTitle?.en ?? "",
+            chosen.text,
+          ],
+        ];
+      }),
+    ),
+    spots: visibleSpots.map((spot) => [
+      spot.id,
+      spot.workSubjectId || spot.subjectId,
+      spot.locationSlug,
+      Math.round(spot.lat * 1e6) / 1e6,
+      Math.round(spot.lng * 1e6) / 1e6,
+      spot.answerName?.zh ?? "",
+      spot.answerName?.ja ?? "",
+      spot.answerName?.en ?? "",
+      toZhTw(spot.answerName?.zh ?? ""),
+    ]),
+  };
+
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(path.join(OUTPUT_DIR, "index.json"), JSON.stringify(output));
+  await writeFile(NAV_PATH, JSON.stringify(nav));
   await writeFile(
     path.join(OUTPUT_DIR, "zh-tw-review.csv"),
     reviewCsv(reviewRows),

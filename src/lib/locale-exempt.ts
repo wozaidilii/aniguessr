@@ -4,7 +4,7 @@
  * to `/en/robots.txt`. Metadata routes such as `/sitemap.xml` then 404.
  */
 const LOCALE_EXEMPT_PATH =
-  /^\/(?:api|data|images|backgrounds|characters|sitemaps)(?:\/|$)|^\/_next\/|^\/(?:favicon\.ico|robots\.txt|sitemap\.xml|sitemap-index|manifest\.webmanifest|og\.png|apple-touch-icon(?:\.png)?|icon-192(?:\.png)?|icon-512(?:\.png)?)$|^\/sitemap\//;
+  /^\/(?:api|data|images|backgrounds|characters|sitemaps)(?:\/|$)|^\/_next\/|^\/(?:favicon\.ico|robots\.txt|sitemap\.xml|sitemap-index|manifest\.webmanifest|sw\.js|og\.png|apple-touch-icon(?:\.png)?|icon-192(?:\.png)?|icon-512(?:\.png)?)$|^\/sitemap\//;
 
 export function shouldBypassLocale(pathname: string): boolean {
   return LOCALE_EXEMPT_PATH.test(pathname);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import {
@@ -76,7 +77,7 @@ export function PilgrimageShell({
           ) : null}
         </header>
 
-        {children}
+        <PilgrimageFavoritesProvider>{children}</PilgrimageFavoritesProvider>
       </div>
     </main>
   );

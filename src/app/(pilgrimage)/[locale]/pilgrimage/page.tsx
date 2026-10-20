@@ -1,5 +1,8 @@
 import { type Metadata } from "next";
 import Link from "next/link";
+import { FavoritePicker } from "~/components/pilgrimage/favorite-picker";
+import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
+import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { ZH_TW_AREA_COPY, getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
 import { localizedPageMetadata, zhTwOnlyPageMetadata } from "~/lib/seo";
@@ -92,6 +95,23 @@ export default async function PilgrimageHubPage({
         <StatCard label={copy.animeCountLabel(animeCount)} />
         <StatCard label={copy.locationCountLabel(locationCount)} />
       </section>
+
+      <PilgrimageMapPanel locale={locale} />
+      <NearbySpots locale={locale} />
+      <FavoritePicker
+        locale={locale}
+        animes={index.animes.map((anime) => ({
+          id: anime.subjectId,
+          slug: anime.slug,
+          title:
+            locale === "zh-tw"
+              ? pickLocalizedText(anime.animeTitle, locale) ||
+                anime.animeTitle.ja ||
+                anime.animeTitle.en
+              : pickLocalizedText(anime.animeTitle, locale),
+          spotCount: anime.spotCount,
+        }))}
+      />
 
       <section className="mb-10">
         <div className="mb-4 flex items-end justify-between gap-3">
