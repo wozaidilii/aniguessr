@@ -19,6 +19,7 @@ describe("locale middleware exemptions", () => {
       "/sitemap-index",
       "/sitemap/0.xml",
       "/manifest.webmanifest",
+      "/sw.js",
       "/favicon.ico",
       "/og.png",
       "/apple-touch-icon.png",

@@ -24,6 +24,7 @@ export interface PilgrimageAnimeSummary {
   subjectId: string;
   slug: string;
   animeTitle: string;
+  titles?: LocalizedText;
   spotCount: number;
   locationCount: number;
   years: number[];

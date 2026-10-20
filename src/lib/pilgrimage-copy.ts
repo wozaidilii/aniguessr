@@ -29,11 +29,43 @@ export const PILGRIMAGE_COPY: Record<
     emptyIndex: string;
     viewSpot: string;
     seoSpotTitle: (anime: string, place: string) => string;
-    seoSpotDescription: (anime: string, place: string, location: string) => string;
+    seoSpotDescription: (
+      anime: string,
+      place: string,
+      location: string,
+    ) => string;
     seoAnimeTitle: (title: string, count: number) => string;
     seoAnimeDescription: (title: string, count: number) => string;
     seoLocationTitle: (name: string, count: number) => string;
     seoLocationDescription: (name: string, count: number) => string;
+    favoritesTitle: string;
+    favoritesHint: string;
+    favoritesSearch: string;
+    favoritesNone: string;
+    favoritesCount: (count: number) => string;
+    favoritesClear: string;
+    favoritesEmpty: string;
+    editFavorites: string;
+    mapTitle: string;
+    mapLoading: string;
+    mapUnavailable: string;
+    mapShowFavorites: string;
+    mapShowAll: string;
+    mapEmpty: string;
+    nearMeTitle: string;
+    nearMeHint: string;
+    nearMeAction: string;
+    nearMeLocating: string;
+    nearMeDenied: string;
+    nearMeUnavailable: string;
+    nearMeEmpty: string;
+    nearMeFavorites: string;
+    nearMeOthers: string;
+    navigate: string;
+    favoriteBadge: string;
+    creditLead: string;
+    creditRights: string;
+    formatDistance: (km: number) => string;
   }
 > = {
   zh: {
@@ -72,6 +104,36 @@ export const PILGRIMAGE_COPY: Record<
     seoLocationTitle: (name, count) => `${name} 动画圣地巡礼（${count} 处）`,
     seoLocationDescription: (name, count) =>
       `${name} 共收录 ${count} 处日本动画取景地，按作品分类，适合规划圣地巡礼路线。`,
+    favoritesTitle: "想去的番剧",
+    favoritesHint:
+      "勾选想巡礼的作品。选择保存在这台设备上，无需登录。页面内容对所有访客相同。",
+    favoritesSearch: "搜索番剧",
+    favoritesNone: "尚未选择，地图会显示全部取景地",
+    favoritesCount: (count) => `已选 ${count.toLocaleString()} 部`,
+    favoritesClear: "清除选择",
+    favoritesEmpty: "没有匹配的番剧",
+    editFavorites: "选择番剧",
+    mapTitle: "巡礼地图",
+    mapLoading: "正在加载地图…",
+    mapUnavailable: "地图暂时无法加载",
+    mapShowFavorites: "只看想去的番剧",
+    mapShowAll: "显示全部",
+    mapEmpty: "当前筛选没有取景地",
+    nearMeTitle: "附近的圣地",
+    nearMeHint:
+      "使用浏览器定位，在这台设备上计算距离，不会把位置发送到服务器。",
+    nearMeAction: "查找附近",
+    nearMeLocating: "正在定位…",
+    nearMeDenied: "无法获取位置。请在浏览器中允许定位，或继续用地图浏览。",
+    nearMeUnavailable: "这部浏览器不支持定位。",
+    nearMeEmpty: "附近没有取景地",
+    nearMeFavorites: "想去的番剧",
+    nearMeOthers: "其他取景地",
+    navigate: "导航",
+    favoriteBadge: "想去",
+    creditLead: "数据与图片来自",
+    creditRights: "动画截图 © 各自权利人。",
+    formatDistance: (km) => formatDistanceLabel(km, "zh"),
   },
   ja: {
     siteKicker: "聖地巡礼アーカイブ",
@@ -98,17 +160,50 @@ export const PILGRIMAGE_COPY: Record<
     openAnitabi: "Anitabi で見る",
     relatedAnime: "作品",
     relatedLocation: "地域",
-    emptyIndex: "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
+    emptyIndex:
+      "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
     viewSpot: "詳細を見る",
     seoSpotTitle: (anime, place) => `${anime} 聖地：${place}`,
     seoSpotDescription: (anime, place, location) =>
       `『${anime}』の撮影地「${place}」（${location}）。座標・シーン説明・巡礼ガイド。AniGuessr ストリートビューで検証できます。`,
-    seoAnimeTitle: (title, count) => `『${title}』聖地巡礼リスト（${count} 件）`,
+    seoAnimeTitle: (title, count) =>
+      `『${title}』聖地巡礼リスト（${count} 件）`,
     seoAnimeDescription: (title, count) =>
       `『${title}』の日本国内ロケ地 ${count} 件を整理。場所名・シーン手がかり・地図座標付き。`,
     seoLocationTitle: (name, count) => `${name} アニメ聖地巡礼（${count} 件）`,
     seoLocationDescription: (name, count) =>
       `${name} のアニメ撮影地 ${count} 件を作品別に収録。聖地巡礼ルートの参考に。`,
+    favoritesTitle: "行きたい作品",
+    favoritesHint:
+      "巡礼したい作品を選びます。この端末に保存され、ログインは不要です。ページの内容は誰が見ても同じです。",
+    favoritesSearch: "作品を検索",
+    favoritesNone: "未選択です。地図はすべての撮影地を表示します",
+    favoritesCount: (count) => `${count.toLocaleString()} 作品を選択中`,
+    favoritesClear: "選択を解除",
+    favoritesEmpty: "一致する作品がありません",
+    editFavorites: "作品を選ぶ",
+    mapTitle: "巡礼マップ",
+    mapLoading: "地図を読み込んでいます…",
+    mapUnavailable: "地図を読み込めませんでした",
+    mapShowFavorites: "行きたい作品だけ",
+    mapShowAll: "すべて表示",
+    mapEmpty: "この条件の撮影地はありません",
+    nearMeTitle: "近くの聖地",
+    nearMeHint:
+      "ブラウザの位置情報を使い、距離はこの端末で計算します。位置情報はサーバーに送りません。",
+    nearMeAction: "近くを探す",
+    nearMeLocating: "現在地を取得しています…",
+    nearMeDenied:
+      "位置情報を取得できません。ブラウザで許可するか、地図から探してください。",
+    nearMeUnavailable: "このブラウザは位置情報に対応していません。",
+    nearMeEmpty: "近くに撮影地がありません",
+    nearMeFavorites: "行きたい作品",
+    nearMeOthers: "その他の撮影地",
+    navigate: "ナビ",
+    favoriteBadge: "行きたい",
+    creditLead: "データと画像の出典：",
+    creditRights: "アニメのスクリーンショット © 各権利者。",
+    formatDistance: (km) => formatDistanceLabel(km, "ja"),
   },
   en: {
     siteKicker: "Pilgrimage Archive",
@@ -125,7 +220,8 @@ export const PILGRIMAGE_COPY: Record<
     backAnime: "All anime",
     backLocation: "All regions",
     spotsInAnime: (title, count) => `${title} pilgrimage · ${count} spots`,
-    spotsInLocation: (name, count) => `${name} anime locations · ${count} spots`,
+    spotsInLocation: (name, count) =>
+      `${name} anime locations · ${count} spots`,
     spotDetail: "Spot details",
     answerName: "Real-world place",
     episode: "Scene context",
@@ -135,7 +231,8 @@ export const PILGRIMAGE_COPY: Record<
     openAnitabi: "View on Anitabi",
     relatedAnime: "Anime",
     relatedLocation: "Region",
-    emptyIndex: "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
+    emptyIndex:
+      "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
     viewSpot: "View details",
     seoSpotTitle: (anime, place) => `${anime} pilgrimage: ${place}`,
     seoSpotDescription: (anime, place, location) =>
@@ -143,11 +240,55 @@ export const PILGRIMAGE_COPY: Record<
     seoAnimeTitle: (title, count) => `${title} pilgrimage locations (${count})`,
     seoAnimeDescription: (title, count) =>
       `${count} real-world ${title} filming spots in Japan with place names, scene clues, and map coordinates.`,
-    seoLocationTitle: (name, count) => `${name} anime pilgrimage guide (${count})`,
+    seoLocationTitle: (name, count) =>
+      `${name} anime pilgrimage guide (${count})`,
     seoLocationDescription: (name, count) =>
       `${count} anime filming locations in ${name}, grouped by series for route planning.`,
+    favoritesTitle: "Favorite anime",
+    favoritesHint:
+      "Pick the anime you want to visit. Saved on this device, no login required. Page content stays the same for every visitor.",
+    favoritesSearch: "Search anime",
+    favoritesNone: "None selected. The map shows every spot.",
+    favoritesCount: (count) => `${count.toLocaleString()} selected`,
+    favoritesClear: "Clear",
+    favoritesEmpty: "No matching anime",
+    editFavorites: "Choose anime",
+    mapTitle: "Pilgrimage map",
+    mapLoading: "Loading map…",
+    mapUnavailable: "The map couldn't load",
+    mapShowFavorites: "Favorites only",
+    mapShowAll: "Show all",
+    mapEmpty: "No spots match this filter",
+    nearMeTitle: "Near me",
+    nearMeHint:
+      "Uses your browser location. Distance is calculated on this device and your location is never sent to the server.",
+    nearMeAction: "Near me",
+    nearMeLocating: "Finding your location…",
+    nearMeDenied:
+      "Location is unavailable. Allow it in the browser, or keep browsing the map.",
+    nearMeUnavailable: "This browser doesn't support location.",
+    nearMeEmpty: "No spots found nearby",
+    nearMeFavorites: "Favorites",
+    nearMeOthers: "Other spots",
+    navigate: "Navigate",
+    favoriteBadge: "Favorite",
+    creditLead: "Data and images from",
+    creditRights: "Anime screenshots © their respective rights holders.",
+    formatDistance: (km) => formatDistanceLabel(km, "en"),
   },
 };
+
+function formatDistanceLabel(km: number, locale: AnimeLocale): string {
+  if (!Number.isFinite(km)) return "";
+  if (km < 1) {
+    const meters = Math.max(1, Math.round(km * 1000));
+    if (locale === "zh") return `${meters} 米`;
+    return `${meters} m`;
+  }
+  const value = km < 10 ? km.toFixed(1) : String(Math.round(km));
+  if (locale === "zh") return `${value} 公里`;
+  return `${value} km`;
+}
 
 export function getPilgrimageCopy(locale: AnimeLocale) {
   return PILGRIMAGE_COPY[locale] ?? PILGRIMAGE_COPY.en;

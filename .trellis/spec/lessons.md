@@ -1,3 +1,16 @@
+## Pilgrimage favorites and near-me stay on the device
+
+- 问题：圣地巡礼页如果按登录用户或浏览器定位做服务端渲染，CDN 缓存会失效，而且会把访客位置送到服务器。
+- 根因：Vercel 不缓存带 `Set-Cookie` 的响应；`cookies()` / `headers()` 也会让 ISR 失效。定位和收藏是用户态。
+- 修复：收藏只写 `localStorage`（`aniguessr_pilgrimage_favorites_v1`），在 `useEffect` 之后才读取。附近地点用 `navigator.geolocation`，距离在浏览器里算，请求里不带坐标。地图点位来自构建产物 `public/data/seo/spots-nav.json`。
+- 预防：可缓存的巡礼页不要在服务端读收藏或位置。账号同步如果要做，只能是客户端在渲染之外调用，不能进页面渲染。
+
+## Anitabi 取景数据要带 CC BY-NC-SA 4.0 署名
+
+- 问题：取景地和截图来自 anitabi，页面上只有「在 Anitabi 打开」，没有许可协议。
+- 修复：在取景列表、地点页、地图弹窗和附近列表放一行署名：`anitabi` 链到该点 `sourceUrl`（或 https://anitabi.cn），`CC BY-NC-SA 4.0` 链到 https://creativecommons.org/licenses/by-nc-sa/4.0/ ，并注明动画截图 © 各自权利人。不要加联盟或广告链接。
+- 预防：新增展示取景数据或截图的界面时，复用 `AnitabiCredit`，三种语言都要有这句话。
+
 ## Pilgrimage HTML must not depend on request headers or Set-Cookie
 
 - 问题：搜索引擎抓取数千个 `/pilgrimage/spots/...`（以及 `/ja` `/zh` `/en` 前缀）时，每个 URL 都触发一次动态 SSR，Hobby 计划的函数调用被打满。
