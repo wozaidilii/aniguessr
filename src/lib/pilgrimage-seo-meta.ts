@@ -118,7 +118,8 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexTitle: "按地区浏览动漫取景地 | {brand}",
     locationIndexDescription: "已收录动漫取景地的地区共 {locationCount} 个。",
   },
-  // OpenCC s2twp of zh, with scripts/data/zh-tw-overrides.json applied first.
+  // OpenCC s2twp of zh. zh-TW document <title> and meta description do not
+  // use these templates; they come only from PILGRIMAGE_SEO_OVERRIDES.
   "zh-tw": {
     spotTitle: "{anime} {place} 取景地 | {brand}",
     spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",

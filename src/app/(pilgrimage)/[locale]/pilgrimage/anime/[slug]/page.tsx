@@ -110,21 +110,25 @@ export default async function PilgrimageAnimePage({ params }: Props) {
 
   const title = pickLocalizedText(anime.animeTitle, locale);
   const seo = animePageSeo(locale, anime, spotCount);
+  const visibleTitle = copy.spotsInAnime(title, spotCount);
+  const visibleDescription = copy.seoAnimeDescription(title, spotCount);
   const jsonLd = buildAnimeFilmingListJsonLd({
-    name: seo.title,
-    description: seo.description,
+    name: seo.title || visibleTitle,
+    description: seo.description || visibleDescription,
     url: absoluteUrl(pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale)),
     places: spots
       .slice(0, 24)
-      .map((spot) => toFilmingLocation(spot, locale, seo.description)),
+      .map((spot) =>
+        toFilmingLocation(spot, locale, seo.description || visibleDescription),
+      ),
   });
 
   return (
     <PilgrimageShell
       locale={locale}
       kicker={copy.animeArchive}
-      title={copy.spotsInAnime(title, spotCount)}
-      description={copy.seoAnimeDescription(title, spotCount)}
+      title={visibleTitle}
+      description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
       <PilgrimageSpotList

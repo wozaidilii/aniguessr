@@ -14,6 +14,7 @@ import {
 } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
+import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
@@ -67,6 +68,20 @@ function assertZhTwSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   }
 }
 
+function spotPageSeo(
+  locale: PilgrimageLocale,
+  spot: PilgrimageSpot,
+  fields: SpotSeoFields,
+) {
+  if (locale === "zh-tw") {
+    return applyPilgrimageSeoOverride("spot", spot.id, "zh-tw", {
+      title: "",
+      description: "",
+    });
+  }
+  return buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+}
+
 function absoluteAssetUrl(url: string | undefined): string | null {
   if (!url) return null;
   return /^https?:\/\//i.test(url) ? url : absoluteUrl(url);
@@ -81,7 +96,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   assertZhTwSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);
-  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  const seo = spotPageSeo(locale, spot, fields);
   const path = `/pilgrimage/spots/${id}`;
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const metadata = pilgrimagePageMetadata(
@@ -121,10 +136,14 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
 
   const fields = spotSeoFields(spot, locale);
-  const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  const seo = spotPageSeo(locale, spot, fields);
+  const visibleDescription = pickLocalizedText(spot.description, locale);
   const jsonLd = buildTouristAttractionJsonLd({
     name: fields.place,
-    description: pickLocalizedText(spot.description, locale) || seo.description,
+    description:
+      locale === "zh-tw"
+        ? seo.description || visibleDescription
+        : visibleDescription || seo.description,
     url: absoluteUrl(pilgrimageHref(`/pilgrimage/spots/${spot.id}`, locale)),
     image: absoluteAssetUrl(imageUrl),
     latitude: spot.lat,

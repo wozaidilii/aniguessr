@@ -92,16 +92,30 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const spots = listSpotsForLocation(location.slug).slice(0, 120);
   const seo = locationPageSeo(locale, location);
   const listed = spots.slice(0, 24);
-  const jsonLd = buildPlaceCollectionJsonLd({
+  const visibleTitle = copy.spotsInLocation(name, location.spotCount);
+  const visibleDescription = copy.seoLocationDescription(
     name,
-    description: seo.description,
+    location.spotCount,
+  );
+  const jsonLd = buildPlaceCollectionJsonLd({
+    name: locale === "zh-tw" ? seo.title || visibleTitle : name,
+    description:
+      locale === "zh-tw"
+        ? seo.description || visibleDescription
+        : seo.description,
     url: absoluteUrl(
       pilgrimageHref(`/pilgrimage/locations/${location.slug}`, locale),
     ),
     latitude: listed[0]?.lat,
     longitude: listed[0]?.lng,
     places: listed.map((spot) =>
-      toFilmingLocation(spot, locale, seo.description),
+      toFilmingLocation(
+        spot,
+        locale,
+        locale === "zh-tw"
+          ? seo.description || visibleDescription
+          : seo.description,
+      ),
     ),
   });
 
@@ -109,8 +123,8 @@ export default async function PilgrimageLocationPage({ params }: Props) {
     <PilgrimageShell
       locale={locale}
       kicker={copy.locationArchive}
-      title={copy.spotsInLocation(name, location.spotCount)}
-      description={copy.seoLocationDescription(name, location.spotCount)}
+      title={visibleTitle}
+      description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
       <PilgrimageSpotList

@@ -12,6 +12,8 @@ import {
   localizedField,
   localizedList,
 } from "./lib/pilgrimage-group.mjs";
+import { zhTwAnimeTitle } from "./lib/zh-tw-anime-title.mjs";
+import { reviewCsv, reviewRow } from "./lib/zh-tw-review.mjs";
 import { toZhTw } from "./lib/zh-tw.mjs";
 import zhTwCoverage from "../src/lib/zh-tw-coverage.json" with { type: "json" };
 import {
@@ -503,6 +505,8 @@ async function main() {
   const zhTwLocationSlugs = new Set(zhTwCoverage.locationSlugs);
   const zhTwAnimeIds = new Set();
   let zhTwSpotCount = 0;
+  /** @type {ReturnType<typeof reviewRow>[]} */
+  const reviewRows = [];
 
   const attachTw = (record) => {
     if (!record || typeof record !== "object" || Array.isArray(record)) return;
@@ -512,31 +516,95 @@ async function main() {
     if (!record || typeof record !== "object" || Array.isArray(record)) return;
     record.tw = (record.zh ?? []).map((line) => toZhTw(line));
   };
+  const remember = (kind, id, field, source, zh, zhTw) => {
+    const left = zh ?? "";
+    const right = zhTw ?? "";
+    if (!left && !right) return;
+    reviewRows.push(
+      reviewRow({ kind, id, field, source, zh: left, zhTw: right }),
+    );
+  };
+  const rememberField = (kind, id, field, record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    remember(kind, id, field, "opencc", record.zh ?? "", record.tw ?? "");
+  };
+  const rememberLines = (kind, id, field, record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    const zhLines = Array.isArray(record.zh) ? record.zh : [];
+    const twLines = Array.isArray(record.tw) ? record.tw : [];
+    const count = Math.max(zhLines.length, twLines.length);
+    for (let index = 0; index < count; index += 1) {
+      remember(
+        kind,
+        id,
+        `${field}[${index}]`,
+        "opencc",
+        zhLines[index] ?? "",
+        twLines[index] ?? "",
+      );
+    }
+  };
 
   for (const spot of Object.values(spots)) {
-    if (!zhTwLocationSlugs.has(spot.locationSlug)) continue;
-    if (!spot.redirectTo) {
-      zhTwSpotCount += 1;
-      zhTwAnimeIds.add(spot.workSubjectId);
-    }
+    if (!zhTwLocationSlugs.has(spot.locationSlug) || spot.redirectTo) continue;
+    zhTwSpotCount += 1;
+    zhTwAnimeIds.add(spot.workSubjectId);
     attachTw(spot.title);
     attachTw(spot.description);
-    attachTw(spot.animeTitle);
     attachTw(spot.location);
     attachTw(spot.answerName);
     if (spot.episodeContext && typeof spot.episodeContext === "object") {
       attachTw(spot.episodeContext);
     }
     attachTwLines(spot.funfact);
+    const chosen = zhTwAnimeTitle(
+      [spot.workSubjectId, spot.subjectId],
+      spot.animeTitle,
+    );
+    spot.animeTitle.tw = chosen.text;
+    rememberField("spot", spot.id, "title", spot.title);
+    rememberField("spot", spot.id, "description", spot.description);
+    rememberField("spot", spot.id, "answerName", spot.answerName);
+    rememberField("spot", spot.id, "location", spot.location);
+    rememberField("spot", spot.id, "episodeContext", spot.episodeContext);
+    rememberLines("spot", spot.id, "funfact", spot.funfact);
+    remember(
+      "spot",
+      spot.id,
+      "animeTitle",
+      chosen.source,
+      spot.animeTitle?.zh ?? "",
+      chosen.text,
+    );
   }
   for (const anime of animes) {
     if (!zhTwAnimeIds.has(anime.subjectId)) continue;
-    attachTw(anime.animeTitle);
+    const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
+    anime.animeTitle.tw = chosen.text;
+    remember(
+      "anime",
+      anime.subjectId,
+      "animeTitle",
+      chosen.source,
+      anime.animeTitle?.zh ?? "",
+      chosen.text,
+    );
   }
   for (const location of locations) {
     if (!zhTwLocationSlugs.has(location.slug)) continue;
     attachTw(location.name);
+    rememberField("location", location.slug, "name", location.name);
   }
+  reviewRows.sort(
+    (a, b) =>
+      a.kind.localeCompare(b.kind) ||
+      String(a.id).localeCompare(String(b.id)) ||
+      a.field.localeCompare(b.field),
+  );
+  const zhTwReview = {
+    rows: reviewRows.length,
+    flagged: reviewRows.filter((row) => row.flagged === "yes").length,
+  };
 
   const zhTwAnimeSlugs = animes
     .filter((anime) => zhTwAnimeIds.has(anime.subjectId))
@@ -586,6 +654,7 @@ async function main() {
       animeSlugs: zhTwAnimeSlugs,
       spotCount: zhTwSpotCount,
       animeCount: zhTwAnimeSlugs.length,
+      review: zhTwReview,
     },
     spotIds,
     spots,
@@ -710,6 +779,10 @@ async function main() {
 
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(path.join(OUTPUT_DIR, "index.json"), JSON.stringify(output));
+  await writeFile(
+    path.join(OUTPUT_DIR, "zh-tw-review.csv"),
+    reviewCsv(reviewRows),
+  );
   await writeFile(
     path.join(OUTPUT_DIR, "build-report.json"),
     JSON.stringify(report, null, 2),

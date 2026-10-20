@@ -83,19 +83,24 @@ export function pilgrimagePageMetadata(
     languages["zh-Hant"] = zhTwUrl;
     languages["zh-TW"] = zhTwUrl;
   }
-  return {
-    title: { absolute: title },
-    description,
+  const metadata: Metadata = {
     alternates: {
       canonical,
       languages,
     },
     openGraph: {
-      title,
-      description,
       url: canonical,
     },
   };
+  if (title.trim()) {
+    metadata.title = { absolute: title };
+    metadata.openGraph = { ...metadata.openGraph, title };
+  }
+  if (description.trim()) {
+    metadata.description = description;
+    metadata.openGraph = { ...metadata.openGraph, description };
+  }
+  return metadata;
 }
 
 /**

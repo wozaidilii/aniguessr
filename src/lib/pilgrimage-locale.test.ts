@@ -48,6 +48,20 @@ describe("pilgrimage zh-TW locale", () => {
     expect(uncovered.alternates?.languages?.["zh-TW"]).toBeUndefined();
     expect(uncovered.alternates?.languages?.["zh-Hant"]).toBeUndefined();
 
+    const blank = pilgrimagePageMetadata(
+      "zh-tw",
+      "/pilgrimage/locations/fujisawa-kanagawa",
+      "  ",
+      "",
+      true,
+    );
+    expect(blank.title).toBeUndefined();
+    expect(blank.description).toBeUndefined();
+    expect(blank.alternates?.canonical).toBe(
+      "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
+    );
+    expect(blank.openGraph?.title).toBeUndefined();
+
     const area = zhTwOnlyPageMetadata("/pilgrimage", "鎌倉", "江之島");
     expect(area.alternates?.canonical).toBe("/zh-tw/pilgrimage");
     expect(area.alternates?.languages?.zh).toBeUndefined();
