@@ -1,15 +1,24 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
+import { withAnimeLocale } from "~/lib/anime-locale";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   PILGRIMAGE_REVALIDATE_SECONDS,
   isLocalePrefixedPilgrimagePath,
 } from "~/lib/pilgrimage-cache";
+import { PILGRIMAGE_REDIRECT_MAP } from "~/lib/pilgrimage-redirects";
 import { middleware } from "~/middleware";
 
-function request(pathname: string, host = "aniguessr.ayiora.com") {
+const GOOGLEBOT =
+  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+
+function request(
+  pathname: string,
+  host = "aniguessr.ayiora.com",
+  userAgent = "Mozilla/5.0",
+) {
   const url = new URL(pathname, `https://${host}`);
-  return new NextRequest(url, { headers: { host } });
+  return new NextRequest(url, { headers: { host, "user-agent": userAgent } });
 }
 
 describe("locale middleware exemptions", () => {
@@ -18,6 +27,8 @@ describe("locale middleware exemptions", () => {
       "/robots.txt",
       "/sitemap-index",
       "/sitemap/0.xml",
+      "/sitemaps/index.xml",
+      "/sitemaps/0.xml",
       "/manifest.webmanifest",
       "/favicon.ico",
       "/og.png",
@@ -34,12 +45,80 @@ describe("locale middleware exemptions", () => {
     }
   });
 
-  it("rewrites /sitemap.xml to the index route without a locale redirect", () => {
-    const response = middleware(request("/sitemap.xml"));
-    expect(response.headers.get("location")).toBeNull();
-    expect(response.headers.get("x-middleware-rewrite")).toBe(
-      "https://aniguessr.ayiora.com/sitemap-index",
+  it("rewrites sitemap URLs to static XML without a locale redirect", () => {
+    const index = middleware(request("/sitemap.xml"));
+    expect(index.headers.get("location")).toBeNull();
+    expect(index.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/sitemaps/index.xml",
     );
+
+    const child = middleware(request("/sitemap/0.xml"));
+    expect(child.headers.get("location")).toBeNull();
+    expect(child.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/sitemaps/0.xml",
+    );
+  });
+
+  it("does not block Googlebot on the homepage, sitemap, or spot pages", () => {
+    const home = middleware(request("/", "aniguessr.ayiora.com", GOOGLEBOT));
+    expect(home.status).toBe(307);
+    expect(home.headers.get("location")).toBe(
+      "https://aniguessr.ayiora.com/en",
+    );
+
+    const sitemap = middleware(
+      request("/sitemap.xml", "aniguessr.ayiora.com", GOOGLEBOT),
+    );
+    expect(sitemap.status).not.toBe(429);
+    expect(sitemap.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/sitemaps/index.xml",
+    );
+
+    const spot = middleware(
+      request(
+        "/en/pilgrimage/spots/anitabi_1_2",
+        "aniguessr.ayiora.com",
+        GOOGLEBOT,
+      ),
+    );
+    expect(spot.status).not.toBe(429);
+    if (spot.status === 301) {
+      expect(spot.headers.get("location") ?? "").toContain(
+        "/en/pilgrimage/spots/",
+      );
+    } else {
+      expect(spot.status).toBe(200);
+      expect(spot.headers.get("location")).toBeNull();
+    }
+  });
+
+  it("301s a merged anime subject id to the canonical slug", () => {
+    const canonical = PILGRIMAGE_REDIRECT_MAP.animeBySubjectId["240038"];
+    const movie = PILGRIMAGE_REDIRECT_MAP.animeBySubjectId["467930"];
+    expect(canonical).toBeTruthy();
+    expect(movie).toBe(canonical);
+
+    const response = middleware(
+      request(
+        "/ja/pilgrimage/anime/467930-old-slug",
+        "aniguessr.ayiora.com",
+        GOOGLEBOT,
+      ),
+    );
+    expect(response.status).toBe(301);
+    expect(response.headers.get("location")).toBe(
+      `https://aniguessr.ayiora.com${withAnimeLocale(`/pilgrimage/anime/${canonical}`, "ja")}`,
+    );
+
+    const current = middleware(
+      request(
+        `/ja/pilgrimage/anime/${canonical}`,
+        "aniguessr.ayiora.com",
+        GOOGLEBOT,
+      ),
+    );
+    expect(current.status).toBe(200);
+    expect(current.headers.get("location")).toBeNull();
   });
 
   it("still redirects unprefixed pages to a locale", () => {

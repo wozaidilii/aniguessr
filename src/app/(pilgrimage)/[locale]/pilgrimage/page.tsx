@@ -4,7 +4,10 @@ import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { localizedPageMetadata } from "~/lib/seo";
-import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import {
+  getPilgrimageSeoIndex,
+  pickLocalizedText,
+} from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
@@ -89,7 +92,7 @@ export default async function PilgrimageHubPage({
             <PilgrimageCard
               key={anime.subjectId}
               href={withAnimeLocale(`/pilgrimage/anime/${anime.slug}`, locale)}
-              title={anime.animeTitle}
+              title={pickLocalizedText(anime.animeTitle, locale)}
               meta={copy.spotCountLabel(anime.spotCount)}
             />
           ))}
@@ -116,7 +119,7 @@ export default async function PilgrimageHubPage({
                 `/pilgrimage/locations/${location.slug}`,
                 locale,
               )}
-              title={location.name}
+              title={pickLocalizedText(location.name, locale)}
               meta={copy.spotCountLabel(location.spotCount)}
             />
           ))}

@@ -1,9 +1,11 @@
 import { type Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
+import { pickLocalizedLines, pickLocalizedText } from "~/lib/localized-text";
+import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
@@ -11,7 +13,6 @@ import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
 import {
   getSpotById,
   getSpotSeoVariant,
-  pickLocalizedText,
   type PilgrimageSpot,
 } from "~/server/data/pilgrimage-seo";
 import {
@@ -39,9 +40,22 @@ function spotSeoFields(
     anime: pickLocalizedText(spot.animeTitle, locale),
     place: pickLocalizedText(spot.answerName, locale),
     area: pickLocalizedText(spot.location, locale),
-    episode: spot.episodeContext ?? "",
+    episode:
+      typeof spot.episodeContext === "string"
+        ? spot.episodeContext
+        : pickLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),
   };
+}
+
+function redirectDuplicateSpot(locale: AnimeLocale, spot: PilgrimageSpot) {
+  if (!spot.redirectTo || spot.redirectTo === spot.id) return;
+  permanentRedirect(
+    withAnimeLocale(
+      `/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`,
+      locale,
+    ),
+  );
 }
 
 function absoluteAssetUrl(url: string | undefined): string | null {
@@ -54,6 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = pilgrimageLocale(localeParam);
   const spot = getSpotById(id);
   if (!spot) return { title: "Not found" };
+  redirectDuplicateSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);
   const seo = buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
@@ -81,12 +96,18 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const copy = getPilgrimageCopy(locale);
   const spot = getSpotById(id);
   if (!spot) notFound();
+  redirectDuplicateSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
   const place = pickLocalizedText(spot.answerName, locale);
   const location = pickLocalizedText(spot.location, locale);
   const title = pickLocalizedText(spot.title, locale);
   const description = pickLocalizedText(spot.description, locale);
+  const episode =
+    typeof spot.episodeContext === "string"
+      ? spot.episodeContext
+      : pickLocalizedText(spot.episodeContext, locale);
+  const facts = pickLocalizedLines(spot.funfact, locale);
   const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
 
@@ -129,25 +150,26 @@ export default async function PilgrimageSpotPage({ params }: Props) {
             {description}
           </p>
 
-          {spot.episodeContext ? (
+          {episode ? (
             <section className="mt-6">
               <h3 className="text-xs font-black tracking-[0.16em] text-cyan-100/70 uppercase">
                 {copy.episode}
               </h3>
-              <p className="mt-2 text-sm text-pink-50/75">
-                {spot.episodeContext}
-              </p>
+              <p className="mt-2 text-sm text-pink-50/75">{episode}</p>
             </section>
           ) : null}
 
-          {spot.funfact.length > 0 ? (
+          {facts.length > 0 ? (
             <section className="mt-6">
               <h3 className="text-xs font-black tracking-[0.16em] text-cyan-100/70 uppercase">
                 {copy.funfacts}
               </h3>
               <ul className="mt-2 grid gap-2 text-sm leading-6 text-pink-50/75">
-                {spot.funfact.map((fact) => (
-                  <li key={fact} className="rounded-lg bg-white/5 px-3 py-2">
+                {facts.map((fact, index) => (
+                  <li
+                    key={`${fact}-${index}`}
+                    className="rounded-lg bg-white/5 px-3 py-2"
+                  >
                     {fact}
                   </li>
                 ))}

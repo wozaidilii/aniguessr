@@ -3,7 +3,10 @@ import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildLocationIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { localizedPageMetadata } from "~/lib/seo";
-import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import {
+  getPilgrimageSeoIndex,
+  pickLocalizedText,
+} from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
@@ -60,7 +63,7 @@ export default async function PilgrimageLocationsIndexPage({
                 `/pilgrimage/locations/${location.slug}`,
                 locale,
               )}
-              title={location.name}
+              title={pickLocalizedText(location.name, locale)}
               meta={copy.spotCountLabel(location.spotCount)}
             />
           ))}

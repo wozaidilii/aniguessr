@@ -72,7 +72,7 @@ describe("pilgrimage seo templates", () => {
       (item) => buildSpotSeo("en", item, variants.get(item.id) ?? "id").title,
     );
     expect(new Set(titles).size).toBe(titles.length);
-    expect(titles[0]).toBe(`Only Bridge filming location | ${BRAND_NAME}`);
+    expect(titles[0]).toBe(`Only Bridge real life location | ${BRAND_NAME}`);
     expect(buildSpotSeo("ja", shared[0]!, "base").title).toBe(
       `Only Bridge 撮影地 | ${BRAND_NAME}`,
     );

@@ -3,10 +3,8 @@ import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { absoluteUrl } from "~/lib/seo";
 import { type FilmingLocationInput } from "~/lib/structured-data";
-import {
-  pickLocalizedText,
-  type PilgrimageSpot,
-} from "~/server/data/pilgrimage-seo";
+import { pickLocalizedText } from "~/lib/localized-text";
+import { type PilgrimageSpot } from "~/server/data/pilgrimage-seo";
 
 export function toFilmingLocation(
   spot: PilgrimageSpot,
@@ -31,6 +29,9 @@ export function toFilmingLocation(
     longitude: spot.lng,
     area: pickLocalizedText(spot.location, locale),
     anime: pickLocalizedText(spot.animeTitle, locale),
-    episode: spot.episodeContext,
+    episode:
+      typeof spot.episodeContext === "string"
+        ? spot.episodeContext
+        : pickLocalizedText(spot.episodeContext, locale),
   };
 }

@@ -7,10 +7,11 @@ import {
 import { absoluteUrl, localeAlternates } from "~/lib/seo";
 
 /**
- * URLs per child sitemap. Google allows 50,000, but Vercel rejects an ISR
- * fallback body over 20 MB. About 5,000 URLs keeps each file near 4 MB.
+ * URLs per child sitemap. Google allows 50,000, but a Vercel function
+ * response over about 4.5 MB returns HTTP 500. Static files use the same
+ * cap so each document stays near 1.5 MB.
  */
-export const SITEMAP_URL_LIMIT = 5_000;
+export const SITEMAP_URL_LIMIT = 2_000;
 
 export const SITEMAP_PATHS_PER_FILE = Math.floor(
   SITEMAP_URL_LIMIT / ANIME_LOCALES.length,

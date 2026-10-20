@@ -3,7 +3,10 @@ import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildAnimeIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { localizedPageMetadata } from "~/lib/seo";
-import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import {
+  getPilgrimageSeoIndex,
+  pickLocalizedText,
+} from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
@@ -57,7 +60,7 @@ export default async function PilgrimageAnimeIndexPage({
             <PilgrimageCard
               key={anime.subjectId}
               href={withAnimeLocale(`/pilgrimage/anime/${anime.slug}`, locale)}
-              title={anime.animeTitle}
+              title={pickLocalizedText(anime.animeTitle, locale)}
               meta={copy.spotCountLabel(anime.spotCount)}
             />
           ))}

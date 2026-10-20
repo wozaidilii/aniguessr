@@ -29,7 +29,11 @@ export const PILGRIMAGE_COPY: Record<
     emptyIndex: string;
     viewSpot: string;
     seoSpotTitle: (anime: string, place: string) => string;
-    seoSpotDescription: (anime: string, place: string, location: string) => string;
+    seoSpotDescription: (
+      anime: string,
+      place: string,
+      location: string,
+    ) => string;
     seoAnimeTitle: (title: string, count: number) => string;
     seoAnimeDescription: (title: string, count: number) => string;
     seoLocationTitle: (name: string, count: number) => string;
@@ -98,12 +102,14 @@ export const PILGRIMAGE_COPY: Record<
     openAnitabi: "Anitabi で見る",
     relatedAnime: "作品",
     relatedLocation: "地域",
-    emptyIndex: "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
+    emptyIndex:
+      "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
     viewSpot: "詳細を見る",
     seoSpotTitle: (anime, place) => `${anime} 聖地：${place}`,
     seoSpotDescription: (anime, place, location) =>
       `『${anime}』の撮影地「${place}」（${location}）。座標・シーン説明・巡礼ガイド。AniGuessr ストリートビューで検証できます。`,
-    seoAnimeTitle: (title, count) => `『${title}』聖地巡礼リスト（${count} 件）`,
+    seoAnimeTitle: (title, count) =>
+      `『${title}』聖地巡礼リスト（${count} 件）`,
     seoAnimeDescription: (title, count) =>
       `『${title}』の日本国内ロケ地 ${count} 件を整理。場所名・シーン手がかり・地図座標付き。`,
     seoLocationTitle: (name, count) => `${name} アニメ聖地巡礼（${count} 件）`,
@@ -114,10 +120,10 @@ export const PILGRIMAGE_COPY: Record<
     siteKicker: "Pilgrimage Archive",
     hubTitle: "Anime Pilgrimage Location Guide",
     hubDescription:
-      "Real-world coordinates, scene notes, and visit tips for anime filming locations across Japan. Browse by series or region, then test yourself in AniGuessr Street View.",
+      "Real-world coordinates, scene notes, and visit tips for anime real life locations across Japan. Browse by series or region, then test yourself in AniGuessr Street View.",
     animeArchive: "Browse by anime",
     locationArchive: "Browse by region",
-    spotCountLabel: (count) => `${count.toLocaleString()} filming spots`,
+    spotCountLabel: (count) => `${count.toLocaleString()} real life locations`,
     animeCountLabel: (count) => `${count.toLocaleString()} series`,
     locationCountLabel: (count) => `${count.toLocaleString()} regions`,
     playGame: "Play on AniGuessr",
@@ -125,7 +131,8 @@ export const PILGRIMAGE_COPY: Record<
     backAnime: "All anime",
     backLocation: "All regions",
     spotsInAnime: (title, count) => `${title} pilgrimage · ${count} spots`,
-    spotsInLocation: (name, count) => `${name} anime locations · ${count} spots`,
+    spotsInLocation: (name, count) =>
+      `${name} anime locations · ${count} spots`,
     spotDetail: "Spot details",
     answerName: "Real-world place",
     episode: "Scene context",
@@ -135,17 +142,19 @@ export const PILGRIMAGE_COPY: Record<
     openAnitabi: "View on Anitabi",
     relatedAnime: "Anime",
     relatedLocation: "Region",
-    emptyIndex: "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
+    emptyIndex:
+      "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
     viewSpot: "View details",
     seoSpotTitle: (anime, place) => `${anime} pilgrimage: ${place}`,
     seoSpotDescription: (anime, place, location) =>
-      `${anime} filming location “${place}” in ${location}. Coordinates, scene notes, and pilgrimage tips — playable in AniGuessr Street View.`,
+      `${anime} real life location “${place}” in ${location}. Coordinates, scene notes, and pilgrimage tips — playable in AniGuessr Street View.`,
     seoAnimeTitle: (title, count) => `${title} pilgrimage locations (${count})`,
     seoAnimeDescription: (title, count) =>
-      `${count} real-world ${title} filming spots in Japan with place names, scene clues, and map coordinates.`,
-    seoLocationTitle: (name, count) => `${name} anime pilgrimage guide (${count})`,
+      `${count} real life ${title} locations in Japan with place names, scene clues, and map coordinates.`,
+    seoLocationTitle: (name, count) =>
+      `${name} anime pilgrimage guide (${count})`,
     seoLocationDescription: (name, count) =>
-      `${count} anime filming locations in ${name}, grouped by series for route planning.`,
+      `${count} anime real life locations in ${name}, grouped by series for route planning.`,
   },
 };
 

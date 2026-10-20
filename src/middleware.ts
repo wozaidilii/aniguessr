@@ -9,6 +9,7 @@ import {
 } from "~/lib/anime-locale";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
+import { pilgrimageRedirectPath } from "~/lib/pilgrimage-redirects";
 import { legacyHostRedirectUrl } from "~/lib/site-url";
 
 /** 根据 Cookie 与 Accept-Language 推断首选语言。 */
@@ -77,15 +78,43 @@ function redirectLegacyHost(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(destination, 301);
 }
 
+function rewriteStaticSitemap(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  let file = "";
+  if (pathname === "/sitemap.xml" || pathname === "/sitemap-index") {
+    file = "/sitemaps/index.xml";
+  } else {
+    const match = /^\/sitemap\/(\d+)\.xml$/u.exec(pathname);
+    if (match?.[1]) file = `/sitemaps/${match[1]}.xml`;
+  }
+  if (!file) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = file;
+  return NextResponse.rewrite(url);
+}
+
 export function middleware(request: NextRequest) {
   const hostRedirect = redirectLegacyHost(request);
   if (hostRedirect) return hostRedirect;
 
-  // generateSitemaps() publishes /sitemap/0.xml but not the /sitemap.xml index.
-  if (request.nextUrl.pathname === "/sitemap.xml") {
+  // Static XML from the data build. This does not look at User-Agent.
+  const sitemapRewrite = rewriteStaticSitemap(request);
+  if (sitemapRewrite) return sitemapRewrite;
+
+  const { locale: pathLocale, pathname: innerPath } = parseLocaleFromPathname(
+    request.nextUrl.pathname,
+  );
+  const seoRedirect = pilgrimageRedirectPath(
+    request.nextUrl.pathname,
+    pathLocale ?? pickPreferredLocale(request),
+  );
+  if (seoRedirect) {
     const url = request.nextUrl.clone();
-    url.pathname = "/sitemap-index";
-    return NextResponse.rewrite(url);
+    const parsed = new URL(seoRedirect, request.url);
+    url.pathname = parsed.pathname;
+    url.search = parsed.search;
+    url.hash = parsed.hash;
+    return NextResponse.redirect(url, 301);
   }
 
   if (shouldBypassLocale(request.nextUrl.pathname)) {
@@ -100,10 +129,6 @@ export function middleware(request: NextRequest) {
   if (isLocalePrefixedPilgrimagePath(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
-
-  const { locale: pathLocale, pathname: innerPath } = parseLocaleFromPathname(
-    request.nextUrl.pathname,
-  );
 
   // 无语言前缀：重定向到 /{locale}/...
   if (!pathLocale) {

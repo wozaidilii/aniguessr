@@ -34,36 +34,36 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
   }
 > = {
   en: {
-    spotTitle: "{anime} {place} filming location | {brand}",
+    spotTitle: "{anime} {place} real life location | {brand}",
     spotTitleWithEpisode:
-      "{anime} {place} ({episode}) filming location | {brand}",
-    spotTitleWithScene: "{anime} {place} — {scene} filming location | {brand}",
-    spotTitleWithId: "{anime} {place} filming location ({id}) | {brand}",
-    spotDescription:
-      "Real-world filming location for {anime} at {place} in {area}.",
+      "{anime} {place} ({episode}) real life location | {brand}",
+    spotTitleWithScene:
+      "{anime} {place} — {scene} real life location | {brand}",
+    spotTitleWithId: "{anime} {place} real life location ({id}) | {brand}",
+    spotDescription: "Real life location for {anime} at {place} in {area}.",
     spotDescriptionWithEpisode:
-      "Real-world filming location for {anime} at {place} in {area}. Appears in {episode}.",
+      "Real life location for {anime} at {place} in {area}. Appears in {episode}.",
     spotDescriptionWithScene:
-      "Real-world filming location for {anime} at {place} in {area}. Scene: {scene}.",
+      "Real life location for {anime} at {place} in {area}. Scene: {scene}.",
     spotDescriptionWithId:
-      "Real-world filming location for {anime} at {place} in {area}. Reference {id}.",
-    animeTitle: "{anime} filming locations | {brand}",
-    animeTitleWithId: "{anime} ({id}) filming locations | {brand}",
+      "Real life location for {anime} at {place} in {area}. Reference {id}.",
+    animeTitle: "{anime} Real Life Locations | {brand}",
+    animeTitleWithId: "{anime} ({id}) Real Life Locations | {brand}",
     animeDescription:
-      "{count} real-world filming locations for {anime}, with coordinates and scene notes.",
+      "{count} real life locations for {anime}, with coordinates and scene notes.",
     animeDescriptionWithId:
-      "{count} real-world filming locations for {anime} ({id}), with coordinates and scene notes.",
-    locationTitle: "{area} anime filming locations | {brand}",
-    locationDescription: "{count} anime filming locations in {area}.",
-    hubTitle: "Anime filming locations | {brand}",
+      "{count} real life locations for {anime} ({id}), with coordinates and scene notes.",
+    locationTitle: "{area} anime real life locations | {brand}",
+    locationDescription: "{count} anime real life locations in {area}.",
+    hubTitle: "Anime real life locations | {brand}",
     hubDescription:
-      "Browse {spotCount} anime pilgrimage filming locations from {animeCount} series across {locationCount} regions.",
+      "Browse {spotCount} anime real life locations from {animeCount} series across {locationCount} regions.",
     animeIndexTitle: "Anime pilgrimage index | {brand}",
     animeIndexDescription:
-      "{animeCount} anime series with mapped filming locations.",
-    locationIndexTitle: "Anime filming locations by region | {brand}",
+      "{animeCount} anime series with mapped real life locations.",
+    locationIndexTitle: "Anime real life locations by region | {brand}",
     locationIndexDescription:
-      "{locationCount} regions with mapped anime filming locations.",
+      "{locationCount} regions with mapped anime real life locations.",
   },
   ja: {
     spotTitle: "{anime} {place} 撮影地 | {brand}",
