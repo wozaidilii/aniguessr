@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { BrandLockup } from "~/components/brand/BrandLockup";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
 import {
   ANIME_LOCALES,
@@ -211,12 +212,7 @@ export default function LoginPage() {
     <main className="anime-shell min-h-screen px-5 py-5 text-white sm:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-5xl flex-col">
         <header className="flex flex-wrap items-center justify-between gap-4">
-          <Link
-            href={homeUrl}
-            className="text-lg font-black tracking-[0.18em] text-pink-100 uppercase focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
-          >
-            AniGuessr
-          </Link>
+          <BrandLockup href={homeUrl} />
           <div className="flex flex-wrap items-center gap-3">
             <div
               className="grid grid-cols-3 rounded-xl border border-white/10 bg-black/40 p-1 text-xs font-bold text-white/70"

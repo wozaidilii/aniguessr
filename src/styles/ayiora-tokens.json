@@ -1,0 +1,260 @@
+{
+  "$meta": {
+    "name": "Ayiora Brand Foundation",
+    "version": "1.0.0",
+    "date": "2026-10-20",
+    "note": "Shared tokens for www.ayiora.com, ocr.ayiora.com, aniguessr.ayiora.com. Product accents only via data-product."
+  },
+  "color": {
+    "brand": {
+      "bg": "#faf7f3",
+      "primary": "#cf7656",
+      "action": "#9c4f37",
+      "actionHover": "#693a2b",
+      "dawn": {
+        "50": "#fbf2ec",
+        "100": "#f6e2d7",
+        "200": "#eecab6",
+        "500": "#cf7656",
+        "600": "#bd6244",
+        "700": "#9c4f37",
+        "900": "#693a2b"
+      },
+      "logoGradient": {
+        "start": "#EC4F63",
+        "mid": "#F1804F",
+        "end": "#F6A64C",
+        "css": "linear-gradient(90deg, #EC4F63 0%, #F1804F 55%, #F6A64C 100%)"
+      },
+      "ink": "#1f2937"
+    },
+    "neutral": {
+      "0": "#ffffff",
+      "50": "#f8fafc",
+      "100": "#f1f5f9",
+      "200": "#e2e8f0",
+      "300": "#cad5e2",
+      "400": "#90a1b9",
+      "500": "#62748e",
+      "600": "#45556c",
+      "700": "#314158",
+      "800": "#1d293d",
+      "900": "#0f172a"
+    },
+    "semantic": {
+      "text": "#0f172a",
+      "textMuted": "#45556c",
+      "textSubtle": "#62748e",
+      "border": "#e2e8f0",
+      "borderStrong": "#cad5e2",
+      "surface": "#ffffff",
+      "surfaceMuted": "#f8fafc",
+      "focusRing": "#cf7656",
+      "success": "#007956",
+      "successBg": "#ecfdf5",
+      "warning": "#bb4d00",
+      "warningBg": "#fffbeb",
+      "danger": "#c10007",
+      "dangerBg": "#fef2f2"
+    },
+    "product": {
+      "ocr": {
+        "50": "#f0fdfa",
+        "100": "#cbfbf1",
+        "500": "#00baa7",
+        "600": "#009588",
+        "700": "#00776e",
+        "900": "#0b4f4a",
+        "action": "#00776e",
+        "actionHover": "#0b4f4a"
+      },
+      "aniguessr": {
+        "bg": "#0a0612",
+        "surface": "#0d081a",
+        "surfaceRaised": "#0f1020",
+        "text": "#fff7fb",
+        "pink": "#f9a8d4",
+        "pinkSoft": "#f8e7ff",
+        "cyan": "#67e8f9",
+        "cyanSoft": "#cffafe",
+        "action": "#f9a8d4",
+        "actionText": "#0a0612"
+      }
+    },
+    "dark": {
+      "bg": "#0b0b0d",
+      "bgElevated": "#111114",
+      "surface": "#141418",
+      "surfaceRaised": "#1b1b20",
+      "border": "rgba(245,242,238,0.12)",
+      "borderStrong": "rgba(245,242,238,0.24)",
+      "text": "#f5f2ee",
+      "textSecondary": "#c9c4bd",
+      "textMuted": "#a8a29b",
+      "textSubtle": "#8c8781",
+      "accent": "#eecab6",
+      "btnBg": "#faf7f3",
+      "btnBgHover": "#f6e2d7",
+      "btnText": "#1f2937",
+      "inputBg": "#141418",
+      "inputBorder": "rgba(245,242,238,0.18)",
+      "focus": "#eecab6",
+      "focusRing": "rgba(238,202,182,0.28)",
+      "success": "#7ee2b8",
+      "danger": "#ff8a80",
+      "contrast": {
+        "text_on_bg": 17.62,
+        "textSecondary_on_bg": 11.34,
+        "textMuted_on_bg": 7.78,
+        "textSubtle_on_bg": 5.52,
+        "accent_on_bg": 12.88,
+        "btnText_on_btnBg": 13.74,
+        "text_on_surface": 16.46,
+        "textSubtle_on_surface": 5.16
+      },
+      "overlay": {
+        "headerScrim": "linear-gradient(180deg, rgba(11,11,13,0.62) 0%, rgba(11,11,13,0) 18%)",
+        "bottomFade": "linear-gradient(180deg, rgba(11,11,13,0) 40%, rgba(11,11,13,0.55) 66%, rgba(11,11,13,0.92) 88%, #0b0b0d 100%)",
+        "sectionFade": "linear-gradient(180deg, #0b0b0d 0%, rgba(11,11,13,0.15) 26%, rgba(11,11,13,0.1) 60%, #0b0b0d 100%)",
+        "rules": "Never use pure #000; body text over imagery only on a scrim of >=60% bg opacity; headlines over imagery must keep >=4.5:1 at the worst pixel; images fade into --dark-bg at section edges; desaturate photos ~10%."
+      }
+    }
+  },
+  "font": {
+    "family": {
+      "heading": "\"Sora\", \"Noto Sans JP\", \"Hiragino Sans\", \"Yu Gothic UI\", \"Meiryo\", sans-serif",
+      "body": "\"Noto Sans JP\", \"Hiragino Sans\", \"Yu Gothic UI\", \"Meiryo\", system-ui, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Noto Sans Mono CJK JP\", monospace"
+    },
+    "weight": {
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    },
+    "scale": {
+      "display": {
+        "size": "56px",
+        "sizeMobile": "34px",
+        "lineHeight": 1.35,
+        "weight": 700,
+        "letterSpacing": "0"
+      },
+      "h1": {
+        "size": "40px",
+        "sizeMobile": "28px",
+        "lineHeight": 1.4,
+        "weight": 700,
+        "letterSpacing": "0"
+      },
+      "h2": {
+        "size": "32px",
+        "sizeMobile": "24px",
+        "lineHeight": 1.45,
+        "weight": 700,
+        "letterSpacing": "0"
+      },
+      "h3": {
+        "size": "22px",
+        "sizeMobile": "20px",
+        "lineHeight": 1.5,
+        "weight": 700,
+        "letterSpacing": "0"
+      },
+      "lead": {
+        "size": "18px",
+        "sizeMobile": "16px",
+        "lineHeight": 1.8,
+        "weight": 400,
+        "letterSpacing": "0.02em"
+      },
+      "body": {
+        "size": "16px",
+        "sizeMobile": "15px",
+        "lineHeight": 1.75,
+        "weight": 400,
+        "letterSpacing": "0.02em"
+      },
+      "small": {
+        "size": "14px",
+        "sizeMobile": "14px",
+        "lineHeight": 1.7,
+        "weight": 400,
+        "letterSpacing": "0.02em"
+      },
+      "caption": {
+        "size": "12px",
+        "sizeMobile": "12px",
+        "lineHeight": 1.6,
+        "weight": 500,
+        "letterSpacing": "0.04em"
+      },
+      "eyebrow": {
+        "size": "12px",
+        "sizeMobile": "12px",
+        "lineHeight": 1.5,
+        "weight": 700,
+        "letterSpacing": "0.12em"
+      }
+    },
+    "rules": {
+      "headings": "font-feature-settings: 'palt'; word-break: auto-phrase; text-wrap: balance; text-autospace: normal; no negative letter-spacing on Japanese; key headings: BudouX <wbr> + word-break: keep-all",
+      "body": "line-break: strict; overflow-wrap: anywhere; text-autospace: normal (progressive)",
+      "copy": "Do not type half-width spaces between Japanese and Latin/digits (they become line-break opportunities); spacing comes from text-autospace"
+    }
+  },
+  "radius": {
+    "none": "0",
+    "sm": "6px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "9999px",
+    "usage": {
+      "button": "md",
+      "input": "md",
+      "card": "lg",
+      "panel": "xl",
+      "badge": "full",
+      "avatar": "full"
+    }
+  },
+  "space": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "10": "40px",
+    "12": "48px",
+    "16": "64px",
+    "20": "80px",
+    "24": "96px"
+  },
+  "shadow": {
+    "sm": "0 1px 2px rgba(15,23,42,.06)",
+    "md": "0 4px 16px rgba(105,58,43,.08)",
+    "lg": "0 16px 40px rgba(105,58,43,.10)"
+  },
+  "layout": {
+    "maxWidth": "1152px",
+    "gutter": "24px",
+    "gutterMobile": "16px",
+    "headerHeight": "64px",
+    "headerHeightMobile": "56px",
+    "breakpoint": {
+      "sm": "640px",
+      "md": "768px",
+      "lg": "1024px",
+      "xl": "1280px"
+    }
+  },
+  "control": {
+    "height": {
+      "sm": "36px",
+      "md": "44px",
+      "lg": "52px"
+    }
+  }
+}

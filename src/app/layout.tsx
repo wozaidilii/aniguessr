@@ -3,7 +3,7 @@ import "~/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { type Metadata, type Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Noto_Sans_JP, Sora } from "next/font/google";
 import { headers } from "next/headers";
 import { Suspense } from "react";
 
@@ -116,9 +116,19 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const geist = Geist({
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  weight: ["400", "600", "700"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const notoSansJp = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-noto",
+  display: "swap",
+  preload: false,
 });
 
 export default async function RootLayout({
@@ -127,7 +137,11 @@ export default async function RootLayout({
   const locale = await getRequestLocale();
 
   return (
-    <html lang={locale} className={`${geist.variable}`}>
+    <html
+      lang={locale}
+      data-product="aniguessr"
+      className={`${sora.variable} ${notoSansJp.variable}`}
+    >
       <body>
         <PostHogScript />
         <TRPCReactProvider>

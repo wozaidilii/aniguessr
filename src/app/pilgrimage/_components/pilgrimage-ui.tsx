@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import { BrandLockup } from "~/components/brand/BrandLockup";
 import {
   DEFAULT_ANIME_LOCALE,
   isAnimeLocale,
@@ -37,12 +38,7 @@ export function PilgrimageShell({
       <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
         <nav className="mb-8 flex flex-wrap items-center justify-between gap-3 text-sm">
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href={homeUrl}
-              className="font-black tracking-[0.14em] text-pink-100 uppercase"
-            >
-              AniGuessr
-            </Link>
+            <BrandLockup href={homeUrl} />
             <span className="text-white/20">/</span>
             <Link href={hubUrl} className="font-bold text-cyan-100/80 hover:text-cyan-50">
               {copy.siteKicker}
