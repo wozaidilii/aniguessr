@@ -16,6 +16,22 @@ describe("localized text fallback", () => {
     ).toBe("Tokyo");
   });
 
+  it("returns Traditional text only for zh-TW and never falls back to simplified", () => {
+    expect(
+      pickLocalizedText({ zh: "镰仓", ja: "鎌倉", en: "Kamakura", tw: "鎌倉" }, "zh-tw"),
+    ).toBe("鎌倉");
+    expect(pickLocalizedText({ zh: "镰仓", ja: "鎌倉", en: "" }, "zh-tw")).toBe(
+      "",
+    );
+    expect(
+      pickLocalizedLines(
+        { zh: ["简体"], ja: ["日本語"], en: [], tw: ["繁體"] },
+        "zh-tw",
+      ),
+    ).toEqual(["繁體"]);
+    expect(pickLocalizedLines(["简体"], "zh-tw")).toEqual([]);
+  });
+
   it("falls funfacts through the same order", () => {
     expect(
       pickLocalizedLines({ zh: ["中文"], ja: ["日本語"], en: [] }, "en"),

@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { type RenderedSeo } from "~/lib/pilgrimage-seo-meta";
 import { BRAND_NAME } from "~/lib/site-url";
 
@@ -14,8 +14,8 @@ export interface SeoOverride {
  * Leave a locale blank to keep the generated template.
  */
 export const PILGRIMAGE_SEO_OVERRIDES: {
-  anime: Record<string, Partial<Record<AnimeLocale, SeoOverride>>>;
-  location: Record<string, Partial<Record<AnimeLocale, SeoOverride>>>;
+  anime: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
+  location: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
 } = {
   anime: {},
   location: {
@@ -35,6 +35,11 @@ export const PILGRIMAGE_SEO_OVERRIDES: {
         title: `江之岛 / 江の島 现实取景地 | ${BRAND_NAME}`,
         description: "神奈川县藤泽市江之岛一带的现实取景地，含坐标与场景信息。",
       },
+      "zh-tw": {
+        title: `江之島 / 江の島 實景取景地 | ${BRAND_NAME}`,
+        description:
+          "神奈川縣藤澤市江之島一帶的實景取景地，含座標與場景資訊。",
+      },
     },
   },
 };
@@ -42,7 +47,7 @@ export const PILGRIMAGE_SEO_OVERRIDES: {
 export function applyPilgrimageSeoOverride(
   kind: "anime" | "location",
   slug: string,
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   seo: RenderedSeo,
 ): RenderedSeo {
   const entry = PILGRIMAGE_SEO_OVERRIDES[kind][slug]?.[locale];

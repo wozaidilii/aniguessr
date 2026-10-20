@@ -45,6 +45,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "leaflet": "^1.9.4",
     "next": "^15.2.3",
+    "opencc-js": "^1.4.2",
     "postgres": "^3.4.9",
     "pusher": "^5.3.3",
     "pusher-js": "^8.5.0",

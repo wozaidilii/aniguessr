@@ -1,4 +1,4 @@
-import { parseLocaleFromPathname } from "~/lib/anime-locale";
+import { splitLocalePath } from "~/lib/pilgrimage-locale";
 
 /**
  * ISR window for pilgrimage HTML. Spot data is rebuilt with the app, not per request.
@@ -12,7 +12,7 @@ export const PILGRIMAGE_REVALIDATE_SECONDS = 86_400;
  * These must skip the locale rewrite and must not Set-Cookie, or Vercel will not CDN-cache them.
  */
 export function isLocalePrefixedPilgrimagePath(pathname: string): boolean {
-  const { locale, pathname: inner } = parseLocaleFromPathname(pathname);
+  const { locale, pathname: inner } = splitLocalePath(pathname);
   if (!locale) return false;
   return inner === "/pilgrimage" || inner.startsWith("/pilgrimage/");
 }

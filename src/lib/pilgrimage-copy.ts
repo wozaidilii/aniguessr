@@ -1,7 +1,17 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 
+/**
+ * TODO(map-near-me): origin/main adds favorites, map, and near-me copy that is
+ * not on this branch. When that UI merges, add zh-TW strings (do not fall back
+ * to simplified) for: favoritesTitle, favoritesHint, favoritesSearch,
+ * favoritesNone, favoritesCount, favoritesClear, favoritesEmpty, mapTitle,
+ * nearMeTitle, nearMeHint, nearMeAction, nearMeLocating, nearMeDenied,
+ * nearMeUnavailable, nearMeEmpty, nearMeFavorites, nearMeOthers.
+ * Convert the zh values with scripts/lib/zh-tw.mjs (OpenCC s2twp) and
+ * scripts/data/zh-tw-overrides.json.
+ */
 export const PILGRIMAGE_COPY: Record<
-  AnimeLocale,
+  PilgrimageLocale,
   {
     siteKicker: string;
     hubTitle: string;
@@ -156,8 +166,56 @@ export const PILGRIMAGE_COPY: Record<
     seoLocationDescription: (name, count) =>
       `${count} anime real life locations in ${name}, grouped by series for route planning.`,
   },
+  // OpenCC s2twp of the zh block, plus scripts/data/zh-tw-overrides.json.
+  // Committed so the client bundle does not import opencc.
+  "zh-tw": {
+    siteKicker: "聖地巡禮檔案",
+    hubTitle: "動漫聖地巡禮地圖",
+    hubDescription:
+      "收錄日本動畫取景地的真實座標、場景描述與巡禮貼士。按番劇或城市瀏覽，也可在 AniGuessr 裡用街景驗證你的判斷。",
+    animeArchive: "按番劇瀏覽",
+    locationArchive: "按地區瀏覽",
+    spotCountLabel: (count) => `${count.toLocaleString()} 處取景地`,
+    animeCountLabel: (count) => `${count.toLocaleString()} 部作品`,
+    locationCountLabel: (count) => `${count.toLocaleString()} 個地區`,
+    playGame: "在 AniGuessr 挑戰",
+    backHub: "返回巡禮目錄",
+    backAnime: "番劇列表",
+    backLocation: "地區列表",
+    spotsInAnime: (title, count) => `《${title}》聖地巡禮 · ${count} 處`,
+    spotsInLocation: (name, count) => `${name} 動畫取景 · ${count} 處`,
+    spotDetail: "取景地詳情",
+    answerName: "現實地點",
+    episode: "出現場景",
+    funfacts: "巡禮貼士",
+    coordinates: "座標",
+    openMaps: "在 Google 地圖開啟",
+    openAnitabi: "在 Anitabi 檢視",
+    relatedAnime: "所屬作品",
+    relatedLocation: "所在地區",
+    emptyIndex: "SEO 索引尚未生成，請先執行 npm run data:build-pilgrimage-seo",
+    viewSpot: "檢視詳情",
+    seoSpotTitle: (anime, place) => `${anime} 聖地：${place}`,
+    seoSpotDescription: (anime, place, location) =>
+      `${anime} 取景地「${place}」（${location}）。真實座標、場景描述與聖地巡禮指南，可在 AniGuessr 街景模式中驗證。`,
+    seoAnimeTitle: (title, count) => `${title} 聖地巡禮地點大全（${count} 處）`,
+    seoAnimeDescription: (title, count) =>
+      `整理《${title}》在日本的實景取景地共 ${count} 處，含地點名稱、場景線索與地圖座標。`,
+    seoLocationTitle: (name, count) => `${name} 動畫聖地巡禮（${count} 處）`,
+    seoLocationDescription: (name, count) =>
+      `${name} 共收錄 ${count} 處日本動畫取景地，按作品分類，適合規劃聖地巡禮路線。`,
+  },
 };
 
-export function getPilgrimageCopy(locale: AnimeLocale) {
+/** Thin zh-TW index copy. These URLs are not hreflang twins of the full hub. */
+export const ZH_TW_AREA_COPY = {
+  title: "鎌倉與江之島動漫取景地",
+  description:
+    "目前僅提供鎌倉市與藤澤市（江之島）的繁體中文聖地頁面，含相關作品與取景地。",
+  animeTitle: "鎌倉與江之島相關作品",
+  locationTitle: "鎌倉市與藤澤市（江之島）",
+};
+
+export function getPilgrimageCopy(locale: PilgrimageLocale) {
   return PILGRIMAGE_COPY[locale] ?? PILGRIMAGE_COPY.en;
 }

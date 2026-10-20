@@ -139,6 +139,9 @@ describe("locale middleware exemptions", () => {
       "/zh/pilgrimage/locations",
       "/en/pilgrimage/spots/anitabi_1_2",
       "/ja/pilgrimage/anime/123-title",
+      "/zh-tw/pilgrimage",
+      "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
+      "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
     ]) {
       expect(isLocalePrefixedPilgrimagePath(pathname)).toBe(true);
       const response = middleware(request(pathname));
@@ -147,6 +150,27 @@ describe("locale middleware exemptions", () => {
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("set-cookie")).toBeNull();
     }
+  });
+
+  it("does not locale-redirect /zh-tw outside pilgrimage or onto simplified", () => {
+    const game = middleware(request("/zh-tw/game/anime"));
+    expect(game.status).toBe(200);
+    expect(game.headers.get("location")).toBeNull();
+    expect(game.headers.get("x-middleware-rewrite")).toBeNull();
+    expect(game.headers.get("set-cookie")).toBeNull();
+
+    const preferred = middleware(
+      new NextRequest(new URL("https://aniguessr.ayiora.com/pilgrimage"), {
+        headers: {
+          host: "aniguessr.ayiora.com",
+          "accept-language": "zh-TW,zh;q=0.9",
+        },
+      }),
+    );
+    expect(preferred.status).toBe(307);
+    expect(preferred.headers.get("location")).toBe(
+      "https://aniguessr.ayiora.com/zh/pilgrimage",
+    );
   });
 
   it("still rewrites other locale-prefixed pages", () => {

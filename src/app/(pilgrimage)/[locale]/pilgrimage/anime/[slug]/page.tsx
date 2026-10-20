@@ -1,24 +1,28 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildAnimePageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildAnimeFilmingListJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
 import {
   animeTitleIsAmbiguous,
+  animeHasZhTwPage,
   getAnimeBySlug,
   listSpotsForAnime,
+  listZhTwSpotsForAnime,
   pickLocalizedText,
   type PilgrimageAnimeSummary,
+  type PilgrimageSpot,
 } from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageShell,
   PilgrimageSpotList,
+  pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
 
@@ -34,15 +38,32 @@ export function generateStaticParams() {
 }
 
 function redirectMergedAnime(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   slug: string,
   anime: PilgrimageAnimeSummary,
 ) {
   if (slug === anime.slug) return;
-  permanentRedirect(withAnimeLocale(`/pilgrimage/anime/${anime.slug}`, locale));
+  permanentRedirect(pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale));
 }
 
-function animePageSeo(locale: AnimeLocale, anime: PilgrimageAnimeSummary) {
+function spotsForPage(
+  locale: PilgrimageLocale,
+  anime: PilgrimageAnimeSummary,
+): PilgrimageSpot[] {
+  return locale === "zh-tw"
+    ? listZhTwSpotsForAnime(anime.subjectId)
+    : listSpotsForAnime(anime.subjectId);
+}
+
+function assertZhTwAnime(locale: PilgrimageLocale, spots: PilgrimageSpot[]) {
+  if (locale === "zh-tw" && spots.length === 0) notFound();
+}
+
+function animePageSeo(
+  locale: PilgrimageLocale,
+  anime: PilgrimageAnimeSummary,
+  spotCount: number,
+) {
   const title = pickLocalizedText(anime.animeTitle, locale);
   return applyPilgrimageSeoOverride(
     "anime",
@@ -50,7 +71,7 @@ function animePageSeo(locale: AnimeLocale, anime: PilgrimageAnimeSummary) {
     locale,
     buildAnimePageSeo(
       locale,
-      { id: anime.subjectId, title, count: anime.spotCount },
+      { id: anime.subjectId, title, count: spotCount },
       animeTitleIsAmbiguous(title),
     ),
   );
@@ -62,13 +83,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const anime = getAnimeBySlug(slug);
   if (!anime) return { title: "Not found" };
   redirectMergedAnime(locale, slug, anime);
+  const spots = spotsForPage(locale, anime);
+  assertZhTwAnime(locale, spots);
+  const spotCount = locale === "zh-tw" ? spots.length : anime.spotCount;
 
-  const seo = animePageSeo(locale, anime);
-  return localizedPageMetadata(
+  const seo = animePageSeo(locale, anime, spotCount);
+  return pilgrimagePageMetadata(
     locale,
     `/pilgrimage/anime/${anime.slug}`,
     seo.title,
     seo.description,
+    animeHasZhTwPage(anime.subjectId),
   );
 }
 
@@ -79,16 +104,16 @@ export default async function PilgrimageAnimePage({ params }: Props) {
   const anime = getAnimeBySlug(slug);
   if (!anime) notFound();
   redirectMergedAnime(locale, slug, anime);
+  const spots = spotsForPage(locale, anime);
+  assertZhTwAnime(locale, spots);
+  const spotCount = locale === "zh-tw" ? spots.length : anime.spotCount;
 
   const title = pickLocalizedText(anime.animeTitle, locale);
-  const spots = listSpotsForAnime(anime.subjectId);
-  const seo = animePageSeo(locale, anime);
+  const seo = animePageSeo(locale, anime, spotCount);
   const jsonLd = buildAnimeFilmingListJsonLd({
     name: seo.title,
     description: seo.description,
-    url: absoluteUrl(
-      withAnimeLocale(`/pilgrimage/anime/${anime.slug}`, locale),
-    ),
+    url: absoluteUrl(pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale)),
     places: spots
       .slice(0, 24)
       .map((spot) => toFilmingLocation(spot, locale, seo.description)),
@@ -98,15 +123,15 @@ export default async function PilgrimageAnimePage({ params }: Props) {
     <PilgrimageShell
       locale={locale}
       kicker={copy.animeArchive}
-      title={copy.spotsInAnime(title, anime.spotCount)}
-      description={copy.seoAnimeDescription(title, anime.spotCount)}
+      title={copy.spotsInAnime(title, spotCount)}
+      description={copy.seoAnimeDescription(title, spotCount)}
     >
       <JsonLd data={jsonLd} />
       <PilgrimageSpotList
         locale={locale}
         spots={spots.map((spot) => ({
           id: spot.id,
-          href: withAnimeLocale(
+          href: pilgrimageHref(
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           ),
@@ -114,7 +139,7 @@ export default async function PilgrimageAnimePage({ params }: Props) {
           subtitle: pickLocalizedText(spot.title, locale),
         }))}
       />
-      {anime.spotCount > spots.length ? (
+      {locale !== "zh-tw" && anime.spotCount > spots.length ? (
         <p className="mt-4 text-xs text-pink-100/50">
           {spots.length} / {anime.spotCount} spots listed
         </p>

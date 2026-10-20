@@ -6,6 +6,10 @@ import { notFound } from "next/navigation";
 import { RootDocument } from "~/app/root-document";
 import { PersistAnimeLocale } from "~/components/PersistAnimeLocale";
 import { ANIME_LOCALES, isAnimeLocale } from "~/lib/anime-locale";
+import {
+  htmlLangForPilgrimage,
+  isPilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { SITE_NAME, SITE_URL } from "~/lib/seo";
 import { BRAND_NAME } from "~/lib/site-url";
 
@@ -29,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (!isAnimeLocale(locale)) return {};
+  if (!isPilgrimageLocale(locale)) return {};
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -75,11 +79,11 @@ export default async function PilgrimageLocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!isAnimeLocale(locale)) notFound();
+  if (!isPilgrimageLocale(locale)) notFound();
 
   return (
-    <RootDocument locale={locale}>
-      <PersistAnimeLocale locale={locale} />
+    <RootDocument locale={htmlLangForPilgrimage(locale)}>
+      {isAnimeLocale(locale) ? <PersistAnimeLocale locale={locale} /> : null}
       {children}
     </RootDocument>
   );

@@ -12,13 +12,16 @@ import {
   localizedField,
   localizedList,
 } from "./lib/pilgrimage-group.mjs";
+import { toZhTw } from "./lib/zh-tw.mjs";
+import zhTwCoverage from "../src/lib/zh-tw-coverage.json" with { type: "json" };
 import {
-  SITEMAP_PATHS_PER_FILE,
   buildLocalizedSitemapEntries,
   buildSitemapIndexXml,
   buildUrlSetXml,
+  buildZhTwOnlySitemapEntries,
+  chunkSitemapPaths,
   resolveSiteOrigin,
-  sitemapFileCount,
+  sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 
 const SOURCE_PATH = path.join(
@@ -497,6 +500,48 @@ async function main() {
     locationRedirects[oldLocation] = target;
   }
 
+  const zhTwLocationSlugs = new Set(zhTwCoverage.locationSlugs);
+  const zhTwAnimeIds = new Set();
+  let zhTwSpotCount = 0;
+
+  const attachTw = (record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    record.tw = toZhTw(record.zh ?? "");
+  };
+  const attachTwLines = (record) => {
+    if (!record || typeof record !== "object" || Array.isArray(record)) return;
+    record.tw = (record.zh ?? []).map((line) => toZhTw(line));
+  };
+
+  for (const spot of Object.values(spots)) {
+    if (!zhTwLocationSlugs.has(spot.locationSlug)) continue;
+    if (!spot.redirectTo) {
+      zhTwSpotCount += 1;
+      zhTwAnimeIds.add(spot.workSubjectId);
+    }
+    attachTw(spot.title);
+    attachTw(spot.description);
+    attachTw(spot.animeTitle);
+    attachTw(spot.location);
+    attachTw(spot.answerName);
+    if (spot.episodeContext && typeof spot.episodeContext === "object") {
+      attachTw(spot.episodeContext);
+    }
+    attachTwLines(spot.funfact);
+  }
+  for (const anime of animes) {
+    if (!zhTwAnimeIds.has(anime.subjectId)) continue;
+    attachTw(anime.animeTitle);
+  }
+  for (const location of locations) {
+    if (!zhTwLocationSlugs.has(location.slug)) continue;
+    attachTw(location.name);
+  }
+
+  const zhTwAnimeSlugs = animes
+    .filter((anime) => zhTwAnimeIds.has(anime.subjectId))
+    .map((anime) => anime.slug);
+
   const spotIds = Object.keys(spots).sort();
   for (const spot of Object.values(spots)) {
     delete spot.oldLocation;
@@ -536,44 +581,78 @@ async function main() {
     animes,
     locations,
     locationRedirects,
+    zhTw: {
+      locationSlugs: [...zhTwLocationSlugs],
+      animeSlugs: zhTwAnimeSlugs,
+      spotCount: zhTwSpotCount,
+      animeCount: zhTwAnimeSlugs.length,
+    },
     spotIds,
     spots,
   };
 
   const canonicalPaths = [
     ...PUBLIC_ROUTES.map(([route, priority]) => ({ path: route, priority })),
+    {
+      path: "/pilgrimage",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
+    {
+      path: "/pilgrimage/anime",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
+    {
+      path: "/pilgrimage/locations",
+      priority: 0.5,
+      zhTwOnly: true,
+    },
   ];
   for (const anime of animes) {
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,
       priority: 0.75,
+      zhTw: zhTwAnimeIds.has(anime.subjectId),
     });
   }
   for (const location of locations) {
     canonicalPaths.push({
       path: `/pilgrimage/locations/${location.slug}`,
       priority: 0.7,
+      zhTw: zhTwLocationSlugs.has(location.slug),
     });
   }
   for (const spot of visibleSpots) {
     canonicalPaths.push({
       path: `/pilgrimage/spots/${encodeURIComponent(spot.id)}`,
       priority: 0.6,
+      zhTw: zhTwLocationSlugs.has(spot.locationSlug),
     });
   }
 
   const origin = resolveSiteOrigin();
   const lastModified = generatedAt.slice(0, 10);
-  const fileCount = sitemapFileCount(canonicalPaths.length);
+  const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
   const sitemapUrls = [];
-  for (let file = 0; file < fileCount; file += 1) {
-    const chunk = canonicalPaths.slice(
-      file * SITEMAP_PATHS_PER_FILE,
-      (file + 1) * SITEMAP_PATHS_PER_FILE,
-    );
-    const entries = chunk.flatMap(({ path: route, priority }) =>
-      buildLocalizedSitemapEntries(origin, route, priority, lastModified),
+  for (let file = 0; file < sitemapChunks.length; file += 1) {
+    const chunk = sitemapChunks[file];
+    const entries = chunk.flatMap((item) =>
+      item.zhTwOnly
+        ? buildZhTwOnlySitemapEntries(
+            origin,
+            item.path,
+            item.priority,
+            lastModified,
+          )
+        : buildLocalizedSitemapEntries(
+            origin,
+            item.path,
+            item.priority,
+            lastModified,
+            { zhTw: Boolean(item.zhTw) },
+          ),
     );
     const xml = buildUrlSetXml(entries);
     await writeFile(path.join(SITEMAP_DIR, `${file}.xml`), xml);
@@ -614,10 +693,14 @@ async function main() {
     locations: locations.length,
     locationRedirects: Object.keys(locationRedirects).length,
     sitemap: {
-      files: fileCount,
+      files: sitemapChunks.length,
       paths: canonicalPaths.length,
-      urls: canonicalPaths.length * 3,
+      urls: canonicalPaths.reduce(
+        (sum, item) => sum + sitemapEntryCount(item),
+        0,
+      ),
     },
+    zhTw: output.zhTw,
     redirects: {
       animeSubjects: Object.keys(redirectMap.animeBySubjectId).length,
       locations: Object.keys(redirectMap.locations).length,
@@ -643,6 +726,7 @@ async function main() {
         duplicates: report.duplicates,
         buta: report.anime.buta,
         sitemap: report.sitemap,
+        zhTw: report.zhTw,
         mergedGroupCount: report.anime.mergedGroups,
       },
       null,

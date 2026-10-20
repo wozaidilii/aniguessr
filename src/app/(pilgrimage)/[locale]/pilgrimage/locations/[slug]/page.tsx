@@ -1,12 +1,12 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { isZhTwCoveredLocationSlug, type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { absoluteUrl, localizedPageMetadata } from "~/lib/seo";
+import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
 import {
@@ -18,6 +18,7 @@ import {
 import {
   PilgrimageShell,
   PilgrimageSpotList,
+  pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
 
@@ -33,17 +34,21 @@ export function generateStaticParams() {
 }
 
 function redirectLocationSlug(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   resolved: { location: PilgrimageLocationSummary; redirect: boolean },
 ) {
   if (!resolved.redirect) return;
   permanentRedirect(
-    withAnimeLocale(`/pilgrimage/locations/${resolved.location.slug}`, locale),
+    pilgrimageHref(`/pilgrimage/locations/${resolved.location.slug}`, locale),
   );
 }
 
+function assertZhTwLocation(locale: PilgrimageLocale, slug: string) {
+  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(slug)) notFound();
+}
+
 function locationPageSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   location: PilgrimageLocationSummary,
 ) {
   const name = pickLocalizedText(location.name, locale);
@@ -61,13 +66,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) return { title: "Not found" };
   redirectLocationSlug(locale, resolved);
+  assertZhTwLocation(locale, resolved.location.slug);
 
   const seo = locationPageSeo(locale, resolved.location);
-  return localizedPageMetadata(
+  return pilgrimagePageMetadata(
     locale,
     `/pilgrimage/locations/${resolved.location.slug}`,
     seo.title,
     seo.description,
+    isZhTwCoveredLocationSlug(resolved.location.slug),
   );
 }
 
@@ -78,6 +85,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) notFound();
   redirectLocationSlug(locale, resolved);
+  assertZhTwLocation(locale, resolved.location.slug);
   const location = resolved.location;
   const name = pickLocalizedText(location.name, locale);
 
@@ -88,7 +96,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
     name,
     description: seo.description,
     url: absoluteUrl(
-      withAnimeLocale(`/pilgrimage/locations/${location.slug}`, locale),
+      pilgrimageHref(`/pilgrimage/locations/${location.slug}`, locale),
     ),
     latitude: listed[0]?.lat,
     longitude: listed[0]?.lng,
@@ -109,7 +117,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
         locale={locale}
         spots={spots.map((spot) => ({
           id: spot.id,
-          href: withAnimeLocale(
+          href: pilgrimageHref(
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           ),

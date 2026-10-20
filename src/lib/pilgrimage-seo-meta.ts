@@ -1,4 +1,4 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { BRAND_NAME } from "~/lib/site-url";
 
 /**
@@ -9,7 +9,7 @@ import { BRAND_NAME } from "~/lib/site-url";
  * {count} {spotCount} {animeCount} {locationCount}
  */
 export const PILGRIMAGE_SEO_TEMPLATES: Record<
-  AnimeLocale,
+  PilgrimageLocale,
   {
     spotTitle: string;
     spotTitleWithEpisode: string;
@@ -118,6 +118,33 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexTitle: "按地区浏览动漫取景地 | {brand}",
     locationIndexDescription: "已收录动漫取景地的地区共 {locationCount} 个。",
   },
+  // OpenCC s2twp of zh, with scripts/data/zh-tw-overrides.json applied first.
+  "zh-tw": {
+    spotTitle: "{anime} {place} 取景地 | {brand}",
+    spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",
+    spotTitleWithScene: "{anime} {place}·{scene} 取景地 | {brand}",
+    spotTitleWithId: "{anime} {place} 取景地（{id}） | {brand}",
+    spotDescription: "{anime} 在{area}的取景地「{place}」。",
+    spotDescriptionWithEpisode:
+      "{anime} 在{area}的取景地「{place}」。出現場景：{episode}。",
+    spotDescriptionWithScene:
+      "{anime} 在{area}的取景地「{place}」。場景：{scene}。",
+    spotDescriptionWithId: "{anime} 在{area}的取景地「{place}」。編號 {id}。",
+    animeTitle: "{anime} 取景地 | {brand}",
+    animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
+    animeDescription: "{anime} 的實景取景地共 {count} 處，含座標與場景資訊。",
+    animeDescriptionWithId:
+      "{anime}（{id}）的實景取景地共 {count} 處，含座標與場景資訊。",
+    locationTitle: "{area} 動漫取景地 | {brand}",
+    locationDescription: "{area} 的動漫取景地共 {count} 處。",
+    hubTitle: "動漫取景地與聖地巡禮 | {brand}",
+    hubDescription:
+      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動漫取景地。",
+    animeIndexTitle: "按作品瀏覽動漫取景地 | {brand}",
+    animeIndexDescription: "已收錄取景地的動漫作品共 {animeCount} 部。",
+    locationIndexTitle: "按地區瀏覽動漫取景地 | {brand}",
+    locationIndexDescription: "已收錄動漫取景地的地區共 {locationCount} 個。",
+  },
 };
 
 export type SpotSeoVariant = "base" | "episode" | "scene" | "id";
@@ -213,7 +240,7 @@ function spotVars(fields: SpotSeoFields): Record<string, string> {
 }
 
 export function buildSpotSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   fields: SpotSeoFields,
   variant: SpotSeoVariant,
 ): RenderedSeo {
@@ -238,7 +265,7 @@ export function buildSpotSeo(
 }
 
 export function buildAnimePageSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   anime: { id: string; title: string; count: number },
   ambiguous: boolean,
 ): RenderedSeo {
@@ -262,7 +289,7 @@ export function buildAnimePageSeo(
 }
 
 export function buildLocationPageSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   location: { name: string; count: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -278,7 +305,7 @@ export function buildLocationPageSeo(
 }
 
 export function buildPilgrimageHubSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { spotCount: number; animeCount: number; locationCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -290,7 +317,7 @@ export function buildPilgrimageHubSeo(
 }
 
 export function buildAnimeIndexSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { animeCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
@@ -302,7 +329,7 @@ export function buildAnimeIndexSeo(
 }
 
 export function buildLocationIndexSeo(
-  locale: AnimeLocale,
+  locale: PilgrimageLocale,
   counts: { locationCount: number },
 ): RenderedSeo {
   const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
