@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildAnimeIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
@@ -63,6 +64,7 @@ export default async function PilgrimageAnimeIndexPage({
           ))}
         </PilgrimageCardGrid>
       )}
+      <AnitabiCredit locale={locale} className="mt-6" />
     </PilgrimageShell>
   );
 }

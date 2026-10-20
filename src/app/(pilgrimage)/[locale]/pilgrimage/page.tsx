@@ -1,10 +1,16 @@
 import { type Metadata } from "next";
 import Link from "next/link";
+import { FavoritePicker } from "~/components/pilgrimage/favorite-picker";
+import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
+import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { localizedPageMetadata } from "~/lib/seo";
-import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import {
+  getPilgrimageSeoIndex,
+  pickLocalizedText,
+} from "~/server/data/pilgrimage-seo";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
@@ -73,6 +79,20 @@ export default async function PilgrimageHubPage({
         <StatCard label={copy.animeCountLabel(index.animeCount)} />
         <StatCard label={copy.locationCountLabel(index.locationCount)} />
       </section>
+
+      <PilgrimageMapPanel locale={locale} />
+      <NearbySpots locale={locale} />
+      <FavoritePicker
+        locale={locale}
+        animes={index.animes.map((anime) => ({
+          id: anime.subjectId,
+          slug: anime.slug,
+          title: anime.titles
+            ? pickLocalizedText(anime.titles, locale)
+            : anime.animeTitle,
+          spotCount: anime.spotCount,
+        }))}
+      />
 
       <section className="mb-10">
         <div className="mb-4 flex items-end justify-between gap-3">

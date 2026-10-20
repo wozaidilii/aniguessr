@@ -7,6 +7,7 @@ const SOURCE_PATH = path.join(
 );
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/seo");
 const OUTPUT_PATH = path.join(OUTPUT_DIR, "index.json");
+const NAV_PATH = path.join(OUTPUT_DIR, "spots-nav.json");
 
 function subjectIdFromQuestion(question) {
   const tag = (question.tags ?? []).find((item) =>
@@ -89,6 +90,17 @@ async function main() {
         spotCount: 0,
         locationSlugs: new Set(),
         years: new Set(),
+        titles: {
+          zh: question.animeTitle ?? animeTitle,
+          ja:
+            question.locales?.ja?.animeTitle ||
+            question.animeTitle ||
+            animeTitle,
+          en:
+            question.locales?.en?.animeTitle ||
+            question.animeTitle ||
+            animeTitle,
+        },
       });
     }
     const anime = animeMap.get(subjectId);
@@ -121,6 +133,7 @@ async function main() {
       subjectId: item.subjectId,
       slug: item.slug,
       animeTitle: item.animeTitle,
+      titles: item.titles,
       spotCount: item.spotCount,
       locationCount: item.locationSlugs.size,
       years: [...item.years].sort((a, b) => a - b),
@@ -157,13 +170,38 @@ async function main() {
     spots,
   };
 
+  const nav = {
+    version: 1,
+    animes: Object.fromEntries(
+      animes.map((anime) => [
+        anime.subjectId,
+        [anime.titles.zh, anime.titles.ja, anime.titles.en],
+      ]),
+    ),
+    spots: spotIds.map((id) => {
+      const spot = spots[id];
+      return [
+        spot.id,
+        spot.subjectId,
+        spot.locationSlug,
+        Math.round(spot.lat * 1e6) / 1e6,
+        Math.round(spot.lng * 1e6) / 1e6,
+        spot.answerName.zh,
+        spot.answerName.ja,
+        spot.answerName.en,
+      ];
+    }),
+  };
+
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(OUTPUT_PATH, JSON.stringify(output));
+  await writeFile(NAV_PATH, JSON.stringify(nav));
 
   console.log(
     `pilgrimage SEO index: ${spotIds.length} spots, ${animes.length} anime, ${locations.length} locations`,
   );
   console.log(`written to ${OUTPUT_PATH}`);
+  console.log(`navigation catalog written to ${NAV_PATH}`);
 }
 
 main().catch((error) => {

@@ -459,6 +459,76 @@ if (snapshot.roundStatus !== "round-result") return cloneSnapshot(snapshot);
 
 ---
 
+### Scenario: Pilgrimage navigation, favorites, and anitabi attribution
+
+#### 1. Scope / Trigger
+
+- Trigger: maps, favorite anime, nearby spots, or anitabi attribution on pilgrimage pages.
+- Applies to `src/app/(pilgrimage)/**`, `src/components/pilgrimage/**`, `src/lib/pilgrimage-nav.ts`, `src/lib/pilgrimage-favorites.ts`, `public/sw.js`, and `scripts/build-pilgrimage-seo-data.mjs`.
+
+#### 2. Signatures
+
+- Favorite storage key: `aniguessr_pilgrimage_favorites_v1` (JSON string array of subject IDs).
+- Catalog: `GET /data/seo/spots-nav.json` with `{ version: 1, animes, spots }`. Spot tuples are `[id, subjectId, locationSlug, lat, lng, zh, ja, en]`.
+- Directions: `googleMapsDirectionsUrl(lat, lng)` → `https://www.google.com/maps/dir/?api=1&destination=<lat>,<lng>`.
+- License URL: `https://creativecommons.org/licenses/by-nc-sa/4.0/`. Source fallback: `https://anitabi.cn`.
+
+#### 3. Contracts
+
+- Pilgrimage HTML is identical for every visitor. Do not read `cookies()`, `headers()`, or geolocation on the server. Do not `Set-Cookie` on these responses.
+- Favorites and nearby lists update only after hydration. The first render is the no-favorites, no-location state.
+- Distance and ranking run in the browser. The catalog request must not include coordinates.
+- MapLibre loads only through the dynamic map chunk. Style is OpenFreeMap dark, with no API key.
+- The service worker must ignore navigation requests and must not cache HTML.
+- Wherever spot data or images render, show `anitabi`, `CC BY-NC-SA 4.0`, and a © rights-holder note in the page locale. No affiliate or ad URLs.
+
+#### 4. Validation & Error Matrix
+
+- Missing catalog → map and near-me show the localized failure state.
+- Geolocation denied → explain that location stays on the device; do not send a fallback coordinate to the server.
+- Malformed catalog version → `parseNavCatalog` throws.
+- Service worker caching documents → pilgrimage CDN HTML can go stale. Do not do this.
+
+#### 5. Good/Base/Bad Cases
+
+- Good: server-rendered spot list plus a client map that fetches `spots-nav.json` and clusters markers.
+- Base: favorites stored only in localStorage, account sync left for a later client-only write.
+- Bad: filtering the server-rendered spot list from localStorage, or posting coordinates to an API to sort nearby spots.
+
+#### 6. Tests Required
+
+- Unit tests for catalog parsing, favorite ranking, directions URL, license URL, and the service worker navigation skip.
+- `npm run check` after UI or catalog changes.
+- Browser check of the hub map, favorite picker, and near-me list on a mobile viewport.
+
+#### 7. Wrong vs Correct
+
+Wrong:
+
+```tsx
+const favorites = cookies().get("favorites");
+const nearby = await db.query("select * from spots order by ll_to_earth($1,$2)", [lat, lng]);
+```
+
+Correct:
+
+```tsx
+useEffect(() => {
+  setIds(readFavoriteAnimeIds());
+}, []);
+navigator.geolocation.getCurrentPosition((position) => {
+  setSpots(
+    rankNearbySpots(
+      catalog.spots,
+      { lat: position.coords.latitude, lng: position.coords.longitude },
+      ids,
+    ),
+  );
+});
+```
+
+---
+
 ## Testing Requirements
 
 <!-- What level of testing is expected -->

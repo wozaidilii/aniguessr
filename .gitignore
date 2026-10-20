@@ -31,6 +31,7 @@ public/event-images
 
 # 构建时从 anime-guessr-questions.json 生成的 SEO 索引（体积较大）
 public/data/seo/index.json
+public/data/seo/spots-nav.json
 
 # production
 /build

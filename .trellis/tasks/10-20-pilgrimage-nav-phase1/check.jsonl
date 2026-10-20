@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Check map, image, and cache rules"}
+{"file": ".trellis/spec/lessons.md", "reason": "Confirm pilgrimage responses still avoid Set-Cookie"}
+{"file": ".trellis/tasks/10-20-pilgrimage-nav-phase1/prd.md", "reason": "Acceptance criteria for nav, near me, PWA, and attribution"}
+{"file": ".trellis/tasks/10-20-pilgrimage-nav-phase1/research/nav-approach.md", "reason": "Catalog and license link expectations"}
