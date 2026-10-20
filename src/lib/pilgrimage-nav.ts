@@ -35,7 +35,7 @@ const EMPTY_TEXT: NavText = { zh: "", ja: "", en: "" };
 
 export function anitabiUrlFromSpotId(id: string, subjectId: string): string {
   const embedded = /^anitabi_(\d+)_(.+)$/u.exec(id);
-  const bangumiId = embedded?.[1] || subjectId;
+  const bangumiId = embedded?.[1] ?? subjectId;
   const pid = embedded?.[2] ?? "";
   if (!bangumiId || !pid) return ANITABI_SITE;
   return `https://anitabi.cn/map?bangumiId=${encodeURIComponent(bangumiId)}&pid=${encodeURIComponent(pid)}`;
@@ -61,12 +61,19 @@ export function googleStreetViewUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
 }
 
+function firstFilled(values: Array<string | undefined>): string {
+  for (const value of values) {
+    if (value?.trim()) return value;
+  }
+  return "";
+}
+
 export function localizedNavText(
   text: NavText,
   locale: PilgrimageLocale,
 ): string {
-  if (locale === "zh-tw") return text.tw || text.ja || text.en || "";
-  return text[locale] || text.en || text.zh || text.ja || "";
+  if (locale === "zh-tw") return firstFilled([text.tw, text.ja, text.en]);
+  return firstFilled([text[locale], text.en, text.zh, text.ja]);
 }
 
 export function haversineKm(
