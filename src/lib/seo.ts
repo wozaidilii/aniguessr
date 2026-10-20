@@ -14,9 +14,9 @@ export const SITE_URL: string = resolveSiteUrl();
 export const SITE_NAME = "AniGuessr";
 
 export const SITE_DESCRIPTIONS: Record<AnimeLocale, string> = {
-  en: "AniGuessr is an anime street-view guessing game: read the anime clue, interrogate the real Street View, and pin the pilgrimage location on the world map.",
-  zh: "AniGuessr 是一款动漫街景猜地点游戏：读取番剧线索，在真实街景中寻找答案，把圣地坐标钉回世界地图。",
-  ja: "AniGuessr はアニメの手がかりから現実のストリートビューで場所を当てる聖地巡礼ゲームです。",
+  en: "AniGuessr is an anime street-view guessing game. Look at one anime frame, explore the real street, and pin the place on the map.",
+  zh: "AniGuessr 是动漫街景猜地点游戏。看一张动漫画面，在真实街景里找出拍摄地，再把位置标在地图上。",
+  ja: "AniGuessr は、アニメの一場面から現実の街の場所を当てるゲームです。",
 };
 
 /** 把站内相对路径拼成绝对 URL。 */

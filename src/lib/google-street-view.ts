@@ -140,6 +140,7 @@ export interface GoogleMapsApi {
   };
   event?: {
     clearInstanceListeners?: (instance: object) => void;
+    trigger?: (instance: object, eventName: string) => void;
   };
 }
 

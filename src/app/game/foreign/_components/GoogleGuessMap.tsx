@@ -36,6 +36,10 @@ interface Props {
   restrictToCountry?: boolean;
   formatDistance?: (distanceKm: number) => string;
   onGuess: (point: { lat: number; lng: number }) => void;
+  showLegend?: boolean;
+  guessColor?: string;
+  answerColor?: string;
+  lineColor?: string;
 }
 
 type LoadState = "idle" | "loading" | "ready" | "error";
@@ -78,6 +82,10 @@ export function GoogleGuessMap({
   restrictToCountry = true,
   formatDistance = formatDistanceZh,
   onGuess,
+  showLegend = true,
+  guessColor = "#f59e0b",
+  answerColor = "#22c55e",
+  lineColor = "#fbbf24",
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
@@ -123,7 +131,7 @@ export function GoogleGuessMap({
             ? `${labels.answerTitle}: ${answerLabel}`
             : labels.answerTitle,
           icon: buildMarkerIcon({
-            color: "#22c55e",
+            color: answerColor,
             label: labels.answerMarkerLabel,
             size: 44,
           }),
@@ -139,7 +147,7 @@ export function GoogleGuessMap({
           map,
           title: labels.guessTitle,
           icon: buildMarkerIcon({
-            color: "#f59e0b",
+            color: guessColor,
             label: labels.guessMarkerLabel,
             size: 36,
           }),
@@ -152,7 +160,7 @@ export function GoogleGuessMap({
       lineRef.current = new api.Polyline({
         path: [guess, answer],
         map,
-        strokeColor: "#fbbf24",
+        strokeColor: lineColor,
         strokeOpacity: 0.9,
         strokeWeight: 4,
       });
@@ -177,6 +185,9 @@ export function GoogleGuessMap({
     labels.guessMarkerLabel,
     labels.guessTitle,
     restrictToCountry,
+    answerColor,
+    guessColor,
+    lineColor,
   ]);
 
   useEffect(() => {
@@ -243,6 +254,24 @@ export function GoogleGuessMap({
     if (state === "ready") syncMarkers();
   }, [state, syncMarkers]);
 
+  const syncMarkersRef = useRef(syncMarkers);
+  syncMarkersRef.current = syncMarkers;
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || state !== "ready" || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(() => {
+      const map = mapRef.current;
+      if (!map) return;
+      getGoogleMapsApi()?.event?.trigger?.(map, "resize");
+      syncMarkersRef.current();
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [state]);
+
   return (
     <div
       className={`relative h-full ${minHeightClass} overflow-hidden bg-stone-950`}
@@ -262,14 +291,20 @@ export function GoogleGuessMap({
         </div>
       )}
 
-      {answer && (
+      {showLegend && answer && (
         <div className="pointer-events-none absolute top-3 right-3 rounded-md border border-stone-700 bg-stone-950/90 px-3 py-2 text-xs text-stone-200 shadow-lg shadow-black/30">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-400" />
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-full"
+              style={{ background: guessColor }}
+            />
             {labels.guessTitle}
           </div>
           <div className="mt-1 flex items-center gap-2">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500" />
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-full"
+              style={{ background: answerColor }}
+            />
             {labels.answerTitle}
           </div>
           {distanceKm != null ? (

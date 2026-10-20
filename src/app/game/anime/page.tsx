@@ -1,8 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowIcon } from "~/components/brand/ArrowIcon";
+import { BrandLockup } from "~/components/brand/BrandLockup";
+import { LangSwitch } from "~/components/brand/LangSwitch";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
+import { GAME_UI_COPY } from "~/lib/aniguessr-copy";
+import {
+  difficultyHint,
+  difficultyLabel,
+  difficultyStars,
+} from "~/lib/difficulty-labels";
 import { GoogleGuessMap } from "~/app/game/foreign/_components/GoogleGuessMap";
 import { GoogleStreetView } from "~/app/game/foreign/_components/GoogleStreetView";
 import { redactAnswerTerms } from "~/lib/anime-clue-redaction";
@@ -32,6 +42,8 @@ import {
 } from "~/lib/anime-guessr";
 import {
   DEFAULT_ANIME_LOCALE,
+  saveAnimeLocale,
+  stripLocalePrefix,
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
@@ -195,25 +207,9 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     totalElapsed: (time) => `总用时 ${time}`,
     roundsLabel: "局数",
     roundsOption: (rounds) => `${rounds} 轮`,
-    difficultyLabel: "难度档位",
-    difficultyOption: (tier) =>
-      (
-        ({
-          beginner: "入门",
-          intermediate: "进阶",
-          master: "大师",
-          miracle: "神迹",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
-    difficultyHint: (tier) =>
-      (
-        ({
-          beginner: "仅包含难度 1 的题目。",
-          intermediate: "包含难度 1 与 2 的题目。",
-          master: "包含难度 1、2、3 的题目。",
-          miracle: "包含全部难度题目。",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
+    difficultyLabel: "难度",
+    difficultyOption: (tier) => difficultyLabel("zh", tier),
+    difficultyHint: (tier) => difficultyHint("zh", tier),
     animeClue: "动漫线索",
     scene: "场景",
     openMap: "打开地图",
@@ -309,24 +305,8 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     roundsLabel: "ラウンド数",
     roundsOption: (rounds) => `${rounds} ラウンド`,
     difficultyLabel: "難易度",
-    difficultyOption: (tier) =>
-      (
-        ({
-          beginner: "入門",
-          intermediate: "進階",
-          master: "マスター",
-          miracle: "奇跡",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
-    difficultyHint: (tier) =>
-      (
-        ({
-          beginner: "難易度 1 の問題のみ。",
-          intermediate: "難易度 1 と 2 の問題。",
-          master: "難易度 1、2、3 の問題。",
-          miracle: "すべての難易度の問題。",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
+    difficultyOption: (tier) => difficultyLabel("ja", tier),
+    difficultyHint: (tier) => difficultyHint("ja", tier),
     animeClue: "アニメヒント",
     scene: "シーン",
     openMap: "地図を開く",
@@ -427,24 +407,8 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     roundsLabel: "Rounds",
     roundsOption: (rounds) => `${rounds} rounds`,
     difficultyLabel: "Difficulty",
-    difficultyOption: (tier) =>
-      (
-        ({
-          beginner: "Beginner",
-          intermediate: "Intermediate",
-          master: "Master",
-          miracle: "Miracle",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
-    difficultyHint: (tier) =>
-      (
-        ({
-          beginner: "Difficulty 1 questions only.",
-          intermediate: "Difficulty 1 and 2 questions.",
-          master: "Difficulty 1, 2, and 3 questions.",
-          miracle: "All difficulty levels.",
-        }) satisfies Record<AnimeGuessrDifficultyTier, string>
-      )[tier],
+    difficultyOption: (tier) => difficultyLabel("en", tier),
+    difficultyHint: (tier) => difficultyHint("en", tier),
     animeClue: "Anime clue",
     scene: "Scene",
     openMap: "Open map",
@@ -593,11 +557,13 @@ function AnimeClueImage({
   text,
   imageUnavailable,
   imageMissingBase,
+  flush = false,
 }: {
   question: AnimeGuessrQuestion;
   text: AnimeGuessrQuestionText;
   imageUnavailable: string;
   imageMissingBase: string;
+  flush?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   const imageUrl = buildAnimeGuessrImageUrl(question.imagePath);
@@ -611,11 +577,17 @@ function AnimeClueImage({
   }, [question.id]);
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-xl border border-white/10 bg-black/40">
+    <div
+      className={
+        flush
+          ? "relative aspect-video overflow-hidden bg-black/40"
+          : "relative aspect-video overflow-hidden rounded-xl border border-white/10 bg-black/40"
+      }
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={displayImageUrl}
-        alt={text.title}
+        alt={flush ? "" : text.title}
         className="h-full w-full object-cover"
         onError={() => setFailed(true)}
       />
@@ -628,99 +600,68 @@ function AnimeClueImage({
   );
 }
 
-function useCompactViewport() {
-  const [matches, setMatches] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const query = window.matchMedia("(max-width: 639px)");
-    const update = () => setMatches(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  return matches;
-}
-
 function AnimeCluePanel({
   question,
   text,
   copy,
+  locale,
+  difficultyTier,
   loadMessage,
-  className,
-  onClose,
 }: {
   question: AnimeGuessrQuestion;
   text: AnimeGuessrQuestionText;
   copy: GameCopy;
+  locale: AnimeLocale;
+  difficultyTier: AnimeGuessrDifficultyTier;
   loadMessage: string;
-  className: string;
-  onClose?: () => void;
 }) {
+  const ui = GAME_UI_COPY[locale];
+  const [open, setOpen] = useState(false);
+  const description = redactAnswerTerms(text.description, [
+    text.location,
+    text.answerName,
+    question.location,
+  ]);
+  const aspect = text.aspect
+    ? redactAnswerTerms(text.aspect, [
+        text.location,
+        text.answerName,
+        question.location,
+      ])
+    : "";
+
   return (
-    <aside
-      className={`anime-panel flex flex-col gap-3 overflow-y-auto ${className}`}
-    >
-      {onClose && (
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-bold text-cyan-100/70">
-            {copy.animeClue}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 rounded-lg border border-white/10 px-3 text-sm font-bold text-pink-50/80 transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
-          >
-            {copy.closePanel}
-          </button>
-        </div>
-      )}
-
-      <AnimeClueImage
-        question={question}
-        text={text}
-        imageUnavailable={copy.imageUnavailable}
-        imageMissingBase={copy.imageMissingBase}
-      />
-
-      <div>
-        {!onClose && (
-          <div className="text-sm font-bold text-cyan-100/70">
-            {copy.animeClue}
-          </div>
-        )}
-        <h2 className="mt-1 text-xl font-black text-pink-100 sm:text-2xl">
-          {text.animeTitle}
-        </h2>
-        {question.year != null && (
-          <div className="mt-1 text-sm text-pink-50/60">{question.year}</div>
-        )}
+    <aside className="ag-glass ag-clue">
+      <div className="relative">
+        <AnimeClueImage
+          question={question}
+          text={text}
+          imageUnavailable={copy.imageUnavailable}
+          imageMissingBase={copy.imageMissingBase}
+          flush
+        />
+        <span className="ag-clue-tag">{ui.clueTag}</span>
       </div>
-
-      <div className="rounded-xl border border-pink-300/20 bg-pink-300/10 px-3 py-2 text-sm leading-6 text-pink-50">
-        {redactAnswerTerms(text.description, [
-          text.location,
-          text.answerName,
-          question.location,
-        ])}
+      <div className="ag-clue-cap">
+        <b>
+          {difficultyLabel(locale, difficultyTier)} {difficultyStars(difficultyTier)}
+        </b>
+        <span>{ui.clueHidden}</span>
+        <button type="button" className="ag-clue-more" onClick={() => setOpen((value) => !value)}>
+          {ui.clueMore}
+        </button>
       </div>
-
-      {text.aspect && (
-        <div className="text-sm leading-6 text-pink-50/70">
-          {copy.scene}:{" "}
-          {redactAnswerTerms(text.aspect, [
-            text.location,
-            text.answerName,
-            question.location,
-          ])}
+      {open && (
+        <div className="ag-clue-text">
+          <p>{description}</p>
+          {aspect ? (
+            <p>
+              {copy.scene}: {aspect}
+            </p>
+          ) : null}
         </div>
       )}
-
-      {loadMessage && (
-        <div className="rounded-xl border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs leading-5 text-cyan-50">
-          {loadMessage}
-        </div>
-      )}
+      {loadMessage && <p className="ag-clue-text">{loadMessage}</p>}
     </aside>
   );
 }
@@ -728,6 +669,9 @@ function AnimeCluePanel({
 export default function AnimeGuessrPage() {
   const { ready, session } = useEmailSession();
   const locale = useAnimeLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const ui = GAME_UI_COPY[locale];
   const [questions, setQuestions] = useState<AnimeGuessrQuestion[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [loadMessage, setLoadMessage] = useState(
@@ -743,8 +687,6 @@ export default function AnimeGuessrPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const [round, setRound] = useState(0);
   const [phase, setPhase] = useState<Phase>("playing");
-  const [mobileClueOpen, setMobileClueOpen] = useState(false);
-  const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [guess, setGuess] = useState<{ lat: number; lng: number } | null>(null);
   const [results, setResults] = useState<AnimeRoundResult[]>([]);
   const [roundCount, setRoundCount] =
@@ -760,7 +702,6 @@ export default function AnimeGuessrPage() {
   const copy = GAME_COPY[locale];
   const googleMapLabels = getGoogleGuessMapLabels(locale);
   const googleMapsLanguage = getGoogleMapsLanguage(locale);
-  const isCompactViewport = useCompactViewport();
   const gameNextUrl = useMemo(
     () => withAnimeLocale("/game/anime", locale),
     [locale],
@@ -807,17 +748,6 @@ export default function AnimeGuessrPage() {
     loadState === "ready" && phase !== "final" && !guestBlocked,
     gameTimerKey,
   );
-
-  useEffect(() => {
-    setMobileClueOpen(false);
-    setMobileMapOpen(false);
-  }, [current?.id]);
-
-  useEffect(() => {
-    if (!roundResult) return;
-    setMobileClueOpen(false);
-    setMobileMapOpen(false);
-  }, [roundResult]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1256,6 +1186,43 @@ export default function AnimeGuessrPage() {
     setLoadMessage(copy.skippedStreetView);
   }, [copy, current, questions, results.length, round]);
 
+  function selectLocale(nextLocale: AnimeLocale) {
+    saveAnimeLocale(nextLocale);
+    const innerPath = stripLocalePrefix(pathname);
+    const search = window.location.search;
+    router.push(withAnimeLocale(`${innerPath}${search}`, nextLocale));
+  }
+
+  function openShare(kind: "x" | "line" | "link") {
+    const url = `${window.location.origin}${gameNextUrl}`;
+    const text = copy.shareText(totalScore.toLocaleString(), url);
+    capturePostHogEvent(
+      POSTHOG_EVENTS.animeScoreShared,
+      { score: totalScore, auth_state: session ? "logged_in" : "guest", channel: kind },
+      session?.user.id,
+    );
+    if (kind === "x") {
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;
+    }
+    if (kind === "line") {
+      window.open(
+        `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;
+    }
+    void navigator.clipboard.writeText(text).then(
+      () => setShareMessage(copy.shareCopied),
+      () => setShareMessage(copy.shareFailed),
+    );
+  }
+
   if (!ready) return <AuthLoading />;
 
   if (guestBlocked) {
@@ -1364,8 +1331,8 @@ export default function AnimeGuessrPage() {
             onBeforeAuth={persistPendingFinalResult}
           />
         )}
-        <header className="flex items-center justify-between border-b border-white/10 bg-slate-950/60 px-6 py-3 backdrop-blur">
-          <h1 className="text-xl font-black text-pink-200">AniGuessr</h1>
+        <header className="flex items-center justify-between border-b border-white/10 px-6 py-3">
+          <BrandLockup href={homeUrl} />
           <Link
             href={homeUrl}
             className="rounded-lg border border-white/10 bg-white/10 px-3 py-1.5 text-sm font-bold text-pink-50 transition hover:bg-white/15 focus:ring-2 focus:ring-cyan-200 focus:outline-none"
@@ -1509,333 +1476,233 @@ export default function AnimeGuessrPage() {
     );
   }
 
+  const roundMax = roundResult?.scoreBreakthrough
+    ? LOCATION_SOLO_ANIME_BREAKTHROUGH_MAX
+    : LOCATION_ROUND_SCORE_MAX;
+  const meterWidth = roundResult
+    ? Math.min(100, Math.round((roundResult.score / roundMax) * 100))
+    : 0;
+  const filledDots = roundResult ? results.length : round;
+
   return (
-    <main className="anime-shell flex h-dvh flex-col overflow-hidden text-white">
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-slate-950/70 px-3 py-2 backdrop-blur sm:gap-3 sm:px-6 sm:py-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-black text-pink-200 sm:text-xl">
-            AniGuessr
-          </h1>
-          <Link
-            href={homeUrl}
-            className="text-xs font-bold text-cyan-100/60 transition hover:text-cyan-100 focus:ring-2 focus:ring-cyan-200 focus:outline-none"
-          >
-            {copy.home}
-          </Link>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-          {!session && guestProgress && (
-            <span className="hidden rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-xs font-bold text-cyan-50 min-[390px]:inline-flex">
-              {copy.guestRemainingShort(getGuestGamesRemaining(guestProgress))}
-            </span>
-          )}
-          <span className="anime-chip">
-            {copy.roundStatus(
-              round + 1,
-              questions.length,
-              Boolean(roundResult),
-            )}
-          </span>
-          <span className="rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-xs font-black text-amber-50">
-            {copy.totalElapsed(formatAnimeGameCountdown(totalElapsedSeconds))}
-          </span>
-        </div>
-      </header>
+    <main className={`ag-game ${roundResult ? "is-result" : "is-play"}`}>
+      <div className={`ag-street ${roundResult ? "is-dimmed" : ""}`}>
+        {currentStreetViewLocation && (
+          <GoogleStreetView
+            key={currentStreetViewLocation.id}
+            location={currentStreetViewLocation}
+            googleMapsLanguage={googleMapsLanguage}
+            onUnavailable={handleCurrentStreetViewUnavailable}
+          />
+        )}
+      </div>
 
-      <div className="relative flex-1 overflow-hidden">
-        <section
-          className={`h-full min-h-0 ${
-            roundResult ? "pointer-events-none opacity-0" : ""
-          }`}
-          aria-hidden={Boolean(roundResult)}
-        >
-          {currentStreetViewLocation && !roundResult && (
-            <GoogleStreetView
-              key={currentStreetViewLocation.id}
-              location={currentStreetViewLocation}
-              googleMapsLanguage={googleMapsLanguage}
-              onUnavailable={handleCurrentStreetViewUnavailable}
-            />
-          )}
-        </section>
-
-        {!roundResult &&
-          current &&
-          currentText &&
-          isCompactViewport === false && (
+      {!roundResult && (
+        <>
+          <div className="ag-bar">
+            <div className="ag-glass ag-bar-logo">
+              <BrandLockup href={homeUrl} />
+            </div>
+            <div className="ag-glass ag-hud">
+              <div>
+                <small>{ui.hudRound}</small>
+                <b>
+                  {round + 1} / {questions.length}
+                </b>
+                <div className="ag-dots" aria-hidden="true">
+                  {questions.map((question, index) => (
+                    <i
+                      key={question.id}
+                      className={
+                        index < filledDots
+                          ? "is-done"
+                          : index === round
+                            ? "is-now"
+                            : ""
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <small>{ui.hudScore}</small>
+                <b>{totalScore.toLocaleString()}</b>
+              </div>
+              <div className="is-time">
+                <small>{ui.hudTime}</small>
+                <b>{formatAnimeGameCountdown(totalElapsedSeconds)}</b>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {!session && guestProgress && (
+                <span className="ag-guest ag-glass" style={{ display: "inline-flex", alignItems: "center", padding: "0 12px" }}>
+                  {copy.guestRemainingShort(getGuestGamesRemaining(guestProgress))}
+                </span>
+              )}
+              <Link href={homeUrl} className="ag-glass ag-icon-btn">
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                  <path d="M7 4v12M13 4v12" />
+                </svg>
+                <span className="ag-quit-label">{ui.quit}</span>
+              </Link>
+            </div>
+          </div>
+          {current && currentText && (
             <AnimeCluePanel
               question={current}
               text={currentText}
               copy={copy}
+              locale={locale}
+              difficultyTier={difficultyTier}
               loadMessage={loadMessage}
-              className="absolute top-4 left-4 z-20 max-h-[calc(100dvh-7rem)] w-[min(calc(100vw-2rem),400px)] p-4"
             />
           )}
+          <div className="ag-glass ag-hint">{ui.dragHint}</div>
+        </>
+      )}
 
-        {!roundResult &&
-          current &&
-          currentText &&
-          isCompactViewport === true &&
-          !mobileClueOpen && (
-            <button
-              type="button"
-              onClick={() => {
-                setMobileClueOpen(true);
-                setMobileMapOpen(false);
-              }}
-              className="anime-panel absolute top-3 left-3 z-30 min-h-11 max-w-[calc(100vw-1.5rem)] rounded-xl px-3 text-sm font-black text-pink-50 shadow-lg shadow-black/35"
-            >
-              {copy.animeClue}
-            </button>
-          )}
-
-        {!roundResult &&
-          current &&
-          currentText &&
-          isCompactViewport === true &&
-          mobileClueOpen && (
-            <>
-              <button
-                type="button"
-                aria-label={copy.closePanel}
-                className="absolute inset-0 z-40 bg-black/45"
-                onClick={() => setMobileClueOpen(false)}
-              />
-              <AnimeCluePanel
-                question={current}
-                text={currentText}
-                copy={copy}
-                loadMessage={loadMessage}
-                onClose={() => setMobileClueOpen(false)}
-                className="absolute inset-x-3 top-3 z-50 max-h-[min(72dvh,560px)] p-3"
-              />
-            </>
-          )}
-
-        {roundResult && roundResultText && (
-          <aside className="absolute top-[42%] right-0 bottom-0 left-0 z-30 flex flex-col gap-4 overflow-y-auto border-t border-white/10 bg-slate-950/95 p-5 backdrop-blur lg:top-0 lg:left-auto lg:w-[400px] lg:border-t-0 lg:border-l">
-            <div>
-              <div className="text-sm font-bold text-cyan-100/70">
-                {copy.answer}
+      {roundResult && roundResultText && (
+        <>
+          <div className="ag-result-top">
+            <BrandLockup href={homeUrl} />
+            <LangSwitch locale={locale} onSelect={selectLocale} />
+          </div>
+          <aside className="ag-result-side">
+            <p className="ag-kicker">
+              ROUND {round + 1} / {questions.length}
+            </p>
+            <h2 style={{ marginTop: 10, fontSize: 24 }}>{ui.closeness(roundResult.distanceKm)}</h2>
+            <div className="ag-scoreline">
+              <b>{roundResult.score.toLocaleString()}</b>
+              <span>/ {roundMax.toLocaleString()}</span>
+            </div>
+            <div className="ag-meter" aria-hidden="true">
+              <i style={{ width: `${meterWidth}%` }} />
+            </div>
+            <div className="ag-kv">
+              <div>
+                <small>{ui.distance}</small>
+                <b>{formatDistance(roundResult.distanceKm, locale)}</b>
               </div>
-              <h2 className="mt-1 text-2xl font-black text-pink-100">
-                {roundResultText.answerName}
-              </h2>
-              <p className="mt-1 text-sm text-pink-50/60">
-                {roundResultText.animeTitle} · {roundResultText.location}
+              <div>
+                <small>{ui.answerTime}</small>
+                <b>{formatElapsed(roundResult.elapsedSeconds, locale)}</b>
+              </div>
+            </div>
+            <p className="ag-clue-text" style={{ padding: "10px 0 0" }}>
+              {ui.breakdown(roundResult.distancePts, roundResult.speedCompensationPts)}
+            </p>
+            {roundResult.scoreBreakthrough ? (
+              <p className="ag-clue-text" style={{ padding: "8px 0 0" }}>
+                {copy.scoreBreakthrough}
               </p>
-              {roundResultText.episodeContext && (
-                <p className="mt-2 text-sm text-pink-50/50">
-                  {roundResultText.episodeContext}
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/10 p-5 text-center">
-              <div className="text-sm text-cyan-100/70">{copy.roundScore}</div>
-              <div
-                className={`text-6xl font-extrabold ${
-                  roundResult.scoreBreakthrough ? "text-cyan-100" : "text-white"
-                }`}
-              >
-                {roundResult.score.toLocaleString()}
-              </div>
-              <div className="text-sm text-pink-50/50">
-                /{" "}
-                {roundResult.scoreBreakthrough
-                  ? LOCATION_SOLO_ANIME_BREAKTHROUGH_MAX
-                  : LOCATION_ROUND_SCORE_MAX}
-              </div>
-              {roundResult.scoreBreakthrough ? (
-                <div className="mt-4 rounded-xl border border-cyan-200/30 bg-cyan-200/10 px-3 py-2 text-sm leading-6 text-cyan-50">
-                  {copy.scoreBreakthrough}
-                </div>
-              ) : null}
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/10 p-4">
-                <div className="text-xs text-pink-50/50">
-                  {copy.distancePts}
-                </div>
-                <div className="mt-1 font-bold text-white">
-                  {roundResult.distancePts}
-                </div>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/10 p-4">
-                <div className="text-xs text-pink-50/50">{copy.speedBonus}</div>
-                <div className="mt-1 font-bold text-white">
-                  +{roundResult.speedCompensationPts}
-                </div>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/10 p-4">
-                <div className="text-xs text-pink-50/50">{copy.elapsed}</div>
-                <div className="mt-1 font-bold text-white">
-                  {formatElapsed(roundResult.elapsedSeconds, locale)}
-                </div>
+            ) : null}
+            <div className="ag-answer">
+              <AnimeClueImage
+                question={roundResult.question}
+                text={roundResultText}
+                imageUnavailable={copy.imageUnavailable}
+                imageMissingBase={copy.imageMissingBase}
+                flush
+              />
+              <div>
+                <b>{ui.answerLabel(roundResultText.answerName)}</b>
+                <span>
+                  {roundResultText.animeTitle} · {roundResultText.location}
+                </span>
               </div>
             </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-pink-50/70">
-              <span className="font-bold text-white">
-                {copy.guessDistance(
-                  formatDistance(roundResult.distanceKm, locale),
-                )}
-              </span>
-              {roundResultText.funfact.length > 0 && (
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-pink-50/60">
-                  {roundResultText.funfact.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
+            {roundResultText.funfact.length > 0 && (
+              <ul className="ag-clue-text">
+                {roundResultText.funfact.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
             <a
               href={buildGoogleMapsStreetViewUrl(roundResult.question)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-cyan-200/35 bg-cyan-200/10 px-4 text-center text-sm font-black text-cyan-50 transition hover:border-cyan-100 hover:bg-cyan-200/20 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
+              className="ag-clue-more"
+              style={{ marginTop: 8, textAlign: "left" }}
             >
               {copy.streetViewLink}
             </a>
-
-            <button
-              type="button"
-              onClick={handleNext}
-              className="anime-button mt-auto"
-            >
-              {round + 1 >= questions.length ? copy.finalScore : copy.nextRound}
-            </button>
+            <div className="ag-share">
+              <p>{ui.shareResult}</p>
+              {shareMessage && (
+                <p style={{ color: "var(--ag-cyan)" }}>{shareMessage}</p>
+              )}
+              <div className="ag-share-row">
+                <button type="button" onClick={() => openShare("x")}>
+                  X
+                </button>
+                <button type="button" onClick={() => openShare("line")}>
+                  LINE
+                </button>
+                <button type="button" onClick={() => openShare("link")}>
+                  {locale === "ja" ? "リンク" : locale === "zh" ? "链接" : "Link"}
+                </button>
+              </div>
+              <button type="button" onClick={handleNext} className="ag-btn ag-btn-pink ag-next">
+                {round + 1 >= questions.length ? copy.finalScore : copy.nextRound} <ArrowIcon />
+              </button>
+            </div>
           </aside>
-        )}
-
-        {roundResult && (
-          <div className="absolute inset-x-0 top-0 z-10 h-[42%] lg:inset-y-0 lg:right-[400px] lg:left-0 lg:h-auto">
-            <section className="flex h-full min-h-0 flex-col overflow-hidden border-b border-white/10 bg-slate-950 shadow-lg shadow-black/40 lg:border-r lg:border-b-0">
-              <div className="min-h-0 flex-1 bg-stone-900">
-                <GoogleGuessMap
-                  country={DEFAULT_FOREIGN_COUNTRY}
-                  guess={mapGuess}
-                  answer={mapAnswer}
-                  answerLabel={roundResultText?.answerName}
-                  distanceKm={roundResult.distanceKm}
-                  disabled
-                  labels={googleMapLabels}
-                  googleMapsLanguage={googleMapsLanguage}
-                  formatDistance={(distanceKm) =>
-                    formatDistance(distanceKm, locale)
-                  }
-                  minHeightClass="min-h-0"
-                  onGuess={setGuess}
-                />
-              </div>
-            </section>
+          <div className="ag-prog">
+            {questions.map((question, index) => (
+              <i key={question.id} className={index < filledDots ? "is-done" : ""} />
+            ))}
+            <span>{ui.totalLabel(totalScore.toLocaleString())}</span>
           </div>
-        )}
+        </>
+      )}
 
-        {!roundResult && isCompactViewport === false && (
-          <div className="group fixed right-3 bottom-3 z-40 h-44 w-56 transition-all duration-200 ease-out focus-within:h-[min(72dvh,640px)] focus-within:w-[min(calc(100vw-1.5rem),920px)] hover:h-[min(72dvh,640px)] hover:w-[min(calc(100vw-1.5rem),920px)] focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 sm:right-5 sm:bottom-5 sm:h-48 sm:w-64">
-            <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950 shadow-lg shadow-black/40">
-              <div className="min-h-0 flex-1 bg-stone-900">
-                <GoogleGuessMap
-                  country={DEFAULT_FOREIGN_COUNTRY}
-                  guess={guess}
-                  answer={null}
-                  disabled={false}
-                  labels={googleMapLabels}
-                  googleMapsLanguage={googleMapsLanguage}
-                  formatDistance={(distanceKm) =>
-                    formatDistance(distanceKm, locale)
-                  }
-                  minHeightClass="min-h-0"
-                  onGuess={setGuess}
-                />
-              </div>
-
-              <div className="hidden border-t border-white/10 bg-slate-950/95 p-2 transition group-focus-within:block group-hover:block">
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!guess}
-                  className="anime-button w-full text-sm disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {copy.submitGuess}
-                </button>
-              </div>
-            </section>
-          </div>
-        )}
-
-        {!roundResult && isCompactViewport === true && !mobileMapOpen && (
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMapOpen(true);
-              setMobileClueOpen(false);
-            }}
-            className="anime-button fixed right-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 min-h-12 rounded-xl px-4 shadow-lg shadow-black/35"
-          >
-            {guess ? copy.guessSelected : copy.openMap}
-          </button>
-        )}
-
-        {!roundResult && isCompactViewport === true && mobileMapOpen && (
+      <div className="ag-glass ag-map-slot">
+        <div className="ag-map-canvas">
+          <GoogleGuessMap
+            country={DEFAULT_FOREIGN_COUNTRY}
+            guess={roundResult ? mapGuess : guess}
+            answer={roundResult ? mapAnswer : null}
+            answerLabel={roundResult ? roundResultText?.answerName : undefined}
+            distanceKm={roundResult?.distanceKm}
+            disabled={Boolean(roundResult)}
+            labels={googleMapLabels}
+            googleMapsLanguage={googleMapsLanguage}
+            formatDistance={(distanceKm) => formatDistance(distanceKm, locale)}
+            minHeightClass="min-h-0 h-full"
+            showLegend={false}
+            guessColor="#f9a8d4"
+            answerColor="#67e8f9"
+            lineColor="#fff7fb"
+            onGuess={setGuess}
+          />
+          {roundResult && (
+            <div className="ag-legend">
+              <span>
+                <i style={{ background: "#f9a8d4" }} />
+                {ui.yourGuess}
+              </span>
+              <span>
+                <i style={{ background: "#67e8f9" }} />
+                {ui.correctPoint}
+              </span>
+            </div>
+          )}
+        </div>
+        {!roundResult && (
           <>
+            <div className="ag-map-note">
+              <span>{guess ? copy.guessSelected : ui.pinHint}</span>
+            </div>
             <button
               type="button"
-              aria-label={copy.closePanel}
-              className="fixed inset-0 z-40 bg-black/55"
-              onClick={() => setMobileMapOpen(false)}
-            />
-            <section className="fixed inset-x-0 bottom-0 z-50 flex max-h-[calc(100dvh-0.75rem)] flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/50">
-              <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-                <div>
-                  <div className="text-sm font-black text-pink-100">
-                    {copy.mapGuessTitle}
-                  </div>
-                  {guess && (
-                    <div className="mt-0.5 text-xs font-bold text-cyan-100/70">
-                      {copy.guessSelected}
-                    </div>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileMapOpen(false)}
-                  className="min-h-11 rounded-lg border border-white/10 px-3 text-sm font-bold text-pink-50/80 transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
-                >
-                  {copy.closePanel}
-                </button>
-              </div>
-
-              <div className="h-[min(52dvh,440px)] min-h-[300px] bg-stone-900">
-                <GoogleGuessMap
-                  country={DEFAULT_FOREIGN_COUNTRY}
-                  guess={guess}
-                  answer={null}
-                  disabled={false}
-                  labels={googleMapLabels}
-                  googleMapsLanguage={googleMapsLanguage}
-                  formatDistance={(distanceKm) =>
-                    formatDistance(distanceKm, locale)
-                  }
-                  minHeightClass="min-h-0"
-                  onGuess={setGuess}
-                />
-              </div>
-
-              <div className="shrink-0 border-t border-white/10 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!guess}
-                  className="anime-button w-full text-sm disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {copy.submitGuess}
-                </button>
-              </div>
-            </section>
+              onClick={handleSubmit}
+              disabled={!guess}
+              className="ag-btn ag-btn-pink ag-map-go"
+            >
+              {copy.submitGuess} <ArrowIcon />
+            </button>
           </>
         )}
       </div>

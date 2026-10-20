@@ -14,6 +14,10 @@ import { classifyPlayerUniqueViolation } from "~/server/data/postgres-errors";
 import { hashPassword, verifyPassword } from "~/server/auth/password";
 import { sendEmailVerificationCode } from "~/server/email/verification-code";
 import { sql } from "~/server/db/client";
+import {
+  LEADERBOARD_EXCLUDED_NAMES,
+  LEADERBOARD_EXCLUDED_PLAYER_IDS,
+} from "~/server/data/leaderboard-exclusions";
 import { normalizeCountryCode } from "~/lib/country";
 import {
   ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
@@ -540,6 +544,15 @@ export async function recordGameSession(
   return { ok: true };
 }
 
+function leaderboardPlayerFilter() {
+  const names = [...LEADERBOARD_EXCLUDED_NAMES];
+  const ids = [...LEADERBOARD_EXCLUDED_PLAYER_IDS];
+  if (ids.length === 0) {
+    return sql`lower(btrim(p.name)) not in ${sql(names)}`;
+  }
+  return sql`lower(btrim(p.name)) not in ${sql(names)} and p.id::text not in ${sql(ids)}`;
+}
+
 export async function getAnimeLeaderboard(
   input: {
     token?: string;
@@ -590,6 +603,7 @@ export async function getAnimeLeaderboard(
       from best_sessions bs
       inner join players p on p.id = bs.user_id
       where bs.best_rank = 1
+        and ${leaderboardPlayerFilter()}
     )
     select *
     from ranked
@@ -637,6 +651,7 @@ export async function getAnimeLeaderboard(
         from best_sessions bs
         inner join players p on p.id = bs.user_id
         where bs.best_rank = 1
+          and ${leaderboardPlayerFilter()}
       )
       select *
       from ranked

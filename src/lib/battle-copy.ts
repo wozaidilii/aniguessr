@@ -1,4 +1,5 @@
 import { type AnimeLocale } from "~/lib/anime-locale";
+import { difficultyHint, difficultyLabel } from "~/lib/difficulty-labels";
 import { type AnimeGuessrDifficultyTier } from "~/lib/anime-guessr";
 import { type GameModeConfig, type GameModeSlug } from "~/lib/game-mode";
 
@@ -149,17 +150,8 @@ export const BATTLE_COPY: Record<AnimeLocale, BattleCopy> = {
     seconds: (value) => `${value} 秒`,
     startingHp: "初始血量",
     difficultyLabel: "难度档位",
-    difficultyOption: (tier) =>
-      ({ beginner: "入门", intermediate: "进阶", master: "大师", miracle: "神迹" })[
-        tier
-      ],
-    difficultyHint: (tier) =>
-      ({
-        beginner: "仅包含难度 1 的题目。",
-        intermediate: "包含难度 1 与 2 的题目。",
-        master: "包含难度 1、2、3 的题目。",
-        miracle: "包含全部难度题目。",
-      })[tier],
+    difficultyOption: (tier) => difficultyLabel("zh", tier),
+    difficultyHint: (tier) => difficultyHint("zh", tier),
     createRoom: "创建房间 →",
     joinRoom: "加入房间 →",
     roomCode: "房间号",
@@ -287,20 +279,8 @@ export const BATTLE_COPY: Record<AnimeLocale, BattleCopy> = {
     seconds: (value) => `${value} 秒`,
     startingHp: "初期HP",
     difficultyLabel: "難易度",
-    difficultyOption: (tier) =>
-      ({
-        beginner: "入門",
-        intermediate: "中級",
-        master: "上級",
-        miracle: "神業",
-      })[tier],
-    difficultyHint: (tier) =>
-      ({
-        beginner: "難易度 1 の問題のみ。",
-        intermediate: "難易度 1 と 2 の問題。",
-        master: "難易度 1、2、3 の問題。",
-        miracle: "全難易度の問題。",
-      })[tier],
+    difficultyOption: (tier) => difficultyLabel("ja", tier),
+    difficultyHint: (tier) => difficultyHint("ja", tier),
     createRoom: "ルーム作成 →",
     joinRoom: "ルーム参加 →",
     roomCode: "ルームコード",
@@ -434,20 +414,8 @@ export const BATTLE_COPY: Record<AnimeLocale, BattleCopy> = {
     seconds: (value) => `${value}s`,
     startingHp: "Starting HP",
     difficultyLabel: "Difficulty",
-    difficultyOption: (tier) =>
-      ({
-        beginner: "Beginner",
-        intermediate: "Intermediate",
-        master: "Master",
-        miracle: "Miracle",
-      })[tier],
-    difficultyHint: (tier) =>
-      ({
-        beginner: "Difficulty 1 questions only.",
-        intermediate: "Difficulty 1 and 2 questions.",
-        master: "Difficulty 1, 2, and 3 questions.",
-        miracle: "All difficulty levels.",
-      })[tier],
+    difficultyOption: (tier) => difficultyLabel("en", tier),
+    difficultyHint: (tier) => difficultyHint("en", tier),
     createRoom: "Create room →",
     joinRoom: "Join room →",
     roomCode: "Room code",
