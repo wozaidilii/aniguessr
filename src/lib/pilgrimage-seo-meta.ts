@@ -7,6 +7,10 @@ import { BRAND_NAME } from "~/lib/site-url";
  *
  * Placeholders: {brand} {anime} {place} {area} {episode} {scene} {id}
  * {count} {spotCount} {animeCount} {locationCount}
+ *
+ * Spot titles use the SEO desk pattern and end with `AniGuessr`.
+ * The area parentheses are omitted when the place already names one,
+ * or when the title would pass the locale character limit.
  */
 export const PILGRIMAGE_SEO_TEMPLATES: Record<
   PilgrimageLocale,
@@ -34,19 +38,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
   }
 > = {
   en: {
-    spotTitle: "{anime} {place} real-life location | {brand}",
-    spotTitleWithEpisode:
-      "{anime} {place} ({episode}) real-life location | {brand}",
-    spotTitleWithScene:
-      "{anime} {place} — {scene} real-life location | {brand}",
-    spotTitleWithId: "{anime} {place} real-life location ({id}) | {brand}",
-    spotDescription: "Real-life location for {anime} at {place} in {area}.",
+    spotTitle: "{place} — {anime} Real-Life Location | AniGuessr",
+    spotTitleWithEpisode: "{place} — {anime} Real-Life Location | AniGuessr",
+    spotTitleWithScene: "{place} — {anime} Real-Life Location | AniGuessr",
+    spotTitleWithId: "{place} — {anime} Real-Life Location | AniGuessr",
+    spotDescription:
+      "{place} appears in {anime}, in {area}. Preview it on Street View and get directions in Google Maps.",
     spotDescriptionWithEpisode:
-      "Real-life location for {anime} at {place} in {area}. Appears in {episode}.",
+      "{place} appears in {anime}, {episode}, in {area}. Preview it on Street View and get directions in Google Maps.",
     spotDescriptionWithScene:
-      "Real-life location for {anime} at {place} in {area}. Scene: {scene}.",
+      "{place} appears in {anime}. Nearest station: {station}. Preview it on Street View and get directions in Google Maps.",
     spotDescriptionWithId:
-      "Real-life location for {anime} at {place} in {area}. Reference {id}.",
+      "{place} appears in {anime}, {episode}. Nearest station: {station}. Preview it on Street View and get directions in Google Maps.",
     animeTitle: "{anime} Real-Life Locations | {brand}",
     animeTitleWithId: "{anime} ({id}) Real-Life Locations | {brand}",
     animeDescription:
@@ -66,17 +69,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
       "{locationCount} regions with mapped anime real-life locations.",
   },
   ja: {
-    spotTitle: "{anime} {place} 撮影地 | {brand}",
-    spotTitleWithEpisode: "{anime} {place}（{episode}）撮影地 | {brand}",
-    spotTitleWithScene: "{anime} {place}・{scene} 撮影地 | {brand}",
-    spotTitleWithId: "{anime} {place} 撮影地（{id}） | {brand}",
-    spotDescription: "{anime}の{area}にある撮影地「{place}」。",
+    spotTitle: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithEpisode: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithScene: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithId: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotDescription:
+      "『{anime}』に登場する{place}。{area}。ストリートビューで下見して、Googleマップでナビできます。",
     spotDescriptionWithEpisode:
-      "{anime}の{area}にある撮影地「{place}」。登場場面: {episode}。",
+      "『{anime}』{episode}に登場する{place}。{area}。ストリートビューで下見して、Googleマップでナビできます。",
     spotDescriptionWithScene:
-      "{anime}の{area}にある撮影地「{place}」。シーン: {scene}。",
+      "『{anime}』に登場する{place}。最寄りは{station}。ストリートビューで下見して、Googleマップでナビできます。",
     spotDescriptionWithId:
-      "{anime}の{area}にある撮影地「{place}」。参照 {id}。",
+      "『{anime}』{episode}に登場する{place}。最寄りは{station}。ストリートビューで下見して、Googleマップでナビできます。",
     animeTitle: "{anime} 撮影地一覧 | {brand}",
     animeTitleWithId: "{anime}（{id}）撮影地一覧 | {brand}",
     animeDescription: "{anime}の実在撮影地 {count} 件。座標とシーン情報つき。",
@@ -93,16 +97,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexDescription: "アニメ撮影地がある地域 {locationCount} 件。",
   },
   zh: {
-    spotTitle: "{anime} {place} 取景地 | {brand}",
-    spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",
-    spotTitleWithScene: "{anime} {place}·{scene} 取景地 | {brand}",
-    spotTitleWithId: "{anime} {place} 取景地（{id}） | {brand}",
-    spotDescription: "{anime} 在{area}的取景地「{place}」。",
+    spotTitle: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithEpisode: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithScene: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithId: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotDescription:
+      "《{anime}》取景地「{place}」，位于{area}。可以在街景里预览，并用 Google 地图导航。",
     spotDescriptionWithEpisode:
-      "{anime} 在{area}的取景地「{place}」。出现场景：{episode}。",
+      "《{anime}》{episode}取景地「{place}」，位于{area}。可以在街景里预览，并用 Google 地图导航。",
     spotDescriptionWithScene:
-      "{anime} 在{area}的取景地「{place}」。场景：{scene}。",
-    spotDescriptionWithId: "{anime} 在{area}的取景地「{place}」。编号 {id}。",
+      "《{anime}》取景地「{place}」。最近车站是{station}。可以在街景里预览，并用 Google 地图导航。",
+    spotDescriptionWithId:
+      "《{anime}》{episode}取景地「{place}」。最近车站是{station}。可以在街景里预览，并用 Google 地图导航。",
     animeTitle: "{anime} 取景地 | {brand}",
     animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
     animeDescription: "{anime} 的现实取景地共 {count} 处，含坐标与场景信息。",
@@ -121,16 +127,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
   // Traditional wording of the zh templates. 動漫 stays 動畫, matching
   // the visible zh-TW copy. Place and work names come from the zh-TW resolver.
   "zh-tw": {
-    spotTitle: "{anime} {place} 取景地 | {brand}",
-    spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",
-    spotTitleWithScene: "{anime} {place}·{scene} 取景地 | {brand}",
-    spotTitleWithId: "{anime} {place} 取景地（{id}） | {brand}",
-    spotDescription: "{anime} 在{area}的取景地「{place}」。",
+    spotTitle: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithEpisode: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithScene: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithId: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotDescription:
+      "《{anime}》取景地「{place}」，位於{area}。可以在街景裡預覽，並用 Google 地圖導航。",
     spotDescriptionWithEpisode:
-      "{anime} 在{area}的取景地「{place}」。出現場景：{episode}。",
+      "《{anime}》{episode}取景地「{place}」，位於{area}。可以在街景裡預覽，並用 Google 地圖導航。",
     spotDescriptionWithScene:
-      "{anime} 在{area}的取景地「{place}」。場景：{scene}。",
-    spotDescriptionWithId: "{anime} 在{area}的取景地「{place}」。編號 {id}。",
+      "《{anime}》取景地「{place}」。最近車站是{station}。可以在街景裡預覽，並用 Google 地圖導航。",
+    spotDescriptionWithId:
+      "《{anime}》{episode}取景地「{place}」。最近車站是{station}。可以在街景裡預覽，並用 Google 地圖導航。",
     animeTitle: "{anime} 取景地 | {brand}",
     animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
     animeDescription: "{anime} 的現實取景地共 {count} 處，含座標與場景資訊。",
@@ -157,6 +165,45 @@ export interface SpotSeoFields {
   area: string;
   episode: string;
   scene: string;
+  /** Set only from a real station field. Never inferred from the place name. */
+  station?: string;
+}
+
+/** ja / zh / zh-tw titles stay near 120 characters. English stays near 155. */
+export const SPOT_SEO_CHAR_LIMIT: Record<PilgrimageLocale, number> = {
+  ja: 120,
+  zh: 120,
+  "zh-tw": 120,
+  en: 155,
+};
+
+const EPISODE_NUMBER = /第\s*(\d+)\s*([話话集])/;
+const ENGLISH_EPISODE = /^episode\s+(\d+)\b/i;
+const NOT_A_SINGLE_EPISODE =
+  /不明|未知|不詳|unknown|複数|多集|多次|multiple|several/i;
+
+export function codePointLength(value: string): number {
+  return [...value].length;
+}
+
+/**
+ * A single episode number, without timestamps or scene notes.
+ * "Unknown", "multiple episodes", and unstructured text stay empty.
+ */
+export function spotEpisodeLabel(
+  locale: PilgrimageLocale,
+  raw: string,
+): string {
+  const text = raw.trim();
+  if (!text || NOT_A_SINGLE_EPISODE.test(text)) return "";
+  if (locale === "en") {
+    const match = ENGLISH_EPISODE.exec(text);
+    return match ? `Episode ${match[1]}` : "";
+  }
+  const match = EPISODE_NUMBER.exec(text);
+  if (!match) return "";
+  const unit = locale === "ja" ? "話" : "集";
+  return `第${match[1]}${unit}`;
 }
 
 export interface RenderedSeo {
@@ -228,16 +275,162 @@ export function assignSpotSeoVariants(
   return assigned;
 }
 
-function spotVars(fields: SpotSeoFields): Record<string, string> {
-  return {
-    brand: BRAND_NAME,
-    anime: fields.anime,
-    place: fields.place,
-    area: fields.area,
-    episode: fields.episode,
-    scene: fields.scene,
-    id: fields.id,
-  };
+function titleMark(
+  locale: PilgrimageLocale,
+  fields: SpotSeoFields,
+  variant: SpotSeoVariant,
+  episode: string,
+): string {
+  if (variant === "episode") return episode || fields.episode.trim();
+  if (variant === "scene") return fields.scene.trim();
+  if (variant === "id") return fields.id.trim();
+  return "";
+}
+
+function areaAlreadyNamed(place: string): boolean {
+  return place.includes("（") || place.includes("(");
+}
+
+function composeSpotTitle(
+  locale: PilgrimageLocale,
+  anime: string,
+  place: string,
+  area: string,
+): string {
+  const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
+  if (locale === "en") {
+    return fillSeoTemplate(templates.spotTitle, { anime, place });
+  }
+  const region = area.trim();
+  const withArea = region.length > 0 && !areaAlreadyNamed(place);
+  const template = withArea
+    ? templates.spotTitle
+    : templates.spotTitle.replace("（{area}）", "");
+  return fillSeoTemplate(template, { anime, place, area: region });
+}
+
+function fitSpotTitle(
+  locale: PilgrimageLocale,
+  anime: string,
+  place: string,
+  area: string,
+): string {
+  const limit = SPOT_SEO_CHAR_LIMIT[locale];
+  const withArea = composeSpotTitle(locale, anime, place, area);
+  if (codePointLength(withArea) <= limit) return withArea;
+  const bare = composeSpotTitle(locale, anime, place, "");
+  if (codePointLength(bare) <= limit) return bare;
+
+  const animeChars = [...anime];
+  const placeChars = [...place];
+  const render = () =>
+    composeSpotTitle(locale, animeChars.join(""), placeChars.join(""), "");
+  while (
+    codePointLength(render()) > limit &&
+    (animeChars.length > 1 || placeChars.length > 1)
+  ) {
+    if (placeChars.length >= animeChars.length && placeChars.length > 1) {
+      placeChars.pop();
+    } else if (animeChars.length > 1) animeChars.pop();
+    else placeChars.pop();
+  }
+  if (animeChars.join("") !== anime && animeChars.length > 0) {
+    animeChars[animeChars.length - 1] = "…";
+  }
+  if (placeChars.join("") !== place && placeChars.length > 0) {
+    placeChars[placeChars.length - 1] = "…";
+  }
+  let title = render();
+  while (codePointLength(title) > limit && placeChars.length > 1) {
+    placeChars.pop();
+    if (placeChars.length > 0) placeChars[placeChars.length - 1] = "…";
+    title = render();
+  }
+  return title;
+}
+
+/** `scene` / `id` slots hold the station templates. Title variants stay separate. */
+function descriptionKey(
+  episode: string,
+  station: string,
+): "base" | "episode" | "scene" | "id" {
+  if (episode && station) return "id";
+  if (station) return "scene";
+  if (episode) return "episode";
+  return "base";
+}
+
+function composeSpotDescription(
+  locale: PilgrimageLocale,
+  anime: string,
+  place: string,
+  area: string,
+  episode: string,
+  station: string,
+): string {
+  const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
+  const key = descriptionKey(episode, station);
+  let template = {
+    base: templates.spotDescription,
+    episode: templates.spotDescriptionWithEpisode,
+    scene: templates.spotDescriptionWithScene,
+    id: templates.spotDescriptionWithId,
+  }[key];
+  if (!station && !area.trim()) {
+    template = template
+      .replace("{area}。", "")
+      .replace("，位于{area}。", "。")
+      .replace("，位於{area}。", "。")
+      .replace(", in {area}", "");
+  }
+  return fillSeoTemplate(template, {
+    anime,
+    place,
+    area,
+    episode,
+    station,
+  });
+}
+
+const STREET_VIEW_SENTENCE: Record<PilgrimageLocale, string> = {
+  ja: "ストリートビューで下見して、Googleマップでナビできます。",
+  zh: "可以在街景里预览，并用 Google 地图导航。",
+  "zh-tw": "可以在街景裡預覽，並用 Google 地圖導航。",
+  en: "Preview it on Street View and get directions in Google Maps.",
+};
+
+function withoutStreetView(locale: PilgrimageLocale, text: string): string {
+  return text
+    .replace(STREET_VIEW_SENTENCE[locale], "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function fitSpotDescription(
+  locale: PilgrimageLocale,
+  anime: string,
+  place: string,
+  area: string,
+  episode: string,
+  station: string,
+): string {
+  const limit = SPOT_SEO_CHAR_LIMIT[locale];
+  const full = composeSpotDescription(
+    locale,
+    anime,
+    place,
+    area,
+    episode,
+    station,
+  );
+  if (codePointLength(full) <= limit) return full;
+
+  const withoutArea = station
+    ? full
+    : composeSpotDescription(locale, anime, place, "", episode, "");
+  if (codePointLength(withoutArea) <= limit) return withoutArea;
+
+  return withoutStreetView(locale, withoutArea);
 }
 
 export function buildSpotSeo(
@@ -245,23 +438,20 @@ export function buildSpotSeo(
   fields: SpotSeoFields,
   variant: SpotSeoVariant,
 ): RenderedSeo {
-  const templates = PILGRIMAGE_SEO_TEMPLATES[locale];
-  const vars = spotVars(fields);
-  const titleTemplate = {
-    base: templates.spotTitle,
-    episode: templates.spotTitleWithEpisode,
-    scene: templates.spotTitleWithScene,
-    id: templates.spotTitleWithId,
-  }[variant];
-  const descriptionTemplate = {
-    base: templates.spotDescription,
-    episode: templates.spotDescriptionWithEpisode,
-    scene: templates.spotDescriptionWithScene,
-    id: templates.spotDescriptionWithId,
-  }[variant];
+  const episode = spotEpisodeLabel(locale, fields.episode);
+  const station = fields.station?.trim() ?? "";
+  const mark = titleMark(locale, fields, variant, episode);
+  const place = mark ? `${fields.place}・${mark}` : fields.place;
   return {
-    title: fillSeoTemplate(titleTemplate, vars),
-    description: fillSeoTemplate(descriptionTemplate, vars),
+    title: fitSpotTitle(locale, fields.anime.trim(), place.trim(), fields.area),
+    description: fitSpotDescription(
+      locale,
+      fields.anime.trim(),
+      fields.place.trim(),
+      fields.area.trim(),
+      episode,
+      station,
+    ),
   };
 }
 

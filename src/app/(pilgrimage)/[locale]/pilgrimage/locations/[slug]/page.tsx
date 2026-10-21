@@ -7,6 +7,7 @@ import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import { pickSpotPlaceFromRecord } from "~/lib/localized-text";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
+import { locationDocumentSeo } from "~/lib/location-meta-overrides";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
@@ -69,7 +70,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!resolved) return { title: "Not found" };
   redirectLocationSlug(locale, resolved);
 
-  const seo = locationPageSeo(locale, resolved.location);
+  const seo = locationDocumentSeo(
+    locale,
+    resolved.location.slug,
+    locationPageSeo(locale, resolved.location),
+  );
   const metadata = pilgrimagePageMetadata(
     locale,
     `/pilgrimage/locations/${resolved.location.slug}`,

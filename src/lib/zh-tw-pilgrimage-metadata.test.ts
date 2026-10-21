@@ -178,8 +178,9 @@ describe("zh-tw pilgrimage document metadata", () => {
         "base",
       ),
     ).toEqual({
-      title: `四月是你的謊言 稲村ヶ崎 取景地 | ${BRAND_NAME}`,
-      description: "四月是你的謊言 在鎌倉市的取景地「稲村ヶ崎」。",
+      title: "四月是你的謊言 聖地：稲村ヶ崎（鎌倉市）| AniGuessr",
+      description:
+        "《四月是你的謊言》取景地「稲村ヶ崎」，位於鎌倉市。可以在街景裡預覽，並用 Google 地圖導航。",
     });
     expect(
       buildPilgrimageHubSeo("zh-tw", {
@@ -283,10 +284,10 @@ describe("zh-tw pilgrimage document metadata", () => {
         description: `咒術迴戰 的現實取景地共 ${work!.spotCount} 處，含座標與場景資訊。`,
       });
       expect(spotDocument.title).toBe(
-        `四月是你的謊言 稲村ヶ崎 取景地 | ${BRAND_NAME}`,
+        "四月是你的謊言 聖地：稲村ヶ崎（鎌倉市）| AniGuessr",
       );
       expect(spotDocument.description).toBe(
-        "四月是你的謊言 在鎌倉市的取景地「稲村ヶ崎」。",
+        "《四月是你的謊言》第14集取景地「稲村ヶ崎」，位於鎌倉市。可以在街景裡預覽，並用 Google 地圖導航。",
       );
 
       for (const location of index.locations)
