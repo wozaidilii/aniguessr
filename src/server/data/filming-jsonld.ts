@@ -1,5 +1,9 @@
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
-import { pickLocalizedText, pickMaybeLocalizedText } from "~/lib/localized-text";
+import {
+  pickLocalizedText,
+  pickMaybeLocalizedText,
+  pickSpotPlaceFromRecord,
+} from "~/lib/localized-text";
 import {
   withPilgrimageLocale,
   type PilgrimageLocale,
@@ -18,7 +22,7 @@ export function toFilmingLocation(
   const description =
     pickLocalizedText(spot.description, locale) || fallbackDescription;
   return {
-    name: pickLocalizedText(spot.answerName, locale),
+    name: pickSpotPlaceFromRecord(spot.answerName, spot.title, locale),
     description,
     url: absoluteUrl(
       withPilgrimageLocale(

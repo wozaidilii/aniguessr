@@ -160,6 +160,7 @@ function spotCard(locale: PilgrimageLocale, spot: PilgrimageSpot): OgCard | null
     shortName: optionalNames(spot, "shortName"),
     workTitle: animeNames(anime?.animeTitle ?? spot.animeTitle),
     derivedJa: namesOf(spot.title).ja,
+    titleZh: namesOf(spot.title).zh,
     workOgTitle: anime ? optionalNames(anime, "ogTitle") : undefined,
     workShortName: anime ? optionalNames(anime, "shortName") : undefined,
     areaName: namesOf(location?.name ?? spot.location),

@@ -11,7 +11,7 @@ import {
   pickLocalizedLines,
   pickLocalizedText,
   pickMaybeLocalizedText,
-  pickSpotPlaceName,
+  pickSpotPlaceFromRecord,
 } from "~/lib/localized-text";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
@@ -52,7 +52,7 @@ function spotSeoFields(
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
-    place: pickSpotPlaceName(spot.answerName, locale, spot.title.ja),
+    place: pickSpotPlaceFromRecord(spot.answerName, spot.title, locale),
     area: pickLocalizedText(spot.location, locale),
     episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),
@@ -62,7 +62,10 @@ function spotSeoFields(
 function redirectDuplicateSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   if (!spot.redirectTo || spot.redirectTo === spot.id) return;
   permanentRedirect(
-    pilgrimageHref(`/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`, locale),
+    pilgrimageHref(
+      `/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`,
+      locale,
+    ),
   );
 }
 
@@ -116,7 +119,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   redirectDuplicateSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
-  const place = pickSpotPlaceName(spot.answerName, locale, spot.title.ja);
+  const place = pickSpotPlaceFromRecord(spot.answerName, spot.title, locale);
   const location = pickLocalizedText(spot.location, locale);
   const title = pickLocalizedText(spot.title, locale);
   const description = pickLocalizedText(spot.description, locale);

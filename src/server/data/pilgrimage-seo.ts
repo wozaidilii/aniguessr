@@ -12,6 +12,7 @@ import {
 import {
   pickLocalizedText,
   pickMaybeLocalizedText,
+  pickSpotPlaceFromRecord,
   type LocalizedLines,
   type LocalizedText,
 } from "~/lib/localized-text";
@@ -203,7 +204,7 @@ function spotFields(
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
-    place: pickLocalizedText(spot.answerName, locale),
+    place: pickSpotPlaceFromRecord(spot.answerName, spot.title, locale),
     area: pickLocalizedText(spot.location, locale),
     episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),

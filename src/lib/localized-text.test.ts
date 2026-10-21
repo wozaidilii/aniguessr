@@ -22,7 +22,10 @@ describe("localized text fallback", () => {
 
   it("returns Traditional text only for zh-TW and never falls back to simplified", () => {
     expect(
-      pickLocalizedText({ zh: "镰仓", ja: "鎌倉", en: "Kamakura", tw: "鎌倉" }, "zh-tw"),
+      pickLocalizedText(
+        { zh: "镰仓", ja: "鎌倉", en: "Kamakura", tw: "鎌倉" },
+        "zh-tw",
+      ),
     ).toBe("鎌倉");
     expect(pickLocalizedText({ zh: "镰仓", ja: "鎌倉", en: "" }, "zh-tw")).toBe(
       "",
@@ -37,15 +40,60 @@ describe("localized text fallback", () => {
   });
 
   it("prefers the Japanese kanji stored on zh before romaji", () => {
-    const place = { zh: "稲村ヶ崎", ja: "", en: "Inamuragasaki", tw: "稲村ヶ崎" };
+    const place = {
+      zh: "稲村ヶ崎",
+      ja: "",
+      en: "Inamuragasaki",
+      tw: "稲村ヶ崎",
+    };
     expect(pickSpotPlaceName(place, "ja")).toBe("稲村ヶ崎");
     expect(pickSpotPlaceName(place, "ja", "稲村ヶ崎の海岸")).toBe("稲村ヶ崎");
-    expect(pickSpotPlaceName({ zh: "", ja: "", en: "Inamuragasaki" }, "ja", "稲村ヶ崎の海岸")).toBe(
-      "稲村ヶ崎の海岸",
-    );
+    expect(
+      pickSpotPlaceName(
+        { zh: "", ja: "", en: "Inamuragasaki" },
+        "ja",
+        "稲村ヶ崎の海岸",
+      ),
+    ).toBe("稲村ヶ崎の海岸");
     expect(pickSpotPlaceName(place, "en")).toBe("Inamuragasaki");
-    expect(pickSpotPlaceName({ zh: "镰仓", ja: "", en: "" }, "zh")).toBe("镰仓");
-    expect(pickLocalizedText({ ja: "", en: "Tokyo", zh: "東京" }, "ja")).toBe("Tokyo");
+    expect(pickSpotPlaceName({ zh: "镰仓", ja: "", en: "" }, "zh")).toBe(
+      "镰仓",
+    );
+    expect(pickLocalizedText({ ja: "", en: "Tokyo", zh: "東京" }, "ja")).toBe(
+      "Tokyo",
+    );
+  });
+
+  it("uses a Japanese scene title when the zh place name is Latin", () => {
+    expect(
+      pickSpotPlaceName(
+        { zh: "竹下口（原宿）", ja: "", en: "Takeshita Exit (Harajuku)" },
+        "ja",
+        "竹下口アーチと商店街入口",
+      ),
+    ).toBe("竹下口（原宿）");
+    expect(
+      pickSpotPlaceName(
+        { zh: "A&A CAFE DINING Waseda", ja: "", en: "A&A CAFE DINING Waseda" },
+        "ja",
+        "行きつけの喫茶店",
+      ),
+    ).toBe("行きつけの喫茶店");
+    expect(
+      pickSpotPlaceName(
+        { zh: "BLUE NOTE TOKYO", ja: "", en: "" },
+        "ja",
+        "BLUE NOTE TOKYO",
+        { titleZh: "BLUE NOTE TOKYO" },
+      ),
+    ).toBe("BLUE NOTE TOKYO");
+    expect(
+      pickSpotPlaceName(
+        { zh: "", ja: "Takeshita", en: "Takeshita Exit" },
+        "ja",
+        "竹下口",
+      ),
+    ).toBe("Takeshita");
   });
 
   it("falls funfacts through the same order", () => {

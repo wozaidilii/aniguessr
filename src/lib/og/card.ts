@@ -7,6 +7,7 @@ import {
   ogLocaleChain,
   type OgLocale,
 } from "~/lib/og/copy";
+import { japanesePlaceLabel } from "~/lib/localized-text";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   layoutAreaMarkers,
@@ -89,8 +90,7 @@ export function preferredName(
 
 /**
  * Order used only when the resolved card locale itself has no string.
- * Matches the page (`ja`: en then zh) so a blank `answerName.ja` still
- * shows the label the page shows. It does not change chip, fonts, or alt.
+ * Japanese place names do not use this list; they use `displaySpotPlace`.
  */
 const HOLE_ORDER: Record<OgLocale, readonly OgLocale[]> = {
   ja: ["en", "zh", "zh-tw"],
@@ -115,9 +115,8 @@ export function displayName(
 }
 
 /**
- * Japanese place labels often live in `zh` (the source stores kanji there)
- * while `en` is romaji. Stay on the Japanese card: ja, zh, a derived
- * Japanese label, then romaji. Other locales keep `displayName`.
+ * Japanese place labels stay on the Japanese card. A CJK-only zh name or
+ * the Japanese scene title wins over romaji. Other locales keep `displayName`.
  */
 export function displaySpotPlace(
   locale: OgLocale,
@@ -125,16 +124,17 @@ export function displaySpotPlace(
   ogTitle?: OgNames,
   shortName?: OgNames,
   derivedJa?: string,
+  titleZh?: string,
 ): string {
   if (locale !== "ja") return displayName(locale, base, ogTitle, shortName);
-  const ordered = [
-    preferredName("ja", base, ogTitle, shortName),
-    preferredName("zh", base, ogTitle, shortName),
-    derivedJa?.trim() ?? "",
-    preferredName("en", base, ogTitle, shortName),
-    preferredName("zh-tw", base, ogTitle, shortName),
-  ];
-  return ordered.find((value) => value.length > 0) ?? "";
+  return japanesePlaceLabel({
+    ja: preferredName("ja", base, ogTitle, shortName),
+    zh: preferredName("zh", base, ogTitle, shortName),
+    en: preferredName("en", base, ogTitle, shortName),
+    tw: preferredName("zh-tw", base, ogTitle, shortName),
+    titleJa: derivedJa,
+    titleZh,
+  });
 }
 
 export function resolveContentLocale(
@@ -149,8 +149,10 @@ export function resolveContentLocale(
 }
 
 function usable(names: OgNames): boolean {
-  return ogLocaleChain("zh-tw").some((locale) => readOgName(names, locale)) ||
-    Boolean(readOgName(names, "en"));
+  return (
+    ogLocaleChain("zh-tw").some((locale) => readOgName(names, locale)) ||
+    Boolean(readOgName(names, "en"))
+  );
 }
 
 function versionFor(parts: readonly string[]): string {
@@ -174,7 +176,11 @@ function markerKey(layout: MarkerLayout): string {
   ].join("|");
 }
 
-function titleBlock(text: string, locale: OgLocale, field: "spotTitle" | "workTitle" | "areaTitle") {
+function titleBlock(
+  text: string,
+  locale: OgLocale,
+  field: "spotTitle" | "workTitle" | "areaTitle",
+) {
   const fit = fitField(text, locale, field);
   return {
     titleSize: fit.size,
@@ -206,13 +212,25 @@ export function buildSpotCard(input: {
   art: MapArt;
   origin: LatLng;
   nearby: LatLng[];
-  /** Japanese label from the spot scene title, used only when answer names are blank. */
+  /** Japanese label from the spot scene title, used when answerName.ja is blank. */
   derivedJa?: string;
+  /** Simplified scene title, used when the Japanese title is also blank or Latin. */
+  titleZh?: string;
 }): OgCard {
   const workName = (locale: OgLocale) =>
-    preferredName(locale, input.workTitle, input.workOgTitle, input.workShortName);
+    preferredName(
+      locale,
+      input.workTitle,
+      input.workOgTitle,
+      input.workShortName,
+    );
   const areaName = (locale: OgLocale) =>
-    preferredName(locale, input.areaName, input.areaOgTitle, input.areaShortName);
+    preferredName(
+      locale,
+      input.areaName,
+      input.areaOgTitle,
+      input.areaShortName,
+    );
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.spotName, input.ogTitle, input.shortName),
@@ -226,6 +244,7 @@ export function buildSpotCard(input: {
     input.ogTitle,
     input.shortName,
     input.derivedJa,
+    input.titleZh,
   );
   const work = displayName(
     contentLocale,
@@ -245,9 +264,7 @@ export function buildSpotCard(input: {
       ? areaRaw
       : ellipsize(areaRaw, areaCap, contentLocale);
   const more =
-    input.otherWorkCount > 0
-      ? copy.moreWorks(input.otherWorkCount)
-      : undefined;
+    input.otherWorkCount > 0 ? copy.moreWorks(input.otherWorkCount) : undefined;
   const markers = layoutSpotMarkers(input.origin, input.nearby, input.art);
   const title = titleBlock(spot, contentLocale, "spotTitle");
   const subtitle = subtitleBlock(work, contentLocale, more);
