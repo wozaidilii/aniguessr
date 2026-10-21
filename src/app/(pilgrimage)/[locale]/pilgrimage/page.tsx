@@ -33,10 +33,13 @@ export async function generateMetadata({
     animeCount: index?.animeCount ?? 0,
     locationCount: index?.locationCount ?? 0,
   });
-  // zh-TW document titles stay on the override map. It is empty until supplied.
-  const title = locale === "zh-tw" ? "" : seo.title;
-  const description = locale === "zh-tw" ? "" : seo.description;
-  return pilgrimagePageMetadata(locale, "/pilgrimage", title, description, true);
+  return pilgrimagePageMetadata(
+    locale,
+    "/pilgrimage",
+    seo.title,
+    seo.description,
+    true,
+  );
 }
 
 export default async function PilgrimageHubPage({

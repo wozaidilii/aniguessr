@@ -118,8 +118,8 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexTitle: "按地区浏览动漫取景地 | {brand}",
     locationIndexDescription: "已收录动漫取景地的地区共 {locationCount} 个。",
   },
-  // OpenCC s2twp of zh. zh-TW document <title> and meta description do not
-  // use these templates; they come only from PILGRIMAGE_SEO_OVERRIDES.
+  // Traditional wording of the zh templates. 動漫 stays 動畫, matching
+  // the visible zh-TW copy. Place and work names come from the zh-TW resolver.
   "zh-tw": {
     spotTitle: "{anime} {place} 取景地 | {brand}",
     spotTitleWithEpisode: "{anime} {place}（{episode}）取景地 | {brand}",
@@ -133,18 +133,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     spotDescriptionWithId: "{anime} 在{area}的取景地「{place}」。編號 {id}。",
     animeTitle: "{anime} 取景地 | {brand}",
     animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
-    animeDescription: "{anime} 的實景取景地共 {count} 處，含座標與場景資訊。",
+    animeDescription: "{anime} 的現實取景地共 {count} 處，含座標與場景資訊。",
     animeDescriptionWithId:
-      "{anime}（{id}）的實景取景地共 {count} 處，含座標與場景資訊。",
-    locationTitle: "{area} 動漫取景地 | {brand}",
-    locationDescription: "{area} 的動漫取景地共 {count} 處。",
-    hubTitle: "動漫取景地與聖地巡禮 | {brand}",
+      "{anime}（{id}）的現實取景地共 {count} 處，含座標與場景資訊。",
+    locationTitle: "{area} 動畫取景地 | {brand}",
+    locationDescription: "{area} 的動畫取景地共 {count} 處。",
+    hubTitle: "動畫取景地與聖地巡禮 | {brand}",
     hubDescription:
-      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動漫取景地。",
-    animeIndexTitle: "按作品瀏覽動漫取景地 | {brand}",
-    animeIndexDescription: "已收錄取景地的動漫作品共 {animeCount} 部。",
-    locationIndexTitle: "按地區瀏覽動漫取景地 | {brand}",
-    locationIndexDescription: "已收錄動漫取景地的地區共 {locationCount} 個。",
+      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動畫取景地。",
+    animeIndexTitle: "按作品瀏覽動畫取景地 | {brand}",
+    animeIndexDescription: "已收錄取景地的動畫作品共 {animeCount} 部。",
+    locationIndexTitle: "按地區瀏覽動畫取景地 | {brand}",
+    locationIndexDescription: "已收錄動畫取景地的地區共 {locationCount} 個。",
   },
 };
 

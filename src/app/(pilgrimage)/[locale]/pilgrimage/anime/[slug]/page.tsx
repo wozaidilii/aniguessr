@@ -61,19 +61,16 @@ function animePageSeo(
   spotCount: number,
 ) {
   const title = pickLocalizedText(anime.animeTitle, locale);
-  const generated = buildAnimePageSeo(
+  return applyPilgrimageSeoOverride(
+    "anime",
+    anime.slug,
     locale,
-    { id: anime.subjectId, title, count: spotCount },
-    animeTitleIsAmbiguous(title),
+    buildAnimePageSeo(
+      locale,
+      { id: anime.subjectId, title, count: spotCount },
+      animeTitleIsAmbiguous(title),
+    ),
   );
-  const seo = applyPilgrimageSeoOverride("anime", anime.slug, locale, generated);
-  // Other zh-TW documents stay blank until an override is supplied.
-  // The work page title uses the build-time traditional name. The path,
-  // canonical, and hreflang stay on the simplified slug.
-  if (locale === "zh-tw" && !seo.title.trim()) {
-    return { title: generated.title, description: seo.description };
-  }
-  return seo;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -95,10 +95,12 @@ export function pilgrimagePageMetadata(
   if (title.trim()) {
     metadata.title = { absolute: title };
     metadata.openGraph = { ...metadata.openGraph, title };
+    metadata.twitter = { ...metadata.twitter, title };
   }
   if (description.trim()) {
     metadata.description = description;
     metadata.openGraph = { ...metadata.openGraph, description };
+    metadata.twitter = { ...metadata.twitter, description };
   }
   return metadata;
 }
@@ -128,6 +130,10 @@ export function zhTwOnlyPageMetadata(
       title,
       description,
       url: canonical,
+    },
+    twitter: {
+      title,
+      description,
     },
   };
 }
