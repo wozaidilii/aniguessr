@@ -1,6 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { loadMunicipalities, locateMunicipality } from "./lib/japan-area.mjs";
+import {
+  loadMunicipalities,
+  locateMunicipality,
+  municipalityTouchesSea,
+} from "./lib/japan-area.mjs";
 import {
   chooseCanonicalSpot,
   chooseCanonicalSubject,
@@ -480,6 +484,10 @@ async function main() {
     );
   const locationSlugs = new Set(locations.map((location) => location.slug));
   const places = loadMunicipalities(AREA_PATH).places;
+  const placeBySlug = new Map(places.map((place) => [place.slug, place]));
+  for (const location of locations) {
+    location.isCoastal = municipalityTouchesSea(placeBySlug.get(location.slug));
+  }
 
   /** @type {Record<string, string>} */
   const locationRedirects = {};
@@ -558,6 +566,7 @@ async function main() {
       spot.animeTitle,
     );
     spot.animeTitle.tw = chosen.text;
+    spot.animeTitle.twSource = chosen.source;
     rememberField("spot", spot.id, "title", spot.title);
     rememberField("spot", spot.id, "description", spot.description);
     rememberField("spot", spot.id, "answerName", spot.answerName);
@@ -576,6 +585,7 @@ async function main() {
   for (const anime of animes) {
     const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
     anime.animeTitle.tw = chosen.text;
+    anime.animeTitle.twSource = chosen.source;
     remember(
       "anime",
       anime.subjectId,

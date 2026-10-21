@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { withAnimeLocale } from "~/lib/anime-locale";
-import { isLocaleHomePath } from "~/lib/home-cache";
+import { isLocaleHomeOgPath, isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   PILGRIMAGE_REVALIDATE_SECONDS,
@@ -34,6 +34,8 @@ describe("locale middleware exemptions", () => {
       "/sw.js",
       "/favicon.ico",
       "/og.png",
+      "/og/home-ja.png",
+      "/og/home-zh-tw.png",
       "/apple-touch-icon.png",
       "/icon-192.png",
       "/icon-512.png",
@@ -178,6 +180,22 @@ describe("locale middleware exemptions", () => {
     expect(preferred.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/zh/pilgrimage",
     );
+  });
+
+  it("serves homepage share images without rewrite or Set-Cookie", () => {
+    for (const pathname of [
+      "/ja/opengraph-image",
+      "/zh/opengraph-image",
+      "/en/opengraph-image",
+      "/zh-tw/opengraph-image",
+    ]) {
+      expect(isLocaleHomeOgPath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
   });
 
   it("serves locale homepages without rewrite or Set-Cookie", () => {

@@ -7,7 +7,7 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
-import { isLocaleHomePath } from "~/lib/home-cache";
+import { isLocaleHomeOgPath, isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
@@ -151,7 +151,8 @@ export function middleware(request: NextRequest) {
   // skip the CDN cache for these ISR pages.
   if (
     isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
-    isLocaleHomePath(request.nextUrl.pathname)
+    isLocaleHomePath(request.nextUrl.pathname) ||
+    isLocaleHomeOgPath(request.nextUrl.pathname)
   ) {
     return NextResponse.next();
   }

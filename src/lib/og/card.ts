@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 import {
+  HOME_OG_COPY,
   OG_TEMPLATE_VERSION,
   ogCopy,
   ogLocaleChain,
@@ -44,7 +45,7 @@ export interface OgSubtitleLine {
 }
 
 export interface OgCard {
-  kind: "spot" | "work" | "area";
+  kind: "spot" | "work" | "area" | "home";
   requestedLocale: PilgrimageLocale;
   contentLocale: OgLocale;
   art: MapArt;
@@ -111,6 +112,29 @@ export function displayName(
     if (value) return value;
   }
   return "";
+}
+
+/**
+ * Japanese place labels often live in `zh` (the source stores kanji there)
+ * while `en` is romaji. Stay on the Japanese card: ja, zh, a derived
+ * Japanese label, then romaji. Other locales keep `displayName`.
+ */
+export function displaySpotPlace(
+  locale: OgLocale,
+  base: OgNames | undefined,
+  ogTitle?: OgNames,
+  shortName?: OgNames,
+  derivedJa?: string,
+): string {
+  if (locale !== "ja") return displayName(locale, base, ogTitle, shortName);
+  return (
+    preferredName("ja", base, ogTitle, shortName) ||
+    preferredName("zh", base, ogTitle, shortName) ||
+    derivedJa?.trim() ||
+    preferredName("en", base, ogTitle, shortName) ||
+    preferredName("zh-tw", base, ogTitle, shortName) ||
+    ""
+  );
 }
 
 export function resolveContentLocale(
@@ -182,6 +206,8 @@ export function buildSpotCard(input: {
   art: MapArt;
   origin: LatLng;
   nearby: LatLng[];
+  /** Japanese label from the spot scene title, used only when answer names are blank. */
+  derivedJa?: string;
 }): OgCard {
   const workName = (locale: OgLocale) =>
     preferredName(locale, input.workTitle, input.workOgTitle, input.workShortName);
@@ -194,11 +220,12 @@ export function buildSpotCard(input: {
     areaName,
   ]);
   const copy = ogCopy(contentLocale);
-  const spot = displayName(
+  const spot = displaySpotPlace(
     contentLocale,
     input.spotName,
     input.ogTitle,
     input.shortName,
+    input.derivedJa,
   );
   const work = displayName(
     contentLocale,
@@ -263,7 +290,6 @@ export function buildWorkCard(input: {
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.title, input.ogTitle, input.shortName),
-    ...areas.map((area) => (locale: OgLocale) => readOgName(area, locale)),
   ]);
   const copy = ogCopy(contentLocale);
   const title = displayName(
@@ -321,7 +347,6 @@ export function buildAreaCard(input: {
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.title, input.ogTitle, input.shortName),
-    ...works.map((work) => (locale: OgLocale) => readOgName(work, locale)),
   ]);
   const copy = ogCopy(contentLocale);
   const title = displayName(
@@ -362,6 +387,59 @@ export function buildAreaCard(input: {
       String(input.workCount),
       String(input.spotCount),
       pills.join("|"),
+      markerKey(markers),
+    ]),
+  };
+}
+
+const HOME_POINTS: LatLng[] = [
+  { lat: 35.2998, lng: 139.4806 },
+  { lat: 35.3192, lng: 139.5503 },
+  { lat: 35.4437, lng: 139.638 },
+  { lat: 35.6595, lng: 139.7004 },
+  { lat: 35.6812, lng: 139.7671 },
+];
+
+/** Map + text homepage card. No screenshots. Each locale stays in one language. */
+export function buildHomeCard(input: {
+  requestedLocale: PilgrimageLocale;
+  spotCount: number;
+  points?: LatLng[];
+}): OgCard {
+  const contentLocale: OgLocale =
+    input.requestedLocale === "zh" ||
+    input.requestedLocale === "zh-tw" ||
+    input.requestedLocale === "en"
+      ? input.requestedLocale
+      : "ja";
+  const copy = HOME_OG_COPY[contentLocale];
+  const count = ogCopy(contentLocale).spotCount(input.spotCount);
+  const points =
+    input.points && input.points.length > 0 ? input.points : HOME_POINTS;
+  const markers = layoutAreaMarkers(points, "coast");
+  const fitted = titleBlock(copy.title, contentLocale, "workTitle");
+  return {
+    kind: "home",
+    requestedLocale: input.requestedLocale,
+    contentLocale,
+    art: "coast",
+    chip: fitChip(copy.chip),
+    ...fitted,
+    subtitleSize: 0,
+    subtitleLines: [],
+    stat: [
+      { text: count.strong, strong: true },
+      { text: count.rest, strong: false },
+    ],
+    pills: [],
+    markers,
+    alt: copy.alt,
+    version: versionFor([
+      "home",
+      input.requestedLocale,
+      contentLocale,
+      copy.title,
+      String(input.spotCount),
       markerKey(markers),
     ]),
   };

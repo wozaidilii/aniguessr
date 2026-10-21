@@ -248,6 +248,33 @@ export function fitChip(text: string): string {
   return ellipsize(plain, CHIP_CAP, latin);
 }
 
+/** Space width Satori will not collapse. Leading and trailing spaces need margin. */
+export function edgeMargin(fontSize: number): number {
+  return Math.round(fontSize * 0.28);
+}
+
+/**
+ * Satori drops leading and trailing spaces, including NBSP.
+ * Internal spaces stay in `text`; the edges become margins.
+ */
+export function splitEdgeSpace(value: string): {
+  lead: boolean;
+  trail: boolean;
+  text: string;
+} {
+  const lead = /^[\s\u00A0]/u.test(value);
+  const trail = /[\s\u00A0]$/u.test(value);
+  const text = value
+    .replace(/^[\s\u00A0]+|[\s\u00A0]+$/gu, "")
+    .replace(/\u00A0/gu, " ");
+  return { lead, trail, text };
+}
+
+/** NBSP keeps a suffix unbreakable while fitting. Paint it as a normal space. */
+export function visibleText(value: string): string {
+  return value.replace(/\u00A0/gu, " ");
+}
+
 export function splitKeptSuffix(
   line: string,
   keep: string | undefined,

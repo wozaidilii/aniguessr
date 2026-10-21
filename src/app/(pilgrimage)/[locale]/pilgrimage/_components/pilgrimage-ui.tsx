@@ -58,6 +58,7 @@ export function PilgrimageShell({
 
         <PilgrimageFavoritesProvider>{children}</PilgrimageFavoritesProvider>
         <AnitabiAttribution locale={locale} className="mt-10 text-center" />
+        <p className="mt-1.5 text-center text-xs text-white/45">© 2026 Ayiora</p>
       </div>
     </main>
   );

@@ -39,6 +39,8 @@ export interface PilgrimageLocationSummary {
   name: LocalizedText;
   spotCount: number;
   animeCount: number;
+  /** True when the municipality ring steps into the sea. Unknown stays city art. */
+  isCoastal?: boolean;
 }
 
 export interface PilgrimageSpot {

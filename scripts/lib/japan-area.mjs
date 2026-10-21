@@ -83,6 +83,53 @@ function candidatesNear(lng, lat, radius) {
   return found;
 }
 
+/** Exact ring hit. Does not snap sea points back onto the shore. */
+function containsMunicipality(lng, lat) {
+  if (!index) return false;
+  for (const place of candidatesNear(lng, lat, 0)) {
+    const [minLng, minLat, maxLng, maxLat] = place.bbox;
+    if (lng < minLng || lng > maxLng || lat < minLat || lat > maxLat) continue;
+    for (const ring of place.rings) {
+      if (pointInRing(lng, lat, ring)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * True when a step outward from the municipality leaves land.
+ * Inland borders step into a neighbor; a coast steps into the sea.
+ * @param {Municipality | null | undefined} place
+ */
+export function municipalityTouchesSea(place) {
+  if (!index || !place?.rings?.length) return false;
+  const gap = 0.025;
+  for (const ring of place.rings) {
+    if (ring.length < 6) continue;
+    let cx = 0;
+    let cy = 0;
+    const count = ring.length / 2;
+    for (let index = 0; index < count; index += 1) {
+      cx += ring[index * 2];
+      cy += ring[index * 2 + 1];
+    }
+    cx /= count;
+    cy /= count;
+    const stride = Math.max(1, Math.floor(count / 28));
+    for (let index = 0; index < count; index += stride) {
+      const lng = ring[index * 2];
+      const lat = ring[index * 2 + 1];
+      const dx = lng - cx;
+      const dy = lat - cy;
+      const length = Math.hypot(dx, dy) || 1;
+      const x = lng + (dx / length) * gap;
+      const y = lat + (dy / length) * gap;
+      if (!containsMunicipality(x, y)) return true;
+    }
+  }
+  return false;
+}
+
 /**
  * Municipality containing this coordinate.
  * Points that fall just outside a simplified coastline use the nearest boundary.

@@ -147,7 +147,7 @@ export function HomeNearby({
         </>
       ) : null}
       <div className="home-nearby-head">
-        <h2>{title}</h2>
+        <p className="home-nearby-label">{title}</p>
         {origin ? <p>{copy.nearbySorted}</p> : null}
       </div>
       <ol className="home-spot-list">

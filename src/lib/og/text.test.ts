@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { segmentForOg } from "~/lib/og/text";
 import {
+  edgeMargin,
   ellipsize,
   fitText,
   layout,
+  splitEdgeSpace,
   splitKeptSuffix,
   tokenize,
   units,
+  visibleText,
 } from "~/lib/og/text";
 import { STEPS } from "~/lib/og/text";
 
@@ -79,6 +82,31 @@ describe("og text fit", () => {
   it("omits the suffix token when the count is zero", () => {
     const fit = fitText("青春ブタ野郎はバニーガール先輩の夢を見ない", "ja", sub);
     expect(fit.lines.join("")).not.toContain("ほか");
+  });
+
+  it("turns edge spaces into margins and keeps the words", () => {
+    expect(splitEdgeSpace(" real-life locations")).toEqual({
+      lead: true,
+      trail: false,
+      text: "real-life locations",
+    });
+    expect(splitEdgeSpace(" series · ")).toEqual({
+      lead: true,
+      trail: true,
+      text: "series ·",
+    });
+    expect(splitEdgeSpace(" か所")).toEqual({
+      lead: true,
+      trail: false,
+      text: "か所",
+    });
+    expect(splitEdgeSpace("\u00A0ほか 12 作品")).toEqual({
+      lead: true,
+      trail: false,
+      text: "ほか 12 作品",
+    });
+    expect(edgeMargin(28)).toBe(8);
+    expect(visibleText("ほか\u00A012\u00A0作品")).toBe("ほか 12 作品");
   });
 
   it("strips dangling punctuation before the ellipsis", () => {

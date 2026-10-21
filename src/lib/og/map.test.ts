@@ -4,6 +4,7 @@ import {
   layoutAreaMarkers,
   layoutSpotMarkers,
   layoutWorkMarkers,
+  mergeOverlappingClusters,
 } from "~/lib/og/map";
 
 describe("og map markers", () => {
@@ -52,5 +53,20 @@ describe("og map markers", () => {
     expect(clusterRadius(2)).toBe(24);
     expect(clusterRadius(12)).toBe(29);
     expect(clusterRadius(120)).toBe(34);
+  });
+
+  it("merges clusters whose bubbles would overlap and leaves distant ones", () => {
+    const merged = mergeOverlappingClusters([
+      { x: 100, y: 100, n: 19 },
+      { x: 110, y: 100, n: 12 },
+    ]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0]?.n).toBe(31);
+    const apart = mergeOverlappingClusters([
+      { x: 0, y: 0, n: 2 },
+      { x: 200, y: 0, n: 3 },
+    ]);
+    expect(apart).toHaveLength(2);
+    expect(apart.map((item) => item.n).sort()).toEqual([2, 3]);
   });
 });

@@ -6,7 +6,8 @@ import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
  */
 export type OgLocale = "ja" | "zh" | "zh-tw" | "en";
 
-export const OG_TEMPLATE_VERSION = "1";
+/** Bump when card pixels change so CDN and crawler URLs fetch the new image. */
+export const OG_TEMPLATE_VERSION = "2";
 
 export const OG_CHROME = {
   logo: "ANIGUESSR",
@@ -123,6 +124,36 @@ export const OG_COPY: Record<OgLocale, OgCopy> = {
 export function ogCopy(locale: OgLocale): OgCopy {
   return OG_COPY[locale];
 }
+
+/**
+ * Homepage share card. Same words as the homepage H1 and chip.
+ * zh-tw is written here, so the card does not fall through to Japanese.
+ */
+export const HOME_OG_COPY: Record<
+  OgLocale,
+  { chip: string; title: string; alt: string }
+> = {
+  ja: {
+    chip: "聖地巡礼マップ",
+    title: "アニメ聖地巡礼マップ",
+    alt: "アニメ聖地巡礼マップ",
+  },
+  zh: {
+    chip: "圣地巡礼地图",
+    title: "动漫圣地巡礼地图",
+    alt: "动漫圣地巡礼地图",
+  },
+  "zh-tw": {
+    chip: "動漫聖地巡禮地圖",
+    title: "動漫聖地巡禮地圖",
+    alt: "動漫聖地巡禮地圖",
+  },
+  en: {
+    chip: "Pilgrimage map",
+    title: "Anime Pilgrimage Map",
+    alt: "Anime Pilgrimage Map",
+  },
+};
 
 /** zh-tw → zh → ja. Every other locale falls back to ja. */
 export function ogLocaleChain(requested: PilgrimageLocale): OgLocale[] {

@@ -181,6 +181,45 @@ function projectToFocus(points: LatLng[], art: MapArt): MarkerPoint[] {
   }));
 }
 
+/** Extra pixels required between cluster edges so "19" and "12" cannot read as "1912". */
+const CLUSTER_GAP = 8;
+
+/**
+ * After the 80px grid, neighboring cells can still sit on top of each other.
+ * Merge those clusters: sum the counts and keep a count-weighted center.
+ * Singles are not passed in, so a lone pin is never absorbed.
+ */
+export function mergeOverlappingClusters(
+  clusters: readonly MarkerCluster[],
+): MarkerCluster[] {
+  const pending = clusters.map((item) => ({ ...item }));
+  const merged: MarkerCluster[] = [];
+  while (pending.length > 0) {
+    const current = pending.shift();
+    if (!current) break;
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (let index = pending.length - 1; index >= 0; index -= 1) {
+        const other = pending[index];
+        if (!other) continue;
+        const distance = Math.hypot(current.x - other.x, current.y - other.y);
+        const limit =
+          clusterRadius(current.n) + clusterRadius(other.n) + CLUSTER_GAP;
+        if (distance >= limit) continue;
+        const total = current.n + other.n;
+        current.x = round((current.x * current.n + other.x * other.n) / total);
+        current.y = round((current.y * current.n + other.y * other.n) / total);
+        current.n = total;
+        pending.splice(index, 1);
+        grew = true;
+      }
+    }
+    merged.push(current);
+  }
+  return merged;
+}
+
 export function clusterMarkers(points: MarkerPoint[]): {
   singles: MarkerPoint[];
   clusters: MarkerCluster[];
@@ -213,7 +252,7 @@ export function layoutWorkMarkers(points: LatLng[], art: MapArt): MarkerLayout {
     art,
     minorPins: grouped.singles,
     pins: [],
-    clusters: grouped.clusters,
+    clusters: mergeOverlappingClusters(grouped.clusters),
   };
 }
 
@@ -223,7 +262,7 @@ export function layoutAreaMarkers(points: LatLng[], art: MapArt): MarkerLayout {
     art,
     minorPins: grouped.singles,
     pins: [],
-    clusters: grouped.clusters,
+    clusters: mergeOverlappingClusters(grouped.clusters),
   };
 }
 

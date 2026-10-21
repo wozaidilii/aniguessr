@@ -5,7 +5,10 @@ import { HomeView } from "~/components/home/home-view";
 import { buildHomeCatalog } from "~/lib/home-catalog";
 import { isHomeLocale } from "~/lib/home-locale";
 import { homePageMetadata } from "~/lib/home-page-copy";
+import { withHomeOg } from "~/lib/og/metadata";
 import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import { homeOgStaticStamp } from "~/server/og/home-art";
+import { loadHomeOg } from "~/server/og/load";
 
 export const revalidate = 86_400;
 
@@ -16,7 +19,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isHomeLocale(locale)) return {};
-  return homePageMetadata(locale);
+  const metadata = homePageMetadata(locale);
+  const og = loadHomeOg(locale);
+  if (og.status !== "ready") return metadata;
+  return withHomeOg(metadata, locale, og.card, homeOgStaticStamp(locale));
 }
 
 export default async function HomePage({

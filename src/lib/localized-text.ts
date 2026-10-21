@@ -6,6 +6,12 @@ export interface LocalizedText {
   en: string;
   /** Traditional Chinese for pilgrimage records. zh-TW does not fall back to zh. */
   tw?: string;
+  /**
+   * Anime titles only. `ja-fallback` means `tw` is a copy of the Japanese
+   * title, not an official Traditional title. Pages still display `tw`.
+   * Open Graph cards treat that copy as empty.
+   */
+  twSource?: "official-title" | "ja-fallback";
 }
 
 export interface LocalizedLines {
@@ -32,6 +38,25 @@ export function pickLocalizedText(
   if (locale === "zh") return zh || ja || en;
   if (locale === "ja") return ja || en || zh;
   return en || ja || zh;
+}
+
+/**
+ * Spot place names. Japanese prefers the kanji stored on `zh`, then a
+ * Japanese label derived from the scene title, and only then romaji.
+ * Every other locale keeps `pickLocalizedText`.
+ */
+export function pickSpotPlaceName(
+  text: Partial<LocalizedText> | null | undefined,
+  locale: PilgrimageLocale,
+  derivedJa?: string,
+): string {
+  if (locale !== "ja") return pickLocalizedText(text, locale);
+  const ja = text?.ja?.trim() ?? "";
+  const zh = text?.zh?.trim() ?? "";
+  const derived = derivedJa?.trim() ?? "";
+  const en = text?.en?.trim() ?? "";
+  const tw = text?.tw?.trim() ?? "";
+  return ja || zh || derived || en || tw;
 }
 
 export function pickLocalizedLines(
