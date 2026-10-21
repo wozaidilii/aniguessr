@@ -13,10 +13,8 @@ import { buildAnimeFilmingListJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
 import {
   animeTitleIsAmbiguous,
-  animeHasZhTwPage,
   getAnimeBySlug,
   listSpotsForAnime,
-  listZhTwSpotsForAnime,
   pickLocalizedText,
   type PilgrimageAnimeSummary,
   type PilgrimageSpot,
@@ -48,17 +46,8 @@ function redirectMergedAnime(
   permanentRedirect(pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale));
 }
 
-function spotsForPage(
-  locale: PilgrimageLocale,
-  anime: PilgrimageAnimeSummary,
-): PilgrimageSpot[] {
-  return locale === "zh-tw"
-    ? listZhTwSpotsForAnime(anime.subjectId)
-    : listSpotsForAnime(anime.subjectId);
-}
-
-function assertZhTwAnime(locale: PilgrimageLocale, spots: PilgrimageSpot[]) {
-  if (locale === "zh-tw" && spots.length === 0) notFound();
+function spotsForPage(anime: PilgrimageAnimeSummary): PilgrimageSpot[] {
+  return listSpotsForAnime(anime.subjectId);
 }
 
 function animePageSeo(
@@ -85,17 +74,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const anime = getAnimeBySlug(slug);
   if (!anime) return { title: "Not found" };
   redirectMergedAnime(locale, slug, anime);
-  const spots = spotsForPage(locale, anime);
-  assertZhTwAnime(locale, spots);
-  const spotCount = locale === "zh-tw" ? spots.length : anime.spotCount;
-
-  const seo = animePageSeo(locale, anime, spotCount);
+  const seo = animePageSeo(locale, anime, anime.spotCount);
   return pilgrimagePageMetadata(
     locale,
     `/pilgrimage/anime/${anime.slug}`,
     seo.title,
     seo.description,
-    animeHasZhTwPage(anime.subjectId),
+    true,
   );
 }
 
@@ -106,9 +91,8 @@ export default async function PilgrimageAnimePage({ params }: Props) {
   const anime = getAnimeBySlug(slug);
   if (!anime) notFound();
   redirectMergedAnime(locale, slug, anime);
-  const spots = spotsForPage(locale, anime);
-  assertZhTwAnime(locale, spots);
-  const spotCount = locale === "zh-tw" ? spots.length : anime.spotCount;
+  const spots = spotsForPage(anime);
+  const spotCount = anime.spotCount;
 
   const title = pickLocalizedText(anime.animeTitle, locale);
   const seo = animePageSeo(locale, anime, spotCount);
@@ -147,7 +131,7 @@ export default async function PilgrimageAnimePage({ params }: Props) {
           subtitle: pickLocalizedText(spot.title, locale),
         }))}
       />
-      {locale !== "zh-tw" && anime.spotCount > spots.length ? (
+      {anime.spotCount > spots.length ? (
         <p className="mt-4 text-xs text-pink-100/50">
           {spots.length} / {anime.spotCount} spots listed
         </p>

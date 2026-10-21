@@ -12,10 +12,7 @@ import {
   pickLocalizedText,
   pickMaybeLocalizedText,
 } from "~/lib/localized-text";
-import {
-  isZhTwCoveredLocationSlug,
-  type PilgrimageLocale,
-} from "~/lib/pilgrimage-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
@@ -66,12 +63,6 @@ function redirectDuplicateSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   );
 }
 
-function assertZhTwSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
-  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(spot.locationSlug)) {
-    notFound();
-  }
-}
-
 function spotPageSeo(
   locale: PilgrimageLocale,
   spot: PilgrimageSpot,
@@ -97,7 +88,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const spot = getSpotById(id);
   if (!spot) return { title: "Not found" };
   redirectDuplicateSpot(locale, spot);
-  assertZhTwSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -108,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path,
     seo.title,
     seo.description,
-    isZhTwCoveredLocationSlug(spot.locationSlug),
+    true,
   );
 
   return {
@@ -127,7 +117,6 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const spot = getSpotById(id);
   if (!spot) notFound();
   redirectDuplicateSpot(locale, spot);
-  assertZhTwSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
   const place = pickLocalizedText(spot.answerName, locale);

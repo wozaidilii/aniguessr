@@ -4,7 +4,7 @@ import { JsonLd } from "~/components/JsonLd";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
-import { isZhTwCoveredLocationSlug, type PilgrimageLocale } from "~/lib/pilgrimage-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
@@ -45,10 +45,6 @@ function redirectLocationSlug(
   );
 }
 
-function assertZhTwLocation(locale: PilgrimageLocale, slug: string) {
-  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(slug)) notFound();
-}
-
 function locationPageSeo(
   locale: PilgrimageLocale,
   location: PilgrimageLocationSummary,
@@ -68,7 +64,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) return { title: "Not found" };
   redirectLocationSlug(locale, resolved);
-  assertZhTwLocation(locale, resolved.location.slug);
 
   const seo = locationPageSeo(locale, resolved.location);
   return pilgrimagePageMetadata(
@@ -76,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `/pilgrimage/locations/${resolved.location.slug}`,
     seo.title,
     seo.description,
-    isZhTwCoveredLocationSlug(resolved.location.slug),
+    true,
   );
 }
 
@@ -87,7 +82,6 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) notFound();
   redirectLocationSlug(locale, resolved);
-  assertZhTwLocation(locale, resolved.location.slug);
   const location = resolved.location;
   const name = pickLocalizedText(location.name, locale);
 
