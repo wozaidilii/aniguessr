@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { withAnimeLocale } from "~/lib/anime-locale";
+import { isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   PILGRIMAGE_REVALIDATE_SECONDS,
@@ -172,6 +173,17 @@ describe("locale middleware exemptions", () => {
     expect(preferred.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/zh/pilgrimage",
     );
+  });
+
+  it("serves locale homepages without rewrite or Set-Cookie", () => {
+    for (const pathname of ["/ja", "/ja/", "/zh", "/en", "/zh-tw"]) {
+      expect(isLocaleHomePath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
   });
 
   it("still rewrites other locale-prefixed pages", () => {

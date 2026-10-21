@@ -662,7 +662,11 @@ async function main() {
   };
 
   const canonicalPaths = [
-    ...PUBLIC_ROUTES.map(([route, priority]) => ({ path: route, priority })),
+    ...PUBLIC_ROUTES.map(([route, priority]) => ({
+      path: route,
+      priority,
+      zhTw: route === "/",
+    })),
     {
       path: "/pilgrimage",
       priority: 0.5,
