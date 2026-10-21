@@ -18,10 +18,11 @@ import {
   googleStreetViewUrl,
   haversineKm,
   localizedNavText,
+  formatWorkTitle,
+  groupPlaceWorks,
   parseNavCatalog,
   placeNamesSimilar,
   rankNearbySpots,
-  samePlaceWorkLabel,
   type NavSpot,
   type NavText,
 } from "~/lib/pilgrimage-nav";
@@ -160,25 +161,44 @@ describe("pilgrimage navigation", () => {
       "stairs-far",
     ]);
     expect(placeNamesSimilar(nakatsu.name, shrine.name)).toBe(true);
-    expect(
-      samePlaceWorkLabel(
-        nakatsu,
-        [nakatsu, shrine],
-        { "215158": { zh: "刀使", ja: "刀使ノ巫女", en: "Toji" } },
-        "ja",
-      ),
-    ).toBe("刀使ノ巫女");
+    expect(formatWorkTitle("ja", "『Just Because!』")).toBe(
+      "『Just Because!』",
+    );
+    expect(formatWorkTitle("ja", "刀使ノ巫女")).toBe("『刀使ノ巫女』");
+    expect(formatWorkTitle("zh", "『Just Because!』")).toBe(
+      "《Just Because!》",
+    );
+    expect(formatWorkTitle("zh-tw", "Just Because!")).toBe("《Just Because!》");
+    expect(formatWorkTitle("en", "『Just Because!』")).toBe('"Just Because!"');
     const stairs = spot("stairs", "215158", 35.2994, 139.4804, {
       ja: "中津宮階段",
     });
-    expect(
-      samePlaceWorkLabel(
-        nakatsu,
-        [nakatsu, stairs],
-        { "215158": { zh: "刀使", ja: "刀使ノ巫女", en: "Toji" } },
-        "ja",
-      ),
-    ).toBe("刀使ノ巫女 · 中津宮（江の島）");
+    const grouped = groupPlaceWorks(
+      [nakatsu, stairs, shrine],
+      {
+        "215158": { zh: "刀使", ja: "刀使ノ巫女", en: "Toji" },
+        "321885": { zh: "电锯人", ja: "チェンソーマン", en: "Chainsaw Man" },
+      },
+      "ja",
+      (id) => `/ja/pilgrimage/spots/${id}`,
+    );
+    expect(grouped.map((work) => work.title)).toEqual([
+      "『刀使ノ巫女』",
+      "『チェンソーマン』",
+    ]);
+    expect(grouped[0]?.countLabel).toBe("（2か所）");
+    expect(grouped[0]?.spots.map((item) => item.place)).toEqual([
+      "中津宮（江の島）",
+      "中津宮階段",
+    ]);
+    expect(grouped[0]?.spots.map((item) => item.href)).toEqual([
+      "/ja/pilgrimage/spots/anitabi_215158_51i53xo8n",
+      "/ja/pilgrimage/spots/stairs",
+    ]);
+    expect(grouped[1]?.countLabel).toBe("");
+    expect(grouped[1]?.spots[0]?.href).toBe(
+      "/ja/pilgrimage/spots/anitabi_321885_csisxbghx",
+    );
     expect(
       placeNamesSimilar(
         { ja: "中津駅", zh: "中津站", en: "" },
@@ -209,6 +229,28 @@ describe("pilgrimage navigation", () => {
       "anitabi_215158_51i53xo8n",
       "anitabi_321885_csisxbghx",
     ]);
+    const works = groupPlaceWorks(
+      enoshima ?? [],
+      catalog.animes,
+      "ja",
+      (id) => `/ja/pilgrimage/spots/${id}`,
+    );
+    expect(works.map((work) => work.title).sort()).toEqual([
+      "『Just Because!』",
+      "『チェンソーマン』",
+      "『刀使ノ巫女』",
+    ]);
+    const toji = works.find((work) => work.key === "215158");
+    expect(toji?.countLabel).toBe("（2か所）");
+    expect(toji?.spots.map((item) => item.place).sort()).toEqual(
+      ["中津宮（江の島）", "中津宮階段"].sort(),
+    );
+    expect(toji?.spots.every((item) => item.href.includes(item.id))).toBe(true);
+    expect(
+      groupPlaceWorks(enoshima ?? [], catalog.animes, "zh-tw", (id) => id).find(
+        (work) => work.key === "215158",
+      )?.countLabel,
+    ).toBe("（2處）");
     expect(groups.reduce((sum, group) => sum + group.length, 0)).toBe(
       catalog.spots.length,
     );
@@ -232,9 +274,11 @@ describe("pilgrimage navigation", () => {
       "utf8",
     );
     expect(home).toContain("clusterSamePlaces");
-    expect(home).toContain("/pilgrimage/spots/${encodeSpotId(item.id)}");
+    expect(home).toContain("/pilgrimage/spots/${encodeSpotId(id)}");
+    expect(home).toContain("<a href={item.href}>{item.place}</a>");
     expect(near).toContain("clusterSamePlaces");
-    expect(near).toContain("/pilgrimage/spots/${encodeSpotId(item.id)}");
+    expect(near).toContain("/pilgrimage/spots/${encodeSpotId(id)}");
+    expect(near).toContain("href={item.href}");
     expect(spotPage).not.toContain("NearbySpots");
     expect(spotPage).not.toContain("clusterSamePlaces");
   });
@@ -300,10 +344,28 @@ describe("pilgrimage navigation", () => {
     expect(source).toContain("text-[var(--dark-text-secondary)]");
     expect(shell).toContain("<AnitabiAttribution locale={locale}");
     expect(shell).not.toContain("AnitabiCredit");
+    expect(getPilgrimageCopy("ja").samePlaceWorks).toBe(
+      "同じ場所が登場する作品：",
+    );
+    expect(getPilgrimageCopy("ja").samePlaceSiblings).toBe(
+      "同じ作品の近くのスポット：",
+    );
+    expect(getPilgrimageCopy("zh").samePlaceWorks).toBe("同一地点出现的作品：");
+    expect(getPilgrimageCopy("zh-tw").samePlaceWorks).toBe(
+      "同一地點出現的作品：",
+    );
+    expect(getPilgrimageCopy("en").samePlaceWorks).toBe(
+      "Also in these works: ",
+    );
+    expect(getPilgrimageCopy("en").samePlaceSiblings).toBe(
+      "Other spots from this work: ",
+    );
     for (const locale of ["zh", "ja", "en", "zh-tw"] as const) {
       const copy = getPilgrimageCopy(locale);
       expect(copy.navigate.length).toBeGreaterThan(0);
-      expect(copy.samePlaceAlso("刀使ノ巫女")).toContain("刀使ノ巫女");
+      expect(copy.samePlaceWorks.includes("《")).toBe(false);
+      expect(copy.samePlaceSiblings.includes("《")).toBe(false);
+      expect(copy).not.toHaveProperty("samePlaceAlso");
       expect(copy.formatDistance(0.25)).toMatch(/250/);
       expect(copy).not.toHaveProperty("openAnitabi");
       expect(copy).not.toHaveProperty("creditLead");

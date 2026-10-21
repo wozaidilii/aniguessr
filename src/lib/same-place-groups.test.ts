@@ -39,7 +39,10 @@ describe("same-place group export", () => {
       "utf8",
     );
     expect(page).toContain("<a");
-    expect(page).toContain("samePlaceAlso");
+    expect(page).toContain("samePlaceWorks");
+    expect(page).toContain("samePlaceSiblings");
+    expect(page).toContain("whitespace-nowrap");
+    expect(page).not.toContain("samePlaceAlso");
     expect(page).not.toContain("permanentRedirect(samePlace");
     const parsed = parseSamePlaceGroupsCsv(csv);
     expect(parsed).toHaveLength(1662);

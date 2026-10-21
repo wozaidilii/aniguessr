@@ -13,10 +13,10 @@ import {
   clusterSamePlaces,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
+  groupPlaceWorks,
   haversineKm,
   loadNavCatalog,
   localizedSpotName,
-  samePlaceWorkLabel,
   type NavCatalog,
   type NavSpot,
   type NearbySpot,
@@ -196,21 +196,49 @@ function SpotGroup({
               </div>
               {group.length === 1 ? (
                 <p className="mt-1 text-sm text-pink-100/65">
-                  {samePlaceWorkLabel(spot, group, animes, locale)}
+                  {groupPlaceWorks(group, animes, locale, (id) =>
+                    withPilgrimageLocale(
+                      `/pilgrimage/spots/${encodeSpotId(id)}`,
+                      locale,
+                    ),
+                  )[0]?.title ?? ""}
                 </p>
               ) : (
                 <ul className="mt-1 grid gap-1 text-sm text-pink-100/65">
-                  {group.map((item) => (
-                    <li key={item.id}>
-                      <Link
-                        href={withPilgrimageLocale(
-                          `/pilgrimage/spots/${encodeSpotId(item.id)}`,
-                          locale,
-                        )}
-                        className="hover:text-cyan-50"
-                      >
-                        {samePlaceWorkLabel(item, group, animes, locale)}
-                      </Link>
+                  {groupPlaceWorks(group, animes, locale, (id) =>
+                    withPilgrimageLocale(
+                      `/pilgrimage/spots/${encodeSpotId(id)}`,
+                      locale,
+                    ),
+                  ).map((work) => (
+                    <li key={work.key}>
+                      {work.spots.length === 1 && work.spots[0] ? (
+                        <a
+                          href={work.spots[0].href}
+                          className="hover:text-cyan-50"
+                        >
+                          {work.title}
+                        </a>
+                      ) : (
+                        <>
+                          <span>
+                            {work.title}
+                            {work.countLabel}
+                          </span>
+                          <ul className="mt-0.5 grid gap-0.5 pl-3 text-xs">
+                            {work.spots.map((item) => (
+                              <li key={item.id}>
+                                <a
+                                  href={item.href}
+                                  className="hover:text-cyan-50"
+                                >
+                                  {item.place}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
                     </li>
                   ))}
                 </ul>

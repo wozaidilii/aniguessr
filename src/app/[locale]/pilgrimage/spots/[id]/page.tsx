@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import {
+  formatWorkTitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
+  workSpotCountLabel,
 } from "~/lib/pilgrimage-nav";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
 import {
@@ -47,40 +49,65 @@ export function generateStaticParams() {
   return [];
 }
 
-function samePlaceLinksFor(
+interface SamePlaceLink {
+  id: string;
+  href: string;
+  text: string;
+}
+
+function samePlaceSections(
   spot: PilgrimageSpot,
   locale: PilgrimageLocale,
-  labelFor: (work: string) => string,
-): { id: string; href: string; label: string }[] {
-  const peerIds = samePlacePeerIds(spot.id);
-  if (peerIds.length === 0) return [];
-  const members = [spot, ...peerIds.map((id) => getSpotById(id))].flatMap(
-    (item) => {
-      if (!item) return [];
-      const place = spotPlaceName(item, locale);
-      const work = pickLocalizedText(item.animeTitle, locale) || place;
-      return [{ id: item.id, place, work }];
-    },
-  );
-  return members
-    .filter((item) => item.id !== spot.id)
-    .map((item) => {
-      const repeated = members.filter(
-        (other) => other.work === item.work,
-      ).length;
-      const work =
-        repeated > 1 && item.place && item.place !== item.work
-          ? `${item.work} · ${item.place}`
-          : item.work;
-      return {
-        id: item.id,
+): { works: SamePlaceLink[]; siblings: SamePlaceLink[] } {
+  const currentWork = spot.workSubjectId ?? spot.subjectId;
+  const peers = samePlacePeerIds(spot.id).flatMap((id) => {
+    const other = getSpotById(id);
+    if (!other || other.id === spot.id) return [];
+    const place = spotPlaceName(other, locale);
+    const title =
+      formatWorkTitle(locale, pickLocalizedText(other.animeTitle, locale)) ||
+      place;
+    return [
+      {
+        id: other.id,
+        workId: other.workSubjectId ?? other.subjectId,
+        place,
+        title,
         href: pilgrimageHref(
-          `/pilgrimage/spots/${encodeSpotId(item.id)}`,
+          `/pilgrimage/spots/${encodeSpotId(other.id)}`,
           locale,
         ),
-        label: labelFor(work),
-      };
+      },
+    ];
+  });
+  const siblings = peers
+    .filter((item) => item.workId === currentWork)
+    .map((item) => ({ id: item.id, href: item.href, text: item.place }));
+  const works: SamePlaceLink[] = [];
+  const others = new Map<string, typeof peers>();
+  for (const item of peers) {
+    if (item.workId === currentWork) continue;
+    const list = others.get(item.workId);
+    if (list) list.push(item);
+    else others.set(item.workId, [item]);
+  }
+  for (const group of others.values()) {
+    const first = group[0];
+    if (!first) continue;
+    if (group.length === 1) {
+      works.push({ id: first.id, href: first.href, text: first.title });
+      continue;
+    }
+    works.push({
+      id: `${first.workId}-count`,
+      href: "",
+      text: `${first.title}${workSpotCountLabel(locale, group.length)}`,
     });
+    for (const item of group) {
+      works.push({ id: item.id, href: item.href, text: item.place });
+    }
+  }
+  return { works, siblings };
 }
 
 function spotSeoFields(
@@ -161,7 +188,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
   const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
   const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
-  const samePlaceLinks = samePlaceLinksFor(spot, locale, copy.samePlaceAlso);
+  const samePlace = samePlaceSections(spot, locale);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -208,22 +235,50 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
             {description}
           </p>
-          {samePlaceLinks.length > 0 ? (
-            <ul
-              className="mt-4 grid gap-1 text-sm leading-6"
+          {samePlace.works.length + samePlace.siblings.length > 0 ? (
+            <div
+              className="mt-4 grid gap-2 text-sm leading-6 text-pink-100/80"
               data-testid="same-place-works"
             >
-              {samePlaceLinks.map((item) => (
-                <li key={item.id}>
-                  <a
-                    href={item.href}
-                    className="text-cyan-100 hover:text-cyan-50"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+              {samePlace.works.length > 0 ? (
+                <p>
+                  <span className="whitespace-nowrap">
+                    {copy.samePlaceWorks}
+                  </span>
+                  {samePlace.works.map((item) =>
+                    item.href ? (
+                      <a
+                        key={item.id}
+                        href={item.href}
+                        className="ml-1 whitespace-nowrap text-cyan-100 hover:text-cyan-50"
+                      >
+                        {item.text}
+                      </a>
+                    ) : (
+                      <span key={item.id} className="ml-1 whitespace-nowrap">
+                        {item.text}
+                      </span>
+                    ),
+                  )}
+                </p>
+              ) : null}
+              {samePlace.siblings.length > 0 ? (
+                <p>
+                  <span className="whitespace-nowrap">
+                    {copy.samePlaceSiblings}
+                  </span>
+                  {samePlace.siblings.map((item) => (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      className="ml-1 whitespace-nowrap text-cyan-100 hover:text-cyan-50"
+                    >
+                      {item.text}
+                    </a>
+                  ))}
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
           {episode ? (

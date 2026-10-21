@@ -333,24 +333,108 @@ export function animeTitle(
   return localizedNavText(animes[subjectId] ?? EMPTY_TEXT, locale);
 }
 
-/** Work title for a grouped card. Repeated titles keep the spot name. */
-export function samePlaceWorkLabel(
-  spot: NavSpot,
-  peers: readonly NavSpot[],
+const TITLE_BRACKETS: ReadonlyArray<readonly [string, string]> = [
+  ["『", "』"],
+  ["「", "」"],
+  ["《", "》"],
+  ["“", "”"],
+  ['"', '"'],
+];
+
+/** Drop brackets that were stored as part of a title, once per matched pair. */
+export function stripStoredTitleBrackets(value: string): string {
+  let text = value.trim();
+  let changed = true;
+  while (changed && text.length > 0) {
+    changed = false;
+    for (const [open, close] of TITLE_BRACKETS) {
+      if (
+        text.startsWith(open) &&
+        text.endsWith(close) &&
+        text.length > open.length + close.length
+      ) {
+        text = text.slice(open.length, text.length - close.length).trim();
+        changed = true;
+      }
+    }
+  }
+  return text;
+}
+
+/** ja 『』, zh/zh-tw 《》, en quotes. Stored brackets are not kept. */
+export function formatWorkTitle(
+  locale: PilgrimageLocale,
+  title: string,
+): string {
+  const name = stripStoredTitleBrackets(title);
+  if (!name) return "";
+  if (locale === "ja") return `『${name}』`;
+  if (locale === "en") return `"${name}"`;
+  return `《${name}》`;
+}
+
+export function workSpotCountLabel(
+  locale: PilgrimageLocale,
+  count: number,
+): string {
+  if (locale === "ja") return `（${count}か所）`;
+  if (locale === "zh") return `（${count}处）`;
+  if (locale === "zh-tw") return `（${count}處）`;
+  return ` (${count} spots)`;
+}
+
+export interface GroupedPlaceSpot {
+  id: string;
+  href: string;
+  place: string;
+}
+
+export interface GroupedPlaceWork {
+  key: string;
+  title: string;
+  countLabel: string;
+  spots: GroupedPlaceSpot[];
+}
+
+/** One entry per work. Several spots of that work stay on the entry. */
+export function groupPlaceWorks(
+  spots: readonly NavSpot[],
   animes: Record<string, NavText>,
   locale: PilgrimageLocale,
-): string {
-  const place = localizedSpotName(spot, locale);
-  const label = animeTitle(animes, spot.subjectId, locale) || place;
-  const repeated = peers.some((other) => {
-    if (other.id === spot.id) return false;
-    const otherPlace = localizedSpotName(other, locale);
-    const otherLabel =
-      animeTitle(animes, other.subjectId, locale) || otherPlace;
-    return otherLabel === label;
+  hrefFor: (id: string) => string,
+): GroupedPlaceWork[] {
+  const order: string[] = [];
+  const buckets = new Map<string, NavSpot[]>();
+  for (const spot of spots) {
+    const key = spot.subjectId || spot.id;
+    const list = buckets.get(key);
+    if (list) list.push(spot);
+    else {
+      buckets.set(key, [spot]);
+      order.push(key);
+    }
+  }
+  return order.flatMap((key) => {
+    const members = buckets.get(key);
+    const first = members?.[0];
+    if (!members || !first) return [];
+    const raw = animeTitle(animes, first.subjectId, locale);
+    const title =
+      formatWorkTitle(locale, raw) || localizedSpotName(first, locale);
+    return [
+      {
+        key,
+        title,
+        countLabel:
+          members.length > 1 ? workSpotCountLabel(locale, members.length) : "",
+        spots: members.map((item) => ({
+          id: item.id,
+          href: hrefFor(item.id),
+          place: localizedSpotName(item, locale),
+        })),
+      },
+    ];
   });
-  if (!repeated || !place || place === label) return label;
-  return `${label} · ${place}`;
 }
 
 let catalogRequest: Promise<NavCatalog> | null = null;
