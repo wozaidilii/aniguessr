@@ -1,7 +1,6 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
@@ -143,7 +142,6 @@ export default async function PilgrimageLocationPage({ params }: Props) {
           + {location.spotCount - spots.length} more spots indexed
         </p>
       ) : null}
-      <AnitabiCredit locale={locale} className="mt-4" />
     </PilgrimageShell>
   );
 }

@@ -1,5 +1,4 @@
 import { type Metadata } from "next";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildLocationIndexSeo } from "~/lib/pilgrimage-seo-meta";
 import { pilgrimagePageMetadata } from "~/lib/seo";
@@ -74,7 +73,6 @@ export default async function PilgrimageLocationsIndexPage({
           ))}
         </PilgrimageCardGrid>
       )}
-      <AnitabiCredit locale={locale} className="mt-6" />
     </PilgrimageShell>
   );
 }

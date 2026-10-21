@@ -2,7 +2,6 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import {
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
@@ -168,17 +167,8 @@ export default async function PilgrimageSpotPage({ params }: Props) {
                 alt={title}
                 className="aspect-video w-full rounded-xl border border-white/10 object-cover"
               />
-              <figcaption className="mt-2">
-                <AnitabiCredit locale={locale} sourceUrl={spot.sourceUrl} />
-              </figcaption>
             </figure>
-          ) : (
-            <AnitabiCredit
-              locale={locale}
-              sourceUrl={spot.sourceUrl}
-              className="mb-5"
-            />
-          )}
+          ) : null}
 
           <h2 className="text-lg font-black text-pink-100">{title}</h2>
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
@@ -290,16 +280,6 @@ export default async function PilgrimageSpotPage({ params }: Props) {
             >
               {copy.openMaps}
             </a>
-            {spot.sourceUrl ? (
-              <a
-                href={spot.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="anime-button-secondary block text-center text-sm"
-              >
-                {copy.openAnitabi}
-              </a>
-            ) : null}
             <Link
               href={pilgrimageSiteHref("/game/anime", locale)}
               className="block text-center text-xs font-bold text-cyan-100/70 hover:text-cyan-50"

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
-import { fillAnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -10,7 +9,6 @@ import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   PILGRIMAGE_MAP_STYLE,
   animeTitle,
-  anitabiUrlFromSpotId,
   filterNavSpots,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
@@ -424,11 +422,6 @@ function showSpotPopup(
     popupAction(googleStreetViewUrl(spot.lat, spot.lng), copy.streetView),
   );
   root.append(actions);
-  fillAnitabiCredit(
-    root,
-    locale,
-    anitabiUrlFromSpotId(spot.id, spot.subjectId),
-  );
   popupRef.current?.remove();
   const popup = new maplibregl.Popup({ offset: 12, maxWidth: "240px" })
     .setLngLat([spot.lng, spot.lat])
