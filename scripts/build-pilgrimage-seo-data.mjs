@@ -651,7 +651,9 @@ async function main() {
   };
 
   const pilgrimageSitemapPath = (route) =>
-    route === "/pilgrimage" || route.startsWith("/pilgrimage/");
+    route === "/" ||
+    route === "/pilgrimage" ||
+    route.startsWith("/pilgrimage/");
   const canonicalPaths = PUBLIC_ROUTES.map(([route, priority]) => ({
     path: route,
     priority,

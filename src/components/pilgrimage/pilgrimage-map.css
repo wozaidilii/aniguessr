@@ -1,3 +1,7 @@
+.pilgrimage-map {
+  isolation: isolate;
+}
+
 .pilgrimage-map .maplibregl-popup-content {
   border-radius: 12px;
   background: #140c1c;

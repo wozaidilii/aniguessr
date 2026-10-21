@@ -1045,7 +1045,7 @@ export default function AnimeGuessrPage() {
 
     setShareMessage(copy.leaderboardSaved);
     window.location.href = withAnimeLocale(
-      `/?difficulty=${difficultyTier}&rounds=${roundCount}`,
+      `/?difficulty=${difficultyTier}&rounds=${roundCount}#rank`,
       locale,
     );
   }

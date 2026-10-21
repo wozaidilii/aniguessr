@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BrandLockup } from "~/components/brand/BrandLockup";
 import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
 import { withAnimeLocale } from "~/lib/anime-locale";
@@ -42,30 +41,9 @@ export function PilgrimageShell({
   description?: string;
   children: React.ReactNode;
 }) {
-  const copy = getPilgrimageCopy(locale);
-  const homeUrl = pilgrimageSiteHref("/", locale);
-  const hubUrl = pilgrimageHref("/pilgrimage", locale);
-  const playUrl = pilgrimageSiteHref("/game/anime", locale);
-
   return (
-    <main className="anime-shell min-h-screen text-white">
+    <main className="anime-shell min-h-screen text-white" data-locale={locale}>
       <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
-        <nav className="mb-8 flex flex-wrap items-center justify-between gap-3 text-sm">
-          <div className="flex flex-wrap items-center gap-3">
-            <BrandLockup href={homeUrl} />
-            <span className="text-white/20">/</span>
-            <Link
-              href={hubUrl}
-              className="font-bold text-cyan-100/80 hover:text-cyan-50"
-            >
-              {copy.siteKicker}
-            </Link>
-          </div>
-          <Link href={playUrl} className="anime-button px-4 py-2 text-xs">
-            {copy.playGame}
-          </Link>
-        </nav>
-
         <header className="mb-8 max-w-3xl">
           <div className="anime-chip mb-4 w-fit">{kicker}</div>
           <h1 className="text-3xl leading-tight font-black text-white sm:text-4xl">

@@ -7,6 +7,7 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
@@ -148,7 +149,10 @@ export function middleware(request: NextRequest) {
 
   // Locale is already in the path. Rewriting or Set-Cookie would make Vercel
   // skip the CDN cache for these ISR pages.
-  if (isLocalePrefixedPilgrimagePath(request.nextUrl.pathname)) {
+  if (
+    isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
+    isLocaleHomePath(request.nextUrl.pathname)
+  ) {
     return NextResponse.next();
   }
 

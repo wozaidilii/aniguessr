@@ -1,10 +1,10 @@
-import { type AnimeLocale } from "~/lib/anime-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   buildHomeStructuredData,
   serializeJsonLd,
 } from "~/lib/structured-data";
 
-export function HomeStructuredData({ locale }: { locale: AnimeLocale }) {
+export function HomeStructuredData({ locale }: { locale: PilgrimageLocale }) {
   return (
     <script
       type="application/ld+json"
