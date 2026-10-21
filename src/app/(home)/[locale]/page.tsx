@@ -7,7 +7,7 @@ import { isHomeLocale } from "~/lib/home-locale";
 import { homePageMetadata } from "~/lib/home-page-copy";
 import { withHomeOg } from "~/lib/og/metadata";
 import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
-import { homeOgStaticStamp } from "~/server/og/home-art";
+import { homeOgStaticExists } from "~/server/og/home-art";
 import { loadHomeOg } from "~/server/og/load";
 
 export const revalidate = 86_400;
@@ -20,9 +20,15 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isHomeLocale(locale)) return {};
   const metadata = homePageMetadata(locale);
+  if (homeOgStaticExists(locale)) {
+    return withHomeOg(metadata, locale, { staticArt: true });
+  }
   const og = loadHomeOg(locale);
   if (og.status !== "ready") return metadata;
-  return withHomeOg(metadata, locale, og.card, homeOgStaticStamp(locale));
+  return withHomeOg(metadata, locale, {
+    staticArt: false,
+    version: og.card.version,
+  });
 }
 
 export default async function HomePage({

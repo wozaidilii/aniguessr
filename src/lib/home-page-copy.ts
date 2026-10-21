@@ -511,26 +511,28 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
   },
 };
 
-export const HOME_SEO: Record<HomeLocale, { title: string; description: string }> =
-  {
-    ja: {
-      title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
-      description: HOME_PAGE_COPY.ja.intro,
-    },
-    zh: {
-      title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
-      description: HOME_PAGE_COPY.zh.intro,
-    },
-    "zh-tw": {
-      title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
-      description: HOME_PAGE_COPY["zh-tw"].intro,
-    },
-    en: {
-      title:
-        "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
-      description: HOME_PAGE_COPY.en.intro,
-    },
-  };
+export const HOME_SEO: Record<
+  HomeLocale,
+  { title: string; description: string }
+> = {
+  ja: {
+    title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
+    description: HOME_PAGE_COPY.ja.intro,
+  },
+  zh: {
+    title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
+    description: HOME_PAGE_COPY.zh.intro,
+  },
+  "zh-tw": {
+    title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
+    description: HOME_PAGE_COPY["zh-tw"].intro,
+  },
+  en: {
+    title:
+      "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
+    description: HOME_PAGE_COPY.en.intro,
+  },
+};
 
 export const HOME_LANG_LINKS: Array<{ locale: HomeLocale; label: string }> = [
   { locale: "ja", label: "日本語" },
@@ -543,6 +545,16 @@ export function getHomePageCopy(locale: HomeLocale): HomePageCopy {
   return HOME_PAGE_COPY[locale];
 }
 
+/**
+ * Visible homepage H1. English keeps the space between the accent and the tail.
+ * CJK titles are concatenated with no extra space.
+ */
+export function homeHeadingText(locale: HomeLocale): string {
+  const copy = HOME_PAGE_COPY[locale];
+  if (locale === "en") return `${copy.h1Lead}${copy.h1Accent} ${copy.h1Tail}`;
+  return `${copy.h1Lead}${copy.h1Accent}${copy.h1Tail}`;
+}
+
 export function homeDifficultyTiers(): readonly AnimeGuessrDifficultyTier[] {
   return ANIME_GUESSR_DIFFICULTY_TIERS;
 }
@@ -551,7 +563,9 @@ export function homeDifficultyTiers(): readonly AnimeGuessrDifficultyTier[] {
 export function homePageMetadata(locale: HomeLocale): Metadata {
   const seo = HOME_SEO[locale];
   const canonical =
-    locale === "zh-tw" ? "/zh-tw" : withAnimeLocale("/", homeSiteLocale(locale));
+    locale === "zh-tw"
+      ? "/zh-tw"
+      : withAnimeLocale("/", homeSiteLocale(locale));
   const languages = localeAlternates("/");
   const zhTwUrl = absoluteUrl(withPilgrimageLocale("/", "zh-tw"));
   languages["zh-Hant"] = zhTwUrl;

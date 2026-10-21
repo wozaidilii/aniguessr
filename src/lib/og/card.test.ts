@@ -6,8 +6,16 @@ import {
   buildWorkCard,
   emptyNames,
 } from "~/lib/og/card";
-import { OG_COPY, OG_TEMPLATE_VERSION } from "~/lib/og/copy";
-import { homeOgImagePath, homeOgVersion, pilgrimageOgPath } from "~/lib/og/metadata";
+import { OG_COPY } from "~/lib/og/copy";
+import { homeHeadingText } from "~/lib/home-page-copy";
+import {
+  HOME_OG_ASSET_VERSION,
+  homeOgFallbackPath,
+  homeOgStaticPublicPath,
+  pilgrimageOgPath,
+  withHomeOg,
+} from "~/lib/og/metadata";
+import { absoluteUrl } from "~/lib/seo";
 import { otherWorkCounts } from "~/lib/og/map";
 
 function names(ja: string, zh = "", tw = "", en = "") {
@@ -28,8 +36,12 @@ describe("og cards", () => {
     });
     expect(card.contentLocale).toBe("zh");
     expect(card.chip).toBe(OG_COPY.zh.chipSpot);
-    expect(card.alt).toBe("镰仓高校前站的道口（青春猪头少年不会梦到兔女郎学姐）圣地地图");
-    expect(card.subtitleLines.some((line) => line.suffix.includes("另有"))).toBe(true);
+    expect(card.alt).toBe(
+      "镰仓高校前站的道口（青春猪头少年不会梦到兔女郎学姐）圣地地图",
+    );
+    expect(
+      card.subtitleLines.some((line) => line.suffix.includes("另有")),
+    ).toBe(true);
     expect(card.chip).not.toContain("巡禮");
   });
 
@@ -141,7 +153,9 @@ describe("og cards", () => {
       points: [{ lat: 35.3, lng: 139.5 }],
       art: "coast",
     });
-    expect(work.stat.map((part) => part.text).join("")).toBe("1 real-life location");
+    expect(work.stat.map((part) => part.text).join("")).toBe(
+      "1 real-life location",
+    );
     expect(work.alt).toBe("Map of 1 real-life location from Only Yesterday");
     const area = buildAreaCard({
       requestedLocale: "en",
@@ -152,7 +166,9 @@ describe("og cards", () => {
       points: [{ lat: 35.3, lng: 139.5 }],
       art: "city",
     });
-    expect(area.stat.map((part) => part.text).join("")).toBe("4 series · 1 location");
+    expect(area.stat.map((part) => part.text).join("")).toBe(
+      "4 series · 1 location",
+    );
     expect(area.alt).toBe("Anime pilgrimage map of Kamakura");
   });
 
@@ -195,7 +211,9 @@ describe("og cards", () => {
     expect(path).toContain("/ja/pilgrimage/locations/");
     expect(path).toContain("opengraph-image?v=");
     expect(path).not.toContain("anitabi");
-    expect(JSON.stringify(OG_COPY)).not.toMatch(/株式会社|有限会社|Inc\.|Ltd\.|住所/);
+    expect(JSON.stringify(OG_COPY)).not.toMatch(
+      /株式会社|有限会社|Inc\.|Ltd\.|住所/,
+    );
     expect(emptyNames().ja).toBe("");
   });
 
@@ -217,9 +235,42 @@ describe("og cards", () => {
     expect(card.alt).toBe("動漫聖地巡禮地圖");
     expect(card.stat.map((part) => part.text).join("")).toContain("處聖地");
     expect(card.pills).toEqual([]);
-    expect(homeOgVersion(card, null)).toBe(card.version);
-    expect(homeOgVersion(card, "abc")).toBe(`${OG_TEMPLATE_VERSION}.static.abc`);
-    expect(homeOgImagePath("ja", card.version)).toContain("/ja/opengraph-image?v=");
+    expect(homeHeadingText("zh-tw")).toBe("動漫聖地巡禮地圖");
+    expect(homeHeadingText("ja")).toBe("アニメ聖地巡礼マップ");
+    expect(homeHeadingText("zh")).toBe("动漫圣地巡礼地图");
+    expect(homeHeadingText("en")).toBe("Anime Pilgrimage Map");
+    expect(HOME_OG_ASSET_VERSION).toBe("1");
+    expect(homeOgStaticPublicPath("ja")).toBe("/og/home-ja.png?v=1");
+    expect(homeOgStaticPublicPath("zh-tw")).toBe("/og/home-zh-tw.png?v=1");
+    expect(homeOgFallbackPath("en", card.version)).toBe(
+      `/en/opengraph-image?v=${encodeURIComponent(card.version)}`,
+    );
+    const staticMeta = withHomeOg({}, "ja", { staticArt: true });
+    const staticImage = {
+      url: absoluteUrl("/og/home-ja.png?v=1"),
+      type: "image/png",
+      width: 1200,
+      height: 630,
+      alt: "アニメ聖地巡礼マップ",
+    };
+    expect(staticMeta.openGraph?.images).toEqual([staticImage]);
+    expect(staticMeta.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: [{ url: staticImage.url, alt: staticImage.alt }],
+    });
+    const fallback = withHomeOg({}, "en", {
+      staticArt: false,
+      version: card.version,
+    });
+    expect(fallback.openGraph?.images).toEqual([
+      {
+        url: absoluteUrl(homeOgFallbackPath("en", card.version)),
+        type: "image/png",
+        width: 1200,
+        height: 630,
+        alt: "Anime Pilgrimage Map",
+      },
+    ]);
     const english = buildHomeCard({ requestedLocale: "en", spotCount: 2 });
     expect(english.titleLines.join(" ")).toContain("Anime");
     expect(english.alt).toBe("Anime Pilgrimage Map");
@@ -228,7 +279,9 @@ describe("og cards", () => {
   it("keeps a long multi-work suffix on the last line only", () => {
     const card = buildSpotCard({
       requestedLocale: "ja",
-      spotName: names("江ノ島電鉄 鎌倉高校前駅 下りホーム東端から見た七里ヶ浜の海と江の島"),
+      spotName: names(
+        "江ノ島電鉄 鎌倉高校前駅 下りホーム東端から見た七里ヶ浜の海と江の島",
+      ),
       workTitle: names(
         "ラブライブ！虹ヶ咲学園スクールアイドル同好会 完結編 第1章 劇場版スペシャルエディション",
       ),
@@ -240,7 +293,9 @@ describe("og cards", () => {
     });
     const suffixLines = card.subtitleLines.filter((line) => line.suffix);
     expect(suffixLines).toHaveLength(1);
-    expect(suffixLines[0]?.suffix.replace(/\u00A0/gu, " ")).toBe("ほか 12 作品");
+    expect(suffixLines[0]?.suffix.replace(/\u00A0/gu, " ")).toBe(
+      "ほか 12 作品",
+    );
     expect(card.subtitleLines.at(-1)?.suffix).toBe(suffixLines[0]?.suffix);
     expect(card.titleLines.some((line) => line.endsWith("…"))).toBe(true);
   });

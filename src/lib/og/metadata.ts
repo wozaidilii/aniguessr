@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import type { OgCard } from "~/lib/og/card";
-import { OG_TEMPLATE_VERSION } from "~/lib/og/copy";
+import { homeHeadingText } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { absoluteUrl } from "~/lib/seo";
@@ -34,44 +34,59 @@ export function pilgrimageOgUrl(
 }
 
 /**
- * Designer swap point for the homepage share image.
- * Drop the final art at `public/og/home-ja.png`, `home-zh.png`,
- * `home-zh-tw.png`, and `home-en.png`. When a file is present, the
- * `/{locale}/opengraph-image` route serves it instead of the generated
- * map card. The `v=` query includes the file stamp, so crawlers refetch.
- * Also bump `OG_TEMPLATE_VERSION` when spot, work, and area cards change.
+ * Cache-bust for the four static homepage share images in `public/og/`.
+ * Bump this when those PNGs are replaced. Spot, work, and area cards use
+ * `OG_TEMPLATE_VERSION` instead.
  */
+export const HOME_OG_ASSET_VERSION = "1";
+
 export function homeOgStaticName(locale: HomeLocale): string {
   return `home-${locale}.png`;
 }
 
-export function homeOgImagePath(locale: HomeLocale, version: string): string {
+/** Public URL of the designer's homepage PNG. */
+export function homeOgStaticPublicPath(locale: HomeLocale): string {
+  return `/og/${homeOgStaticName(locale)}?v=${encodeURIComponent(HOME_OG_ASSET_VERSION)}`;
+}
+
+/** Generated map card, used only when the static PNG is absent. */
+export function homeOgFallbackPath(
+  locale: HomeLocale,
+  version: string,
+): string {
   return `/${locale}/opengraph-image?v=${encodeURIComponent(version)}`;
 }
 
-export function homeOgVersion(card: OgCard, staticStamp: string | null): string {
-  if (!staticStamp) return card.version;
-  return `${OG_TEMPLATE_VERSION}.static.${staticStamp}`;
-}
+export type HomeOgSource =
+  | { staticArt: true }
+  | { staticArt: false; version: string };
 
-/** Attach the homepage card. Does not change canonical or hreflang. */
+/**
+ * Homepage og:image. A file at `public/og/home-{locale}.png` wins over the
+ * generated map card. Alt is the locale's homepage H1.
+ * Does not change canonical or hreflang.
+ */
 export function withHomeOg(
   metadata: Metadata,
   locale: HomeLocale,
-  card: OgCard,
-  staticStamp: string | null = null,
+  source: HomeOgSource,
 ): Metadata {
-  const url = absoluteUrl(homeOgImagePath(locale, homeOgVersion(card, staticStamp)));
+  const alt = homeHeadingText(locale);
+  const url = absoluteUrl(
+    source.staticArt
+      ? homeOgStaticPublicPath(locale)
+      : homeOgFallbackPath(locale, source.version),
+  );
   return {
     ...metadata,
     openGraph: {
       ...metadata.openGraph,
-      images: [{ url, width: 1200, height: 630, alt: card.alt }],
+      images: [{ url, type: "image/png", width: 1200, height: 630, alt }],
     },
     twitter: {
       ...metadata.twitter,
       card: "summary_large_image",
-      images: [url],
+      images: [{ url, alt }],
     },
   };
 }
