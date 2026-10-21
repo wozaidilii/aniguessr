@@ -156,7 +156,7 @@ declare global {
   }
 }
 
-export type GoogleMapsLanguage = "zh-CN" | "ja" | "en";
+export type GoogleMapsLanguage = "zh-CN" | "zh-TW" | "ja" | "en";
 
 export interface GoogleMapsScriptOptions {
   language?: GoogleMapsLanguage;
@@ -505,24 +505,18 @@ export async function generateRandomForeignLocations(
   country: ForeignCountryConfig = DEFAULT_FOREIGN_COUNTRY,
 ): Promise<ForeignLocationGenerationResult> {
   if (!GOOGLE_MAP_AK) {
-    return unavailableResult(
-      "街景无法加载。请稍后重新加载。",
-    );
+    return unavailableResult("街景无法加载。请稍后重新加载。");
   }
 
   try {
     await loadGoogleMapsScript(GOOGLE_MAP_AK);
   } catch {
-    return unavailableResult(
-      "Google Maps JavaScript API 加载失败，无法生成 Google 街景点。",
-    );
+    return unavailableResult("街景无法加载。请稍后重新加载。");
   }
 
   const api = getGoogleMapsApi();
   if (!api?.StreetViewService) {
-    return unavailableResult(
-      "当前 Google Maps AK 未加载到 Street View 服务，无法生成街景点。",
-    );
+    return unavailableResult("街景无法加载。请稍后重新加载。");
   }
 
   const locations: TuxunLocation[] = [];

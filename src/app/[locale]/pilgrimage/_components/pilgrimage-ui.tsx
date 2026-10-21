@@ -4,11 +4,9 @@ import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { RightsContactLink } from "~/components/rights-contact-link";
 import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
 import { DeferPaint } from "~/components/site/defer-paint";
-import { withAnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import {
   isPilgrimageLocale,
-  pilgrimageSiteLocale,
   withPilgrimageLocale,
   type PilgrimageLocale,
 } from "~/lib/pilgrimage-locale";
@@ -22,12 +20,12 @@ export function pilgrimageHref(path: string, locale: PilgrimageLocale): string {
   return withPilgrimageLocale(path, locale);
 }
 
-/** Home and the game stay on zh/ja/en. /zh-tw does not have those routes. */
+/** Home and the anime game keep the current locale, including zh-tw. */
 export function pilgrimageSiteHref(
   path: string,
   locale: PilgrimageLocale,
 ): string {
-  return withAnimeLocale(path, pilgrimageSiteLocale(locale));
+  return withPilgrimageLocale(path, locale);
 }
 
 export function PilgrimageShell({

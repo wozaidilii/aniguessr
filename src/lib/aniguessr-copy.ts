@@ -1,4 +1,5 @@
 import type { AnimeLocale } from "~/lib/anime-locale";
+import type { GameLocale } from "~/lib/game-locale";
 
 export const COMPANY_SITE_URL = "https://www.ayiora.com";
 export const CONTACT_GENERAL_EMAIL = "aniguessr@ayiora.com";
@@ -351,7 +352,7 @@ export interface GameUiCopy {
   breakdown: (distancePts: number, speedPts: number) => string;
 }
 
-export const GAME_UI_COPY: Record<AnimeLocale, GameUiCopy> = {
+export const GAME_UI_COPY: Record<GameLocale, GameUiCopy> = {
   ja: {
     hudRound: "ラウンド",
     hudScore: "スコア",
@@ -433,12 +434,39 @@ export const GAME_UI_COPY: Record<AnimeLocale, GameUiCopy> = {
     breakdown: (distancePts, speedPts) =>
       `Distance ${distancePts} · time +${speedPts}`,
   },
+  "zh-tw": {
+    hudRound: "回合",
+    hudScore: "分數",
+    hudTime: "用時",
+    clueTag: "動漫線索",
+    clueHidden: "不顯示作品名和地點名",
+    clueMore: "線索文字",
+    pinHint: "放好圖釘後再確認",
+    dragHint: "拖曳查看四周 · 方向鍵移動",
+    yourGuess: "你的回答",
+    correctPoint: "正確地點",
+    shareResult: "分享結果",
+    quit: "結束",
+    distance: "距離",
+    answerTime: "作答時間",
+    answerLabel: (name) => `正確答案：${name}`,
+    totalLabel: (score) => `合計 ${score} 分`,
+    closeness: (distanceKm) => {
+      if (distanceKm < 1) return "非常近！";
+      if (distanceKm < 15) return "比較近";
+      if (distanceKm < 80) return "大致同一區域";
+      if (distanceKm < 400) return "方向對了";
+      return "還比較遠";
+    },
+    breakdown: (distancePts, speedPts) =>
+      `距離分 ${distancePts} · 時間加分 +${speedPts}`,
+  },
 };
 
 export const LANG_SHORT: Record<AnimeLocale, string> = {
   ja: "日本語",
   en: "EN",
-  zh: "中文",
+  zh: "简中",
 };
 
 export const LANG_ORDER = ["ja", "en", "zh"] as const;

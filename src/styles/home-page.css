@@ -2742,3 +2742,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 1023px) {
+  .home-hdr-right > .home-lang {
+    display: flex;
+    flex: none;
+    gap: 0;
+    padding: 2px;
+  }
+
+  .home-hdr-right > .home-lang-current {
+    display: none;
+  }
+
+  .home-hdr-right > .home-lang a {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-hdr-in {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .home-hdr-right > .home-lang a {
+    padding: 3px 5px;
+  }
+}

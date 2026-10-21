@@ -7,6 +7,7 @@ import {
   saveAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { splitLocalePath } from "~/lib/pilgrimage-locale";
 
 /** 从 URL 路径前缀解析当前语言，并在变化时同步到 localStorage。 */
 export function useAnimeLocale(
@@ -18,6 +19,7 @@ export function useAnimeLocale(
   );
 
   useEffect(() => {
+    if (splitLocalePath(pathname ?? "").locale === "zh-tw") return;
     const next = resolveAnimeLocale({ pathname, fallback });
     setLocale(next);
     saveAnimeLocale(next);

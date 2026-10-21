@@ -281,12 +281,10 @@ export function BaiduGuessMap({
         <div className="absolute inset-0 grid place-items-center bg-stone-950 px-5 text-center">
           <div>
             <div className="text-base font-semibold text-stone-100">
-              {BAIDU_MAP_AK ? "正在加载百度地图" : "需要配置百度地图 AK"}
+              {state === "loading" ? "正在加载地图" : "地图暂时无法显示"}
             </div>
             <p className="mt-2 text-sm leading-6 text-stone-400">
-              {BAIDU_MAP_AK
-                ? "地图加载失败时，请确认百度地图 JS API 权限已开通。"
-                : "在 .env.local 配置 NEXT_PUBLIC_BAIDU_MAP_AK 后重启开发服务。"}
+              请稍后重新加载。
             </p>
           </div>
         </div>

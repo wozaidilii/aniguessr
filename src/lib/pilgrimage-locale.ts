@@ -21,7 +21,7 @@ export function isZhTwCoveredLocationSlug(_slug: string): boolean {
   return true;
 }
 
-/** Site chrome (home, game) stays on zh/ja/en. zh-TW covers pilgrimage pages only. */
+/** zh-TW home, pilgrimage, and the anime game stay on /zh-tw. Other app routes stay on zh. */
 export function pilgrimageSiteLocale(locale: PilgrimageLocale): AnimeLocale {
   return locale === ZH_TW_LOCALE ? "zh" : locale;
 }

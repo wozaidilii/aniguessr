@@ -179,6 +179,20 @@ export function middleware(request: NextRequest) {
     ) {
       return NextResponse.next();
     }
+    // Game and login stay on /zh-tw without Set-Cookie so the page stays cacheable.
+    if (
+      zhTw.pathname === "/game" ||
+      zhTw.pathname.startsWith("/game/") ||
+      zhTw.pathname === "/login"
+    ) {
+      const rewriteUrl = request.nextUrl.clone();
+      rewriteUrl.pathname = zhTw.pathname;
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set("x-game-locale", "zh-tw");
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+    }
     return rewriteNotFoundShell(request, "zh-tw", false);
   }
 

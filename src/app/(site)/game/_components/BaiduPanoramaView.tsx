@@ -96,14 +96,10 @@ export function BaiduPanoramaView({
         <div className="absolute inset-0 grid place-items-center px-6 text-center">
           <div>
             <div className="text-lg font-bold text-stone-100">
-              {state === "loading"
-                ? "正在加载百度 JS 全景"
-                : "无法加载百度 JS 全景"}
+              {state === "loading" ? "正在加载街景" : "街景暂时无法显示"}
             </div>
             <p className="mt-2 text-sm leading-6 text-stone-400">
-              {BAIDU_MAP_AK
-                ? "如果当前位置没有可用全景，会自动重新匹配可用街景点。"
-                : "请在 .env.local 配置 NEXT_PUBLIC_BAIDU_MAP_AK 后重启开发服务。"}
+              请稍后重新加载。
             </p>
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
   type AnimeGuessrRoundCount,
 } from "~/lib/anime-guessr";
 import { withAnimeLocale } from "~/lib/anime-locale";
+import { withGameLocale } from "~/lib/game-locale";
 import { homeDifficultyTiers, getHomePageCopy } from "~/lib/home-page-copy";
 import { homeSiteLocale, type HomeLocale } from "~/lib/home-locale";
 import { capturePostHogEvent, POSTHOG_EVENTS } from "~/lib/posthog";
@@ -41,9 +42,9 @@ export function HomeGamePanel({ locale }: { locale: HomeLocale }) {
     if (fromSearchTier) saveAnimeGuessrDifficultyTier(nextTier);
   }, []);
 
-  const playHref = withAnimeLocale(
+  const playHref = withGameLocale(
     `/game/anime?rounds=${rounds}&difficulty=${tier}`,
-    siteLocale,
+    locale,
   );
   const battleHref = withAnimeLocale("/battle", siteLocale);
 

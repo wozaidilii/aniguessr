@@ -9,15 +9,14 @@ import {
   type GoogleMapsLanguage,
   type GoogleStreetViewPanoramaInstance,
 } from "~/lib/google-street-view";
-import { type AnimeLocale } from "~/lib/anime-locale";
-import { streetViewUnavailable } from "~/lib/street-view-status-copy";
+import { streetViewUnavailable, type StreetViewStatusLocale } from "~/lib/street-view-status-copy";
 import { type TuxunLocation } from "~/lib/tuxun-locations";
 
 interface Props {
   location: TuxunLocation;
   allowMovement?: boolean;
   googleMapsLanguage?: GoogleMapsLanguage;
-  locale?: AnimeLocale;
+  locale?: StreetViewStatusLocale;
   onUnavailable?: () => void;
 }
 
@@ -120,7 +119,9 @@ export function GoogleStreetView({
                 ? "Loading Street View"
                 : locale === "ja"
                   ? "ストリートビューを読み込み中"
-                  : "正在加载街景"}
+                  : locale === "zh-tw"
+                    ? "正在載入街景"
+                    : "正在加载街景"}
           </p>
         </div>
       )}
