@@ -16,8 +16,8 @@ describe("rights contact", () => {
     expect(RIGHTS_EMAIL).toBe("rights@ayiora.com");
     expect(rightsMailto()).toBe("mailto:rights@ayiora.com");
     expect(rightsLinkLabel("ja")).toBe("権利者の方へ");
-    expect(rightsLinkLabel("zh")).toBe("版权方联系");
-    expect(rightsLinkLabel("zh-tw")).toBe("版權方聯絡");
+    expect(rightsLinkLabel("zh")).toBe("致版权方");
+    expect(rightsLinkLabel("zh-tw")).toBe("致版權方");
     expect(rightsLinkLabel("en")).toBe("For rights holders");
     expect(rightsPath("ja")).toBe("/ja/rights");
     expect(rightsPath("zh")).toBe("/zh/rights");

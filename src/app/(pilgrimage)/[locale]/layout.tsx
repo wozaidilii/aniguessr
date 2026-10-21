@@ -1,10 +1,13 @@
 import "~/styles/globals.css";
+import "~/styles/home-page.css";
 
 import { type Metadata, type Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import { RootDocument } from "~/app/root-document";
+import { HomeHeader } from "~/components/home/home-header";
 import { PersistAnimeLocale } from "~/components/PersistAnimeLocale";
+import { isHomeLocale } from "~/lib/home-locale";
 import { ANIME_LOCALES, isAnimeLocale } from "~/lib/anime-locale";
 import {
   htmlLangForPilgrimage,
@@ -84,6 +87,8 @@ export default async function PilgrimageLocaleLayout({
   return (
     <RootDocument locale={htmlLangForPilgrimage(locale)}>
       {isAnimeLocale(locale) ? <PersistAnimeLocale locale={locale} /> : null}
+      {/* Same header as the homepage, including over the map. */}
+      {isHomeLocale(locale) ? <HomeHeader locale={locale} /> : null}
       {children}
     </RootDocument>
   );

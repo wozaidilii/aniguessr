@@ -52,6 +52,7 @@ const PUBLIC_ROUTES = [
   ["/game/history-tuxun", 0.6],
   ["/character", 0.6],
   ["/login", 0.3],
+  ["/privacy", 0.4],
 ];
 
 function subjectIdFromQuestion(question) {
@@ -652,7 +653,10 @@ async function main() {
   };
 
   const pilgrimageSitemapPath = (route) =>
-    route === "/pilgrimage" || route.startsWith("/pilgrimage/");
+    route === "/" ||
+    route === "/privacy" ||
+    route === "/pilgrimage" ||
+    route.startsWith("/pilgrimage/");
   const canonicalPaths = PUBLIC_ROUTES.map(([route, priority]) => ({
     path: route,
     priority,

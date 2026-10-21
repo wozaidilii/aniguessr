@@ -1,4 +1,4 @@
-import { type AnimeLocale, withAnimeLocale } from "~/lib/anime-locale";
+import { withPilgrimageLocale, type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { absoluteUrl } from "~/lib/seo";
 import {
   AYIORA_ORGANIZATION,
@@ -117,10 +117,11 @@ export function buildAnimeFilmingListJsonLd(input: {
   };
 }
 
-export function buildHomeStructuredData(locale: AnimeLocale): JsonObject {
+export function buildHomeStructuredData(locale: PilgrimageLocale): JsonObject {
   const siteUrl = resolveSiteUrl();
-  const pageUrl = absoluteUrl(withAnimeLocale("/", locale));
+  const pageUrl = absoluteUrl(withPilgrimageLocale("/", locale));
   const organizationId = `${AYIORA_ORGANIZATION.url}/#organization`;
+  const inLanguage = locale === "zh-tw" ? "zh-Hant" : locale;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -135,7 +136,7 @@ export function buildHomeStructuredData(locale: AnimeLocale): JsonObject {
         "@id": `${siteUrl}/#website`,
         name: BRAND_NAME,
         url: pageUrl,
-        inLanguage: locale,
+        inLanguage,
         publisher: { "@id": organizationId },
       },
       {

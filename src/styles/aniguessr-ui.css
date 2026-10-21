@@ -818,6 +818,18 @@ a.rights-contact-link:hover {
   opacity: 0.8;
 }
 
+/* Footer nav items share the column link style. The quiet size stays on attribution. */
+.ag-ftr ul a.rights-contact-link {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.ag-ftr ul a.rights-contact-link:hover {
+  opacity: 1;
+}
+
 .ag-ftr-copy {
   display: flex;
   justify-content: space-between;

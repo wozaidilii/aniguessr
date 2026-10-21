@@ -46,15 +46,20 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
                 <li>
                   <Link href={`${homeHref}#contact`}>{copy.navContact}</Link>
                 </li>
+                <li>
+                  <Link href={withAnimeLocale("/privacy", locale)}>
+                    {copy.footerPrivacy}
+                  </Link>
+                </li>
+                <li>
+                  <RightsContactLink locale={locale} />
+                </li>
               </ul>
             </div>
           </div>
         </div>
         <div className="ag-ftr-copy">
-          <div>
-            <span>{copy.footerCopy}</span>
-            <RightsContactLink locale={locale} className="mt-2 block" />
-          </div>
+          <span>{copy.footerCopy}</span>
           <span>aniguessr.ayiora.com</span>
         </div>
       </div>

@@ -11,8 +11,8 @@ export const RIGHTS_LOCALES = ["ja", "zh", "zh-tw", "en"] as const;
 
 const LINK_LABEL: Record<PilgrimageLocale, string> = {
   ja: "権利者の方へ",
-  zh: "版权方联系",
-  "zh-tw": "版權方聯絡",
+  zh: "致版权方",
+  "zh-tw": "致版權方",
   en: "For rights holders",
 };
 

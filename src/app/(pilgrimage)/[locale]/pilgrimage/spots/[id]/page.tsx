@@ -17,8 +17,10 @@ import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { withPilgrimageOg } from "~/lib/og/metadata";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
+import { loadSpotOg } from "~/server/og/load";
 import {
   getSpotById,
   getSpotSeoVariant,
@@ -92,7 +94,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
   const path = `/pilgrimage/spots/${id}`;
-  const imageUrl = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const metadata = pilgrimagePageMetadata(
     locale,
     path,
@@ -100,14 +101,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     seo.description,
     true,
   );
-
-  return {
-    ...metadata,
-    openGraph: {
-      ...metadata.openGraph,
-      images: imageUrl ? [{ url: imageUrl, alt: fields.place }] : undefined,
-    },
-  };
+  const og = loadSpotOg(locale, spot.id);
+  if (og.status !== "ready") return metadata;
+  return withPilgrimageOg(metadata, locale, "spots", spot.id, og.card);
 }
 
 export default async function PilgrimageSpotPage({ params }: Props) {

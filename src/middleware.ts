@@ -7,8 +7,12 @@ import {
   withAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
-import { isLocalePrefixedPilgrimagePath } from "~/lib/pilgrimage-cache";
+import {
+  isLocalePrefixedPilgrimagePath,
+  isLocalePrefixedPrivacyPath,
+} from "~/lib/pilgrimage-cache";
 import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { pilgrimageRedirectPath } from "~/lib/pilgrimage-redirects";
@@ -107,7 +111,10 @@ export function middleware(request: NextRequest) {
   // Set-Cookie: partial Traditional coverage must stay CDN-cacheable.
   const zhTw = splitLocalePath(request.nextUrl.pathname);
   if (zhTw.locale === "zh-tw") {
-    if (isLocalePrefixedPilgrimagePath(request.nextUrl.pathname)) {
+    if (
+      isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
+      isLocalePrefixedPrivacyPath(request.nextUrl.pathname)
+    ) {
       const seoRedirect = pilgrimageRedirectPath(
         request.nextUrl.pathname,
         "zh-tw",
@@ -151,13 +158,21 @@ export function middleware(request: NextRequest) {
   // skip the CDN cache for these ISR pages.
   if (
     isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
-    isLocalePrefixedRightsPath(request.nextUrl.pathname)
+    isLocalePrefixedPrivacyPath(request.nextUrl.pathname) ||
+    isLocalePrefixedRightsPath(request.nextUrl.pathname) ||
+    isLocaleHomePath(request.nextUrl.pathname)
   ) {
     return NextResponse.next();
   }
 
   // 无语言前缀：重定向到 /{locale}/...
   if (!pathLocale) {
+    // Bare /privacy always lands on the default locale. Do not Set-Cookie:
+    // the destination page is a cacheable static document.
+    if (innerPath === "/privacy") {
+      const url = buildLocalizedUrl(request, DEFAULT_ANIME_LOCALE);
+      return NextResponse.redirect(url, 308);
+    }
     const preferred = pickPreferredLocale(request);
     const url = buildLocalizedUrl(request, preferred);
     return applyLocaleContext(NextResponse.redirect(url, 307), preferred);

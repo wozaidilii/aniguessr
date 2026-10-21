@@ -38,6 +38,16 @@ describe("structured data", () => {
     expect(website).toMatchObject({
       name: BRAND_NAME,
       url: "https://aniguessr.ayiora.com/en",
+      inLanguage: "en",
+    });
+
+    const traditional = buildHomeStructuredData("zh-tw");
+    const traditionalSite = (traditional["@graph"] as Array<Record<string, unknown>>).find(
+      (node) => node["@type"] === "WebSite",
+    );
+    expect(traditionalSite).toMatchObject({
+      url: "https://aniguessr.ayiora.com/zh-tw",
+      inLanguage: "zh-Hant",
     });
     expect(game).toMatchObject({
       name: BRAND_NAME,

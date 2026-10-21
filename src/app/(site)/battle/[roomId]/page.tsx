@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { BattleGame } from "./_components/BattleGame";
+import { BattleRoomClient } from "./_components/BattleRoomClient";
 import { DEFAULT_AVATAR, normalizeAvatar } from "~/types/player";
 import { getGameMode, isBattleGameModeSlug } from "~/lib/game-mode";
 import {
@@ -36,9 +36,11 @@ export default async function BattleRoomPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const headerList = await headers();
   const headerLocale = headerList.get("x-anime-locale");
-  const locale = isAnimeLocale(headerLocale) ? headerLocale : DEFAULT_ANIME_LOCALE;
+  const locale = isAnimeLocale(headerLocale)
+    ? headerLocale
+    : DEFAULT_ANIME_LOCALE;
 
-  if (!sp.userId || !sp.name) {
+  if (!sp.userId) {
     redirect(
       withAnimeLocale(
         `/login?next=${encodeURIComponent(withAnimeLocale("/battle", locale))}`,
@@ -52,9 +54,7 @@ export default async function BattleRoomPage({ params, searchParams }: Props) {
     icon: sp.avatarIcon ?? DEFAULT_AVATAR.icon,
     color: sp.avatarColor ?? DEFAULT_AVATAR.color,
   });
-  const modeSlug = isBattleGameModeSlug(sp.mode ?? "")
-    ? sp.mode!
-    : "anime";
+  const modeSlug = isBattleGameModeSlug(sp.mode ?? "") ? sp.mode! : "anime";
   const gameMode = getGameMode(modeSlug);
   const settings = isHost
     ? {
@@ -74,12 +74,11 @@ export default async function BattleRoomPage({ params, searchParams }: Props) {
     : null;
 
   return (
-    <BattleGame
+    <BattleRoomClient
       roomId={roomId}
+      userId={sp.userId}
+      avatar={avatar}
       isHost={isHost}
-      playerName={sp.name}
-      playerUserId={sp.userId}
-      playerAvatar={avatar}
       hostSettings={settings}
       locale={locale}
     />
