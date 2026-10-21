@@ -239,15 +239,15 @@ describe("og cards", () => {
     expect(homeHeadingText("ja")).toBe("アニメ聖地巡礼マップ");
     expect(homeHeadingText("zh")).toBe("动漫圣地巡礼地图");
     expect(homeHeadingText("en")).toBe("Anime Pilgrimage Map");
-    expect(HOME_OG_ASSET_VERSION).toBe("1");
-    expect(homeOgStaticPublicPath("ja")).toBe("/og/home-ja.png?v=1");
-    expect(homeOgStaticPublicPath("zh-tw")).toBe("/og/home-zh-tw.png?v=1");
+    expect(HOME_OG_ASSET_VERSION).toBe("2");
+    expect(homeOgStaticPublicPath("ja")).toBe("/og/home-ja.png?v=2");
+    expect(homeOgStaticPublicPath("zh-tw")).toBe("/og/home-zh-tw.png?v=2");
     expect(homeOgFallbackPath("en", card.version)).toBe(
       `/en/opengraph-image?v=${encodeURIComponent(card.version)}`,
     );
     const staticMeta = withHomeOg({}, "ja", { staticArt: true });
     const staticImage = {
-      url: absoluteUrl("/og/home-ja.png?v=1"),
+      url: absoluteUrl("/og/home-ja.png?v=2"),
       type: "image/png",
       width: 1200,
       height: 630,

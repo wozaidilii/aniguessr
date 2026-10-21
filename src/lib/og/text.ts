@@ -1,4 +1,8 @@
-import { loadDefaultJapaneseParser } from "budoux";
+import {
+  loadDefaultJapaneseParser,
+  loadDefaultSimplifiedChineseParser,
+  loadDefaultTraditionalChineseParser,
+} from "budoux";
 
 import type { OgLocale } from "~/lib/og/copy";
 
@@ -12,7 +16,50 @@ export const COL_W = 640;
 export const SAFETY = 0.96;
 export const CHIP_CAP = 15;
 
+/**
+ * Inlined BudouX models. `.parse` is the pure segmenter (no DOM, no filesystem),
+ * so the same parsers run in the Node OG routes and in an Edge bundle.
+ */
 const japanese = loadDefaultJapaneseParser();
+const simplifiedChinese = loadDefaultSimplifiedChineseParser();
+const traditionalChinese = loadDefaultTraditionalChineseParser();
+
+/**
+ * BudouX still splits some Chinese words. Merge these back into one token.
+ * Spec §5.2 `NOBREAK` / `keepWords`.
+ */
+export const NOBREAK: Record<"zh" | "zh-tw", readonly string[]> = {
+  zh: [
+    "取景地",
+    "Google 地图",
+    "动漫",
+    "圣地",
+    "巡礼",
+    "地图",
+    "导航",
+    "附近",
+    "地点",
+    "作品",
+    "地区",
+    "浏览",
+  ],
+  "zh-tw": [
+    "取景地",
+    "Google 地圖",
+    "動漫",
+    "聖地",
+    "巡禮",
+    "地圖",
+    "導航",
+    "附近",
+    "地點",
+    "作品",
+    "地區",
+    "瀏覽",
+  ],
+};
+
+const CLOSING_PUNCT = /^[，。、！？：；」』）》·・…]+/u;
 
 export interface FitStep {
   size: number;
@@ -103,27 +150,74 @@ export function units(value: string): number {
   return total;
 }
 
-/** ja phrases joined with ZWSP, same as the design build. */
+/** Phrase boundaries as U+200B. ja / zh / zh-tw use BudouX; en is unchanged. */
 export function segmentForOg(text: string, lang: OgLocale): string {
-  if (lang !== "ja") return text;
-  return japanese.parse(text).join("\u200B");
+  const parser =
+    lang === "ja"
+      ? japanese
+      : lang === "zh"
+        ? simplifiedChinese
+        : lang === "zh-tw"
+          ? traditionalChinese
+          : null;
+  if (!parser) return text;
+  return parser.parse(text).join("\u200B");
+}
+
+/** Drop boundaries that fall inside a no-break word. */
+export function keepWords(tokens: readonly string[], lang: OgLocale): string[] {
+  const terms = lang === "zh" || lang === "zh-tw" ? NOBREAK[lang] : undefined;
+  if (!terms || tokens.length === 0) return [...tokens];
+  const full = tokens.join("");
+  const cut = new Set<number>();
+  let offset = 0;
+  for (const token of tokens.slice(0, -1)) {
+    offset += token.length;
+    cut.add(offset);
+  }
+  for (const term of terms) {
+    let index = full.indexOf(term);
+    while (index >= 0) {
+      for (let mark = index + 1; mark < index + term.length; mark += 1) {
+        cut.delete(mark);
+      }
+      index = full.indexOf(term, index + 1);
+    }
+  }
+  const merged: string[] = [];
+  let last = 0;
+  for (const boundary of [...cut].sort((left, right) => left - right)) {
+    merged.push(full.slice(last, boundary));
+    last = boundary;
+  }
+  merged.push(full.slice(last));
+  return merged.filter((token) => token.length > 0);
+}
+
+/** Closing punctuation stays on the previous phrase so it never starts a line. */
+function glueClosing(tokens: readonly string[]): string[] {
+  const glued: string[] = [];
+  for (const token of tokens) {
+    const previous = glued[glued.length - 1];
+    const leading = CLOSING_PUNCT.exec(token);
+    if (previous && leading?.[0]) {
+      glued[glued.length - 1] = previous + leading[0];
+      const rest = token.slice(leading[0].length);
+      if (rest) glued.push(rest);
+      continue;
+    }
+    if (token) glued.push(token);
+  }
+  return glued;
 }
 
 export function tokenize(text: string, lang: OgLocale): string[] {
   if (lang === "en") return text.split(/(?<=[ \-–/])/u);
-  if (lang === "ja") {
-    return text.split("\u200B").flatMap((part) => part.split(/(?<=[ 　])/u));
-  }
-  const out: string[] = [];
-  for (const ch of text) {
-    const previous = out[out.length - 1];
-    if (previous && /[，。、！？：；」』）》·・…]/u.test(ch)) {
-      out[out.length - 1] = previous + ch;
-    } else {
-      out.push(ch);
-    }
-  }
-  return out;
+  const segmented = text.includes("\u200B") ? text : segmentForOg(text, lang);
+  const parts = segmented
+    .split("\u200B")
+    .flatMap((part) => (part ? part.split(/(?<=[ 　])/u) : []));
+  return glueClosing(keepWords(parts, lang));
 }
 
 export function layout(tokens: string[], cap: number): string[] {
@@ -164,7 +258,11 @@ export function layout(tokens: string[], cap: number): string[] {
   return lines.map((line) => line[0].replace(/\s+$/u, ""));
 }
 
-export function balance(tokens: string[], cap: number, lineCount: number): string[] {
+export function balance(
+  tokens: string[],
+  cap: number,
+  lineCount: number,
+): string[] {
   let best = layout(tokens, cap);
   const widest = Math.max(...tokens.map((token) => units(token.trim())));
   const floor = Math.max(cap * 0.5, widest <= cap ? widest : 0);
@@ -176,7 +274,11 @@ export function balance(tokens: string[], cap: number, lineCount: number): strin
   return best;
 }
 
-export function ellipsize(last: string, cap: number, lang: OgLocale | "cjk"): string {
+export function ellipsize(
+  last: string,
+  cap: number,
+  lang: OgLocale | "cjk",
+): string {
   let value = last;
   if (lang === "en") {
     while (units(`${value}…`) > cap && value.includes(" ")) {
@@ -234,9 +336,13 @@ export function fitField(
   field: FitField,
   keep?: string,
 ): FitResult {
-  const segmented = field === "sub" || field === "spotTitle" || field === "workTitle" || field === "areaTitle"
-    ? segmentForOg(text, lang)
-    : text;
+  const segmented =
+    field === "sub" ||
+    field === "spotTitle" ||
+    field === "workTitle" ||
+    field === "areaTitle"
+      ? segmentForOg(text, lang)
+      : text;
   return fitText(segmented, lang, stepsFor(field, lang), keep);
 }
 
@@ -288,7 +394,10 @@ export function splitKeptSuffix(
   if (line === suffix) return { body: "", suffix };
   const index = line.lastIndexOf(suffix);
   if (index >= 0) {
-    return { body: line.slice(0, index).replace(/\s+$/u, ""), suffix: line.slice(index) };
+    return {
+      body: line.slice(0, index).replace(/\s+$/u, ""),
+      suffix: line.slice(index),
+    };
   }
   return { body: line, suffix: "" };
 }

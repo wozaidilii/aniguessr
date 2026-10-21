@@ -38,7 +38,7 @@ export function pilgrimageOgUrl(
  * Bump this when those PNGs are replaced. Spot, work, and area cards use
  * `OG_TEMPLATE_VERSION` instead.
  */
-export const HOME_OG_ASSET_VERSION = "1";
+export const HOME_OG_ASSET_VERSION = "2";
 
 export function homeOgStaticName(locale: HomeLocale): string {
   return `home-${locale}.png`;

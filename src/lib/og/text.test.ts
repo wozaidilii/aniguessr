@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { segmentForOg } from "~/lib/og/text";
 import {
   edgeMargin,
   ellipsize,
   fitText,
   layout,
+  NOBREAK,
+  segmentForOg,
   splitEdgeSpace,
   splitKeptSuffix,
+  STEPS,
   tokenize,
   units,
   visibleText,
 } from "~/lib/og/text";
-import { STEPS } from "~/lib/og/text";
 
 const cjkTitle = STEPS.spotTitle.cjk;
 const enTitle = STEPS.spotTitle.en;
@@ -23,6 +24,32 @@ describe("og text fit", () => {
     const fit = fitText(text, "zh", cjkTitle);
     expect(fit.lines).toEqual(["镰仓高校前", "站旁的道口"]);
     expect(fit.truncated).toBe(false);
+  });
+
+  it("keeps the Chinese no-break list whole after BudouX", () => {
+    const sentence = (lang: "zh" | "zh-tw") =>
+      lang === "zh"
+        ? "真实取景地就在Google 地图上，浏览附近地点和动漫圣地巡礼地图，以及作品地区导航"
+        : "真實取景地就在Google 地圖上，瀏覽附近地點和動漫聖地巡禮地圖，以及作品地區導航";
+    for (const lang of ["zh", "zh-tw"] as const) {
+      const text = sentence(lang);
+      const tokens = tokenize(text, lang);
+      expect(tokens.join("")).toBe(text);
+      expect(segmentForOg(text, lang).includes("\u200B")).toBe(true);
+      for (const word of NOBREAK[lang]) {
+        expect(tokens.some((token) => token.includes(word))).toBe(true);
+      }
+      const lines = layout(tokens, 6);
+      expect(lines.join("")).toBe(text);
+      expect(lines.some((line) => line.startsWith("景地"))).toBe(false);
+    }
+    expect(
+      tokenize("真实取景地", "zh").some((token) => token.includes("取景地")),
+    ).toBe(true);
+    expect(tokenize("Google 地图", "zh")).toEqual(["Google 地图"]);
+    expect(tokenize("动漫", "zh")).toEqual(["动漫"]);
+    expect(tokenize("Google 地圖", "zh-tw")).toEqual(["Google 地圖"]);
+    expect(tokenize("動漫", "zh-tw")).toEqual(["動漫"]);
   });
 
   it("keeps closing punctuation off the start of a Chinese line", () => {
@@ -51,7 +78,9 @@ describe("og text fit", () => {
     expect(segmented.includes("踏\u200B切")).toBe(false);
     const fit = fitText(segmented, "ja", cjkTitle);
     expect(fit.lines.join("")).toBe("鎌倉高校前駅の踏切");
-    expect(fit.lines.some((line) => line === "切" || line === "踏")).toBe(false);
+    expect(fit.lines.some((line) => line === "切" || line === "踏")).toBe(
+      false,
+    );
   });
 
   it("truncates only the work title and keeps the multi-work suffix intact", () => {
@@ -80,7 +109,11 @@ describe("og text fit", () => {
   });
 
   it("omits the suffix token when the count is zero", () => {
-    const fit = fitText("青春ブタ野郎はバニーガール先輩の夢を見ない", "ja", sub);
+    const fit = fitText(
+      "青春ブタ野郎はバニーガール先輩の夢を見ない",
+      "ja",
+      sub,
+    );
     expect(fit.lines.join("")).not.toContain("ほか");
   });
 
