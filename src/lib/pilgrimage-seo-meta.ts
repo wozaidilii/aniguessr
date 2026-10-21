@@ -321,8 +321,8 @@ function fitSpotTitle(
   const bare = composeSpotTitle(locale, anime, place, "");
   if (codePointLength(bare) <= limit) return bare;
 
-  let animeChars = [...anime];
-  let placeChars = [...place];
+  const animeChars = [...anime];
+  const placeChars = [...place];
   const render = () =>
     composeSpotTitle(locale, animeChars.join(""), placeChars.join(""), "");
   while (
@@ -412,8 +412,8 @@ function fitSpotDescription(
   // A few characters past the target is still a sane snippet.
   if (codePointLength(full) <= limit + 12) return full;
 
-  let animeChars = [...anime];
-  let placeChars = [...place];
+  const animeChars = [...anime];
+  const placeChars = [...place];
   const render = (nextArea: string) =>
     composeSpotDescription(
       locale,
