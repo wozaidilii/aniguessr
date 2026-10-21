@@ -62,10 +62,9 @@ function assertPublished(pagePath: string, title: string, description: string) {
     withPilgrimageLocale(pagePath, "zh-tw"),
   );
   const languages = metadata.alternates?.languages ?? {};
-  expect(languages["zh-Hant"]).toBe(languages["zh-TW"]);
-  expect(String(languages["zh-Hant"])).toContain(
-    withPilgrimageLocale(pagePath, "zh-tw"),
-  );
+  const zhTwUrl = `https://aniguessr.ayiora.com${withPilgrimageLocale(pagePath, "zh-tw")}`;
+  expect(languages["zh-Hant"]).toBe(zhTwUrl);
+  expect(languages["zh-TW"]).toBe(zhTwUrl);
 
   const withImage = withPilgrimageOg(
     metadata,
