@@ -35,6 +35,15 @@ describe("homepage map labels", () => {
     expect(shortCjkAreaName("藤澤市")).toBe("藤澤市");
     expect(shortCjkAreaName("鎌倉市")).toBe("鎌倉市");
     expect(shortCjkAreaName("京都市左京區")).toBe("京都・左京區");
+    expect(shortCjkAreaName("西多摩郡奧多摩町")).toBe("奧多摩町");
+    expect(shortCjkAreaName("西多摩郡奥多摩町")).toBe("奥多摩町");
+    expect(shortCjkAreaName("东京都西多摩郡奥多摩町")).toBe("奥多摩町");
+    expect(shortCjkAreaName("足柄上郡松田町")).toBe("松田町");
+    expect(shortCjkAreaName("南都留郡山中湖村")).toBe("山中湖村");
+    expect(shortCjkAreaName("長生郡一宮町")).toBe("一宮町");
+    expect(shortCjkAreaName("东茨城郡大洗町")).toBe("大洗町");
+    expect(shortCjkAreaName("郡山市")).toBe("郡山市");
+    expect(shortCjkAreaName("蒲郡市")).toBe("蒲郡市");
   });
 
   it("drops the English prefecture and names a designated-city ward", () => {
@@ -48,6 +57,17 @@ describe("homepage map labels", () => {
       "Kyoto · Sakyo",
     );
     expect(shortEnAreaName("Kamakura")).toBe("Kamakura");
+    expect(shortEnAreaName("Kamikawa-gun (Ishikari), Hokkaido")).toBe(
+      "Kamikawa (Ishikari)",
+    );
+    expect(shortEnAreaName("Okutama, Nishitama District, Tokyo")).toBe(
+      "Okutama",
+    );
+    expect(shortEnAreaName("Nishitama District, Tokyo")).toBe("Nishitama");
+    expect(shortEnAreaName("Matsuda, Ashigarakami-gun, Kanagawa")).toBe(
+      "Matsuda",
+    );
+    expect(shortEnAreaName("Nishitama, Tokyo")).toBe("Nishitama");
   });
 
   it("reads a prefecture from a romaji suffix or a JIS code", () => {
@@ -170,6 +190,39 @@ describe("homepage map labels", () => {
         tw: "藤澤市",
         en: "Fujisawa",
       });
+      expect(byId.get("nishitama-tokyo-13308")).toMatchObject({
+        ja: "奥多摩町",
+        zh: "奥多摩町",
+        tw: "奧多摩町",
+        en: "Nishitama",
+      });
+      expect(byId.get("ashigarakami-kanagawa-14363")).toMatchObject({
+        zh: "松田町",
+        tw: "松田町",
+        en: "Ashigarakami",
+      });
+      expect(byId.get("minamitsuru-yamanashi-19425")).toMatchObject({
+        zh: "山中湖村",
+        tw: "山中湖村",
+        en: "Minamitsuru",
+      });
+      expect(byId.get("chosei-chiba")).toMatchObject({
+        zh: "一宮町",
+        tw: "一宮町",
+        en: "Chosei",
+      });
+      expect(byId.get("kamikawa-gun-ishikari-hokkaido")?.en).toBe(
+        "Kamikawa (Ishikari)",
+      );
+      expect(byId.get("koriyama-fukushima")).toMatchObject({
+        zh: "郡山市",
+        tw: "郡山市",
+      });
+      for (const area of labels.areas) {
+        expect(area.zh, area.id).not.toMatch(/郡.+[町村]$/u);
+        expect(area.tw, area.id).not.toMatch(/郡.+[町村]$/u);
+        expect(area.en, area.id).not.toMatch(/-gun\b|District/i);
+      }
 
       const locations = new Map(
         index.locations.map((location) => [location.slug, location.name.ja]),
