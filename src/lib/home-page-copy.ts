@@ -418,7 +418,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     h1Accent: "Pilgrimage",
     h1Tail: "Map",
     intro:
-      "See real life anime locations across Japan on one map, find the spots near you, and get directions in Google Maps. Browse by series or by area.",
+      "See real-life anime locations across Japan on one map, find the spots near you, and get directions in Google Maps. Browse by series or by area.",
     primaryCta: "Find spots near me",
     secondaryCta: "Open the map",
     privacy:
@@ -438,7 +438,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     areasSubtitle: "See every spot around where you're headed.",
     areasAll: "See all →",
     animeEyebrow: "SERIES",
-    animeTitle: "Real life locations from popular anime",
+    animeTitle: "Real-life locations from popular anime",
     animeSubtitle: "Pick a series and see all its locations on the map.",
     animeAll: "See all →",
     spotCount: (count) => `${formatCount("en", count)} spots`,
@@ -529,7 +529,7 @@ export const HOME_SEO: Record<
   },
   en: {
     title:
-      "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
+      "Anime Pilgrimage Map: Real-Life Anime Locations Near You | AniGuessr",
     description: HOME_PAGE_COPY.en.intro,
   },
 };

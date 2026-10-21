@@ -26,9 +26,9 @@ export const PILGRIMAGE_SEO_OVERRIDES: {
     // Admin area is Fujisawa; the title can still lead with the island name.
     "fujisawa-kanagawa": {
       en: {
-        title: `Enoshima / 江の島 Real Life Locations | ${BRAND_NAME}`,
+        title: `Enoshima / 江の島 Real-Life Locations | ${BRAND_NAME}`,
         description:
-          "Real life locations on Enoshima (江の島) in Fujisawa, Kanagawa, with coordinates and scene notes.",
+          "Real-life locations on Enoshima (江の島) in Fujisawa, Kanagawa, with coordinates and scene notes.",
       },
       ja: {
         title: `江の島 / Enoshima 実在ロケ地 | ${BRAND_NAME}`,

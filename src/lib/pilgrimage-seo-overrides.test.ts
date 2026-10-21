@@ -4,7 +4,7 @@ import { BRAND_NAME } from "~/lib/site-url";
 
 describe("pilgrimage SEO overrides", () => {
   const generated = {
-    title: "Fujisawa, Kanagawa anime real life locations | AniGuessr",
+    title: "Fujisawa, Kanagawa anime real-life locations | AniGuessr",
     description: "Generated description",
   };
 
@@ -16,7 +16,7 @@ describe("pilgrimage SEO overrides", () => {
       generated,
     );
     expect(seo.title).toBe(
-      `Enoshima / 江の島 Real Life Locations | ${BRAND_NAME}`,
+      `Enoshima / 江の島 Real-Life Locations | ${BRAND_NAME}`,
     );
     expect(seo.description).toContain("Enoshima");
   });
