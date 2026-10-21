@@ -162,8 +162,10 @@ describe("pilgrimage navigation", () => {
     expect(source).toContain("，经修改后使用，采用 ");
     expect(source).toContain(" 授权");
     expect(source).toContain("部分地點資料來自 ");
-    expect(source).toContain("一部の地点データは ");
-    expect(source).toContain("Some location data comes from ");
+    expect(source).toContain("一部のスポット情報は ");
+    expect(source).toContain(" のデータを改変して使用しています（");
+    expect(source).toContain("Some location data is adapted from ");
+    expect(source).toContain(" and used under ");
     expect(source).toContain("text-xs");
     expect(source).toContain("text-[var(--dark-text-secondary)]");
     expect(shell).toContain("<AnitabiAttribution locale={locale}");

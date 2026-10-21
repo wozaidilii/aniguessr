@@ -27,14 +27,14 @@ const ATTRIBUTION_COPY: Record<
     tail: " 授權",
   },
   ja: {
-    lead: "一部の地点データは ",
-    mid: " に由来し、改変したうえで ",
-    tail: " により利用しています",
+    lead: "一部のスポット情報は ",
+    mid: " のデータを改変して使用しています（",
+    tail: "）。",
   },
   en: {
-    lead: "Some location data comes from ",
-    mid: ", used with modifications under the ",
-    tail: " license",
+    lead: "Some location data is adapted from ",
+    mid: " and used under ",
+    tail: ".",
   },
 };
 
