@@ -23,7 +23,6 @@ export const PILGRIMAGE_COPY: Record<
     funfacts: string;
     coordinates: string;
     openMaps: string;
-    openAnitabi: string;
     relatedAnime: string;
     relatedLocation: string;
     emptyIndex: string;
@@ -64,8 +63,6 @@ export const PILGRIMAGE_COPY: Record<
     navigate: string;
     streetView: string;
     favoriteBadge: string;
-    creditLead: string;
-    creditRights: string;
     formatDistance: (km: number) => string;
   }
 > = {
@@ -91,7 +88,6 @@ export const PILGRIMAGE_COPY: Record<
     funfacts: "巡礼贴士",
     coordinates: "坐标",
     openMaps: "在 Google 地图打开",
-    openAnitabi: "在 Anitabi 查看",
     relatedAnime: "所属作品",
     relatedLocation: "所在地区",
     emptyIndex: "SEO 索引尚未生成，请先运行 npm run data:build-pilgrimage-seo",
@@ -133,8 +129,6 @@ export const PILGRIMAGE_COPY: Record<
     navigate: "导航",
     streetView: "街景",
     favoriteBadge: "想去",
-    creditLead: "数据与图片来自",
-    creditRights: "动画截图 © 各自权利人。",
     formatDistance: (km) => formatDistanceLabel(km, "zh"),
   },
   ja: {
@@ -159,7 +153,6 @@ export const PILGRIMAGE_COPY: Record<
     funfacts: "巡礼メモ",
     coordinates: "座標",
     openMaps: "Google マップで開く",
-    openAnitabi: "Anitabi で見る",
     relatedAnime: "作品",
     relatedLocation: "地域",
     emptyIndex:
@@ -204,8 +197,6 @@ export const PILGRIMAGE_COPY: Record<
     navigate: "ナビ",
     streetView: "ストリートビュー",
     favoriteBadge: "行きたい",
-    creditLead: "データと画像の出典：",
-    creditRights: "アニメのスクリーンショット © 各権利者。",
     formatDistance: (km) => formatDistanceLabel(km, "ja"),
   },
   en: {
@@ -231,7 +222,6 @@ export const PILGRIMAGE_COPY: Record<
     funfacts: "Visit notes",
     coordinates: "Coordinates",
     openMaps: "Open in Google Maps",
-    openAnitabi: "View on Anitabi",
     relatedAnime: "Anime",
     relatedLocation: "Region",
     emptyIndex:
@@ -276,8 +266,6 @@ export const PILGRIMAGE_COPY: Record<
     navigate: "Navigate",
     streetView: "Street View",
     favoriteBadge: "Favorite",
-    creditLead: "Data and images from",
-    creditRights: "Anime screenshots © their respective rights holders.",
     formatDistance: (km) => formatDistanceLabel(km, "en"),
   },
   // OpenCC s2twp of the zh block, plus scripts/data/zh-tw-overrides.json.
@@ -304,7 +292,6 @@ export const PILGRIMAGE_COPY: Record<
     funfacts: "巡禮貼士",
     coordinates: "座標",
     openMaps: "在 Google 地圖開啟",
-    openAnitabi: "在 Anitabi 檢視",
     relatedAnime: "所屬作品",
     relatedLocation: "所在地區",
     emptyIndex: "SEO 索引尚未生成，請先執行 npm run data:build-pilgrimage-seo",
@@ -346,8 +333,6 @@ export const PILGRIMAGE_COPY: Record<
     navigate: "導航",
     streetView: "街景服務",
     favoriteBadge: "想去",
-    creditLead: "資料與圖片來自",
-    creditRights: "動畫截圖 © 各自權利人。",
     formatDistance: (km) => formatDistanceLabel(km, "zh-tw"),
   },
 };

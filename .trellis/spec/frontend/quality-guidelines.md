@@ -471,7 +471,7 @@ if (snapshot.roundStatus !== "round-result") return cloneSnapshot(snapshot);
 - Favorite storage key: `aniguessr_pilgrimage_favorites_v1` (JSON string array of subject IDs).
 - Catalog: `GET /data/seo/spots-nav.json` with `{ version: 1, animes, spots }`. Spot tuples are `[id, subjectId, locationSlug, lat, lng, zh, ja, en]`.
 - Directions: `googleMapsDirectionsUrl(lat, lng)` → `https://www.google.com/maps/dir/?api=1&destination=<lat>,<lng>`.
-- License URL: `https://creativecommons.org/licenses/by-nc-sa/4.0/`. Source fallback: `https://anitabi.cn`.
+- Shared component: `src/components/anitabi-attribution.tsx`. `SHOW_ANITABI_ATTRIBUTION` defaults to `true`. zh copy is `部分地点数据来自 anitabi，经修改后使用，采用 CC BY-NC-SA 4.0 授权`, with ja / zh-TW / en in the same component. `anitabi` links to `https://anitabi.cn`. `CC BY-NC-SA 4.0` links to `https://creativecommons.org/licenses/by-nc-sa/4.0/`. The line is 12px in `--dark-text-secondary`. The homepage footer slot imports this same component.
 
 #### 3. Contracts
 
@@ -480,7 +480,7 @@ if (snapshot.roundStatus !== "round-result") return cloneSnapshot(snapshot);
 - Distance and ranking run in the browser. The catalog request must not include coordinates.
 - MapLibre loads only through the dynamic map chunk. Style is OpenFreeMap dark, with no API key.
 - The service worker must ignore navigation requests and must not cache HTML.
-- Wherever spot data or images render, show `anitabi`, `CC BY-NC-SA 4.0`, and a © rights-holder note in the page locale. No affiliate or ad URLs.
+- Do not render per-page anitabi links, spot credits, or affiliate URLs. `PilgrimageShell` renders `AnitabiAttribution` once. The homepage footer uses that same component rather than a second sentence. Set `SHOW_ANITABI_ATTRIBUTION` to `false`, or delete the component and its call sites, to remove the line. Do not show a company legal name or address.
 
 #### 4. Validation & Error Matrix
 

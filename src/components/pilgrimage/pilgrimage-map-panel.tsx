@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { PilgrimageMapLoader } from "~/components/pilgrimage/pilgrimage-map-loader";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -8,12 +7,10 @@ export function PilgrimageMapPanel({
   locale,
   subjectId,
   locationSlug,
-  sourceUrl,
 }: {
   locale: PilgrimageLocale;
   subjectId?: string;
   locationSlug?: string;
-  sourceUrl?: string | null;
 }) {
   const copy = getPilgrimageCopy(locale);
   return (
@@ -34,7 +31,6 @@ export function PilgrimageMapPanel({
           locationSlug={locationSlug}
         />
       </div>
-      <AnitabiCredit locale={locale} sourceUrl={sourceUrl} className="mt-2" />
     </section>
   );
 }
