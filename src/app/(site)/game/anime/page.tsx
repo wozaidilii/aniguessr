@@ -222,7 +222,7 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     speedBonus: "速度补偿",
     elapsed: "用时",
     guessDistance: (distance) => `你的猜测距离实际地点 ${distance}。`,
-    streetViewLink: "在 Google 街景中继续浏览",
+    streetViewLink: "在街景中查看",
     finalScore: "查看最终得分",
     nextRound: "下一轮",
     submitGuess: "提交猜测",
@@ -319,14 +319,14 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     elapsed: "所要時間",
     guessDistance: (distance) =>
       `予想地点は正解から ${distance} 離れています。`,
-    streetViewLink: "Google ストリートビューで続きを見る",
+    streetViewLink: "ストリートビューで見る",
     finalScore: "最終スコアを見る",
     nextRound: "次のラウンド",
     submitGuess: "予想を送信",
     shareScore: "成績を共有",
     leaderboard: "ランキングを見る",
     saveHistory: "履歴を保存",
-    playAgain: "もう一度",
+    playAgain: "もう一度遊ぶ",
     leaderboardSaved: "ランキングを更新しました。ホームを開きます。",
     historySaved: "履歴をアカウントに保存しました。",
     shareOpened: "共有パネルを開きました。",
@@ -420,7 +420,7 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     elapsed: "Time",
     guessDistance: (distance) =>
       `Your guess was ${distance} from the real location.`,
-    streetViewLink: "Continue in Google Street View",
+    streetViewLink: "View in Street View",
     finalScore: "View final score",
     nextRound: "Next round",
     submitGuess: "Submit guess",
@@ -1191,37 +1191,7 @@ export default function AnimeGuessrPage() {
     router.push(withAnimeLocale(`${innerPath}${search}`, nextLocale));
   }
 
-  function openShare(kind: "x" | "line" | "link") {
-    const url = `${window.location.origin}${gameNextUrl}`;
-    const text = copy.shareText(totalScore.toLocaleString(), url);
-    capturePostHogEvent(
-      POSTHOG_EVENTS.animeScoreShared,
-      { score: totalScore, auth_state: session ? "logged_in" : "guest", channel: kind },
-      session?.user.id,
-    );
-    if (kind === "x") {
-      window.open(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      return;
-    }
-    if (kind === "line") {
-      window.open(
-        `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      return;
-    }
-    void navigator.clipboard.writeText(text).then(
-      () => setShareMessage(copy.shareCopied),
-      () => setShareMessage(copy.shareFailed),
-    );
-  }
-
-  if (!ready) return <AuthLoading />;
+    if (!ready) return <AuthLoading />;
 
   if (guestBlocked) {
     return (
@@ -1429,7 +1399,14 @@ export default function AnimeGuessrPage() {
             </div>
           )}
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          <div className="ag-final-pair mt-8">
+            <button
+              type="button"
+              onClick={handleRestart}
+              className="anime-button"
+            >
+              {copy.playAgain}
+            </button>
             <button
               type="button"
               onClick={handleShareScore}
@@ -1437,10 +1414,12 @@ export default function AnimeGuessrPage() {
             >
               {copy.shareScore}
             </button>
+          </div>
+          <div className="mt-3 grid gap-3">
             <button
               type="button"
               onClick={() => void handleOpenLeaderboard()}
-              className="anime-button-secondary"
+              className="anime-button-secondary h-11 w-full whitespace-nowrap"
             >
               {copy.leaderboard}
             </button>
@@ -1451,20 +1430,13 @@ export default function AnimeGuessrPage() {
                   ? setShareMessage(copy.historySaved)
                   : setAuthPromptReason("history")
               }
-              className="anime-button-secondary"
+              className="anime-button-secondary h-11 w-full whitespace-nowrap"
             >
               {copy.saveHistory}
             </button>
-            <button
-              type="button"
-              onClick={handleRestart}
-              className="anime-button"
-            >
-              {copy.playAgain}
-            </button>
             <Link
               href={homeUrl}
-              className="anime-button-secondary sm:col-span-2"
+              className="anime-button-secondary h-11 w-full whitespace-nowrap"
             >
               {copy.home}
             </Link>
@@ -1473,6 +1445,37 @@ export default function AnimeGuessrPage() {
       </main>
     );
   }
+
+  const traditionalResult = pathname.startsWith("/zh-tw");
+  const panel = traditionalResult
+    ? {
+        streetView: "在街景中查看",
+        nextRound: "下一回合",
+        finalScore: "查看最終得分",
+      }
+    : {
+        streetView: copy.streetViewLink,
+        nextRound: copy.nextRound,
+        finalScore: copy.finalScore,
+      };
+  const resultUi = traditionalResult
+    ? {
+        ...ui,
+        distance: "距離",
+        answerTime: "作答時間",
+        answerLabel: (name: string) => `正確答案：${name}`,
+        totalLabel: (score: string) => `合計 ${score} 分`,
+        closeness: (distanceKm: number) => {
+          if (distanceKm < 1) return "非常近！";
+          if (distanceKm < 15) return "比較近";
+          if (distanceKm < 80) return "大致同一區域";
+          if (distanceKm < 400) return "方向對了";
+          return "還比較遠";
+        },
+        breakdown: (distancePts: number, speedPts: number) =>
+          `距離分 ${distancePts} · 時間加分 +${speedPts}`,
+      }
+    : ui;
 
   const roundMax = roundResult?.scoreBreakthrough
     ? LOCATION_SOLO_ANIME_BREAKTHROUGH_MAX
@@ -1567,10 +1570,11 @@ export default function AnimeGuessrPage() {
             <LangSwitch locale={locale} onSelect={selectLocale} />
           </div>
           <aside className="ag-result-side">
+            <div className="ag-result-body">
             <p className="ag-kicker">
               ROUND {round + 1} / {questions.length}
             </p>
-            <h2 style={{ marginTop: 10, fontSize: 24 }}>{ui.closeness(roundResult.distanceKm)}</h2>
+            <h2 style={{ marginTop: 10, fontSize: 24 }}>{resultUi.closeness(roundResult.distanceKm)}</h2>
             <div className="ag-scoreline">
               <b>{roundResult.score.toLocaleString()}</b>
               <span>/ {roundMax.toLocaleString()}</span>
@@ -1580,16 +1584,16 @@ export default function AnimeGuessrPage() {
             </div>
             <div className="ag-kv">
               <div>
-                <small>{ui.distance}</small>
+                <small>{resultUi.distance}</small>
                 <b>{formatDistance(roundResult.distanceKm, locale)}</b>
               </div>
               <div>
-                <small>{ui.answerTime}</small>
+                <small>{resultUi.answerTime}</small>
                 <b>{formatElapsed(roundResult.elapsedSeconds, locale)}</b>
               </div>
             </div>
             <p className="ag-clue-text" style={{ padding: "10px 0 0" }}>
-              {ui.breakdown(roundResult.distancePts, roundResult.speedCompensationPts)}
+              {resultUi.breakdown(roundResult.distancePts, roundResult.speedCompensationPts)}
             </p>
             {roundResult.scoreBreakthrough ? (
               <p className="ag-clue-text" style={{ padding: "8px 0 0" }}>
@@ -1605,7 +1609,7 @@ export default function AnimeGuessrPage() {
                 flush
               />
               <div>
-                <b>{ui.answerLabel(roundResultText.answerName)}</b>
+                <b>{resultUi.answerLabel(roundResultText.answerName)}</b>
                 <span>
                   {roundResultText.animeTitle} · {roundResultText.location}
                 </span>
@@ -1618,41 +1622,26 @@ export default function AnimeGuessrPage() {
                 ))}
               </ul>
             )}
-            <a
-              href={buildGoogleMapsStreetViewUrl(roundResult.question)}
-              target="_blank"
-              rel="noreferrer"
-              className="ag-clue-more"
-              style={{ marginTop: 8, textAlign: "left" }}
-            >
-              {copy.streetViewLink}
-            </a>
-            <div className="ag-share">
-              <p>{ui.shareResult}</p>
-              {shareMessage && (
-                <p style={{ color: "var(--ag-cyan)" }}>{shareMessage}</p>
-              )}
-              <div className="ag-share-row">
-                <button type="button" onClick={() => openShare("x")}>
-                  X
-                </button>
-                <button type="button" onClick={() => openShare("line")}>
-                  LINE
-                </button>
-                <button type="button" onClick={() => openShare("link")}>
-                  {locale === "ja" ? "リンク" : locale === "zh" ? "链接" : "Link"}
-                </button>
-              </div>
-              <button type="button" onClick={handleNext} className="ag-btn ag-btn-pink ag-next">
-                {round + 1 >= questions.length ? copy.finalScore : copy.nextRound} <ArrowIcon />
+            </div>
+            <div className="ag-result-actions">
+              <button type="button" onClick={handleNext} className="ag-btn ag-btn-pink">
+                {round + 1 >= questions.length ? panel.finalScore : panel.nextRound}
               </button>
+              <a
+                href={buildGoogleMapsStreetViewUrl(roundResult.question)}
+                target="_blank"
+                rel="noreferrer"
+                className="ag-btn ag-btn-line"
+              >
+                {panel.streetView}
+              </a>
             </div>
           </aside>
           <div className="ag-prog">
             {questions.map((question, index) => (
               <i key={question.id} className={index < filledDots ? "is-done" : ""} />
             ))}
-            <span>{ui.totalLabel(totalScore.toLocaleString())}</span>
+            <span>{resultUi.totalLabel(totalScore.toLocaleString())}</span>
           </div>
         </>
       )}
