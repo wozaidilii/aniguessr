@@ -1,5 +1,6 @@
 import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { RightsContactLink } from "~/components/rights-contact-link";
 import {
   CONTACT_GENERAL_EMAIL,
   CONTACT_SUPPORT_EMAIL,
@@ -51,7 +52,9 @@ export function HomeFooter({ locale }: { locale: HomeLocale }) {
                 <a href="#game">{copy.navGame}</a>
               </li>
               <li>
-                <a href={withAnimeLocale("/battle", siteLocale)}>{copy.gameBattle}</a>
+                <a href={withAnimeLocale("/battle", siteLocale)}>
+                  {copy.gameBattle}
+                </a>
               </li>
               <li>
                 <a href="#rank">{copy.navRank}</a>
@@ -62,10 +65,22 @@ export function HomeFooter({ locale }: { locale: HomeLocale }) {
             <h2>{copy.footerBrand}</h2>
             <ul>
               <li>
-                <a href={`mailto:${CONTACT_GENERAL_EMAIL}`}>{copy.contactGeneral}</a>
+                <a href={`mailto:${CONTACT_GENERAL_EMAIL}`}>
+                  {copy.contactGeneral}
+                </a>
               </li>
               <li>
-                <a href={`mailto:${CONTACT_SUPPORT_EMAIL}`}>{copy.contactSupport}</a>
+                <a href={`mailto:${CONTACT_SUPPORT_EMAIL}`}>
+                  {copy.contactSupport}
+                </a>
+              </li>
+              <li>
+                <a href={withPilgrimageLocale("/privacy", locale)}>
+                  {copy.footerPrivacy}
+                </a>
+              </li>
+              <li>
+                <RightsContactLink locale={locale} />
               </li>
             </ul>
           </div>

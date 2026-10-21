@@ -3,6 +3,7 @@ import {
   buildPostHogCaptureUrl,
   POSTHOG_PROJECT_TOKEN,
 } from "~/lib/posthog-config";
+import { sanitizePostHogProperties } from "~/lib/posthog-privacy";
 import { type PlayerProfile } from "~/types/player";
 
 let lastIdentifiedUserId: string | null = null;
@@ -95,7 +96,9 @@ export function capturePostHogEvent(
 ) {
   if (!POSTHOG_PROJECT_TOKEN || typeof window === "undefined") return;
 
-  const eventProperties = withBaseProperties(properties, distinctId);
+  const eventProperties = sanitizePostHogProperties(
+    withBaseProperties(properties, distinctId),
+  );
 
   if (window.posthog?.capture) {
     try {
@@ -131,25 +134,12 @@ export function capturePostHogEvent(
 export function identifyPostHogUser(user: PlayerProfile) {
   if (!POSTHOG_PROJECT_TOKEN || typeof window === "undefined") return;
 
-  const personProperties = compactProperties({
-    email: user.email ?? undefined,
-    name: user.name,
-    provider: user.provider ?? undefined,
-    country_code: user.countryCode ?? undefined,
-  });
-
   try {
-    window.posthog?.identify(user.id, personProperties);
+    // Account id only. Do not attach email, name, provider, or country.
+    window.posthog?.identify(user.id);
     if (lastIdentifiedUserId !== user.id) {
       lastIdentifiedUserId = user.id;
-      capturePostHogEvent(
-        POSTHOG_EVENTS.playerIdentified,
-        {
-          provider: user.provider ?? "password",
-          has_country: Boolean(user.countryCode),
-        },
-        user.id,
-      );
+      capturePostHogEvent(POSTHOG_EVENTS.playerIdentified, {}, user.id);
     }
   } catch {
     // Analytics must never block auth/session restoration.

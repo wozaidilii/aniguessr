@@ -14,9 +14,7 @@ import {
   type GameModeConfig,
   type GameModeSlug,
 } from "~/lib/game-mode";
-import {
-  withAnimeLocale,
-} from "~/lib/anime-locale";
+import { withAnimeLocale } from "~/lib/anime-locale";
 import { getBattleCopy, getBattleModeText } from "~/lib/battle-copy";
 import {
   ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
@@ -45,9 +43,8 @@ export default function BattleLobby() {
   const [rounds, setRounds] = useState(5);
   const [timePerRound] = useState(120);
   const [startingHp, setStartingHp] = useState(100);
-  const [difficultyTier, setDifficultyTier] = useState<AnimeGuessrDifficultyTier>(
-    ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
-  );
+  const [difficultyTier, setDifficultyTier] =
+    useState<AnimeGuessrDifficultyTier>(ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER);
   const firstBattleMode = useMemo(
     () => BATTLE_GAME_MODE_LIST[0]?.type ?? "anime",
     [],
@@ -87,7 +84,6 @@ export default function BattleLobby() {
     activeSession: PlayerSession,
   ) {
     params.set("userId", activeSession.user.id);
-    params.set("name", activeSession.user.name);
     params.set("avatarIcon", activeSession.user.avatar.icon);
     params.set("avatarColor", activeSession.user.avatar.color);
   }

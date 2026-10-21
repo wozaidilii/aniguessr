@@ -61,6 +61,7 @@ export interface HomeCopy {
   footerBack: string;
   footerGame: string;
   footerBrand: string;
+  footerPrivacy: string;
   footerCopy: string;
   profileTitle: string;
   username: string;
@@ -148,6 +149,7 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     footerBack: "www.ayiora.com へ",
     footerGame: "Game",
     footerBrand: "Ayiora",
+    footerPrivacy: "プライバシーポリシー",
     footerCopy: "© 2026 Ayiora",
     profileTitle: "プレイヤー",
     username: "ユーザー名",
@@ -208,7 +210,8 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     ],
     pilgrimEyebrow: "Pilgrimage",
     pilgrimTitle: "两万多处取景地，从地图上慢慢看。",
-    pilgrimBody: "游戏里出现过的圣地，可以随时在巡礼地图里回看，也方便安排下一次出行。",
+    pilgrimBody:
+      "游戏里出现过的圣地，可以随时在巡礼地图里回看，也方便安排下一次出行。",
     pilgrimCta: "打开圣地巡礼地图",
     rankEyebrow: "Leaderboard",
     rankTitle: "排行榜",
@@ -230,6 +233,7 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     footerBack: "前往 www.ayiora.com",
     footerGame: "Game",
     footerBrand: "Ayiora",
+    footerPrivacy: "隐私政策",
     footerCopy: "© 2026 Ayiora",
     profileTitle: "玩家资料",
     username: "用户名",
@@ -270,8 +274,7 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     pilgrimageHint: "Browse locations on a map",
     howEyebrow: "How to play",
     howTitle: "Three steps.",
-    howBody:
-      "Start from one anime frame and find the answer in a real street.",
+    howBody: "Start from one anime frame and find the answer in a real street.",
     steps: [
       {
         kicker: "Anime clue",
@@ -315,6 +318,7 @@ export const HOME_COPY: Record<AnimeLocale, HomeCopy> = {
     footerBack: "www.ayiora.com",
     footerGame: "Game",
     footerBrand: "Ayiora",
+    footerPrivacy: "Privacy Policy",
     footerCopy: "© 2026 Ayiora",
     profileTitle: "Player profile",
     username: "Username",

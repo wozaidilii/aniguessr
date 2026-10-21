@@ -16,3 +16,12 @@ export function isLocalePrefixedPilgrimagePath(pathname: string): boolean {
   if (!locale) return false;
   return inner === "/pilgrimage" || inner.startsWith("/pilgrimage/");
 }
+
+/**
+ * `/{locale}/privacy`. Same CDN rule as pilgrimage pages: no rewrite, no Set-Cookie.
+ */
+export function isLocalePrefixedPrivacyPath(pathname: string): boolean {
+  const { locale, pathname: inner } = splitLocalePath(pathname);
+  if (!locale) return false;
+  return inner === "/privacy";
+}
