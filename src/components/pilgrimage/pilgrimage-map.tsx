@@ -3,6 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
+import {
+  DEFAULT_FAVORITES_ONLY,
+  SPOT_CLUSTER,
+  spotClusterFavoriteRing,
+  spotClusterPaint,
+  spotFavProperty,
+  spotFavoriteRing,
+  spotPointPaint,
+} from "~/components/pilgrimage/pilgrimage-map-layers";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
@@ -45,9 +54,8 @@ export function PilgrimageMap({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [favoritesOnly, setFavoritesOnly] = useState(DEFAULT_FAVORITES_ONLY);
   const [visibleCount, setVisibleCount] = useState<number | null>(null);
-  const defaulted = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,12 +70,6 @@ export function PilgrimageMap({
       cancelled = true;
     };
   }, [attempt]);
-
-  useEffect(() => {
-    if (!favorites.ready || defaulted.current) return;
-    defaulted.current = true;
-    if (!subjectId && favorites.ids.length > 0) setFavoritesOnly(true);
-  }, [favorites.ready, favorites.ids.length, subjectId]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -99,29 +101,22 @@ export function PilgrimageMap({
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
-        cluster: true,
-        clusterRadius: 48,
-        clusterMaxZoom: 14,
+        ...SPOT_CLUSTER,
+      });
+      const clusterRing = spotClusterFavoriteRing();
+      map.addLayer({
+        id: clusterRing.id,
+        type: "circle",
+        source: SOURCE_ID,
+        filter: clusterRing.filter,
+        paint: clusterRing.paint,
       });
       map.addLayer({
         id: "spot-clusters",
         type: "circle",
         source: SOURCE_ID,
         filter: ["has", "point_count"],
-        paint: {
-          "circle-color": "#f472b6",
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            16,
-            25,
-            22,
-            100,
-            28,
-          ],
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#fff7fb",
-        },
+        paint: spotClusterPaint(),
       });
       map.addLayer({
         id: "spot-cluster-count",
@@ -135,31 +130,25 @@ export function PilgrimageMap({
         },
         paint: { "text-color": "#0a0612" },
       });
+      const favoriteRing = spotFavoriteRing();
+      map.addLayer({
+        id: favoriteRing.id,
+        type: "circle",
+        source: SOURCE_ID,
+        filter: favoriteRing.filter,
+        paint: favoriteRing.paint,
+      });
       map.addLayer({
         id: "spot-points",
         type: "circle",
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-color": [
-            "case",
-            ["==", ["get", "fav"], 1],
-            "#67e8f9",
-            "#fb7185",
-          ],
-          "circle-radius": 6,
-          "circle-stroke-width": 1.5,
-          "circle-stroke-color": "#fff7fb",
-        },
+        paint: spotPointPaint(),
       });
       const pointCursor = (cursor: string) => {
         map.getCanvas().style.cursor = cursor;
       };
-      map.on("mouseenter", "spot-clusters", () => pointCursor("pointer"));
-      map.on("mouseleave", "spot-clusters", () => pointCursor(""));
-      map.on("mouseenter", "spot-points", () => pointCursor("pointer"));
-      map.on("mouseleave", "spot-points", () => pointCursor(""));
-      map.on("click", "spot-clusters", (event) => {
+      const onClusterClick = (event: maplibregl.MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         if (feature?.geometry.type !== "Point") return;
         const clusterId = Number(feature.properties?.cluster_id);
@@ -179,8 +168,8 @@ export function PilgrimageMap({
             });
           },
         );
-      });
-      map.on("click", "spot-points", (event) => {
+      };
+      const onPointClick = (event: maplibregl.MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         if (feature?.geometry.type !== "Point") return;
         const [lng, lat] = feature.geometry.coordinates;
@@ -193,7 +182,17 @@ export function PilgrimageMap({
           lng: lng ?? 0,
           lat: lat ?? 0,
         });
-      });
+      };
+      for (const layer of ["spot-clusters", clusterRing.id]) {
+        map.on("mouseenter", layer, () => pointCursor("pointer"));
+        map.on("mouseleave", layer, () => pointCursor(""));
+        map.on("click", layer, onClusterClick);
+      }
+      for (const layer of ["spot-points", favoriteRing.id]) {
+        map.on("mouseenter", layer, () => pointCursor("pointer"));
+        map.on("mouseleave", layer, () => pointCursor(""));
+        map.on("click", layer, onPointClick);
+      }
       mapRef.current = map;
       setMapLoaded(true);
       map.resize();
@@ -236,7 +235,7 @@ export function PilgrimageMap({
         properties: {
           id: spot.id,
           subjectId: spot.subjectId,
-          fav: favoriteSet.has(spot.subjectId) ? 1 : 0,
+          fav: spotFavProperty(spot.subjectId, favoriteSet),
           name: localizedNavText(spot.name, locale),
           anime: animeTitle(catalog.animes, spot.subjectId, locale),
         },

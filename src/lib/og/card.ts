@@ -1,11 +1,13 @@
 import { createHash } from "node:crypto";
 
 import {
+  HOME_OG_COPY,
   OG_TEMPLATE_VERSION,
   ogCopy,
   ogLocaleChain,
   type OgLocale,
 } from "~/lib/og/copy";
+import { japanesePlaceLabel } from "~/lib/localized-text";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   layoutAreaMarkers,
@@ -44,7 +46,7 @@ export interface OgSubtitleLine {
 }
 
 export interface OgCard {
-  kind: "spot" | "work" | "area";
+  kind: "spot" | "work" | "area" | "home";
   requestedLocale: PilgrimageLocale;
   contentLocale: OgLocale;
   art: MapArt;
@@ -88,8 +90,7 @@ export function preferredName(
 
 /**
  * Order used only when the resolved card locale itself has no string.
- * Matches the page (`ja`: en then zh) so a blank `answerName.ja` still
- * shows the label the page shows. It does not change chip, fonts, or alt.
+ * Japanese place names do not use this list; they use `displaySpotPlace`.
  */
 const HOLE_ORDER: Record<OgLocale, readonly OgLocale[]> = {
   ja: ["en", "zh", "zh-tw"],
@@ -113,6 +114,31 @@ export function displayName(
   return "";
 }
 
+/**
+ * Japanese place labels stay on the Japanese card. A CJK-only zh name or
+ * the Japanese scene title wins over romaji. Other locales keep `displayName`.
+ */
+export function displaySpotPlace(
+  locale: OgLocale,
+  base: OgNames | undefined,
+  ogTitle?: OgNames,
+  shortName?: OgNames,
+  derivedJa?: string,
+  titleZh?: string,
+  override?: string,
+): string {
+  if (locale !== "ja") return displayName(locale, base, ogTitle, shortName);
+  return japanesePlaceLabel({
+    ja: preferredName("ja", base, ogTitle, shortName),
+    zh: preferredName("zh", base, ogTitle, shortName),
+    en: preferredName("en", base, ogTitle, shortName),
+    tw: preferredName("zh-tw", base, ogTitle, shortName),
+    titleJa: derivedJa,
+    titleZh,
+    override,
+  });
+}
+
 export function resolveContentLocale(
   requested: PilgrimageLocale,
   required: Array<(locale: OgLocale) => string>,
@@ -125,8 +151,10 @@ export function resolveContentLocale(
 }
 
 function usable(names: OgNames): boolean {
-  return ogLocaleChain("zh-tw").some((locale) => readOgName(names, locale)) ||
-    Boolean(readOgName(names, "en"));
+  return (
+    ogLocaleChain("zh-tw").some((locale) => readOgName(names, locale)) ||
+    Boolean(readOgName(names, "en"))
+  );
 }
 
 function versionFor(parts: readonly string[]): string {
@@ -150,7 +178,11 @@ function markerKey(layout: MarkerLayout): string {
   ].join("|");
 }
 
-function titleBlock(text: string, locale: OgLocale, field: "spotTitle" | "workTitle" | "areaTitle") {
+function titleBlock(
+  text: string,
+  locale: OgLocale,
+  field: "spotTitle" | "workTitle" | "areaTitle",
+) {
   const fit = fitField(text, locale, field);
   return {
     titleSize: fit.size,
@@ -182,11 +214,27 @@ export function buildSpotCard(input: {
   art: MapArt;
   origin: LatLng;
   nearby: LatLng[];
+  /** Japanese label from the spot scene title, used when answerName.ja is blank. */
+  derivedJa?: string;
+  /** Simplified scene title, used when the Japanese title is also blank or Latin. */
+  titleZh?: string;
+  /** Manual Japanese place label. Wins over zh when answerName.ja is empty. */
+  placeOverride?: string;
 }): OgCard {
   const workName = (locale: OgLocale) =>
-    preferredName(locale, input.workTitle, input.workOgTitle, input.workShortName);
+    preferredName(
+      locale,
+      input.workTitle,
+      input.workOgTitle,
+      input.workShortName,
+    );
   const areaName = (locale: OgLocale) =>
-    preferredName(locale, input.areaName, input.areaOgTitle, input.areaShortName);
+    preferredName(
+      locale,
+      input.areaName,
+      input.areaOgTitle,
+      input.areaShortName,
+    );
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.spotName, input.ogTitle, input.shortName),
@@ -194,11 +242,14 @@ export function buildSpotCard(input: {
     areaName,
   ]);
   const copy = ogCopy(contentLocale);
-  const spot = displayName(
+  const spot = displaySpotPlace(
     contentLocale,
     input.spotName,
     input.ogTitle,
     input.shortName,
+    input.derivedJa,
+    input.titleZh,
+    input.placeOverride,
   );
   const work = displayName(
     contentLocale,
@@ -218,9 +269,7 @@ export function buildSpotCard(input: {
       ? areaRaw
       : ellipsize(areaRaw, areaCap, contentLocale);
   const more =
-    input.otherWorkCount > 0
-      ? copy.moreWorks(input.otherWorkCount)
-      : undefined;
+    input.otherWorkCount > 0 ? copy.moreWorks(input.otherWorkCount) : undefined;
   const markers = layoutSpotMarkers(input.origin, input.nearby, input.art);
   const title = titleBlock(spot, contentLocale, "spotTitle");
   const subtitle = subtitleBlock(work, contentLocale, more);
@@ -263,7 +312,6 @@ export function buildWorkCard(input: {
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.title, input.ogTitle, input.shortName),
-    ...areas.map((area) => (locale: OgLocale) => readOgName(area, locale)),
   ]);
   const copy = ogCopy(contentLocale);
   const title = displayName(
@@ -321,7 +369,6 @@ export function buildAreaCard(input: {
   const contentLocale = resolveContentLocale(input.requestedLocale, [
     (locale) =>
       preferredName(locale, input.title, input.ogTitle, input.shortName),
-    ...works.map((work) => (locale: OgLocale) => readOgName(work, locale)),
   ]);
   const copy = ogCopy(contentLocale);
   const title = displayName(
@@ -362,6 +409,59 @@ export function buildAreaCard(input: {
       String(input.workCount),
       String(input.spotCount),
       pills.join("|"),
+      markerKey(markers),
+    ]),
+  };
+}
+
+const HOME_POINTS: LatLng[] = [
+  { lat: 35.2998, lng: 139.4806 },
+  { lat: 35.3192, lng: 139.5503 },
+  { lat: 35.4437, lng: 139.638 },
+  { lat: 35.6595, lng: 139.7004 },
+  { lat: 35.6812, lng: 139.7671 },
+];
+
+/** Map + text homepage card. No screenshots. Each locale stays in one language. */
+export function buildHomeCard(input: {
+  requestedLocale: PilgrimageLocale;
+  spotCount: number;
+  points?: LatLng[];
+}): OgCard {
+  const contentLocale: OgLocale =
+    input.requestedLocale === "zh" ||
+    input.requestedLocale === "zh-tw" ||
+    input.requestedLocale === "en"
+      ? input.requestedLocale
+      : "ja";
+  const copy = HOME_OG_COPY[contentLocale];
+  const count = ogCopy(contentLocale).spotCount(input.spotCount);
+  const points =
+    input.points && input.points.length > 0 ? input.points : HOME_POINTS;
+  const markers = layoutAreaMarkers(points, "coast");
+  const fitted = titleBlock(copy.title, contentLocale, "workTitle");
+  return {
+    kind: "home",
+    requestedLocale: input.requestedLocale,
+    contentLocale,
+    art: "coast",
+    chip: fitChip(copy.chip),
+    ...fitted,
+    subtitleSize: 0,
+    subtitleLines: [],
+    stat: [
+      { text: count.strong, strong: true },
+      { text: count.rest, strong: false },
+    ],
+    pills: [],
+    markers,
+    alt: copy.alt,
+    version: versionFor([
+      "home",
+      input.requestedLocale,
+      contentLocale,
+      copy.title,
+      String(input.spotCount),
       markerKey(markers),
     ]),
   };

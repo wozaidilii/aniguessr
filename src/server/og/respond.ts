@@ -31,14 +31,18 @@ export function ogRedirect(location: string): Response {
   return new Response(null, { status: 301, headers });
 }
 
-export async function renderOgCard(card: OgCard): Promise<Response> {
+export function ogImageHeaders(): Headers {
   const headers = cacheHeaders(OG_CDN_CACHE_CONTROL);
   headers.set("Cache-Control", OG_CACHE_CONTROL);
+  return headers;
+}
+
+export async function renderOgCard(card: OgCard): Promise<Response> {
   return new ImageResponse(OgCardImage({ card }), {
     width: 1200,
     height: 630,
     fonts: await fontsFor(card.contentLocale),
-    headers,
+    headers: ogImageHeaders(),
   });
 }
 

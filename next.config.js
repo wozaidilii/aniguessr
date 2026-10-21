@@ -11,6 +11,7 @@ const config = {
     "/[locale]/pilgrimage/spots/[id]/opengraph-image": ["./assets/og-fonts/**/*"],
     "/[locale]/pilgrimage/anime/[slug]/opengraph-image": ["./assets/og-fonts/**/*"],
     "/[locale]/pilgrimage/locations/[slug]/opengraph-image": ["./assets/og-fonts/**/*"],
+    "/[locale]/opengraph-image": ["./assets/og-fonts/**/*", "./public/og/**/*"],
   },
   async headers() {
     return [

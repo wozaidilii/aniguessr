@@ -1,6 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { buildAreaCard, buildSpotCard, buildWorkCard, type OgNames } from "~/lib/og/card";
+import {
+  buildAreaCard,
+  buildHomeCard,
+  buildSpotCard,
+  buildWorkCard,
+  type OgNames,
+} from "~/lib/og/card";
 import { renderOgCard } from "~/server/og/respond";
 
 function names(ja: string, zh = ja, tw = zh, en = ja): OgNames {
@@ -92,7 +98,7 @@ const samples = {
   "work-ja": buildWorkCard({
     requestedLocale: "ja",
     title: names("青春ブタ野郎はバニーガール先輩の夢を見ない"),
-    spotCount: 42,
+    spotCount: 785,
     areas: [names("鎌倉・江ノ島"), names("藤沢"), names("横浜")],
     points: [
       { lat: 35.3, lng: 139.48 },
@@ -105,7 +111,7 @@ const samples = {
   "work-zh": buildWorkCard({
     requestedLocale: "zh",
     title: names("青春猪头少年不会梦到兔女郎学姐", "青春猪头少年不会梦到兔女郎学姐"),
-    spotCount: 42,
+    spotCount: 785,
     areas: [
       names("镰仓・江之岛", "镰仓・江之岛"),
       names("藤泽", "藤泽"),
@@ -120,7 +126,7 @@ const samples = {
   "work-zh-tw": buildWorkCard({
     requestedLocale: "zh-tw",
     title: names("青春ブタ", "青春猪头", "青春豬頭少年不會夢到兔女郎學姊"),
-    spotCount: 42,
+    spotCount: 785,
     areas: [names("鎌倉", "镰仓", "鎌倉・江之島")],
     points: [{ lat: 35.3, lng: 139.48 }],
     art: "coast",
@@ -128,7 +134,7 @@ const samples = {
   "work-en": buildWorkCard({
     requestedLocale: "en",
     title: names("a", "b", "c", "Rascal Does Not Dream of Bunny Girl Senpai"),
-    spotCount: 42,
+    spotCount: 785,
     areas: [
       names("a", "b", "c", "Kamakura & Enoshima"),
       names("a", "b", "c", "Fujisawa"),
@@ -179,11 +185,34 @@ const samples = {
   "area-en": buildAreaCard({
     requestedLocale: "en",
     title: names("a", "b", "c", "Kamakura & Enoshima"),
-    workCount: 38,
-    spotCount: 1,
+    workCount: 56,
+    spotCount: 472,
     works: [names("a", "b", "c", "Rascal Does Not Dream of Bunny Girl Senpai")],
     points: [{ lat: 35.3, lng: 139.48 }],
     art: "city",
+  }),
+  "home-ja": buildHomeCard({
+    requestedLocale: "ja",
+    spotCount: 785,
+    points: [
+      { lat: 35.3, lng: 139.48 },
+      { lat: 35.32, lng: 139.55 },
+      { lat: 35.44, lng: 139.64 },
+      { lat: 35.66, lng: 139.7 },
+      { lat: 35.68, lng: 139.77 },
+    ],
+  }),
+  "home-zh": buildHomeCard({
+    requestedLocale: "zh",
+    spotCount: 785,
+  }),
+  "home-zh-tw": buildHomeCard({
+    requestedLocale: "zh-tw",
+    spotCount: 785,
+  }),
+  "home-en": buildHomeCard({
+    requestedLocale: "en",
+    spotCount: 785,
   }),
 };
 

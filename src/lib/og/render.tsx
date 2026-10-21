@@ -11,6 +11,7 @@ import {
   clusterRadius,
   type MarkerCluster,
 } from "~/lib/og/map";
+import { edgeMargin, splitEdgeSpace, visibleText } from "~/lib/og/text";
 
 const PIN_ICON = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(PIN_ICON_SVG)}`;
 
@@ -267,13 +268,14 @@ export function OgCardImage({ card }: { card: OgCard }) {
                   {line.suffix ? (
                     <span
                       style={{
+                        marginLeft: line.body ? edgeMargin(card.subtitleSize) : 0,
                         color: "#c9bfd2",
                         fontWeight: 500,
                         fontFamily: family,
+                        whiteSpace: "pre",
                       }}
                     >
-                      {line.body ? " " : ""}
-                      {line.suffix}
+                      {visibleText(line.suffix)}
                     </span>
                   ) : null}
                 </div>
@@ -300,18 +302,25 @@ export function OgCardImage({ card }: { card: OgCard }) {
                 whiteSpace: "nowrap",
               }}
             >
-              {card.stat.map((part, index) => (
-                <span
-                  key={`${part.text}-${index}`}
-                  style={{
-                    fontFamily: part.strong ? "Sora" : family,
-                    fontWeight: part.strong ? 700 : 500,
-                    color: part.strong ? "#fff7fb" : "#c9bfd2",
-                  }}
-                >
-                  {part.text}
-                </span>
-              ))}
+              {card.stat.map((part, index) => {
+                const edge = splitEdgeSpace(part.text);
+                if (!edge.text) return null;
+                return (
+                  <span
+                    key={`${edge.text}-${index}`}
+                    style={{
+                      marginLeft: edge.lead ? edgeMargin(28) : 0,
+                      marginRight: edge.trail ? edgeMargin(28) : 0,
+                      fontFamily: part.strong ? "Sora" : family,
+                      fontWeight: part.strong ? 700 : 500,
+                      color: part.strong ? "#fff7fb" : "#c9bfd2",
+                      whiteSpace: "pre",
+                    }}
+                  >
+                    {edge.text}
+                  </span>
+                );
+              })}
             </div>
           </div>
           {card.pills.length > 0 ? (

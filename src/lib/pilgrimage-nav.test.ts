@@ -76,6 +76,12 @@ describe("pilgrimage navigation", () => {
         "zh-tw",
       ),
     ).toBe("片瀨");
+    expect(
+      localizedNavText(
+        { zh: "稲村ヶ崎", ja: "", en: "Inamuragasaki", tw: "稲村ヶ崎" },
+        "ja",
+      ),
+    ).toBe("稲村ヶ崎");
   });
 
   it("keeps the anitabi id embedded in a spot when favorites use the merged work", () => {

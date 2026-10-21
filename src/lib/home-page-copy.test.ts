@@ -28,7 +28,13 @@ describe("homepage copy", () => {
       "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
     );
     expect(HOME_SEO.en.title).toBe(
-      "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
+      "Anime Pilgrimage Map: Real-Life Anime Locations Near You | AniGuessr",
+    );
+    expect(HOME_SEO.en.description).toBe(
+      "See real-life anime locations across Japan on one map, find the spots near you, and get directions in Google Maps. Browse by series or by area.",
+    );
+    expect(getHomePageCopy("en").animeTitle).toBe(
+      "Real-life locations from popular anime",
     );
     const english = homePageMetadata("en");
     expect(english.title).toEqual({ absolute: HOME_SEO.en.title });

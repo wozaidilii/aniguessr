@@ -3,6 +3,7 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { ANIME_LOCALES } from "~/lib/anime-locale";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   assignSpotSeoVariants,
@@ -12,6 +13,7 @@ import {
 import {
   pickLocalizedText,
   pickMaybeLocalizedText,
+  pickSpotPlaceFromRecord,
   type LocalizedLines,
   type LocalizedText,
 } from "~/lib/localized-text";
@@ -39,6 +41,8 @@ export interface PilgrimageLocationSummary {
   name: LocalizedText;
   spotCount: number;
   animeCount: number;
+  /** True when the municipality ring steps into the sea. Unknown stays city art. */
+  isCoastal?: boolean;
 }
 
 export interface PilgrimageSpot {
@@ -201,7 +205,12 @@ function spotFields(
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
-    place: pickLocalizedText(spot.answerName, locale),
+    place: pickSpotPlaceFromRecord(
+      spot.answerName,
+      spot.title,
+      locale,
+      jaSpotPlaceOverride(spot.id),
+    ),
     area: pickLocalizedText(spot.location, locale),
     episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),

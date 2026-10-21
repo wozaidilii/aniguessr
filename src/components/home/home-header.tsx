@@ -25,6 +25,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   return (
     <header className="home-hdr" data-testid="site-header">
       <div className="home-hdr-in">
+        <div className="home-hdr-left">
         <BrandLockup href={nav.home} />
         <nav className="home-nav" aria-label={copy.navMap}>
           {nav.links.map((link) => (
@@ -39,6 +40,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
             </a>
           ))}
         </nav>
+        </div>
         <div className="home-hdr-right">
           <div className="home-lang" role="group" aria-label={copy.langLabel}>
             {nav.languages.map((item) => (

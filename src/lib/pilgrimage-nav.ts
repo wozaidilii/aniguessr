@@ -73,6 +73,7 @@ export function localizedNavText(
   locale: PilgrimageLocale,
 ): string {
   if (locale === "zh-tw") return firstFilled([text.tw, text.ja, text.en]);
+  if (locale === "ja") return firstFilled([text.ja, text.zh, text.tw, text.en]);
   return firstFilled([text[locale], text.en, text.zh, text.ja]);
 }
 

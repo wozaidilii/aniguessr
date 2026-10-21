@@ -212,10 +212,10 @@ export const PILGRIMAGE_COPY: Record<
     siteKicker: "Pilgrimage Archive",
     hubTitle: "Anime Pilgrimage Location Guide",
     hubDescription:
-      "Real-world coordinates, scene notes, and visit tips for anime real life locations across Japan. Browse by series or region, then test yourself in AniGuessr Street View.",
+      "Real-world coordinates, scene notes, and visit tips for anime real-life locations across Japan. Browse by series or region, then test yourself in AniGuessr Street View.",
     animeArchive: "Browse by anime",
     locationArchive: "Browse by region",
-    spotCountLabel: (count) => `${count.toLocaleString()} real life locations`,
+    spotCountLabel: (count) => `${count.toLocaleString()} real-life locations`,
     animeCountLabel: (count) => `${count.toLocaleString()} series`,
     locationCountLabel: (count) => `${count.toLocaleString()} regions`,
     playGame: "Play on AniGuessr",
@@ -241,14 +241,14 @@ export const PILGRIMAGE_COPY: Record<
     viewSpot: "View details",
     seoSpotTitle: (anime, place) => `${anime} pilgrimage: ${place}`,
     seoSpotDescription: (anime, place, location) =>
-      `${anime} real life location “${place}” in ${location}. Coordinates, scene notes, and pilgrimage tips — playable in AniGuessr Street View.`,
+      `${anime} real-life location “${place}” in ${location}. Coordinates, scene notes, and pilgrimage tips — playable in AniGuessr Street View.`,
     seoAnimeTitle: (title, count) => `${title} pilgrimage locations (${count})`,
     seoAnimeDescription: (title, count) =>
-      `${count} real life ${title} locations in Japan with place names, scene clues, and map coordinates.`,
+      `${count} real-life ${title} locations in Japan with place names, scene clues, and map coordinates.`,
     seoLocationTitle: (name, count) =>
       `${name} anime pilgrimage guide (${count})`,
     seoLocationDescription: (name, count) =>
-      `${count} anime real life locations in ${name}, grouped by series for route planning.`,
+      `${count} anime real-life locations in ${name}, grouped by series for route planning.`,
     favoritesTitle: "Favorite anime",
     favoritesHint:
       "Pick the anime you want to visit. Saved on this device, no login required. Page content stays the same for every visitor.",

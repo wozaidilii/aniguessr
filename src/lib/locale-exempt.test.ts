@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { withAnimeLocale } from "~/lib/anime-locale";
-import { isLocaleHomePath } from "~/lib/home-cache";
+import { isLocaleHomeOgPath, isLocaleHomePath } from "~/lib/home-cache";
 import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   PILGRIMAGE_REVALIDATE_SECONDS,
@@ -36,6 +36,8 @@ describe("locale middleware exemptions", () => {
       "/sw.js",
       "/favicon.ico",
       "/og.png",
+      "/og/home-ja.png",
+      "/og/home-zh-tw.png",
       "/apple-touch-icon.png",
       "/icon-192.png",
       "/icon-512.png",
@@ -182,6 +184,22 @@ describe("locale middleware exemptions", () => {
     );
   });
 
+  it("serves homepage share images without rewrite or Set-Cookie", () => {
+    for (const pathname of [
+      "/ja/opengraph-image",
+      "/zh/opengraph-image",
+      "/en/opengraph-image",
+      "/zh-tw/opengraph-image",
+    ]) {
+      expect(isLocaleHomeOgPath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
+  });
+
   it("serves locale rights pages without rewrite or Set-Cookie", () => {
     for (const pathname of [
       "/ja/rights",
@@ -196,12 +214,23 @@ describe("locale middleware exemptions", () => {
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("set-cookie")).toBeNull();
     }
+  });
 
-    const bare = middleware(request("/rights"));
-    expect(bare.status).toBe(307);
-    expect(bare.headers.get("location")).toBe(
+  it("redirects bare /rights to English with 308 and does not Set-Cookie", () => {
+    const response = middleware(
+      new NextRequest(new URL("https://aniguessr.ayiora.com/rights"), {
+        headers: {
+          host: "aniguessr.ayiora.com",
+          "accept-language": "ja,en;q=0.8",
+          cookie: "aniguessr_locale=zh",
+        },
+      }),
+    );
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/en/rights",
     );
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("serves locale privacy pages without rewrite or Set-Cookie", () => {
