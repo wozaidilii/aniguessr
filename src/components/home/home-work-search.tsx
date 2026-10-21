@@ -3,16 +3,12 @@
 import {
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
 } from "react";
-import {
-  HOME_FOCUS_WORK_EVENT,
-  HOME_MAP_GESTURE_EVENT,
-} from "~/components/home/home-events";
+import { HOME_FOCUS_WORK_EVENT } from "~/components/home/home-events";
 import type { PopularAnimeChip } from "~/lib/popular-anime";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
@@ -76,9 +72,6 @@ export function HomeWorkSearch({
   const [catalog, setCatalog] = useState<NavCatalog | null>(null);
   const [ready, setReady] = useState(false);
   const [chipsOpen, setChipsOpen] = useState(true);
-  const [showAll, setShowAll] = useState(false);
-  const [chipsOverflow, setChipsOverflow] = useState(false);
-  const chipRowRef = useRef<HTMLDivElement | null>(null);
   const countTag = locale === "zh-tw" ? "zh-TW" : locale;
 
   useEffect(() => {
@@ -112,51 +105,6 @@ export function HomeWorkSearch({
     showList && results[activeIndex]
       ? `${listId}-${results[activeIndex].subjectId}`
       : undefined;
-
-  useEffect(() => {
-    function onGesture() {
-      if (window.matchMedia("(max-width: 1023px)").matches) return;
-      setChipsOpen(false);
-      setShowAll(false);
-    }
-    window.addEventListener(HOME_MAP_GESTURE_EVENT, onGesture);
-    return () => window.removeEventListener(HOME_MAP_GESTURE_EVENT, onGesture);
-  }, []);
-
-  useLayoutEffect(() => {
-    const row = chipRowRef.current;
-    if (!row) return;
-    const measure = () => {
-      const chips = [
-        ...row.querySelectorAll<HTMLAnchorElement>("a.home-popular-chip"),
-      ];
-      const tops = chips.map((chip) => chip.offsetTop);
-      const rowTops = [...new Set(tops)].sort((a, b) => a - b);
-      const desktop = window.matchMedia("(min-width: 1024px)").matches;
-      const secondRow = rowTops[1];
-      const tooMany = desktop && rowTops.length > 2;
-      setChipsOverflow(tooMany);
-      chips.forEach((chip, index) => {
-        const clipped =
-          tooMany &&
-          !showAll &&
-          secondRow !== undefined &&
-          tops[index] !== undefined &&
-          tops[index] > secondRow;
-        if (clipped) {
-          chip.tabIndex = -1;
-          chip.setAttribute("aria-hidden", "true");
-        } else {
-          chip.removeAttribute("tabindex");
-          chip.removeAttribute("aria-hidden");
-        }
-      });
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(row);
-    return () => observer.disconnect();
-  }, [showAll, chipsOpen, popular]);
 
   useEffect(() => {
     if (!open) return;
@@ -203,7 +151,6 @@ export function HomeWorkSearch({
   }
 
   const animeHref = withPilgrimageLocale("/pilgrimage/anime", locale);
-  const favoritesHref = withPilgrimageLocale("/pilgrimage#favorites", locale);
 
   return (
     <div
@@ -211,8 +158,6 @@ export function HomeWorkSearch({
       ref={rootRef}
       data-testid="home-work-search"
       data-collapsed={chipsOpen ? "false" : "true"}
-      onClick={() => setChipsOpen(true)}
-      onFocus={() => setChipsOpen(true)}
     >
       <div className="home-search">
         <label htmlFor="home-work-search" className="home-sr">
@@ -285,38 +230,33 @@ export function HomeWorkSearch({
       </div>
       {popular.length > 0 ? (
         <div className="home-popular" data-testid="home-popular">
-          <p className="home-popular-label">{copy.popularWorks}</p>
-          <div
-            className={`home-popular-row${showAll ? " is-all" : ""}`}
-            ref={chipRowRef}
-          >
-            {popular.map((work) => (
-              <a
-                key={work.subjectId}
-                href={work.href}
-                className="home-popular-chip"
-              >
-                <b>{work.title}</b>
-                <small>{work.spotCount.toLocaleString(countTag)}</small>
-              </a>
-            ))}
+          <div className="home-popular-scroll">
+            <div className="home-popular-row">
+              {popular.map((work) => (
+                <a
+                  key={work.subjectId}
+                  href={work.href}
+                  className="home-popular-chip"
+                >
+                  <b>{work.title}</b>
+                  <small>{work.spotCount.toLocaleString(countTag)}</small>
+                </a>
+              ))}
+            </div>
           </div>
-          {chipsOverflow && !showAll ? (
-            <button
-              type="button"
-              className="home-popular-more"
-              data-testid="home-show-all"
-              onClick={() => setShowAll(true)}
-            >
-              {copy.showAllWorks}
-            </button>
-          ) : null}
+          <a className="home-popular-all" href={animeHref}>
+            {copy.popularAll}
+          </a>
+          <button
+            type="button"
+            className="home-popular-dismiss"
+            aria-label={copy.dismissPopular}
+            onClick={() => setChipsOpen(false)}
+          >
+            ×
+          </button>
         </div>
       ) : null}
-      <div className="home-pills">
-        <a href={animeHref}>{copy.searchPill}</a>
-        <a href={favoritesHref}>{copy.favoritesPill}</a>
-      </div>
     </div>
   );
 }

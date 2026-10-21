@@ -32,7 +32,12 @@ function HomeTitle({
   const Tag = as;
   return (
     <Tag className="home-h1">
-      <span className="home-h1-line">{copy.h1Lead}<span className="home-accent">{copy.h1Accent}</span></span>{locale === "en" ? " " : null}<span className="home-h1-line">{copy.h1Tail}</span>
+      <span className="home-h1-line">
+        {copy.h1Lead}
+        <span className="home-accent">{copy.h1Accent}</span>
+      </span>
+      {locale === "en" ? " " : null}
+      <span className="home-h1-line">{copy.h1Tail}</span>
     </Tag>
   );
 }
@@ -47,7 +52,6 @@ export function HomeView({
   popularAnime: PopularAnimeChip[];
 }) {
   const copy = getHomePageCopy(locale);
-  const pilgrimageHref = withPilgrimageLocale("/pilgrimage", locale);
   const nearbyHref = withPilgrimageLocale("/pilgrimage#nearby", locale);
   const htmlLang = locale === "zh-tw" ? "zh-Hant" : locale;
 
@@ -57,31 +61,8 @@ export function HomeView({
       <HomeLocate message={copy.geoDenied} />
       <HomeHeader locale={locale} />
       <section className="home-hero" id="pilgrim">
-        <div className="home-lead">
-          <div className="home-titleband">
-            <p className="home-chip">
-              <i />
-              {copy.chip}
-            </p>
-            <HomeTitle locale={locale} copy={copy} as="h1" />
-          </div>
-          <div className="home-copy-body">
-          <p className="home-intro">{copy.intro}</p>
-          <div className="home-ctas">
-            <a
-              className="home-btn home-btn-primary"
-              data-find-nearby=""
-              href={nearbyHref}
-            >
-              {copy.primaryCta}
-            </a>
-            <a className="home-btn home-btn-secondary" href={pilgrimageHref}>
-              {copy.secondaryCta}
-            </a>
-          </div>
-          <p className="home-privacy home-privacy-desk">
-            <span>{copy.privacy}</span>
-          </p>
+        <div className="home-mapbar">
+          <HomeTitle locale={locale} copy={copy} as="h1" />
           <dl className="home-stats">
             <div>
               <dd>{formatCount(locale, catalog.spotCount)}</dd>
@@ -96,7 +77,13 @@ export function HomeView({
               <dt>{copy.statAreas}</dt>
             </div>
           </dl>
-          </div>
+          <a
+            className="home-btn home-btn-primary"
+            data-find-nearby=""
+            href={nearbyHref}
+          >
+            {copy.primaryCta}
+          </a>
         </div>
         <div className="home-mapstage">
           <HomeMapLoader locale={locale} />
@@ -104,19 +91,9 @@ export function HomeView({
             <div className="home-map-searchstack">
               <HomeWorkSearch locale={locale} popular={popularAnime} />
             </div>
-            <HomeNearby
-              locale={locale}
-              variant="panel"
-              seeds={catalog.nearby}
-              popularLocationSlugs={catalog.popularLocationSlugs}
-            />
           </div>
-          <HomeNearby
-            locale={locale}
-            variant="sheet"
-            seeds={catalog.nearby}
-            popularLocationSlugs={catalog.popularLocationSlugs}
-          />
+          <HomeNearby locale={locale} variant="panel" />
+          <HomeNearby locale={locale} variant="sheet" />
         </div>
       </section>
 
@@ -210,6 +187,7 @@ export function HomeView({
               </li>
             ))}
           </ol>
+          <p className="home-privacy">{copy.privacy}</p>
         </div>
       </section>
 
