@@ -131,6 +131,104 @@ export function municipalityTouchesSea(place) {
 }
 
 /**
+ * Every municipality whose ring contains the point.
+ * Unlike {@link locateMunicipality}, this does not snap a miss onto the shore.
+ * @returns {Municipality[]}
+ */
+export function municipalitiesContaining(lng, lat) {
+  if (!index || !Number.isFinite(lng) || !Number.isFinite(lat)) return [];
+  const hits = [];
+  for (const place of candidatesNear(lng, lat, 0)) {
+    const [minLng, minLat, maxLng, maxLat] = place.bbox;
+    if (lng < minLng || lng > maxLng || lat < minLat || lat > maxLat) continue;
+    for (const ring of place.rings) {
+      if (pointInRing(lng, lat, ring)) {
+        hits.push(place);
+        break;
+      }
+    }
+  }
+  return hits;
+}
+
+function segmentDistanceMeters(lng, lat, ax, ay, bx, by) {
+  const cos = Math.cos((lat * Math.PI) / 180);
+  const mx = (x) => x * 111320 * cos;
+  const my = (y) => y * 110540;
+  const px = mx(lng);
+  const py = my(lat);
+  const x1 = mx(ax);
+  const y1 = my(ay);
+  const x2 = mx(bx);
+  const y2 = my(by);
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len2 = dx * dx + dy * dy || 1;
+  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+function roughBboxMeters(lng, lat, bbox) {
+  const [minLng, minLat, maxLng, maxLat] = bbox;
+  const cos = Math.cos((lat * Math.PI) / 180);
+  const dx =
+    lng < minLng
+      ? (minLng - lng) * 111320 * cos
+      : lng > maxLng
+        ? (lng - maxLng) * 111320 * cos
+        : 0;
+  const dy =
+    lat < minLat
+      ? (minLat - lat) * 110540
+      : lat > maxLat
+        ? (lat - maxLat) * 110540
+        : 0;
+  return Math.hypot(dx, dy);
+}
+
+/**
+ * Distance in meters from the point to the nearest ring of one municipality.
+ * @param {Municipality} place
+ */
+export function distanceToMunicipality(lng, lat, place) {
+  if (!place) return Infinity;
+  let best = Infinity;
+  if (roughBboxMeters(lng, lat, place.bbox) >= best) return best;
+  for (const ring of place.rings) {
+    const count = ring.length / 2;
+    for (let index = 0; index < count; index += 1) {
+      const next = (index + 1) % count;
+      const distance = segmentDistanceMeters(
+        lng,
+        lat,
+        ring[index * 2],
+        ring[index * 2 + 1],
+        ring[next * 2],
+        ring[next * 2 + 1],
+      );
+      if (distance < best) best = distance;
+    }
+  }
+  return best;
+}
+
+/**
+ * Meters to the nearest municipality other than `code`.
+ * A large value means the point is not on that municipality's border.
+ */
+export function distanceToOtherMunicipality(lng, lat, code) {
+  if (!index || !Number.isFinite(lng) || !Number.isFinite(lat)) return Infinity;
+  let best = Infinity;
+  for (const place of candidatesNear(lng, lat, 1)) {
+    if (place.code === code) continue;
+    if (roughBboxMeters(lng, lat, place.bbox) >= best) continue;
+    const distance = distanceToMunicipality(lng, lat, place);
+    if (distance < best) best = distance;
+  }
+  return best;
+}
+
+/**
  * Municipality containing this coordinate.
  * Points that fall just outside a simplified coastline use the nearest boundary.
  * @returns {Municipality | null}
