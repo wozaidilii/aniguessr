@@ -476,6 +476,7 @@ if (snapshot.roundStatus !== "round-result") return cloneSnapshot(snapshot);
 #### 3. Contracts
 
 - Pilgrimage HTML is identical for every visitor. Do not read `cookies()`, `headers()`, or geolocation on the server. Do not `Set-Cookie` on these responses.
+- Anime title search filters the already-rendered list in the browser. Do not add an indexable `?q=` URL. The homepage map search and the `/pilgrimage/anime` filter both use `matchAnimeTitles` (NFKC, case fold, OpenCC single-character traditional/simplified fold in `src/lib/cjk-search-fold.json`). The homepage "my location" dot is restored from `rememberHomeOrigin`, which outlives map remounts. Curated homepage chips live in `POPULAR_ANIME_SUBJECT_IDS` and resolve through the SEO index, including merged `subjectIds`.
 - Favorites and nearby lists update only after hydration. The first render is the no-favorites, no-location state.
 - Distance and ranking run in the browser. The catalog request must not include coordinates.
 - MapLibre loads only through the dynamic map chunk. Style is OpenFreeMap dark, with no API key.
@@ -507,7 +508,10 @@ Wrong:
 
 ```tsx
 const favorites = cookies().get("favorites");
-const nearby = await db.query("select * from spots order by ll_to_earth($1,$2)", [lat, lng]);
+const nearby = await db.query(
+  "select * from spots order by ll_to_earth($1,$2)",
+  [lat, lng],
+);
 ```
 
 Correct:

@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HOME_ORIGIN_EVENT, type HomeOriginDetail } from "~/components/home/home-events";
+import {
+  HOME_ORIGIN_EVENT,
+  type HomeOriginDetail,
+} from "~/components/home/home-events";
+import { rememberHomeOrigin } from "~/lib/home-origin";
 
 /** Turns the SSR "find nearby" links into a geolocation request after JS loads. */
 export function HomeLocate({ message }: { message: string }) {
@@ -22,9 +26,8 @@ export function HomeLocate({ message }: { message: string }) {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          window.dispatchEvent(
-            new CustomEvent(HOME_ORIGIN_EVENT, { detail }),
-          );
+          rememberHomeOrigin(detail);
+          window.dispatchEvent(new CustomEvent(HOME_ORIGIN_EVENT, { detail }));
         },
         () => {
           setNote(message);

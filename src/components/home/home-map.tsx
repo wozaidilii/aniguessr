@@ -4,14 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import {
   HOME_BOUNDS_EVENT,
+  HOME_FOCUS_WORK_EVENT,
   HOME_ORIGIN_EVENT,
   type HomeBoundsDetail,
+  type HomeFocusWorkDetail,
   type HomeOriginDetail,
 } from "~/components/home/home-events";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
+import { readHomeOrigin, rememberHomeOrigin } from "~/lib/home-origin";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { workFocusLngLats } from "~/lib/home-work-focus";
 import {
   PILGRIMAGE_MAP_STYLE,
   animeTitle,
@@ -20,6 +24,7 @@ import {
   loadNavCatalog,
   localizedNavText,
   type NavCatalog,
+  type NavSpot,
 } from "~/lib/pilgrimage-nav";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -28,6 +33,35 @@ const JAPAN_BOUNDS: [[number, number], [number, number]] = [
   [122.9, 24.0],
   [145.8, 45.6],
 ];
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function spotCollection(
+  spots: readonly NavSpot[],
+  animes: NavCatalog["animes"],
+  locale: HomeLocale,
+  focusId: string | null,
+) {
+  return {
+    type: "FeatureCollection" as const,
+    features: spots.map((spot) => ({
+      type: "Feature" as const,
+      geometry: {
+        type: "Point" as const,
+        coordinates: [spot.lng, spot.lat] as [number, number],
+      },
+      properties: {
+        id: spot.id,
+        name: localizedNavText(spot.name, locale),
+        anime: animeTitle(animes, spot.subjectId, locale),
+        subjectId: spot.subjectId,
+        dim: focusId && spot.subjectId !== focusId ? 1 : 0,
+      },
+    })),
+  };
+}
 
 export function HomeMap({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
@@ -52,6 +86,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       cooperativeGestures: false,
       maxZoom: 18,
     });
+    mapRef.current = map;
     map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
       "bottom-left",
@@ -68,7 +103,20 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         cluster: true,
         clusterRadius: 48,
         clusterMaxZoom: 14,
+        clusterProperties: {
+          dimSum: ["+", ["coalesce", ["get", "dim"], 0]],
+        },
       });
+      const clusterDim: maplibregl.ExpressionSpecification = [
+        "case",
+        [
+          "all",
+          [">", ["get", "dimSum"], 0],
+          ["==", ["get", "dimSum"], ["get", "point_count"]],
+        ],
+        0.35,
+        1,
+      ];
       map.addLayer({
         id: "home-cluster-halo",
         type: "circle",
@@ -76,8 +124,16 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         filter: ["has", "point_count"],
         paint: {
           "circle-color": "#f9a8d4",
-          "circle-opacity": 0.25,
-          "circle-radius": ["step", ["get", "point_count"], 22, 25, 28, 100, 36],
+          "circle-opacity": ["*", 0.25, clusterDim],
+          "circle-radius": [
+            "step",
+            ["get", "point_count"],
+            22,
+            25,
+            28,
+            100,
+            36,
+          ],
         },
       });
       map.addLayer({
@@ -86,8 +142,26 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         source: SOURCE_ID,
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#f9a8d4",
-          "circle-radius": ["step", ["get", "point_count"], 16, 25, 20, 100, 26],
+          "circle-color": [
+            "case",
+            [
+              "all",
+              [">", ["get", "dimSum"], 0],
+              ["==", ["get", "dimSum"], ["get", "point_count"]],
+            ],
+            "#6d6278",
+            "#f9a8d4",
+          ],
+          "circle-radius": [
+            "step",
+            ["get", "point_count"],
+            16,
+            25,
+            20,
+            100,
+            26,
+          ],
+          "circle-opacity": clusterDim,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#0a0612",
         },
@@ -110,8 +184,14 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#f9a8d4",
-          "circle-radius": 7,
+          "circle-color": [
+            "case",
+            ["==", ["get", "dim"], 1],
+            "#6d6278",
+            "#f9a8d4",
+          ],
+          "circle-radius": ["case", ["==", ["get", "dim"], 1], 5, 7],
+          "circle-opacity": ["case", ["==", ["get", "dim"], 1], 0.35, 1],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#0a0612",
         },
@@ -132,12 +212,15 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         if (source?.type !== "geojson") return;
         const center = feature.geometry.coordinates;
         void Promise.resolve(
-          (source as maplibregl.GeoJSONSource).getClusterExpansionZoom(clusterId),
+          (source as maplibregl.GeoJSONSource).getClusterExpansionZoom(
+            clusterId,
+          ),
         ).then((zoom) => {
           map.easeTo({
             center: [center[0] ?? 0, center[1] ?? 0],
             zoom,
-            duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            duration: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches
               ? 0
               : 400,
           });
@@ -156,58 +239,144 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           lat: lat ?? 0,
         });
       });
-      map.fitBounds(JAPAN_BOUNDS, { padding: 28, animate: false });
+      if (!focusedId)
+        map.fitBounds(JAPAN_BOUNDS, { padding: 28, animate: false });
       publishBounds(map);
       mapRef.current = map;
+      ensureYou();
+      if (focusedId) showFocus();
+      else pushSpots();
     });
-    map.on("moveend", () => publishBounds(map));
+    map.on("moveend", () => {
+      publishBounds(map);
+      ensureYou();
+    });
     let catalogReady: NavCatalog | null = null;
-    const applyCatalog = () => {
+    let focusedId: string | null = null;
+    let savedCamera: {
+      lng: number;
+      lat: number;
+      zoom: number;
+      bearing: number;
+      pitch: number;
+    } | null = null;
+
+    function ensureYou() {
+      const origin = readHomeOrigin();
+      if (!origin) return;
+      const existing = youRef.current?.getElement();
+      if (youRef.current && existing?.isConnected) {
+        youRef.current.setLngLat([origin.lng, origin.lat]);
+        existing.style.zIndex = "10";
+        return;
+      }
+      const element = document.createElement("div");
+      element.className = "home-you";
+      element.style.zIndex = "10";
+      youRef.current = new maplibregl.Marker({ element })
+        .setLngLat([origin.lng, origin.lat])
+        .addTo(map);
+    }
+
+    function pushSpots() {
       if (!catalogReady) return;
       const source = map.getSource(SOURCE_ID);
       if (source?.type !== "geojson") return;
-      (source as maplibregl.GeoJSONSource).setData({
-        type: "FeatureCollection",
-        features: catalogReady.spots.map((spot) => ({
-          type: "Feature" as const,
-          geometry: {
-            type: "Point" as const,
-            coordinates: [spot.lng, spot.lat],
-          },
-          properties: {
-            id: spot.id,
-            name: localizedNavText(spot.name, locale),
-            anime: animeTitle(catalogReady?.animes ?? {}, spot.subjectId, locale),
-          },
-        })),
+      (source as maplibregl.GeoJSONSource).setData(
+        spotCollection(
+          catalogReady.spots,
+          catalogReady.animes,
+          locale,
+          focusedId,
+        ),
+      );
+      ensureYou();
+    }
+
+    function showFocus() {
+      pushSpots();
+      if (!focusedId || !catalogReady || !map.getSource(SOURCE_ID)) return;
+      const spots = catalogReady.spots.filter(
+        (spot) => spot.subjectId === focusedId,
+      );
+      const coords = workFocusLngLats(spots, readHomeOrigin());
+      if (coords.length === 0) return;
+      const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
+      for (const coord of coords) bounds.extend(coord);
+      map.fitBounds(bounds, {
+        padding: 48,
+        maxZoom: 14,
+        duration: prefersReducedMotion() ? 0 : 600,
       });
-    };
+      ensureYou();
+    }
 
     function onOrigin(event: Event) {
       const detail = (event as CustomEvent<HomeOriginDetail>).detail;
-      if (!detail) return;
-      youRef.current?.remove();
-      const element = document.createElement("div");
-      element.className = "home-you";
-      youRef.current = new maplibregl.Marker({ element })
-        .setLngLat([detail.lng, detail.lat])
-        .addTo(map);
+      if (
+        !detail ||
+        !Number.isFinite(detail.lat) ||
+        !Number.isFinite(detail.lng)
+      ) {
+        return;
+      }
+      rememberHomeOrigin(detail);
+      ensureYou();
       map.flyTo({
         center: [detail.lng, detail.lat],
-        zoom: 13,
-        duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? 0
-          : 700,
+        zoom: detail.keepZoom ? map.getZoom() : 13,
+        duration: prefersReducedMotion() ? 0 : 700,
       });
     }
-    window.addEventListener(HOME_ORIGIN_EVENT, onOrigin);
 
-    map.on("load", () => applyCatalog());
+    function onFocusWork(event: Event) {
+      const detail = (event as CustomEvent<HomeFocusWorkDetail>).detail;
+      const subjectId = detail?.subjectId ?? null;
+      if (subjectId) {
+        if (!focusedId) {
+          const center = map.getCenter();
+          savedCamera = {
+            lng: center.lng,
+            lat: center.lat,
+            zoom: map.getZoom(),
+            bearing: map.getBearing(),
+            pitch: map.getPitch(),
+          };
+        }
+        focusedId = subjectId;
+        showFocus();
+        return;
+      }
+      focusedId = null;
+      pushSpots();
+      if (savedCamera) {
+        const camera = savedCamera;
+        savedCamera = null;
+        map.easeTo({
+          center: [camera.lng, camera.lat],
+          zoom: camera.zoom,
+          bearing: camera.bearing,
+          pitch: camera.pitch,
+          duration: prefersReducedMotion() ? 0 : 500,
+        });
+      }
+      ensureYou();
+    }
+
+    window.addEventListener(HOME_ORIGIN_EVENT, onOrigin);
+    window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
+    ensureYou();
+
+    map.on("load", () => {
+      if (focusedId) showFocus();
+      else pushSpots();
+    });
     void loadNavCatalog()
       .then((catalog) => {
         if (cancelled) return;
         catalogReady = catalog;
-        applyCatalog();
+        if (focusedId) showFocus();
+        else pushSpots();
       })
       .catch(() => {
         if (!cancelled) setError(true);
@@ -219,8 +388,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       cancelled = true;
       window.clearTimeout(timer);
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
+      window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
       observer.disconnect();
       youRef.current?.remove();
+      youRef.current = null;
       map.remove();
       mapRef.current = null;
       popupRef.current = null;
@@ -236,14 +407,55 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         aria-label={copy.mapLabel}
       />
       <div className="home-map-tools">
-        <a
-          className="home-tool"
-          data-find-nearby=""
-          href={withPilgrimageLocale("/pilgrimage#nearby", locale)}
-          aria-label={copy.locate}
+        <button
+          type="button"
+          className="home-tool home-tool-locate"
+          data-testid="home-my-location"
+          aria-label={copy.myLocation}
+          onClick={() => {
+            const origin = readHomeOrigin();
+            const current = mapRef.current;
+            if (origin && current) {
+              current.flyTo({
+                center: [origin.lng, origin.lat],
+                zoom: current.getZoom(),
+                duration: prefersReducedMotion() ? 0 : 700,
+              });
+              return;
+            }
+            if (!navigator.geolocation) {
+              window.location.assign(
+                withPilgrimageLocale("/pilgrimage#nearby", locale),
+              );
+              return;
+            }
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const detail: HomeOriginDetail = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                  keepZoom: true,
+                };
+                rememberHomeOrigin(detail);
+                window.dispatchEvent(
+                  new CustomEvent(HOME_ORIGIN_EVENT, { detail }),
+                );
+              },
+              () => {
+                window.location.assign(
+                  withPilgrimageLocale("/pilgrimage#nearby", locale),
+                );
+              },
+              {
+                enableHighAccuracy: false,
+                timeout: 12_000,
+                maximumAge: 60_000,
+              },
+            );
+          }}
         >
           <LocateIcon />
-        </a>
+        </button>
         <button
           type="button"
           className="home-tool home-zoom"
@@ -351,7 +563,14 @@ function actionLink(href: string, label: string, primary: boolean) {
 function LocateIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle
+        cx="12"
+        cy="12"
+        r="3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
       <path
         d="M12 3v3M12 18v3M3 12h3M18 12h3"
         fill="none"

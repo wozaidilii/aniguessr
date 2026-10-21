@@ -421,6 +421,7 @@
 }
 
 .home-you {
+  z-index: 10;
   width: 16px;
   height: 16px;
   border: 2px solid #0a0612;
@@ -429,6 +430,206 @@
   box-shadow:
     0 0 0 8px rgba(103, 232, 249, 0.28),
     0 0 0 16px rgba(103, 232, 249, 0.14);
+}
+
+.home-map-searchstack {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 8;
+  display: flex;
+  width: 320px;
+  max-width: calc(100% - 32px);
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-work-search,
+.home-popular {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.home-map-searchstack .home-pills {
+  position: static;
+  flex-wrap: wrap;
+}
+
+.home-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.home-search {
+  position: relative;
+}
+
+.home-search-field {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(13, 8, 26, 0.94);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.home-search-field:focus-within {
+  box-shadow:
+    0 0 0 2px #67e8f9,
+    0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.home-search-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: #f9a8d4;
+}
+
+.home-search-field input {
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #fff7fb;
+  font: inherit;
+  font-size: 14px;
+}
+
+.home-search-field input:focus {
+  outline: none;
+}
+
+.home-search-field input::-webkit-search-cancel-button,
+.home-search-field input::-webkit-search-decoration {
+  display: none;
+}
+
+.home-search-clear {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #f8e7ff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.home-search-results,
+.home-search-empty {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  left: 0;
+  z-index: 9;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(13, 8, 26, 0.96);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.home-search-results {
+  max-height: min(320px, 42vh);
+  padding: 6px;
+  overflow: auto;
+  list-style: none;
+}
+
+.home-search-empty {
+  padding: 12px;
+  color: #c9bfd2;
+  font-size: 13px;
+}
+
+.home-search-results button {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff7fb;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-search-results button[aria-selected="true"],
+.home-search-results button:hover {
+  background: rgba(249, 168, 212, 0.16);
+}
+
+.home-search-results small,
+.home-popular-chip small {
+  color: #8f86a0;
+  font-size: 12px;
+}
+
+.home-popular-label {
+  margin: 0 0 6px;
+  color: #cffafe;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.home-popular-row {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.home-popular-chip {
+  display: flex;
+  flex: 0 0 auto;
+  max-width: 220px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(13, 8, 26, 0.82);
+  color: #f8e7ff;
+  text-decoration: none;
+}
+
+.home-popular-chip b {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-popular-chip.is-selected {
+  border-color: rgba(249, 168, 212, 0.7);
+}
+
+.home-tool-locate {
+  width: 44px;
+  height: 44px;
 }
 
 .home-nearby-panel {
@@ -1068,9 +1269,27 @@
     top: 118px;
   }
 
+  .home-map-searchstack {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+  }
+
+  .home-map-searchstack .home-pills {
+    position: static;
+    top: auto;
+  }
+
+  .home-overlay {
+    padding-top: 196px;
+  }
+
   .home-map-tools {
-    top: 290px;
-    bottom: auto;
+    top: auto;
+    right: 12px;
+    bottom: 396px;
   }
 
   .home-zoom {
