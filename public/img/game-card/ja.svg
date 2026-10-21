@@ -68,7 +68,7 @@
  <!-- result chip -->
  <g font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif">
   <rect x="566" y="420" width="290" height="56" rx="28" fill="#fff" filter="url(#sh)"/>
-  <text x="594" y="455" font-size="16" fill="#646b79">あと</text>
+  <text x="594" y="455" font-size="16" fill="#646b79">誤差</text>
   <text x="630" y="456" font-size="20" font-weight="800" fill="#1f2430">1.2km</text>
   <rect x="712" y="436" width="1.5" height="24" fill="#e5e3de"/>
   <text x="730" y="456" font-size="20" font-weight="800" fill="#c2276b">4,280</text>

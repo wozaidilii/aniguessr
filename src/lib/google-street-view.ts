@@ -219,7 +219,7 @@ export function loadGoogleMapsScript(
   }
   if (!ak) {
     return Promise.reject(
-      new Error("未配置 Google Maps AK，请配置 NEXT_PUBLIC_GOOGLE_MAP_AK"),
+      new Error("街景无法加载。请稍后重新加载。"),
     );
   }
   if (hasGoogleMapsApi()) return Promise.resolve();
@@ -440,7 +440,7 @@ export async function findGoogleStreetViewNear(
   candidateAttempts = 6,
 ): Promise<GoogleStreetViewLookupResult | null> {
   if (!GOOGLE_MAP_AK) {
-    throw new Error("未配置 Google Maps AK，无法匹配 Google 街景。");
+    throw new Error("街景无法加载。请稍后重新加载。");
   }
 
   await loadGoogleMapsScript(GOOGLE_MAP_AK);
@@ -506,7 +506,7 @@ export async function generateRandomForeignLocations(
 ): Promise<ForeignLocationGenerationResult> {
   if (!GOOGLE_MAP_AK) {
     return unavailableResult(
-      "未配置 Google Maps AK，无法生成 Google 街景点；请配置 NEXT_PUBLIC_GOOGLE_MAP_AK 后重试。",
+      "街景无法加载。请稍后重新加载。",
     );
   }
 

@@ -250,24 +250,22 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           </dl>
 
           <div className="mt-5 grid gap-2">
-            <div className="flex gap-2">
-              <a
-                href={directionsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="anime-button flex-1 text-center text-sm"
-              >
-                {copy.navigate}
-              </a>
-              <a
-                href={streetViewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="anime-button-secondary flex-1 text-center text-sm"
-              >
-                {copy.streetView}
-              </a>
-            </div>
+            <a
+              href={directionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="anime-button whitespace-nowrap text-center text-sm"
+            >
+              {copy.navigate}
+            </a>
+            <a
+              href={streetViewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="anime-button-secondary whitespace-nowrap text-center text-sm"
+            >
+              {copy.streetView}
+            </a>
             <a
               href={mapsUrl}
               target="_blank"

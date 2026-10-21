@@ -18,7 +18,15 @@ import {
   withPilgrimageLocale,
 } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { workFocusFrame } from "~/lib/home-map-focus";
 import { tuneHomeMapStyle } from "~/lib/home-map-style";
+import {
+  PILGRIMAGE_FIT_MAX_ZOOM,
+  PILGRIMAGE_FIT_PADDING,
+  PILGRIMAGE_JAPAN_BOUNDS,
+  pilgrimageFitTarget,
+  pilgrimageSpotBounds,
+} from "~/lib/pilgrimage-map-frame";
 import {
   PILGRIMAGE_MAP_STYLE,
   animeTitle,
@@ -28,16 +36,11 @@ import {
   loadNavCatalog,
   localizedSpotName,
   type NavCatalog,
-  type NavSpot,
 } from "~/lib/pilgrimage-nav";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./pilgrimage-map.css";
 
 const SOURCE_ID = "pilgrimage-spots";
-const JAPAN_BOUNDS: [[number, number], [number, number]] = [
-  [122.9, 24.0],
-  [145.8, 45.6],
-];
 
 export function PilgrimageMap({
   locale,
@@ -82,11 +85,12 @@ export function PilgrimageMap({
     const map = new maplibregl.Map({
       container,
       style: PILGRIMAGE_MAP_STYLE,
-      center: [138.2, 36.2],
-      zoom: 4.2,
+      bounds: PILGRIMAGE_JAPAN_BOUNDS,
+      fitBoundsOptions: { padding: 24 },
       attributionControl: false,
       cooperativeGestures: true,
       maxZoom: 18,
+      maxBounds: PILGRIMAGE_JAPAN_BOUNDS,
     });
     map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
@@ -247,16 +251,46 @@ export function PilgrimageMap({
       })),
     });
     const fitKey = `${subjectId ?? ""}|${locationSlug ?? ""}|${favoritesOnly}|${spots.length}`;
+    map.resize();
+    if (map.getContainer().clientWidth < 2) return;
     if (fittedKey.current === fitKey) return;
     fittedKey.current = fitKey;
-    if (!subjectId && !locationSlug && !favoritesOnly) {
-      map.fitBounds(JAPAN_BOUNDS, { padding: 24, animate: false });
-      return;
+    const focused = subjectId
+      ? workFocusFrame(
+          spots.filter((spot) => pilgrimageSpotBounds([spot]) !== null),
+        )
+      : null;
+    const bounds =
+      focused && !focused.spansCountry
+        ? ([
+            [focused.west, focused.south],
+            [focused.east, focused.north],
+          ] as [[number, number], [number, number]])
+        : subjectId
+          ? null
+          : pilgrimageSpotBounds(spots);
+    const japanZoom =
+      map.cameraForBounds(PILGRIMAGE_JAPAN_BOUNDS, { padding: 24 })?.zoom ?? 0;
+    const spotZoom = bounds
+      ? (map.cameraForBounds(bounds, {
+          padding: PILGRIMAGE_FIT_PADDING,
+          maxZoom: PILGRIMAGE_FIT_MAX_ZOOM,
+        })?.zoom ?? null)
+      : null;
+    const frameAll =
+      !subjectId && !locationSlug && !favoritesOnly
+        ? "japan"
+        : pilgrimageFitTarget(spotZoom, japanZoom);
+    if (frameAll === "spots" && bounds) {
+      map.fitBounds(bounds, {
+        padding: PILGRIMAGE_FIT_PADDING,
+        maxZoom: PILGRIMAGE_FIT_MAX_ZOOM,
+        animate: false,
+      });
+    } else {
+      map.fitBounds(PILGRIMAGE_JAPAN_BOUNDS, { padding: 24, animate: false });
     }
-    const bounds = boundsFor(spots);
-    if (bounds) {
-      map.fitBounds(bounds, { padding: 36, maxZoom: 13, animate: false });
-    }
+    map.getContainer().dataset.cameraZoom = map.getZoom().toFixed(2);
   }, [
     catalog,
     favoriteKey,
@@ -355,19 +389,6 @@ function FilterButton({
       {label}
     </button>
   );
-}
-
-function boundsFor(spots: readonly NavSpot[]) {
-  const bounds = new maplibregl.LngLatBounds();
-  let count = 0;
-  for (const spot of spots) {
-    if (spot.lng < 120 || spot.lng > 155 || spot.lat < 20 || spot.lat > 50) {
-      continue;
-    }
-    bounds.extend([spot.lng, spot.lat]);
-    count += 1;
-  }
-  return count > 0 ? bounds : null;
 }
 
 function popupAction(href: string, label: string): HTMLAnchorElement {

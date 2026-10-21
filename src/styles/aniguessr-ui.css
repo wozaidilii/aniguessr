@@ -361,9 +361,39 @@
 }
 
 .ag-seg button[aria-pressed="true"] {
-  border-color: var(--ag-pink);
-  background: rgba(249, 168, 212, 0.1);
+  border-color: #1f2430;
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.ag-difficulty {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  border: 1px solid #e5e3de;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.ag-difficulty button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
   color: #1f2430;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ag-difficulty button[aria-pressed="true"] {
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.ag-difficulty button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .ag-seg button[aria-pressed="true"] i {

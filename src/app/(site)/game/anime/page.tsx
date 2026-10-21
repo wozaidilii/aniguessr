@@ -58,6 +58,7 @@ import { DEFAULT_FOREIGN_COUNTRY } from "~/lib/foreign-map";
 import { getGoogleGuessMapLabels } from "~/lib/google-guess-map-labels";
 import { getGoogleMapsLanguage } from "~/lib/google-maps-language";
 import { GOOGLE_MAP_AK } from "~/lib/google-street-view";
+import { streetViewUnavailable } from "~/lib/street-view-status-copy";
 import {
   haversineDistance,
   locationRoundScore,
@@ -192,8 +193,7 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     notEnoughQuestions: (found, total, pool) =>
       `当前难度下只找到 ${found} / ${total} 道可用题（可选池 ${pool} 道），请提高难度档位或重新加载。`,
     bankLoadFailed: "动漫题库加载失败",
-    noGoogleKey:
-      "未配置 Google Maps AK，无法加载猜动漫模式的现实街景；请配置 NEXT_PUBLIC_GOOGLE_MAP_AK 后重试。",
+    noGoogleKey: streetViewUnavailable("zh"),
     noStreetViewQuestions: "当前没有可用的 Google 街景题目，请重新加载题库。",
     skippedStreetView:
       "上一道动漫巡礼题的现实街景加载失败，已跳过并切换到下一题。",
@@ -288,8 +288,7 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     notEnoughQuestions: (found, total, pool) =>
       `現在の難易度では ${found} / ${total} 問しか選べません（候補 ${pool} 問）。難易度を上げるか再読み込みしてください。`,
     bankLoadFailed: "問題データの読み込みに失敗しました",
-    noGoogleKey:
-      "Google Maps AK が未設定のため、現実のストリートビューを読み込めません。NEXT_PUBLIC_GOOGLE_MAP_AK を設定してください。",
+    noGoogleKey: streetViewUnavailable("ja"),
     noStreetViewQuestions:
       "利用可能な Google ストリートビュー問題がありません。問題データを再読み込みしてください。",
     skippedStreetView:
@@ -389,8 +388,7 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     notEnoughQuestions: (found, total, pool) =>
       `Only ${found} / ${total} questions match this difficulty cap (pool ${pool}). Raise the cap or reload.`,
     bankLoadFailed: "Failed to load anime question data",
-    noGoogleKey:
-      "Google Maps AK is not configured, so the real Street View cannot load. Set NEXT_PUBLIC_GOOGLE_MAP_AK and retry.",
+    noGoogleKey: streetViewUnavailable("en"),
     noStreetViewQuestions:
       "No Google Street View questions are currently available. Reload the question bank.",
     skippedStreetView:
@@ -1491,6 +1489,7 @@ export default function AnimeGuessrPage() {
           <GoogleStreetView
             key={currentStreetViewLocation.id}
             location={currentStreetViewLocation}
+            locale={locale}
             googleMapsLanguage={googleMapsLanguage}
             onUnavailable={handleCurrentStreetViewUnavailable}
           />

@@ -1,24 +1,10 @@
-import Link from "next/link";
+import { RootDocument } from "~/app/root-document";
+import { SiteNotFound } from "~/components/site/site-not-found";
 
 export default function NotFound() {
   return (
-    <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          background: "#f7f6f3",
-          color: "#1f2430",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <main style={{ padding: "64px 24px" }}>
-          <p>404</p>
-          <h1>Page not found</h1>
-          <Link href="/ja" style={{ color: "#c2276b", fontWeight: 700 }}>
-            AniGuessr
-          </Link>
-        </main>
-      </body>
-    </html>
+    <RootDocument locale="ja">
+      <SiteNotFound chrome />
+    </RootDocument>
   );
 }

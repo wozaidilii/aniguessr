@@ -1963,6 +1963,7 @@ export function BattleGame({
             <GoogleStreetView
               key={currentQuestion.id}
               location={currentQuestion.location}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
@@ -1975,6 +1976,7 @@ export function BattleGame({
                 currentQuestion.question,
                 locale,
               )}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
@@ -1984,6 +1986,7 @@ export function BattleGame({
             <GoogleStreetView
               key={currentQuestion.id}
               location={toAnimeTuxunBattleStreetViewLocation(currentQuestion)}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
