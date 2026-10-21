@@ -243,8 +243,9 @@ function cjkPrefecturePrefixes() {
 const CJK_PREFECTURE_PREFIXES = cjkPrefecturePrefixes();
 
 /**
- * zh / zh-tw map pills. Drop a leading prefecture, and write a designated
- * city's ward as 市名・区. A trailing 市 stays.
+ * zh / zh-tw map pills. Drop a leading prefecture, write a designated
+ * city's ward as 市名・区, and drop a 郡 before a town or village.
+ * A trailing 市 stays.
  * @param {string} name
  */
 export function shortCjkAreaName(name) {
@@ -257,19 +258,22 @@ export function shortCjkAreaName(name) {
   }
   const cityWard = /^(.+?)市(.+[区區])$/u.exec(text);
   if (cityWard) text = `${cityWard[1]}・${cityWard[2]}`;
+  const county = /^(.+?郡)(.+[町村])$/u.exec(text);
+  if (county) text = county[2];
   return text || name.trim();
 }
 
 /**
- * English map pills. Drop the prefecture and a trailing place suffix.
- * A designated-city ward keeps the city and the ward: "Yokohama · Naka".
- * `ja` is the unshortened Japanese name, used only to find that ward.
+ * English map pills. Drop the prefecture, a trailing place suffix, and a
+ * district marker (“X District” or “-gun”). A designated-city ward keeps
+ * the city and the ward: "Yokohama · Naka". `ja` is the unshortened
+ * Japanese name, used only to find that ward.
  * @param {string} en
  * @param {string} [ja]
  */
 export function shortEnAreaName(en, ja = "") {
   const source = en.trim();
-  const city = source.split(",")[0]?.trim() ?? "";
+  const city = stripEnDistrict(source.split(",")[0]?.trim() ?? "");
   const ward = /^(.+?)市(.+区)$/u.exec(ja.trim());
   const latin = /^[\p{Script=Latin}\d\s.'’-]+$/u.test(city);
   if (ward && latin && city) {
@@ -277,6 +281,24 @@ export function shortEnAreaName(en, ja = "") {
     return `${stripEnPlaceSuffix(city)} · ${romaji}`;
   }
   return stripEnPlaceSuffix(city) || source;
+}
+
+/**
+ * Drop “-gun”, and drop an “X District” phrase when a town name remains.
+ * A segment that is only “X District” keeps X.
+ * @param {string} name
+ */
+function stripEnDistrict(name) {
+  const withoutGun = name.replace(/-gun\b/gi, "").replace(/\s{2,}/g, " ").trim();
+  const withoutPhrase = withoutGun
+    .replace(/\b[\p{Script=Latin}\d.'’-]+\s+District\b/giu, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  const outsideParens = withoutPhrase.replace(/\([^)]*\)/g, " ").trim();
+  if (outsideParens && /[\p{Script=Latin}\d]/u.test(outsideParens)) {
+    return withoutPhrase;
+  }
+  return withoutGun.replace(/\s+District\b/gi, "").replace(/\s{2,}/g, " ").trim();
 }
 
 /** @param {string} name */
