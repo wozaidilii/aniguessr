@@ -2,14 +2,11 @@ import {
   isAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
-import coverage from "~/lib/zh-tw-coverage.json";
 
 /** Pilgrimage-only locale. Not part of ANIME_LOCALES, so the rest of the site does not advertise it. */
 export const ZH_TW_LOCALE = "zh-tw" as const;
 
 export type PilgrimageLocale = AnimeLocale | typeof ZH_TW_LOCALE;
-
-export const ZH_TW_LOCATION_SLUGS: readonly string[] = coverage.locationSlugs;
 
 export function isZhTwLocale(value: unknown): value is typeof ZH_TW_LOCALE {
   return value === ZH_TW_LOCALE;
@@ -19,8 +16,9 @@ export function isPilgrimageLocale(value: unknown): value is PilgrimageLocale {
   return isZhTwLocale(value) || isAnimeLocale(value);
 }
 
-export function isZhTwCoveredLocationSlug(slug: string): boolean {
-  return ZH_TW_LOCATION_SLUGS.includes(slug);
+/** Every pilgrimage location has a zh-TW page. Non-pilgrimage routes stay off this locale. */
+export function isZhTwCoveredLocationSlug(_slug: string): boolean {
+  return true;
 }
 
 /** Site chrome (home, game) stays on zh/ja/en. zh-TW covers pilgrimage pages only. */

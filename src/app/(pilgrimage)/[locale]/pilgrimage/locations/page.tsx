@@ -1,11 +1,9 @@
 import { type Metadata } from "next";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
-import { ZH_TW_AREA_COPY, getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildLocationIndexSeo } from "~/lib/pilgrimage-seo-meta";
-import { localizedPageMetadata, zhTwOnlyPageMetadata } from "~/lib/seo";
+import { pilgrimagePageMetadata } from "~/lib/seo";
 import {
   getPilgrimageSeoIndex,
-  getZhTwCatalog,
   pickLocalizedText,
 } from "~/server/data/pilgrimage-seo";
 import {
@@ -25,24 +23,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: localeParam } = await params;
   const locale = pilgrimageLocale(localeParam);
-  if (locale === "zh-tw") {
-    const count = getZhTwCatalog()?.locations.length ?? 0;
-    const seo = buildLocationIndexSeo(locale, { locationCount: count });
-    return zhTwOnlyPageMetadata(
-      "/pilgrimage/locations",
-      ZH_TW_AREA_COPY.locationTitle,
-      seo.description,
-    );
-  }
   const index = getPilgrimageSeoIndex();
   const seo = buildLocationIndexSeo(locale, {
     locationCount: index?.locationCount ?? 0,
   });
-  return localizedPageMetadata(
+  const title = locale === "zh-tw" ? "" : seo.title;
+  const description = locale === "zh-tw" ? "" : seo.description;
+  return pilgrimagePageMetadata(
     locale,
     "/pilgrimage/locations",
-    seo.title,
-    seo.description,
+    title,
+    description,
+    true,
   );
 }
 
@@ -55,21 +47,14 @@ export default async function PilgrimageLocationsIndexPage({
   const locale = pilgrimageLocale(localeParam);
   const copy = getPilgrimageCopy(locale);
   const index = getPilgrimageSeoIndex();
-  const locations =
-    locale === "zh-tw"
-      ? (getZhTwCatalog()?.locations ?? [])
-      : (index?.locations ?? []);
+  const locations = index?.locations ?? [];
 
   return (
     <PilgrimageShell
       locale={locale}
       kicker={copy.siteKicker}
-      title={
-        locale === "zh-tw" ? ZH_TW_AREA_COPY.locationTitle : copy.locationArchive
-      }
-      description={
-        locale === "zh-tw" ? ZH_TW_AREA_COPY.description : copy.hubDescription
-      }
+      title={copy.locationArchive}
+      description={copy.hubDescription}
     >
       {!index ? (
         <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>
@@ -88,7 +73,6 @@ export default async function PilgrimageLocationsIndexPage({
           ))}
         </PilgrimageCardGrid>
       )}
-      <AnitabiCredit locale={locale} className="mt-6" />
     </PilgrimageShell>
   );
 }

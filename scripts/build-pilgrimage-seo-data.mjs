@@ -15,12 +15,10 @@ import {
 import { zhTwAnimeTitle } from "./lib/zh-tw-anime-title.mjs";
 import { reviewCsv, reviewRow } from "./lib/zh-tw-review.mjs";
 import { toZhTw } from "./lib/zh-tw.mjs";
-import zhTwCoverage from "../src/lib/zh-tw-coverage.json" with { type: "json" };
 import {
   buildLocalizedSitemapEntries,
   buildSitemapIndexXml,
   buildUrlSetXml,
-  buildZhTwOnlySitemapEntries,
   chunkSitemapPaths,
   resolveSiteOrigin,
   sitemapEntryCount,
@@ -503,8 +501,6 @@ async function main() {
     locationRedirects[oldLocation] = target;
   }
 
-  const zhTwLocationSlugs = new Set(zhTwCoverage.locationSlugs);
-  const zhTwAnimeIds = new Set();
   let zhTwSpotCount = 0;
   /** @type {ReturnType<typeof reviewRow>[]} */
   const reviewRows = [];
@@ -547,9 +543,8 @@ async function main() {
   };
 
   for (const spot of Object.values(spots)) {
-    if (!zhTwLocationSlugs.has(spot.locationSlug) || spot.redirectTo) continue;
+    if (spot.redirectTo) continue;
     zhTwSpotCount += 1;
-    zhTwAnimeIds.add(spot.workSubjectId);
     attachTw(spot.title);
     attachTw(spot.description);
     attachTw(spot.location);
@@ -579,7 +574,6 @@ async function main() {
     );
   }
   for (const anime of animes) {
-    if (!zhTwAnimeIds.has(anime.subjectId)) continue;
     const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
     anime.animeTitle.tw = chosen.text;
     remember(
@@ -592,7 +586,6 @@ async function main() {
     );
   }
   for (const location of locations) {
-    if (!zhTwLocationSlugs.has(location.slug)) continue;
     attachTw(location.name);
     rememberField("location", location.slug, "name", location.name);
   }
@@ -606,10 +599,6 @@ async function main() {
     rows: reviewRows.length,
     flagged: reviewRows.filter((row) => row.flagged === "yes").length,
   };
-
-  const zhTwAnimeSlugs = animes
-    .filter((anime) => zhTwAnimeIds.has(anime.subjectId))
-    .map((anime) => anime.slug);
 
   const spotIds = Object.keys(spots).sort();
   for (const spot of Object.values(spots)) {
@@ -651,57 +640,44 @@ async function main() {
     locations,
     locationRedirects,
     zhTw: {
-      locationSlugs: [...zhTwLocationSlugs],
-      animeSlugs: zhTwAnimeSlugs,
+      coverage: "all-pilgrimage",
+      locationCount: locations.length,
       spotCount: zhTwSpotCount,
-      animeCount: zhTwAnimeSlugs.length,
+      animeCount: animes.length,
       review: zhTwReview,
     },
     spotIds,
     spots,
   };
 
-  const canonicalPaths = [
-    ...PUBLIC_ROUTES.map(([route, priority]) => ({
-      path: route,
-      priority,
-      zhTw: route === "/",
-    })),
-    {
-      path: "/pilgrimage",
-      priority: 0.5,
-      zhTwOnly: true,
-    },
-    {
-      path: "/pilgrimage/anime",
-      priority: 0.5,
-      zhTwOnly: true,
-    },
-    {
-      path: "/pilgrimage/locations",
-      priority: 0.5,
-      zhTwOnly: true,
-    },
-  ];
+  const pilgrimageSitemapPath = (route) =>
+    route === "/" ||
+    route === "/pilgrimage" ||
+    route.startsWith("/pilgrimage/");
+  const canonicalPaths = PUBLIC_ROUTES.map(([route, priority]) => ({
+    path: route,
+    priority,
+    zhTw: pilgrimageSitemapPath(route),
+  }));
   for (const anime of animes) {
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,
       priority: 0.75,
-      zhTw: zhTwAnimeIds.has(anime.subjectId),
+      zhTw: true,
     });
   }
   for (const location of locations) {
     canonicalPaths.push({
       path: `/pilgrimage/locations/${location.slug}`,
       priority: 0.7,
-      zhTw: zhTwLocationSlugs.has(location.slug),
+      zhTw: true,
     });
   }
   for (const spot of visibleSpots) {
     canonicalPaths.push({
       path: `/pilgrimage/spots/${encodeURIComponent(spot.id)}`,
       priority: 0.6,
-      zhTw: zhTwLocationSlugs.has(spot.locationSlug),
+      zhTw: true,
     });
   }
 
@@ -713,20 +689,13 @@ async function main() {
   for (let file = 0; file < sitemapChunks.length; file += 1) {
     const chunk = sitemapChunks[file];
     const entries = chunk.flatMap((item) =>
-      item.zhTwOnly
-        ? buildZhTwOnlySitemapEntries(
-            origin,
-            item.path,
-            item.priority,
-            lastModified,
-          )
-        : buildLocalizedSitemapEntries(
-            origin,
-            item.path,
-            item.priority,
-            lastModified,
-            { zhTw: Boolean(item.zhTw) },
-          ),
+      buildLocalizedSitemapEntries(
+        origin,
+        item.path,
+        item.priority,
+        lastModified,
+        { zhTw: Boolean(item.zhTw) },
+      ),
     );
     const xml = buildUrlSetXml(entries);
     await writeFile(path.join(SITEMAP_DIR, `${file}.xml`), xml);

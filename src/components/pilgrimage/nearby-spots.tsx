@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   animeTitle,
-  anitabiUrlFromSpotId,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   loadNavCatalog,
@@ -109,10 +107,6 @@ export function NearbySpots({ locale }: { locale: PilgrimageLocale }) {
           animes={animes}
         />
       ) : null}
-      <AnitabiCredit
-        locale={locale}
-        className="mt-3 text-[11px] leading-4 text-pink-100/55"
-      />
     </section>
   );
 }
@@ -178,14 +172,6 @@ function SpotGroup({
                   className="anime-button-secondary px-3 py-2 text-xs"
                 >
                   {copy.streetView}
-                </a>
-                <a
-                  href={anitabiUrlFromSpotId(spot.id, spot.subjectId)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="anime-button-secondary px-3 py-2 text-xs"
-                >
-                  anitabi
                 </a>
               </div>
             </li>

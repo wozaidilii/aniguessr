@@ -144,6 +144,7 @@ describe("locale middleware exemptions", () => {
       "/zh-tw/pilgrimage",
       "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
+      "/zh-tw/pilgrimage/locations/shinjuku-tokyo",
     ]) {
       expect(isLocalePrefixedPilgrimagePath(pathname)).toBe(true);
       const response = middleware(request(pathname));

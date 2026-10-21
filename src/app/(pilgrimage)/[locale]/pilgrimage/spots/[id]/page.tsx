@@ -2,7 +2,6 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
-import { AnitabiCredit } from "~/components/pilgrimage/anitabi-credit";
 import {
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
@@ -13,10 +12,7 @@ import {
   pickLocalizedText,
   pickMaybeLocalizedText,
 } from "~/lib/localized-text";
-import {
-  isZhTwCoveredLocationSlug,
-  type PilgrimageLocale,
-} from "~/lib/pilgrimage-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
@@ -67,12 +63,6 @@ function redirectDuplicateSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   );
 }
 
-function assertZhTwSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
-  if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(spot.locationSlug)) {
-    notFound();
-  }
-}
-
 function spotPageSeo(
   locale: PilgrimageLocale,
   spot: PilgrimageSpot,
@@ -98,7 +88,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const spot = getSpotById(id);
   if (!spot) return { title: "Not found" };
   redirectDuplicateSpot(locale, spot);
-  assertZhTwSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -109,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path,
     seo.title,
     seo.description,
-    isZhTwCoveredLocationSlug(spot.locationSlug),
+    true,
   );
 
   return {
@@ -128,7 +117,6 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const spot = getSpotById(id);
   if (!spot) notFound();
   redirectDuplicateSpot(locale, spot);
-  assertZhTwSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
   const place = pickLocalizedText(spot.answerName, locale);
@@ -179,17 +167,8 @@ export default async function PilgrimageSpotPage({ params }: Props) {
                 alt={title}
                 className="aspect-video w-full rounded-xl border border-white/10 object-cover"
               />
-              <figcaption className="mt-2">
-                <AnitabiCredit locale={locale} sourceUrl={spot.sourceUrl} />
-              </figcaption>
             </figure>
-          ) : (
-            <AnitabiCredit
-              locale={locale}
-              sourceUrl={spot.sourceUrl}
-              className="mb-5"
-            />
-          )}
+          ) : null}
 
           <h2 className="text-lg font-black text-pink-100">{title}</h2>
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
@@ -301,16 +280,6 @@ export default async function PilgrimageSpotPage({ params }: Props) {
             >
               {copy.openMaps}
             </a>
-            {spot.sourceUrl ? (
-              <a
-                href={spot.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="anime-button-secondary block text-center text-sm"
-              >
-                {copy.openAnitabi}
-              </a>
-            ) : null}
             <Link
               href={pilgrimageSiteHref("/game/anime", locale)}
               className="block text-center text-xs font-bold text-cyan-100/70 hover:text-cyan-50"

@@ -5,11 +5,11 @@
 - 修复：收藏只写 `localStorage`（`aniguessr_pilgrimage_favorites_v1`），在 `useEffect` 之后才读取。附近地点用 `navigator.geolocation`，距离在浏览器里算，请求里不带坐标。地图点位来自构建产物 `public/data/seo/spots-nav.json`。
 - 预防：可缓存的巡礼页不要在服务端读收藏或位置。账号同步如果要做，只能是客户端在渲染之外调用，不能进页面渲染。
 
-## Anitabi 取景数据要带 CC BY-NC-SA 4.0 署名
+## Anitabi 署名只留一行，默认打开
 
-- 问题：取景地和截图来自 anitabi，页面上只有「在 Anitabi 打开」，没有许可协议。
-- 修复：在取景列表、地点页、地图弹窗和附近列表放一行署名：`anitabi` 链到该点 `sourceUrl`（或 https://anitabi.cn），`CC BY-NC-SA 4.0` 链到 https://creativecommons.org/licenses/by-nc-sa/4.0/ ，并注明动画截图 © 各自权利人。不要加联盟或广告链接。
-- 预防：新增展示取景数据或截图的界面时，复用 `AnitabiCredit`，三种语言都要有这句话。
+- 问题：每个取景列表、地点页、地图弹窗和附近列表都放了 anitabi 链接和许可说明。
+- 修复：页面上的 anitabi 链接和逐页署名都去掉。圣地巡礼外壳只留 `src/components/anitabi-attribution.tsx` 这一句，四语都有。简体是「部分地点数据来自 anitabi，经修改后使用，采用 CC BY-NC-SA 4.0 授权」。`anitabi` 链到 https://anitabi.cn ，`CC BY-NC-SA 4.0` 链到许可协议。字号 12px，颜色是 `--dark-text-secondary`。首页页脚要用同一个组件，不要再写一遍。开关 `SHOW_ANITABI_ATTRIBUTION` 默认 `true`。设成 `false`，或删掉这个文件和所有引用，这句话就没了。不要加联盟链接，也不要写公司法律实体名称或地址。
+- 预防：不要再把 anitabi 链接或 `AnitabiCredit` 加回单个页面。数据 id 和图片管线保持不动。
 
 ## Pilgrimage HTML must not depend on request headers or Set-Cookie
 

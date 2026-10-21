@@ -95,22 +95,26 @@ describe("homepage catalog", () => {
     expect(catalog.spotCount).not.toBe(23834);
   });
 
-  it("keeps zh-TW links inside the covered locations and off simplified names", () => {
+  it("includes every zh-TW area and does not fall back to simplified names", () => {
     const catalog = buildHomeCatalog(source(), "zh-tw");
     expect(catalog.areas.map((area) => area.slug)).toEqual([
+      "tokyo",
       "kamakura-kanagawa",
       "fujisawa-kanagawa",
     ]);
-    expect(catalog.areas.map((area) => area.name)).toEqual(["鎌倉", "藤澤"]);
+    expect(catalog.areas.map((area) => area.name)).toEqual([
+      "東京",
+      "鎌倉",
+      "藤澤",
+    ]);
     expect(catalog.areas.every((area) => area.href.startsWith("/zh-tw/"))).toBe(
       true,
     );
-    expect(catalog.spotCount).toBe(3);
+    expect(catalog.spotCount).toBe(4);
     expect(catalog.animeCards.map((card) => card.slug)).toEqual([
       "one-title",
       "two-title",
     ]);
-    expect(catalog.animeTags).toEqual([]);
-    expect(catalog.nearby.map((spot) => spot.name)).toEqual(["坡道", "車站"]);
+    expect(catalog.nearby.map((spot) => spot.name)).toEqual(["塔"]);
   });
 });
