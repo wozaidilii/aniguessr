@@ -86,6 +86,33 @@ export function preferredName(
   );
 }
 
+/**
+ * Order used only when the resolved card locale itself has no string.
+ * Matches the page (`ja`: en then zh) so a blank `answerName.ja` still
+ * shows the label the page shows. It does not change chip, fonts, or alt.
+ */
+const HOLE_ORDER: Record<OgLocale, readonly OgLocale[]> = {
+  ja: ["en", "zh", "zh-tw"],
+  zh: ["ja", "en", "zh-tw"],
+  en: ["ja", "zh", "zh-tw"],
+  "zh-tw": ["zh", "ja", "en"],
+};
+
+export function displayName(
+  locale: OgLocale,
+  base: OgNames | undefined,
+  ogTitle?: OgNames,
+  shortName?: OgNames,
+): string {
+  const direct = preferredName(locale, base, ogTitle, shortName);
+  if (direct) return direct;
+  for (const next of HOLE_ORDER[locale]) {
+    const value = preferredName(next, base, ogTitle, shortName);
+    if (value) return value;
+  }
+  return "";
+}
+
 export function resolveContentLocale(
   requested: PilgrimageLocale,
   required: Array<(locale: OgLocale) => string>,
@@ -167,15 +194,25 @@ export function buildSpotCard(input: {
     areaName,
   ]);
   const copy = ogCopy(contentLocale);
-  const spot = preferredName(
+  const spot = displayName(
     contentLocale,
     input.spotName,
     input.ogTitle,
     input.shortName,
   );
-  const work = workName(contentLocale);
+  const work = displayName(
+    contentLocale,
+    input.workTitle,
+    input.workOgTitle,
+    input.workShortName,
+  );
   const areaCap = ((COL_W - 40) * SAFETY) / 28;
-  const areaRaw = areaName(contentLocale);
+  const areaRaw = displayName(
+    contentLocale,
+    input.areaName,
+    input.areaOgTitle,
+    input.areaShortName,
+  );
   const area =
     units(areaRaw) <= areaCap
       ? areaRaw
@@ -229,7 +266,7 @@ export function buildWorkCard(input: {
     ...areas.map((area) => (locale: OgLocale) => readOgName(area, locale)),
   ]);
   const copy = ogCopy(contentLocale);
-  const title = preferredName(
+  const title = displayName(
     contentLocale,
     input.title,
     input.ogTitle,
@@ -287,7 +324,7 @@ export function buildAreaCard(input: {
     ...works.map((work) => (locale: OgLocale) => readOgName(work, locale)),
   ]);
   const copy = ogCopy(contentLocale);
-  const title = preferredName(
+  const title = displayName(
     contentLocale,
     input.title,
     input.ogTitle,

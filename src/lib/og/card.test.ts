@@ -27,6 +27,39 @@ describe("og cards", () => {
     expect(card.chip).not.toContain("巡禮");
   });
 
+  it("fills a blank Japanese place name without leaving the Japanese card", () => {
+    const card = buildSpotCard({
+      requestedLocale: "ja",
+      spotName: names("", "稲村ヶ崎", "稲村ヶ崎", "Inamuragasaki"),
+      workTitle: names("四月は君の嘘", "四月是你的谎言"),
+      areaName: names("鎌倉市", "镰仓市"),
+      otherWorkCount: 0,
+      art: "city",
+      origin: { lat: 35.3, lng: 139.5 },
+      nearby: [],
+    });
+    expect(card.contentLocale).toBe("ja");
+    expect(card.chip).toBe("聖地巡礼スポット");
+    expect(card.titleLines.join("")).toBe("Inamuragasaki");
+    expect(card.alt).toBe("Inamuragasaki（四月は君の嘘）の聖地の地図");
+  });
+
+  it("switches an English request to a Japanese card when English names are missing", () => {
+    const card = buildSpotCard({
+      requestedLocale: "en",
+      spotName: names("踏切"),
+      workTitle: names("青春ブタ"),
+      areaName: names("鎌倉"),
+      otherWorkCount: 0,
+      art: "city",
+      origin: { lat: 35.3, lng: 139.5 },
+      nearby: [],
+    });
+    expect(card.contentLocale).toBe("ja");
+    expect(card.chip).toBe("聖地巡礼スポット");
+    expect(card.alt).toBe("踏切（青春ブタ）の聖地の地図");
+  });
+
   it("keeps Traditional when every name exists", () => {
     const card = buildSpotCard({
       requestedLocale: "zh-tw",
