@@ -1365,7 +1365,7 @@ export default function AnimeGuessrPage() {
             onBeforeAuth={persistPendingFinalResult}
           />
         )}
-        <header className="flex items-center justify-between border-b border-white/10 px-6 py-3">
+        <header className="ag-page-bar">
           <BrandLockup href={homeUrl} />
           <LangSwitch locale={locale} onSelect={selectLocale} />
         </header>

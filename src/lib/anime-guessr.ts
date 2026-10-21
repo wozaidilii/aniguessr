@@ -336,7 +336,8 @@ export function getAnimeGuessrQuestionText(
     description: toZhTw(text.description),
     animeTitle: toZhTw(text.animeTitle),
     aspect: text.aspect ? toZhTw(text.aspect) : text.aspect,
-    location: toZhTw(text.location),
+    // Place names already use the zh-tw table. OpenCC would turn 岩手縣 into 巖手縣.
+    location: text.location,
     answerName: toZhTw(text.answerName),
     episodeContext: text.episodeContext
       ? toZhTw(text.episodeContext)

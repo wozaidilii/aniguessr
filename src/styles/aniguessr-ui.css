@@ -1132,20 +1132,60 @@ a.rights-contact-link:hover {
   margin-top: 8px;
 }
 
+.ag-result-top,
+.ag-page-bar,
+.ag-login-bar,
+.ag-login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ag-login-bar {
+  flex-wrap: wrap;
+}
+
+.ag-login-brand {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
 .ag-result-top {
   position: fixed;
   top: 0;
   right: 0;
   left: 0;
   z-index: 6;
-  display: flex;
   height: 72px;
-  align-items: center;
-  justify-content: space-between;
+  flex-wrap: nowrap;
   padding: 0 32px;
   border-bottom: 1px solid #e5e3de;
   background: #fff;
   box-shadow: 0 8px 24px rgba(31, 36, 48, 0.08);
+}
+
+.ag-page-bar {
+  flex-wrap: nowrap;
+  min-height: 60px;
+  padding: 8px 24px;
+  border-bottom: 1px solid #e5e3de;
+  background: #fff;
+}
+
+.ag-result-top .ag-lockup,
+.ag-page-bar .ag-lockup,
+.ag-login-brand .ag-lockup,
+.ag-hdr-in .ag-lockup {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.ag-result-top .ag-lang,
+.ag-page-bar .ag-lang,
+.ag-login-brand .ag-lang,
+.ag-hdr-right .ag-lang {
+  flex: none;
 }
 
 .ag-game.is-result .ag-lang {
@@ -1755,8 +1795,10 @@ a.rights-contact-link:hover {
     height: 200px;
   }
 
-  .ag-result-top {
+  .ag-result-top,
+  .ag-page-bar {
     height: 60px;
+    min-height: 60px;
     padding: 0 12px;
   }
 
@@ -1812,6 +1854,20 @@ a.rights-contact-link:hover {
   .ag-final-pair > .anime-button,
   .ag-final-pair > .anime-button-secondary {
     width: 100%;
+  }
+
+  .ag-lockup-by {
+    display: none;
+  }
+
+  .ag-lockup-name {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+  }
+
+  .ag-lang button {
+    padding: 3px 6px;
+    font-size: 11px;
   }
 
   .ag-prog {

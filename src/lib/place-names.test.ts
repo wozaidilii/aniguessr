@@ -35,8 +35,41 @@ describe("place names", () => {
     expect(localizePlaceName("东京府中市", "en")).toBe("Fuchu");
     expect(localizePlaceName("北海道伊达市", "ja")).toBe("伊達市");
     expect(localizePlaceName("北海道伊达市", "en")).toBe("Date");
-    expect(matchPlaceName("海外", "en").kind).toBe("unmatched");
-    expect(localizePlaceName("海外", "en")).toBe("海外");
+    expect(localizePlaceName("京丹波町", "ja")).toBe("京丹波町");
+    expect(localizePlaceName("京丹波町", "en")).toBe("京丹波町");
+    expect(localizePlaceName("京都市", "ja", { lat: 35.6442, lng: 140.0457 })).toBe(
+      "京都市",
+    );
+    expect(localizePlaceName("京都市", "en", { lat: 35.6442, lng: 140.0457 })).toBe(
+      "Kyoto",
+    );
+  });
+
+  it("translates places outside Japan from a fixed table", () => {
+    expect(localizePlaceName("中国", "en")).toBe("China");
+    expect(localizePlaceName("中国", "ja")).toBe("中国");
+    expect(localizePlaceName("中国", "zh-tw")).toBe("中國");
+    expect(localizePlaceName("亚洲", "ja")).toBe("アジア");
+    expect(localizePlaceName("亚洲", "zh-tw")).toBe("亞洲");
+    expect(localizePlaceName("关岛", "en")).toBe("Guam");
+    expect(localizePlaceName("关岛", "ja")).toBe("グアム");
+    expect(localizePlaceName("关岛", "zh-tw")).toBe("關島");
+    expect(localizePlaceName("吉林省", "en")).toBe("Jilin");
+    expect(localizePlaceName("吉林省", "ja")).toBe("吉林省");
+    expect(localizePlaceName("大洋洲", "ja")).toBe("オセアニア");
+    expect(localizePlaceName("大洋洲", "en")).toBe("Oceania");
+    expect(localizePlaceName("欧洲", "ja")).toBe("ヨーロッパ");
+    expect(localizePlaceName("欧洲", "zh-tw")).toBe("歐洲");
+    expect(localizePlaceName("江苏省", "ja")).toBe("江蘇省");
+    expect(localizePlaceName("江苏省", "zh-tw")).toBe("江蘇省");
+    expect(localizePlaceName("海外", "en")).toBe("Overseas");
+    expect(localizePlaceName("海外", "ja")).toBe("海外");
+    expect(localizePlaceName("海外", "zh")).toBe("海外");
+    expect(localizePlaceName("辽宁省", "ja")).toBe("遼寧省");
+    expect(localizePlaceName("辽宁省", "zh-tw")).toBe("遼寧省");
+    expect(localizePlaceName("黑龙江省", "ja")).toBe("黑竜江省");
+    expect(localizePlaceName("黑龙江省", "zh-tw")).toBe("黑龍江省");
+    expect(localizePlaceName("黑龙江省", "zh")).toBe("黑龙江省");
   });
 
   it("covers the anime question locations without inventing romaji", () => {
@@ -49,30 +82,21 @@ describe("place names", () => {
     expect(coverage.byKind).toEqual({
       country: { labels: 1, questions: 2941 },
       prefecture: { labels: 31, questions: 7453 },
-      municipality: { labels: 166, questions: 14145 },
-      "prefecture-fallback": { labels: 1, questions: 16 },
-      unmatched: { labels: 10, questions: 195 },
+      municipality: { labels: 167, questions: 14161 },
+      "prefecture-fallback": { labels: 0, questions: 0 },
+      outside: { labels: 10, questions: 195 },
+      unmatched: { labels: 0, questions: 0 },
     });
-    expect(coverage.unmatchedLabels).toEqual([
-      "中国",
-      "亚洲",
-      "关岛",
-      "吉林省",
-      "大洋洲",
-      "欧洲",
-      "江苏省",
-      "海外",
-      "辽宁省",
-      "黑龙江省",
-    ]);
+    expect(coverage.unmatchedLabels).toEqual([]);
     expect(coverage.byKind.country.questions).toBeGreaterThan(0);
     expect(coverage.byKind.prefecture.questions).toBeGreaterThan(0);
     expect(coverage.byKind.municipality.questions).toBeGreaterThan(0);
     expect(
-      coverage.byKind.municipality.questions +
+        coverage.byKind.municipality.questions +
         coverage.byKind.prefecture.questions +
         coverage.byKind.country.questions +
         coverage.byKind["prefecture-fallback"].questions +
+        coverage.byKind.outside.questions +
         coverage.byKind.unmatched.questions,
     ).toBe(coverage.questions);
   });

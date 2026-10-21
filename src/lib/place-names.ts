@@ -98,7 +98,33 @@ export type PlaceMatchKind =
   | "prefecture"
   | "municipality"
   | "prefecture-fallback"
+  | "outside"
   | "unmatched";
+
+/**
+ * Labels that are not Japanese admin areas. The question bank stores the
+ * simplified form. Japanese uses the table only where that stored form is
+ * not already the Japanese name.
+ */
+const OUTSIDE_JAPAN = [
+  { ja: "中国", zh: "中国", tw: "中國", en: "China" },
+  { ja: "アジア", zh: "亚洲", tw: "亞洲", en: "Asia" },
+  { ja: "グアム", zh: "关岛", tw: "關島", en: "Guam" },
+  { ja: "吉林省", zh: "吉林省", tw: "吉林省", en: "Jilin" },
+  { ja: "オセアニア", zh: "大洋洲", tw: "大洋洲", en: "Oceania" },
+  { ja: "ヨーロッパ", zh: "欧洲", tw: "歐洲", en: "Europe" },
+  { ja: "江蘇省", zh: "江苏省", tw: "江蘇省", en: "Jiangsu" },
+  { ja: "海外", zh: "海外", tw: "海外", en: "Overseas" },
+  { ja: "遼寧省", zh: "辽宁省", tw: "遼寧省", en: "Liaoning" },
+  { ja: "黑竜江省", zh: "黑龙江省", tw: "黑龍江省", en: "Heilongjiang" },
+] as const;
+
+const outsideByKey = new Map<string, (typeof OUTSIDE_JAPAN)[number]>();
+for (const row of OUTSIDE_JAPAN) {
+  for (const key of [row.ja, row.zh, row.tw, row.en]) {
+    outsideByKey.set(key, row);
+  }
+}
 
 export interface PlaceMatch {
   kind: PlaceMatchKind;
@@ -178,8 +204,9 @@ function municipalityMatch(
     return label ? { kind: "prefecture-fallback", label } : null;
   }
   if (locale === "en" && !resolved.en) {
-    const label = prefectureLabel(resolved.pref, locale);
-    return label ? { kind: "prefecture-fallback", label } : null;
+    // No reliable romaji. Keep the Japanese municipality instead of the
+    // prefecture, which is a different place name.
+    return { kind: "municipality", label: resolved.ja };
   }
   return { kind: "municipality", label: labelOf(resolved, locale) };
 }
@@ -209,6 +236,8 @@ export function matchPlaceName(
   if (text === "日本" || text === "日本国" || text.toLowerCase() === "japan") {
     return { kind: "country", label: labelOf(JAPAN, locale) };
   }
+  const outside = outsideByKey.get(text);
+  if (outside) return { kind: "outside", label: labelOf(outside, locale) };
   const prefecture = prefectureKeys.get(text);
   if (prefecture) {
     return { kind: "prefecture", label: labelOf(prefecture, locale) };
@@ -269,6 +298,7 @@ export function summarizePlaceCoverage(
     prefecture: { labels: 0, questions: 0 },
     municipality: { labels: 0, questions: 0 },
     "prefecture-fallback": { labels: 0, questions: 0 },
+    outside: { labels: 0, questions: 0 },
     unmatched: { labels: 0, questions: 0 },
   };
   const grouped = new Map<string, { lat?: number; lng?: number; count: number }>();

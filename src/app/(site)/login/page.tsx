@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { LangSwitch } from "~/components/brand/LangSwitch";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
 import { saveAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import {
@@ -11,7 +12,6 @@ import {
   withGameLocale,
   type GameLocale,
 } from "~/lib/game-locale";
-import { HOME_LANG_LINKS } from "~/lib/home-page-copy";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { normalizeEmailLoginCode } from "~/lib/email-login-code";
 import {
@@ -210,28 +210,12 @@ export default function LoginPage() {
   return (
     <main className="anime-shell min-h-screen px-5 py-5 text-white sm:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-5xl flex-col">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <BrandLockup href={homeUrl} />
+        <header className="ag-login-bar">
+          <div className="ag-login-brand">
+            <BrandLockup href={homeUrl} />
+            <LangSwitch locale={switchLocale} onSelect={selectLocale} />
+          </div>
           <div className="flex flex-wrap items-center gap-3">
-            <div
-              className="grid grid-cols-4 rounded-xl border border-white/10 bg-black/40 p-1 text-xs font-bold text-white/70"
-              aria-label={copy.languageLabel}
-            >
-              {HOME_LANG_LINKS.map((item) => (
-                <button
-                  key={item.locale}
-                  type="button"
-                  onClick={() => selectLocale(item.locale)}
-                  className={`min-h-10 rounded-lg px-3 transition focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none ${
-                    switchLocale === item.locale
-                      ? "bg-pink-300 text-slate-950"
-                      : "hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
             <Link
               href={withGameLocale("/privacy", switchLocale)}
               className="text-sm font-bold text-cyan-100/70 transition hover:text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
