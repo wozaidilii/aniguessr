@@ -1,4 +1,5 @@
 {
+  "correctedOn": "2026-10-21",
   "source": "scripts/data/japan-municipalities.json",
   "boundary": "国土数値情報 行政区域 (MLIT), simplified polygons in japan-municipalities.json",
   "rule": "Rewrite the stored label only when the point is more than 1km inside a single prefecture that is not the stored label's prefecture. Same-prefecture municipality differences, outside Japan, borders, and ambiguous points stay as stored.",

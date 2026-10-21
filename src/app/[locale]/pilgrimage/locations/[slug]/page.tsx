@@ -11,6 +11,7 @@ import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { withPilgrimageOg } from "~/lib/og/metadata";
+import { emptyAreaOutcome } from "~/lib/empty-area";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
@@ -49,6 +50,22 @@ function redirectLocationSlug(
   );
 }
 
+/** No spots: 308 only when a parent area route exists, otherwise a real 404. */
+function refuseEmptyArea(
+  locale: PilgrimageLocale,
+  slug: string,
+  spotCount: number,
+) {
+  if (spotCount > 0) return;
+  const outcome = emptyAreaOutcome(slug);
+  if (outcome.kind === "redirect") {
+    permanentRedirect(
+      pilgrimageHref(`/pilgrimage/locations/${outcome.slug}`, locale),
+    );
+  }
+  notFound();
+}
+
 function locationPageSeo(
   locale: PilgrimageLocale,
   location: PilgrimageLocationSummary,
@@ -68,6 +85,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) return { title: "Not found" };
   redirectLocationSlug(locale, resolved);
+  refuseEmptyArea(
+    locale,
+    resolved.location.slug,
+    listSpotsForLocation(resolved.location.slug).length,
+  );
 
   const seo = locationDocumentSeo(
     locale,
@@ -103,6 +125,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const name = pickLocalizedText(location.name, locale);
 
   const spots = listSpotsForLocation(location.slug);
+  refuseEmptyArea(locale, location.slug, spots.length);
   const seo = locationPageSeo(locale, location);
   const listed = spots.slice(0, 24);
   const visibleTitle = copy.spotsInLocation(name, location.spotCount);
