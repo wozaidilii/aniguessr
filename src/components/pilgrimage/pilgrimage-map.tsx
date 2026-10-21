@@ -13,7 +13,10 @@ import {
   spotPointPaint,
 } from "~/components/pilgrimage/pilgrimage-map-layers";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
+import {
+  type PilgrimageLocale,
+  withPilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   PILGRIMAGE_MAP_STYLE,
@@ -22,7 +25,7 @@ import {
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   loadNavCatalog,
-  localizedNavText,
+  localizedSpotName,
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
@@ -236,7 +239,7 @@ export function PilgrimageMap({
           id: spot.id,
           subjectId: spot.subjectId,
           fav: spotFavProperty(spot.subjectId, favoriteSet),
-          name: localizedNavText(spot.name, locale),
+          name: localizedSpotName(spot, locale),
           anime: animeTitle(catalog.animes, spot.subjectId, locale),
         },
       })),

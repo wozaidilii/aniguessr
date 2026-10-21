@@ -6,12 +6,11 @@ vi.mock("server-only", () => ({}));
 
 import type { OgCard } from "~/lib/og/card";
 import { withPilgrimageOg } from "~/lib/og/metadata";
-import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   pickLocalizedText,
   pickMaybeLocalizedText,
-  pickSpotPlaceFromRecord,
 } from "~/lib/localized-text";
+import { spotPlaceName } from "~/lib/spot-name-overrides";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   buildAnimeIndexSeo,
@@ -113,12 +112,7 @@ function spotFields(spot: PilgrimageSpot): SpotSeoFields {
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, "zh-tw"),
-    place: pickSpotPlaceFromRecord(
-      spot.answerName,
-      spot.title,
-      "zh-tw",
-      jaSpotPlaceOverride(spot.id),
-    ),
+    place: spotPlaceName(spot, "zh-tw"),
     area: pickLocalizedText(spot.location, "zh-tw"),
     episode: pickMaybeLocalizedText(spot.episodeContext, "zh-tw"),
     scene: pickLocalizedText(spot.title, "zh-tw"),

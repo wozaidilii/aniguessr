@@ -1,5 +1,6 @@
 import type { LocalizedText } from "~/lib/localized-text";
 import { pickLocalizedText } from "~/lib/localized-text";
+import { applySpotDisplayName } from "~/lib/spot-name-overrides";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   isZhTwCoveredLocationSlug,
@@ -207,8 +208,7 @@ export function buildHomeCatalog(
     .filter((entry) => entry.spotCount > 0)
     .sort(
       (a, b) =>
-        b.spotCount - a.spotCount ||
-        a.anime.slug.localeCompare(b.anime.slug),
+        b.spotCount - a.spotCount || a.anime.slug.localeCompare(b.anime.slug),
     );
   const shownAnime = rankedAnime.slice(0, ANIME_CARD_LIMIT + ANIME_TAG_LIMIT);
   const animeSet = new Set(shownAnime.map((entry) => entry.anime.subjectId));
@@ -233,8 +233,16 @@ export function buildHomeCatalog(
       hits.set(spot.locationSlug, (hits.get(spot.locationSlug) ?? 0) + 1);
       areaHits.set(subjectId, hits);
     }
-    if (seedSlug && spot.locationSlug === seedSlug && seeds.length < SEED_LIMIT) {
-      const name = homeLabel(spot.answerName, locale);
+    if (
+      seedSlug &&
+      spot.locationSlug === seedSlug &&
+      seeds.length < SEED_LIMIT
+    ) {
+      const name = applySpotDisplayName(
+        locale,
+        spot.id,
+        homeLabel(spot.answerName, locale),
+      );
       if (!name) continue;
       seeds.push({
         id: spot.id,
@@ -304,7 +312,8 @@ export function buildHomeCatalog(
     }));
 
   const spotCount = locale === "zh-tw" ? coveredSpotCount : source.spotCount;
-  const animeCount = locale === "zh-tw" ? rankedAnime.length : source.animeCount;
+  const animeCount =
+    locale === "zh-tw" ? rankedAnime.length : source.animeCount;
   const locationCount =
     locale === "zh-tw" ? locations.length : source.locationCount;
 

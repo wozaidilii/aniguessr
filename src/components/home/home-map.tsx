@@ -28,7 +28,7 @@ import {
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   loadNavCatalog,
-  localizedNavText,
+  localizedSpotName,
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
@@ -56,7 +56,7 @@ function spotCollection(
       },
       properties: {
         id: spot.id,
-        name: localizedNavText(spot.name, locale),
+        name: localizedSpotName(spot, locale),
         anime: animeTitle(animes, spot.subjectId, locale),
         subjectId: spot.subjectId,
         dim: focusId && spot.subjectId !== focusId ? 1 : 0,
