@@ -7,6 +7,12 @@ import { ArrowIcon } from "~/components/brand/ArrowIcon";
 import { BrandLockup } from "~/components/brand/BrandLockup";
 import { LangSwitch } from "~/components/brand/LangSwitch";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
+import {
+  gameLocaleFromPathname,
+  withGameLocale,
+  type GameLocale,
+} from "~/lib/game-locale";
+import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { GAME_UI_COPY } from "~/lib/aniguessr-copy";
 import {
   difficultyHint,
@@ -20,7 +26,6 @@ import { AnimeDifficultySelector } from "~/components/AnimeDifficultySelector";
 import { AnimeRoundCountSelector } from "~/components/AnimeRoundCountSelector";
 import {
   ANIME_GUESSR_DEFAULT_DIFFICULTY_TIER,
-  ANIME_GUESSR_PLACEHOLDER_IMAGE_URL,
   ANIME_GUESSR_ROUNDS,
   buildAnimeGuessrImageUrl,
   buildGoogleMapsStreetViewUrl,
@@ -43,9 +48,6 @@ import {
 import {
   DEFAULT_ANIME_LOCALE,
   saveAnimeLocale,
-  stripLocalePrefix,
-  withAnimeLocale,
-  type AnimeLocale,
 } from "~/lib/anime-locale";
 import {
   clearPendingAnimeFinalResult,
@@ -104,8 +106,6 @@ type GameCopy = {
   noGoogleKey: string;
   noStreetViewQuestions: string;
   skippedStreetView: string;
-  imageUnavailable: string;
-  imageMissingBase: string;
   guestRemaining: (remaining: number, bestScore: number) => string;
   guestRemainingShort: (remaining: number) => string;
   roundStatus: (round: number, total: number, isResult: boolean) => string;
@@ -156,7 +156,7 @@ type GameCopy = {
   };
 };
 
-const GAME_COPY: Record<AnimeLocale, GameCopy> = {
+const GAME_COPY: Record<GameLocale, GameCopy> = {
   zh: {
     authSync: "账号同步",
     authPrompts: {
@@ -197,8 +197,6 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
     noStreetViewQuestions: "当前没有可用的 Google 街景题目，请重新加载题库。",
     skippedStreetView:
       "上一道动漫巡礼题的现实街景加载失败，已跳过并切换到下一题。",
-    imageUnavailable: "题目图片暂不可用，已显示占位图",
-    imageMissingBase: "图片前缀未配置，已显示占位图",
     guestRemaining: (remaining, bestScore) =>
       `游客今日剩余 ${remaining} 局 · 本模式本地最高 ${bestScore.toLocaleString()} 分`,
     guestRemainingShort: (remaining) => `游客 · 今日剩余 ${remaining} 局`,
@@ -293,8 +291,6 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
       "利用可能な Google ストリートビュー問題がありません。問題データを再読み込みしてください。",
     skippedStreetView:
       "前の問題のストリートビューを読み込めなかったため、次の問題に切り替えました。",
-    imageUnavailable: "問題画像を表示できないため、仮画像を表示しています",
-    imageMissingBase: "画像公開 URL が未設定のため、仮画像を表示しています",
     guestRemaining: (remaining, bestScore) =>
       `ゲスト残り ${remaining} 回 · このモード最高 ${bestScore.toLocaleString()} 点`,
     guestRemainingShort: (remaining) => `ゲスト · 本日残り ${remaining} 回`,
@@ -393,9 +389,6 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
       "No Google Street View questions are currently available. Reload the question bank.",
     skippedStreetView:
       "The previous anime pilgrimage question had no available Street View, so it was skipped.",
-    imageUnavailable: "Question image unavailable. Showing the placeholder.",
-    imageMissingBase:
-      "Image public base URL is not configured. Showing the placeholder.",
     guestRemaining: (remaining, bestScore) =>
       `Guest runs left today: ${remaining} · Mode best ${bestScore.toLocaleString()} pts`,
     guestRemainingShort: (remaining) => `Guest · ${remaining} left today`,
@@ -452,20 +445,114 @@ const GAME_COPY: Record<AnimeLocale, GameCopy> = {
       d: "Lost traveler",
     },
   },
+  "zh-tw": {
+    authSync: "帳號同步",
+    authPrompts: {
+      record: {
+        title: "儲存這次新紀錄",
+        body: "登入後可以把本機新紀錄儲存到帳號，之後換裝置也能繼續追蹤成績。",
+      },
+      leaderboard: {
+        title: "登入查看排行榜",
+        body: "排行榜需要帳號成績，登入後會把本局分數寫入你的成績紀錄。",
+      },
+      history: {
+        title: "儲存歷史成績",
+        body: "訪客成績只保存在目前的瀏覽器。登入後可以長期儲存每局紀錄。",
+      },
+      quota: {
+        title: "今日訪客局數已用完",
+        body: "訪客每天可以免費玩 3 局。登入後可以繼續儲存成績並跨裝置查看紀錄。",
+      },
+    },
+    googleContinue: "使用 Google 繼續",
+    emailContinue: "使用電子郵件登入 / 註冊",
+    guestContinue: "繼續以訪客身分遊玩",
+    guestMode: "訪客模式",
+    quotaTitle: "今日免費局數已用完",
+    quotaBody:
+      "未登入每天可以免費玩 3 局，並保存在目前的瀏覽器。登入後可以繼續儲存成績和歷史紀錄。",
+    home: "返回首頁",
+    loadingTitle: "猜動漫模式",
+    loadingBank: "正在載入動漫巡禮題庫...",
+    emptyBank: "動漫題庫是空的，請重新產生題庫。",
+    reload: "重新載入",
+    restored: "登入成功，已回到剛才的成績頁。",
+    notEnoughQuestions: (found, total, pool) =>
+      `目前難度只找到 ${found} / ${total} 題可用題（可選池 ${pool} 題），請提高難度或重新載入。`,
+    bankLoadFailed: "動漫題庫載入失敗",
+    noGoogleKey: streetViewUnavailable("zh-tw"),
+    noStreetViewQuestions: "目前沒有可用的 Google 街景題目，請重新載入題庫。",
+    skippedStreetView: "上一題的街景載入失敗，已跳過並切換到下一題。",
+    guestRemaining: (remaining, bestScore) =>
+      `訪客今日剩餘 ${remaining} 局 · 本模式本機最高 ${bestScore.toLocaleString()} 分`,
+    guestRemainingShort: (remaining) => `訪客 · 今日剩餘 ${remaining} 局`,
+    roundStatus: (round, total, isResult) =>
+      `第 ${round} / ${total} 輪${isResult ? "結果" : ""}`,
+    totalElapsed: (time) => `總用時 ${time}`,
+    roundsLabel: "局數",
+    roundsOption: (rounds) => `${rounds} 輪`,
+    difficultyLabel: "難度",
+    difficultyOption: (tier) => difficultyLabel("zh-tw", tier),
+    difficultyHint: (tier) => difficultyHint("zh-tw", tier),
+    animeClue: "動漫線索",
+    scene: "場景",
+    openMap: "打開地圖",
+    mapGuessTitle: "選擇你猜測的位置",
+    closePanel: "關閉",
+    guessSelected: "已選地點",
+    answer: "答案",
+    roundScore: "本輪得分",
+    distancePts: "距離分",
+    speedBonus: "速度補償",
+    elapsed: "用時",
+    guessDistance: (distance) => `你的猜測距離實際地點 ${distance}。`,
+    streetViewLink: "在街景中檢視",
+    finalScore: "檢視最終得分",
+    nextRound: "下一輪",
+    submitGuess: "提交猜測",
+    shareScore: "分享成績",
+    leaderboard: "檢視排行榜",
+    saveHistory: "儲存歷史成績",
+    playAgain: "再來一局",
+    leaderboardSaved: "排行榜已更新，正在打開首頁。",
+    historySaved: "歷史成績已儲存到帳號。",
+    shareOpened: "分享面板已打開。",
+    shareCopied: "成績文字已複製。",
+    shareFailed: "分享未完成，可以稍後再試。",
+    shareTitle: "AniGuessr 成績",
+    shareText: (score, url) =>
+      `我在 AniGuessr 猜動漫模式拿到 ${score} 分，你也來試試：${url}`,
+    roundLabel: (round) => `第 ${round} 輪`,
+    resultLine: (location, distance, elapsed) =>
+      `${location} · 偏差 ${distance} · 用時 ${elapsed}`,
+    scoreUnit: "分",
+    scoreBreakthrough: "精確度與用時都超乎尋常，本輪得分突破了一般滿分上限。",
+    scoreBreakthroughFinal: "本局有輪次突破了單輪滿分上限。",
+    ranks: {
+      s: "聖地巡禮大師",
+      a: "取景地獵人",
+      b: "動漫地理通",
+      c: "巡禮新手",
+      d: "迷路中",
+    },
+  },
 };
 
-function formatDistance(distanceKm: number, locale: AnimeLocale): string {
+function formatDistance(distanceKm: number, locale: GameLocale): string {
   if (distanceKm < 1) {
     const meters = Math.round(distanceKm * 1000);
-    return locale === "zh" ? `${meters} 米` : `${meters} m`;
+    return locale === "en" || locale === "ja" ? `${meters} m` : `${meters} 米`;
   }
   const kilometers = Math.round(distanceKm).toLocaleString(
     locale === "ja" ? "ja-JP" : locale === "en" ? "en-US" : "zh-CN",
   );
-  return locale === "zh" ? `${kilometers} 公里` : `${kilometers} km`;
+  return locale === "en" || locale === "ja"
+    ? `${kilometers} km`
+    : `${kilometers} 公里`;
 }
 
-function formatElapsed(seconds: number, locale: AnimeLocale): string {
+function formatElapsed(seconds: number, locale: GameLocale): string {
   const elapsed = Math.max(0, Math.round(seconds));
   if (locale === "en") return `${elapsed}s`;
   return `${elapsed} 秒`;
@@ -488,7 +575,7 @@ function useElapsedSeconds(active: boolean, resetKey: string) {
   return elapsed;
 }
 
-function getRank(score: number, locale: AnimeLocale) {
+function getRank(score: number, locale: GameLocale) {
   const ranks = GAME_COPY[locale].ranks;
   if (score >= 450) return { label: ranks.s, symbol: "S" };
   if (score >= 360) return { label: ranks.a, symbol: "A" };
@@ -504,13 +591,13 @@ function AuthPromptModal({
   onBeforeAuth,
 }: {
   reason: AuthPromptReason;
-  locale: AnimeLocale;
+  locale: GameLocale;
   onClose: () => void;
   onBeforeAuth?: () => void;
 }) {
   const copy = GAME_COPY[locale];
   const prompt = copy.authPrompts[reason];
-  const next = withAnimeLocale("/game/anime", locale);
+  const next = withGameLocale("/game/anime", locale);
 
   return (
     <div className="fixed inset-0 z-[80] grid place-items-center bg-slate-950/75 px-4 backdrop-blur-sm">
@@ -528,7 +615,7 @@ function AuthPromptModal({
             {copy.googleContinue}
           </Link>
           <Link
-            href={withAnimeLocale(
+            href={withGameLocale(
               `/login?next=${encodeURIComponent(next)}`,
               locale,
             )}
@@ -553,47 +640,30 @@ function AuthPromptModal({
 function AnimeClueImage({
   question,
   text,
-  imageUnavailable,
-  imageMissingBase,
-  flush = false,
+  variant,
 }: {
   question: AnimeGuessrQuestion;
   text: AnimeGuessrQuestionText;
-  imageUnavailable: string;
-  imageMissingBase: string;
-  flush?: boolean;
+  variant: "clue" | "thumb";
 }) {
   const [failed, setFailed] = useState(false);
   const imageUrl = buildAnimeGuessrImageUrl(question.imagePath);
-  const showPlaceholder = !imageUrl || failed;
-  const displayImageUrl = showPlaceholder
-    ? ANIME_GUESSR_PLACEHOLDER_IMAGE_URL
-    : imageUrl;
+  const showImage = Boolean(imageUrl) && !failed;
 
   useEffect(() => {
     setFailed(false);
   }, [question.id]);
 
   return (
-    <div
-      className={
-        flush
-          ? "relative aspect-video overflow-hidden bg-black/40"
-          : "relative aspect-video overflow-hidden rounded-xl border border-white/10 bg-black/40"
-      }
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={displayImageUrl}
-        alt={flush ? "" : text.title}
-        className="h-full w-full object-cover"
-        onError={() => setFailed(true)}
-      />
-      {showPlaceholder && (
-        <div className="absolute right-2 bottom-2 left-2 rounded-lg border border-white/10 bg-slate-950/90 px-2 py-1.5 text-[11px] leading-4 text-pink-50/80">
-          {imageUrl ? imageUnavailable : imageMissingBase}
-        </div>
-      )}
+    <div className={variant === "thumb" ? "ag-thumb" : "ag-clue-photo"}>
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt={variant === "thumb" ? "" : text.title}
+          onError={() => setFailed(true)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -609,7 +679,7 @@ function AnimeCluePanel({
   question: AnimeGuessrQuestion;
   text: AnimeGuessrQuestionText;
   copy: GameCopy;
-  locale: AnimeLocale;
+  locale: GameLocale;
   difficultyTier: AnimeGuessrDifficultyTier;
   loadMessage: string;
 }) {
@@ -631,13 +701,7 @@ function AnimeCluePanel({
   return (
     <aside className="ag-glass ag-clue">
       <div className="relative">
-        <AnimeClueImage
-          question={question}
-          text={text}
-          imageUnavailable={copy.imageUnavailable}
-          imageMissingBase={copy.imageMissingBase}
-          flush
-        />
+        <AnimeClueImage question={question} text={text} variant="clue" />
         <span className="ag-clue-tag">{ui.clueTag}</span>
       </div>
       <div className="ag-clue-cap">
@@ -666,9 +730,11 @@ function AnimeCluePanel({
 
 export default function AnimeGuessrPage() {
   const { ready, session } = useEmailSession();
-  const locale = useAnimeLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const storedLocale = useAnimeLocale();
+  const pathGameLocale = gameLocaleFromPathname(pathname);
+  const locale: GameLocale = pathGameLocale ?? storedLocale;
   const ui = GAME_UI_COPY[locale];
   const [questions, setQuestions] = useState<AnimeGuessrQuestion[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
@@ -701,13 +767,13 @@ export default function AnimeGuessrPage() {
   const googleMapLabels = getGoogleGuessMapLabels(locale);
   const googleMapsLanguage = getGoogleMapsLanguage(locale);
   const gameNextUrl = useMemo(
-    () => withAnimeLocale("/game/anime", locale),
+    () => withGameLocale("/game/anime", locale),
     [locale],
   );
-  const homeUrl = useMemo(() => withAnimeLocale("/", locale), [locale]);
+  const homeUrl = useMemo(() => withGameLocale("/", locale), [locale]);
   const loginUrl = useMemo(
     () =>
-      withAnimeLocale(`/login?next=${encodeURIComponent(gameNextUrl)}`, locale),
+      withGameLocale(`/login?next=${encodeURIComponent(gameNextUrl)}`, locale),
     [gameNextUrl, locale],
   );
 
@@ -1042,7 +1108,7 @@ export default function AnimeGuessrPage() {
     }
 
     setShareMessage(copy.leaderboardSaved);
-    window.location.href = withAnimeLocale(
+    window.location.href = withGameLocale(
       `/?difficulty=${difficultyTier}&rounds=${roundCount}#rank`,
       locale,
     );
@@ -1184,11 +1250,11 @@ export default function AnimeGuessrPage() {
     setLoadMessage(copy.skippedStreetView);
   }, [copy, current, questions, results.length, round]);
 
-  function selectLocale(nextLocale: AnimeLocale) {
-    saveAnimeLocale(nextLocale);
-    const innerPath = stripLocalePrefix(pathname);
+  function selectLocale(nextLocale: GameLocale) {
+    if (nextLocale !== "zh-tw") saveAnimeLocale(nextLocale);
+    const innerPath = splitLocalePath(pathname).pathname;
     const search = window.location.search;
-    router.push(withAnimeLocale(`${innerPath}${search}`, nextLocale));
+    router.push(withGameLocale(`${innerPath}${search}`, nextLocale));
   }
 
     if (!ready) return <AuthLoading />;
@@ -1301,12 +1367,7 @@ export default function AnimeGuessrPage() {
         )}
         <header className="flex items-center justify-between border-b border-white/10 px-6 py-3">
           <BrandLockup href={homeUrl} />
-          <Link
-            href={homeUrl}
-            className="rounded-lg border border-white/10 bg-white/10 px-3 py-1.5 text-sm font-bold text-pink-50 transition hover:bg-white/15 focus:ring-2 focus:ring-cyan-200 focus:outline-none"
-          >
-            {copy.home}
-          </Link>
+          <LangSwitch locale={locale} onSelect={selectLocale} />
         </header>
 
         <div className="mx-auto w-full max-w-3xl px-6 py-8">
@@ -1415,11 +1476,10 @@ export default function AnimeGuessrPage() {
               {copy.shareScore}
             </button>
           </div>
-          <div className="mt-3 grid gap-3">
+          <div className="ag-final-links">
             <button
               type="button"
               onClick={() => void handleOpenLeaderboard()}
-              className="anime-button-secondary h-11 w-full whitespace-nowrap"
             >
               {copy.leaderboard}
             </button>
@@ -1430,52 +1490,22 @@ export default function AnimeGuessrPage() {
                   ? setShareMessage(copy.historySaved)
                   : setAuthPromptReason("history")
               }
-              className="anime-button-secondary h-11 w-full whitespace-nowrap"
             >
               {copy.saveHistory}
             </button>
-            <Link
-              href={homeUrl}
-              className="anime-button-secondary h-11 w-full whitespace-nowrap"
-            >
-              {copy.home}
-            </Link>
+            <Link href={homeUrl}>{copy.home}</Link>
           </div>
         </div>
       </main>
     );
   }
 
-  const traditionalResult = pathname.startsWith("/zh-tw");
-  const panel = traditionalResult
-    ? {
-        streetView: "在街景中查看",
-        nextRound: "下一回合",
-        finalScore: "查看最終得分",
-      }
-    : {
-        streetView: copy.streetViewLink,
-        nextRound: copy.nextRound,
-        finalScore: copy.finalScore,
-      };
-  const resultUi = traditionalResult
-    ? {
-        ...ui,
-        distance: "距離",
-        answerTime: "作答時間",
-        answerLabel: (name: string) => `正確答案：${name}`,
-        totalLabel: (score: string) => `合計 ${score} 分`,
-        closeness: (distanceKm: number) => {
-          if (distanceKm < 1) return "非常近！";
-          if (distanceKm < 15) return "比較近";
-          if (distanceKm < 80) return "大致同一區域";
-          if (distanceKm < 400) return "方向對了";
-          return "還比較遠";
-        },
-        breakdown: (distancePts: number, speedPts: number) =>
-          `距離分 ${distancePts} · 時間加分 +${speedPts}`,
-      }
-    : ui;
+  const panel = {
+    streetView: copy.streetViewLink,
+    nextRound: copy.nextRound,
+    finalScore: copy.finalScore,
+  };
+  const resultUi = ui;
 
   const roundMax = roundResult?.scoreBreakthrough
     ? LOCATION_SOLO_ANIME_BREAKTHROUGH_MAX
@@ -1604,24 +1634,19 @@ export default function AnimeGuessrPage() {
               <AnimeClueImage
                 question={roundResult.question}
                 text={roundResultText}
-                imageUnavailable={copy.imageUnavailable}
-                imageMissingBase={copy.imageMissingBase}
-                flush
+                variant="thumb"
               />
-              <div>
+              <div className="ag-answer-copy">
                 <b>{resultUi.answerLabel(roundResultText.answerName)}</b>
                 <span>
                   {roundResultText.animeTitle} · {roundResultText.location}
                 </span>
+                <p className="ag-answer-desc">
+                  {roundResultText.funfact.filter(Boolean).join(" ") ||
+                    roundResultText.description}
+                </p>
               </div>
             </div>
-            {roundResultText.funfact.length > 0 && (
-              <ul className="ag-clue-text">
-                {roundResultText.funfact.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            )}
             </div>
             <div className="ag-result-actions">
               <button type="button" onClick={handleNext} className="ag-btn ag-btn-pink">

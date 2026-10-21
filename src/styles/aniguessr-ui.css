@@ -1276,19 +1276,45 @@ a.rights-contact-link:hover {
 
 .ag-answer {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   margin-top: 22px;
   padding: 10px;
+  overflow: hidden;
   border: 1px solid var(--ag-line);
   border-radius: 12px;
 }
 
-.ag-answer img {
+.ag-thumb,
+.ag-clue-photo {
+  flex: none;
+  overflow: hidden;
+  background: #eceae5;
+}
+
+.ag-thumb {
   width: 110px;
   height: 70px;
   border-radius: 8px;
+}
+
+.ag-clue-photo {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+
+.ag-thumb img,
+.ag-clue-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+
+.ag-answer-copy {
+  min-width: 0;
+  flex: 1;
 }
 
 .ag-answer b {
@@ -1296,11 +1322,21 @@ a.rights-contact-link:hover {
   font-size: 14px;
 }
 
-.ag-answer span {
+.ag-answer span,
+.ag-answer-desc {
   display: block;
   color: var(--ag-tx3);
   font-size: 12px;
   line-height: 1.6;
+}
+
+.ag-answer-desc {
+  display: -webkit-box;
+  margin-top: 4px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .ag-result-body {
@@ -1428,6 +1464,27 @@ a.rights-contact-link:hover {
   min-height: 44px;
   padding: 0 12px;
   white-space: nowrap;
+}
+
+.ag-final-links {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-top: 14px;
+}
+
+.ag-final-links button,
+.ag-final-links a {
+  border: 0;
+  background: transparent;
+  color: #3d4452;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: underline;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .ag-prog i {
@@ -1737,6 +1794,15 @@ a.rights-contact-link:hover {
   .ag-result-actions .ag-btn {
     width: 100%;
     flex: none;
+  }
+
+  .ag-final-links {
+    gap: 6px 10px;
+  }
+
+  .ag-final-links button,
+  .ag-final-links a {
+    font-size: 12px;
   }
 
   .ag-final-pair {

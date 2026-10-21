@@ -5,13 +5,14 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BrandLockup } from "~/components/brand/BrandLockup";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
+import { saveAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 import {
-  ANIME_LOCALES,
-  saveAnimeLocale,
-  stripLocalePrefix,
-  withAnimeLocale,
-  type AnimeLocale,
-} from "~/lib/anime-locale";
+  gameLocaleFromPathname,
+  withGameLocale,
+  type GameLocale,
+} from "~/lib/game-locale";
+import { HOME_LANG_LINKS } from "~/lib/home-page-copy";
+import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { normalizeEmailLoginCode } from "~/lib/email-login-code";
 import {
   getGoogleLoginErrorMessage,
@@ -43,8 +44,16 @@ function getGoogleLoginUrl() {
 export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useAnimeLocale();
-  const homeUrl = useMemo(() => withAnimeLocale("/", locale), [locale]);
+  const storedLocale = useAnimeLocale();
+  const pathGameLocale = gameLocaleFromPathname(pathname);
+  const locale: AnimeLocale =
+    pathGameLocale && pathGameLocale !== "zh-tw" ? pathGameLocale : storedLocale;
+  const switchLocale: GameLocale =
+    pathGameLocale === "zh-tw" ? "zh-tw" : locale;
+  const homeUrl = useMemo(
+    () => withGameLocale("/", switchLocale),
+    [switchLocale],
+  );
   const [mode, setMode] = useState<AuthMode>("password");
   const [resetStep, setResetStep] = useState<ResetStep>("email");
   const [identifier, setIdentifier] = useState("");
@@ -59,7 +68,6 @@ export default function LoginPage() {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [message, setMessage] = useState("");
-  const [debugCode, setDebugCode] = useState<string | null>(null);
   const rawServerErrorRef = useRef<string | null>(null);
   const localeRef = useRef<AnimeLocale>(locale);
   localeRef.current = locale;
@@ -87,23 +95,23 @@ export default function LoginPage() {
     }
   }, [locale]);
 
-  function selectLocale(nextLocale: AnimeLocale) {
-    saveAnimeLocale(nextLocale);
-
-    if (rawServerErrorRef.current) {
-      setMessage(
-        translateAuthErrorMessage(rawServerErrorRef.current, nextLocale),
-      );
+  function selectLocale(nextLocale: GameLocale) {
+    if (nextLocale !== "zh-tw") {
+      saveAnimeLocale(nextLocale);
+      if (rawServerErrorRef.current) {
+        setMessage(
+          translateAuthErrorMessage(rawServerErrorRef.current, nextLocale),
+        );
+      }
+      const error = new URLSearchParams(window.location.search).get("error");
+      if (error?.startsWith("google")) {
+        setMessage(getGoogleLoginErrorMessage(error, nextLocale));
+      }
     }
 
-    const error = new URLSearchParams(window.location.search).get("error");
-    if (error?.startsWith("google")) {
-      setMessage(getGoogleLoginErrorMessage(error, nextLocale));
-    }
-
-    const innerPath = stripLocalePrefix(pathname);
+    const innerPath = splitLocalePath(pathname).pathname;
     const search = window.location.search;
-    router.push(withAnimeLocale(`${innerPath}${search}`, nextLocale));
+    router.push(withGameLocale(`${innerPath}${search}`, nextLocale));
   }
 
   const handleAuthSuccess = (
@@ -147,7 +155,6 @@ export default function LoginPage() {
             ? copy.resetCodeSentDebug
             : copy.resetCodeSent,
         );
-        setDebugCode(result.debugCode ?? null);
       },
       onError(error) {
         setLocalizedServerError(error.message);
@@ -166,7 +173,6 @@ export default function LoginPage() {
   function switchMode(nextMode: AuthMode) {
     setMode(nextMode);
     clearMessages();
-    setDebugCode(null);
   }
 
   function handlePasswordLogin(event: FormEvent<HTMLFormElement>) {
@@ -188,7 +194,6 @@ export default function LoginPage() {
   function handleRequestPasswordResetCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     clearMessages();
-    setDebugCode(null);
     requestPasswordResetCode.mutate({ email: resetEmail });
   }
 
@@ -209,26 +214,26 @@ export default function LoginPage() {
           <BrandLockup href={homeUrl} />
           <div className="flex flex-wrap items-center gap-3">
             <div
-              className="grid grid-cols-3 rounded-xl border border-white/10 bg-black/40 p-1 text-xs font-bold text-white/70"
+              className="grid grid-cols-4 rounded-xl border border-white/10 bg-black/40 p-1 text-xs font-bold text-white/70"
               aria-label={copy.languageLabel}
             >
-              {ANIME_LOCALES.map((item) => (
+              {HOME_LANG_LINKS.map((item) => (
                 <button
-                  key={item}
+                  key={item.locale}
                   type="button"
-                  onClick={() => selectLocale(item)}
+                  onClick={() => selectLocale(item.locale)}
                   className={`min-h-10 rounded-lg px-3 transition focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none ${
-                    locale === item
+                    switchLocale === item.locale
                       ? "bg-pink-300 text-slate-950"
                       : "hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  {getLoginCopy(item).lang}
+                  {item.label}
                 </button>
               ))}
             </div>
             <Link
-              href={withAnimeLocale("/privacy", locale)}
+              href={withGameLocale("/privacy", switchLocale)}
               className="text-sm font-bold text-cyan-100/70 transition hover:text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
             >
               {copy.privacyPolicy}
@@ -593,13 +598,6 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {debugCode && (
-                  <div className="rounded-xl border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-sm leading-6 text-cyan-50">
-                    {copy.debugCodeLabel}{" "}
-                    <span className="font-black">{debugCode}</span>
-                  </div>
-                )}
-
                 {message && (
                   <p
                     className="rounded-xl border border-pink-300/20 bg-pink-300/10 px-3 py-2 text-sm leading-6 text-pink-50"
@@ -616,7 +614,6 @@ export default function LoginPage() {
                       setResetStep("email");
                       setResetCode("");
                       setResetPassword("");
-                      setDebugCode(null);
                       clearMessages();
                     }}
                     className="anime-button-secondary flex-1"

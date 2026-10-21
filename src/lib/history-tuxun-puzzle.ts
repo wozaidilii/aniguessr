@@ -84,7 +84,7 @@ export async function findHistoryTuxunScene(
   puzzle: LocationTuxunPuzzle,
 ): Promise<HistoryTuxunScene | null> {
   if (!BAIDU_MAP_AK) {
-    throw new Error("未配置百度地图 AK，无法匹配有街景的历史题。");
+    throw new Error("街景暂时无法显示。请稍后重试。");
   }
 
   const baiduMapAk = BAIDU_MAP_AK;

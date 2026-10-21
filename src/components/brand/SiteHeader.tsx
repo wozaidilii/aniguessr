@@ -6,6 +6,7 @@ import { BrandLockup } from "~/components/brand/BrandLockup";
 import { LangSwitch } from "~/components/brand/LangSwitch";
 import { HOME_COPY } from "~/lib/aniguessr-copy";
 import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
+import type { HomeLocale } from "~/lib/home-locale";
 
 export function SiteHeader({
   locale,
@@ -13,7 +14,7 @@ export function SiteHeader({
   action,
 }: {
   locale: AnimeLocale;
-  onSelectLocale: (locale: AnimeLocale) => void;
+  onSelectLocale: (locale: HomeLocale) => void;
   action?: ReactNode;
 }) {
   const copy = HOME_COPY[locale];

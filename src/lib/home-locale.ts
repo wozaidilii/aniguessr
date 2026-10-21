@@ -7,7 +7,7 @@ export function isHomeLocale(value: string): value is HomeLocale {
   return (HOME_LOCALES as readonly string[]).includes(value);
 }
 
-/** Game, login, and battle stay on zh/ja/en. zh-TW is a homepage and pilgrimage locale. */
+/** Battle stays on zh/ja/en. Home, pilgrimage, and the anime game keep zh-tw. */
 export function homeSiteLocale(locale: HomeLocale): AnimeLocale {
   return locale === "zh-tw" ? "zh" : locale;
 }

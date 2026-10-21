@@ -219,9 +219,18 @@ describe("locale middleware exemptions", () => {
     expect(game.status).toBe(200);
     expect(game.headers.get("location")).toBeNull();
     expect(game.headers.get("x-middleware-rewrite")).toBe(
-      "https://aniguessr.ayiora.com/not-found-shell/zh-tw",
+      "https://aniguessr.ayiora.com/game/anime",
     );
     expect(game.headers.get("set-cookie")).toBeNull();
+    expect(game.headers.get("x-middleware-request-x-game-locale")).toBe(
+      "zh-tw",
+    );
+
+    const login = middleware(request("/zh-tw/login"));
+    expect(login.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/login",
+    );
+    expect(login.headers.get("set-cookie")).toBeNull();
 
     const preferred = middleware(
       new NextRequest(new URL("https://aniguessr.ayiora.com/login"), {

@@ -27,14 +27,21 @@ const OG_IMAGE = {
   alt: SITE_NAME,
 } as const;
 
-async function getRequestLocale(): Promise<AnimeLocale> {
+async function getRequestLocale(): Promise<{
+  locale: AnimeLocale;
+  lang: string;
+}> {
   const headerList = await headers();
+  if (headerList.get("x-game-locale") === "zh-tw") {
+    return { locale: "zh", lang: "zh-Hant" };
+  }
   const headerLocale = headerList.get("x-anime-locale");
-  return isAnimeLocale(headerLocale) ? headerLocale : DEFAULT_ANIME_LOCALE;
+  const locale = isAnimeLocale(headerLocale) ? headerLocale : DEFAULT_ANIME_LOCALE;
+  return { locale, lang: locale };
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
+  const { locale } = await getRequestLocale();
   const description = SITE_DESCRIPTIONS[locale];
   const canonicalPath = withAnimeLocale("/", locale);
 
@@ -112,6 +119,6 @@ export const viewport: Viewport = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getRequestLocale();
-  return <RootDocument locale={locale}>{children}</RootDocument>;
+  const { lang } = await getRequestLocale();
+  return <RootDocument locale={lang}>{children}</RootDocument>;
 }

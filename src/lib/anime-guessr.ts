@@ -4,6 +4,9 @@ import {
   isAnimeLocale,
   type AnimeLocale,
 } from "~/lib/anime-locale";
+import { type GameLocale } from "~/lib/game-locale";
+import { localizePlaceName } from "~/lib/place-names";
+import { toZhTw } from "~/lib/zh-tw-text";
 import {
   ANIME_GUESSR_IMAGE_API_PREFIX as SHARED_ANIME_GUESSR_IMAGE_API_PREFIX,
   buildAnimeGuessrLocalImageApiUrl,
@@ -293,8 +296,9 @@ export function buildGoogleMapsStreetViewUrl(question: AnimeGuessrQuestion) {
 
 export function getAnimeGuessrQuestionText(
   question: AnimeGuessrQuestion,
-  locale: AnimeLocale = DEFAULT_ANIME_LOCALE,
+  locale: GameLocale = DEFAULT_ANIME_LOCALE,
 ): AnimeGuessrQuestionText {
+  const contentLocale: AnimeLocale = locale === "zh-tw" ? "zh" : locale;
   const base: AnimeGuessrQuestionText = {
     title: question.title,
     description: question.description,
@@ -307,15 +311,38 @@ export function getAnimeGuessrQuestionText(
     tags: question.tags,
   };
   const localized =
-    question.locales?.[locale] ??
-    (locale === "zh" ? undefined : question.locales?.[DEFAULT_ANIME_LOCALE]) ??
+    question.locales?.[contentLocale] ??
+    (contentLocale === "zh"
+      ? undefined
+      : question.locales?.[DEFAULT_ANIME_LOCALE]) ??
     {};
-
-  return {
+  const text: AnimeGuessrQuestionText = {
     ...base,
     ...Object.fromEntries(
       Object.entries(localized).filter(([, value]) => value !== undefined),
     ),
+  };
+  const explicitLocation =
+    locale === "zh-tw" ? undefined : localized.location?.trim();
+  const point = { lat: question.lat, lng: question.lng };
+  text.location =
+    explicitLocation && explicitLocation.length > 0
+      ? explicitLocation
+      : localizePlaceName(question.location, locale, point);
+  if (locale !== "zh-tw") return text;
+  return {
+    ...text,
+    title: toZhTw(text.title),
+    description: toZhTw(text.description),
+    animeTitle: toZhTw(text.animeTitle),
+    aspect: text.aspect ? toZhTw(text.aspect) : text.aspect,
+    location: toZhTw(text.location),
+    answerName: toZhTw(text.answerName),
+    episodeContext: text.episodeContext
+      ? toZhTw(text.episodeContext)
+      : text.episodeContext,
+    funfact: text.funfact.map((item) => toZhTw(item)),
+    tags: text.tags.map((item) => toZhTw(item)),
   };
 }
 
@@ -329,7 +356,7 @@ function stableHeadingFromId(id: string): number {
 
 export function toAnimeStreetViewLocation(
   question: AnimeGuessrQuestion,
-  locale: AnimeLocale = DEFAULT_ANIME_LOCALE,
+  locale: GameLocale = DEFAULT_ANIME_LOCALE,
 ): TuxunLocation {
   const text = getAnimeGuessrQuestionText(question, locale);
   return {

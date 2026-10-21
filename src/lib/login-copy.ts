@@ -93,9 +93,8 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
     changeEmail: "更换邮箱",
     resetting: "重置中...",
     resetAndLogIn: "重置并登录",
-    debugCodeLabel: "调试验证码：",
-    resetCodeSentDebug:
-      "开发环境未配置邮件发送，请使用下方调试验证码重置密码。",
+    debugCodeLabel: "",
+    resetCodeSentDebug: "验证码暂时无法发送，请稍后再试。",
     resetCodeSent: "若该邮箱已注册，验证码将发送到邮箱。",
     googleErrorDefault: "Google 登录失败，请稍后重试或改用邮箱登录。",
     googleErrors: {
@@ -103,10 +102,8 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
       google_unknown: "Google 登录失败，请稍后重试或改用邮箱登录。",
       google_state:
         "Google 登录状态已过期。请从本页重新开始 Google 登录，并确保浏览器允许 Cookie。",
-      google_config:
-        "Google 登录缺少服务端配置。请检查 Vercel 中的 GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET 和 GOOGLE_REDIRECT_URI。",
-      google_token:
-        "Google 授权码交换失败。请确认 Vercel 中的 GOOGLE_CLIENT_SECRET 与 Google Cloud OAuth 客户端一致。",
+      google_config: "Google 登录失败，请稍后重试或改用邮箱登录。",
+      google_token: "Google 登录失败，请稍后重试或改用邮箱登录。",
       google_profile:
         "Google 授权成功，但获取资料失败。请稍后重试或改用邮箱登录。",
       google_database:
@@ -158,9 +155,9 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
     changeEmail: "メールを変更",
     resetting: "再設定中...",
     resetAndLogIn: "再設定してログイン",
-    debugCodeLabel: "デバッグコード:",
+    debugCodeLabel: "",
     resetCodeSentDebug:
-      "開発環境ではメール送信が未設定です。下のデバッグコードでパスワードを再設定してください。",
+      "確認コードを送信できません。しばらくしてからもう一度お試しください。",
     resetCodeSent: "このメールが登録済みの場合、確認コードが送信されます。",
     googleErrorDefault:
       "Google ログインに失敗しました。後でもう一度試すか、メールログインを使ってください。",
@@ -172,9 +169,9 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
       google_state:
         "Google ログイン状態の有効期限が切れました。このページから再度 Google ログインを開始し、Cookie が使えることを確認してください。",
       google_config:
-        "Google ログインのサーバー設定が不足しています。Vercel の GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET、GOOGLE_REDIRECT_URI を確認してください。",
+        "Google ログインに失敗しました。後でもう一度試すか、メールログインを使ってください。",
       google_token:
-        "Google 認可コードの交換に失敗しました。Vercel の GOOGLE_CLIENT_SECRET が Google Cloud OAuth クライアントと一致しているか確認してください。",
+        "Google ログインに失敗しました。後でもう一度試すか、メールログインを使ってください。",
       google_profile:
         "Google 認可は成功しましたが、プロフィール取得に失敗しました。後でもう一度試すか、メールログインを使ってください。",
       google_database:
@@ -226,9 +223,9 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
     changeEmail: "Change email",
     resetting: "Resetting...",
     resetAndLogIn: "Reset and log in",
-    debugCodeLabel: "Debug code:",
+    debugCodeLabel: "",
     resetCodeSentDebug:
-      "Email delivery is not configured in development. Use the debug code below to reset your password.",
+      "The reset code could not be sent. Please try again later.",
     resetCodeSent:
       "If this email is registered, a reset code will be sent to it.",
     googleErrorDefault:
@@ -240,9 +237,8 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
       google_state:
         "The Google login state expired. Start Google login again from this page, and make sure this site can use cookies in private browsing.",
       google_config:
-        "Google login is missing server configuration. Check GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI in Vercel.",
-      google_token:
-        "Google authorization code exchange failed. Make sure the Vercel GOOGLE_CLIENT_SECRET matches the current Google Cloud OAuth client secret.",
+        "Google login failed. Try again later or use email login.",
+      google_token: "Google login failed. Try again later or use email login.",
       google_profile:
         "Google authorization succeeded, but profile lookup failed. Try again later or use email login.",
       google_database:
@@ -259,8 +255,8 @@ const AUTH_ERROR_MESSAGES: Record<AnimeLocale, Record<string, string>> = {
     "The code is incorrect.": "验证码不正确。",
     "Too many incorrect attempts. Request a new code.":
       "错误次数过多，请重新获取验证码。",
-    "Email verification is not configured. Try again later.":
-      "邮件验证未配置，请稍后再试。",
+    "Email verification is unavailable. Try again later.":
+      "邮件验证暂时不可用，请稍后再试。",
     "Verification email failed to send. Try again later.":
       "验证邮件发送失败，请稍后再试。",
     "This email is already registered. Log in instead.":
@@ -278,8 +274,8 @@ const AUTH_ERROR_MESSAGES: Record<AnimeLocale, Record<string, string>> = {
     "The code is incorrect.": "確認コードが正しくありません。",
     "Too many incorrect attempts. Request a new code.":
       "試行回数が多すぎます。新しいコードを取得してください。",
-    "Email verification is not configured. Try again later.":
-      "メール認証が設定されていません。後でもう一度お試しください。",
+    "Email verification is unavailable. Try again later.":
+      "メール認証を利用できません。後でもう一度お試しください。",
     "Verification email failed to send. Try again later.":
       "確認メールの送信に失敗しました。後でもう一度お試しください。",
     "This email is already registered. Log in instead.":

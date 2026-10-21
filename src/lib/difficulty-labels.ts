@@ -1,12 +1,12 @@
 import type { AnimeGuessrDifficultyTier } from "~/lib/anime-guessr";
-import type { AnimeLocale } from "~/lib/anime-locale";
+import type { GameLocale } from "~/lib/game-locale";
 
 /**
  * Display names only. Stored values stay beginner | intermediate | master | miracle.
  * 進階 → 中級, 奇跡 → エキスパート, and the same swap in zh/en.
  */
 const LABELS: Record<
-  AnimeLocale,
+  GameLocale,
   Record<AnimeGuessrDifficultyTier, string>
 > = {
   ja: {
@@ -27,10 +27,16 @@ const LABELS: Record<
     master: "Master",
     miracle: "Expert",
   },
+  "zh-tw": {
+    beginner: "入門",
+    intermediate: "中級",
+    master: "大師",
+    miracle: "專家",
+  },
 };
 
 const HINTS: Record<
-  AnimeLocale,
+  GameLocale,
   Record<AnimeGuessrDifficultyTier, string>
 > = {
   ja: {
@@ -51,6 +57,12 @@ const HINTS: Record<
     master: "Difficulty 1, 2, and 3 questions.",
     miracle: "Questions from every difficulty.",
   },
+  "zh-tw": {
+    beginner: "只出難度 1 的題目，以知名聖地為主。",
+    intermediate: "包含難度 1 和 2 的題目。",
+    master: "包含難度 1、2 和 3 的題目。",
+    miracle: "包含全部難度的題目。",
+  },
 };
 
 const STARS: Record<AnimeGuessrDifficultyTier, 1 | 2 | 3 | 4> = {
@@ -61,14 +73,14 @@ const STARS: Record<AnimeGuessrDifficultyTier, 1 | 2 | 3 | 4> = {
 };
 
 export function difficultyLabel(
-  locale: AnimeLocale,
+  locale: GameLocale,
   tier: AnimeGuessrDifficultyTier,
 ): string {
   return LABELS[locale][tier];
 }
 
 export function difficultyHint(
-  locale: AnimeLocale,
+  locale: GameLocale,
   tier: AnimeGuessrDifficultyTier,
 ): string {
   return HINTS[locale][tier];

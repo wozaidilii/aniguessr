@@ -64,11 +64,10 @@ export function BaiduSceneMap({ center }: Props) {
         <div className="absolute inset-0 grid place-items-center px-6 text-center">
           <div>
             <div className="text-lg font-bold text-stone-100">
-              无法加载百度 JS 底图
+              地图暂时无法显示
             </div>
             <p className="mt-2 text-sm leading-6 text-stone-400">
-              请确认 NEXT_PUBLIC_BAIDU_MAP_AK 已配置，并且该 AK 开通了基础 JS
-              API 底图服务。
+              请稍后重新加载。
             </p>
           </div>
         </div>

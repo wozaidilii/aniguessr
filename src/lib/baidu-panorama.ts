@@ -249,7 +249,7 @@ function assertBaiduFeature(feature: BaiduMapFeature) {
   if (hasBaiduFeature(window.BMap, feature)) return;
 
   throw new Error(
-    feature === "map" ? "百度地图 JS API 未加载" : "百度地图全景 API 未加载",
+    feature === "map" ? "地图暂时无法显示" : "街景暂时无法显示",
   );
 }
 
@@ -270,7 +270,7 @@ export function loadBaiduMapScript(
   window.__histoguessrBaiduMapPromise = new Promise((resolve, reject) => {
     const existing = document.getElementById("baidu-map-jsapi");
     const timer = window.setTimeout(() => {
-      reject(new Error("百度地图 JS API 加载超时"));
+      reject(new Error("地图暂时无法显示"));
     }, 8000);
 
     window.__histoguessrBaiduMapReady = () => {
@@ -278,7 +278,7 @@ export function loadBaiduMapScript(
       if (window.BMap?.Map || window.BMap?.Panorama) {
         resolve();
       } else {
-        reject(new Error("百度地图 JS API 未加载"));
+        reject(new Error("地图暂时无法显示"));
       }
     };
 
@@ -292,7 +292,7 @@ export function loadBaiduMapScript(
     script.async = true;
     script.onerror = () => {
       window.clearTimeout(timer);
-      reject(new Error("百度地图 JS API 加载失败"));
+      reject(new Error("地图暂时无法显示"));
     };
     document.head.appendChild(script);
   });
@@ -552,7 +552,7 @@ export async function generateRandomTuxunLocations(
 ): Promise<TuxunLocationGenerationResult> {
   if (!BAIDU_MAP_AK) {
     return unavailableResult(
-      "未配置百度地图 AK，无法生成百度 JS 街景点；请配置 NEXT_PUBLIC_BAIDU_MAP_AK 后重试。",
+      "街景暂时无法显示。请稍后重试。",
     );
   }
 
@@ -560,14 +560,14 @@ export async function generateRandomTuxunLocations(
     await loadBaiduMapScript(BAIDU_MAP_AK);
   } catch {
     return unavailableResult(
-      "百度地图 JS API 加载失败，无法生成百度 JS 街景点。",
+      "街景暂时无法显示。请稍后重试。",
     );
   }
 
   const api = window.BMap;
   if (!api?.PanoramaService) {
     return unavailableResult(
-      "当前 AK 未加载到百度全景检索服务，无法生成百度 JS 街景点。",
+      "街景暂时无法显示。请稍后重试。",
     );
   }
 

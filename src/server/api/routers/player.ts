@@ -94,7 +94,7 @@ async function withEmailLoginError<T>(fn: () => Promise<T>) {
       ) {
         throw new TRPCError({
           code: "SERVICE_UNAVAILABLE",
-          message: "Email verification is not configured. Try again later.",
+          message: "Email verification is unavailable. Try again later.",
         });
       }
       if (error.message === "Email verification delivery failed") {

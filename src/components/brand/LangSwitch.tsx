@@ -1,25 +1,25 @@
 "use client";
 
-import { LANG_ORDER, LANG_SHORT } from "~/lib/aniguessr-copy";
-import type { AnimeLocale } from "~/lib/anime-locale";
+import { HOME_LANG_LINKS } from "~/lib/home-page-copy";
+import type { HomeLocale } from "~/lib/home-locale";
 
 export function LangSwitch({
   locale,
   onSelect,
 }: {
-  locale: AnimeLocale;
-  onSelect: (locale: AnimeLocale) => void;
+  locale: HomeLocale;
+  onSelect: (locale: HomeLocale) => void;
 }) {
   return (
     <div className="ag-lang" role="group" aria-label="Language">
-      {LANG_ORDER.map((item) => (
+      {HOME_LANG_LINKS.map((item) => (
         <button
-          key={item}
+          key={item.locale}
           type="button"
-          aria-pressed={locale === item}
-          onClick={() => onSelect(item)}
+          aria-pressed={locale === item.locale}
+          onClick={() => onSelect(item.locale)}
         >
-          {LANG_SHORT[item]}
+          {item.label}
         </button>
       ))}
     </div>
