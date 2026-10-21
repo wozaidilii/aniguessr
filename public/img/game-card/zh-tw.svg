@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" role="img" aria-label="">
+<defs>
+ <clipPath id="c"><rect width="880" height="500" rx="0"/></clipPath>
+ <filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#1f2430" flood-opacity=".14"/></filter>
+</defs>
+<g clip-path="url(#c)">
+ <rect width="880" height="500" fill="#f2f3f0"/>
+ <!-- sea (Sagami Bay) -->
+ <path d="M0 330 C120 318 190 352 270 340 C350 328 400 300 470 312 C560 328 610 372 700 360 C780 350 830 330 880 336 L880 500 L0 500Z" fill="#d4e4ef"/>
+ <path d="M0 330 C120 318 190 352 270 340 C350 328 400 300 470 312 C560 328 610 372 700 360 C780 350 830 330 880 336" fill="none" stroke="#c3d7e5" stroke-width="2"/>
+ <!-- parks / hills -->
+ <path d="M520 60 C600 40 690 70 720 130 C740 180 690 220 630 210 C570 200 520 160 510 120Z" fill="#e3ebdd"/>
+ <path d="M90 90 C150 70 220 100 230 150 C238 200 180 230 130 215 C80 200 60 130 90 90Z" fill="#e3ebdd"/>
+ <!-- major roads -->
+ <g fill="none" stroke="#ffffff" stroke-linecap="round">
+  <path d="M-10 300 C150 290 300 270 470 280 C620 290 760 300 890 296" stroke-width="10"/>
+  <path d="M430 -10 C440 80 450 170 470 280" stroke-width="9"/>
+  <path d="M250 -10 C270 90 300 180 330 280" stroke-width="7"/>
+  <path d="M600 -10 C590 100 560 200 540 290" stroke-width="7"/>
+ </g>
+ <g fill="none" stroke="#e4e3de" stroke-linecap="round">
+  <path d="M-10 300 C150 290 300 270 470 280 C620 290 760 300 890 296" stroke-width="1.5" opacity=".0"/>
+ </g>
+ <!-- minor roads -->
+ <g fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity=".95">
+  <path d="M60 240 C200 230 330 215 470 210 C600 205 720 215 860 230"/>
+  <path d="M120 160 C240 170 360 150 450 140"/>
+  <path d="M470 160 C560 150 680 160 820 180"/>
+  <path d="M350 40 C360 120 380 190 400 270"/>
+  <path d="M700 40 C690 120 670 200 660 292"/>
+  <path d="M160 300 C170 250 175 200 190 120"/>
+ </g>
+ <!-- railway -->
+ <path d="M-10 260 C160 250 320 236 470 244 C620 252 760 262 890 258" fill="none" stroke="#c9ccd3" stroke-width="3" stroke-dasharray="10 6"/>
+ <!-- place labels -->
+ <g font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif" fill="#7a8090" font-size="15">
+  <text x="440" y="132">鶴岡八幡宮</text>
+  <text x="96" y="275">江之島電鐵</text>
+  <text x="120" y="430" fill="#8aa6ba">相模灣</text>
+ </g>
+ <!-- dashed guess line -->
+ <path d="M300 210 L585 168" fill="none" stroke="#d6337a" stroke-width="3" stroke-dasharray="9 7" stroke-linecap="round"/>
+ <!-- guess pin -->
+ <g transform="translate(300 210)">
+  <circle r="20" fill="#d6337a" opacity=".18"/>
+  <circle r="10" fill="#d6337a" stroke="#fff" stroke-width="3"/>
+ </g>
+ <g transform="translate(300 250)" font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif" font-size="14" font-weight="700">
+  <rect x="-52" y="-4" width="104" height="28" rx="14" fill="#fff" filter="url(#sh)"/>
+  <text y="15" text-anchor="middle" fill="#c2276b">你的答案</text>
+ </g>
+ <!-- answer flag -->
+ <g transform="translate(585 168)">
+  <circle r="20" fill="#0e8f8a" opacity=".16"/>
+  <circle r="6" fill="#0e8f8a" stroke="#fff" stroke-width="2.5"/>
+  <path d="M0 0 V-46" stroke="#0e8f8a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1.5 -46 L30 -37 L1.5 -27Z" fill="#0e8f8a"/>
+ </g>
+ <g transform="translate(585 206)" font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif" font-size="14" font-weight="700">
+  <rect x="-48" y="-4" width="96" height="28" rx="14" fill="#fff" filter="url(#sh)"/>
+  <text y="15" text-anchor="middle" fill="#0b6f6b">正確位置</text>
+ </g>
+ <!-- round badge -->
+ <g font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif" font-weight="800">
+  <rect x="24" y="24" width="132" height="40" rx="20" fill="#fff" filter="url(#sh)"/>
+  <text x="90" y="50" text-anchor="middle" font-size="16" fill="#1f2430" letter-spacing="1.5">ROUND 1/5</text>
+ </g>
+ <!-- result chip -->
+ <g font-family="Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif">
+  <rect x="566" y="420" width="290" height="56" rx="28" fill="#fff" filter="url(#sh)"/>
+  <text x="594" y="455" font-size="16" fill="#646b79">相差</text>
+  <text x="630" y="456" font-size="20" font-weight="800" fill="#1f2430">1.2km</text>
+  <rect x="712" y="436" width="1.5" height="24" fill="#e5e3de"/>
+  <text x="730" y="456" font-size="20" font-weight="800" fill="#c2276b">4,280</text>
+  <text x="790" y="455" font-size="15" fill="#646b79">分</text>
+ </g>
+</g>
+</svg>

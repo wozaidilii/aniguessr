@@ -4,12 +4,13 @@
 
 @theme {
   --font-sans:
-    var(--font-noto), var(--font-sora), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-heading: var(--font-sora), var(--font-noto), "Hiragino Sans", "Yu Gothic UI",
-    Meiryo, sans-serif;
-  --font-body: var(--font-noto), "Hiragino Sans", "Yu Gothic UI", Meiryo, system-ui,
-    sans-serif;
+    var(--font-noto, "Hiragino Sans"), var(--font-sora, sans-serif), ui-sans-serif,
+    system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  --font-heading: var(--font-sora, sans-serif), var(--font-noto, "Hiragino Sans"),
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  --font-body: var(--font-noto, "Hiragino Sans"), "Hiragino Sans", "Yu Gothic UI",
+    Meiryo, system-ui, sans-serif;
 }
 
 html,
@@ -17,9 +18,14 @@ body {
   min-height: 100%;
 }
 
+html {
+  background: #f7f6f3;
+  color-scheme: light;
+}
+
 body {
-  background: var(--color-bg, #0a0612);
-  color: var(--color-text, #fff7fb);
+  background: var(--color-bg, #f7f6f3);
+  color: var(--color-text, #1f2430);
   font-family: var(--font-body);
 }
 
@@ -35,24 +41,23 @@ body {
 
 @layer components {
   .anime-shell {
-    background: var(--color-bg, #0a0612);
-    color: var(--color-text, #fff7fb);
+    background: var(--color-bg, #f7f6f3);
+    color: var(--color-text, #1f2430);
   }
 
   .anime-panel {
-    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+    border: 1px solid var(--color-border, #e5e3de);
     border-radius: var(--radius-panel, 16px);
-    background: color-mix(in srgb, var(--color-surface, #0d081a) 92%, transparent);
-    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.24);
-    backdrop-filter: blur(16px);
+    background: var(--color-surface, #ffffff);
+    box-shadow: 0 8px 24px rgba(31, 36, 48, 0.06);
   }
 
   .anime-chip {
-    border: 1px solid rgba(103, 232, 249, 0.34);
+    border: 1px solid #f7a8d0;
     border-radius: 999px;
-    background: rgba(8, 145, 178, 0.14);
+    background: #fdeef5;
     padding: 0.375rem 0.75rem;
-    color: #cffafe;
+    color: #c2276b;
     font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0;
@@ -74,14 +79,14 @@ body {
   }
 
   .anime-button {
-    background: var(--accent-action, #f9a8d4);
-    color: var(--color-ani-action-text, #0a0612);
+    background: var(--accent-action, #c2276b);
+    color: #ffffff;
   }
 
   .anime-button-secondary {
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.08);
-    color: #f8e7ff;
+    border: 1px solid #e5e3de;
+    background: #ffffff;
+    color: #1f2430;
   }
 
   .anime-button:hover,
@@ -97,18 +102,18 @@ body {
 
   .anime-stat {
     min-height: 5.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.11);
+    border: 1px solid #e5e3de;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.07);
+    background: #ffffff;
     padding: 1rem;
   }
 }
 
 :root {
-  --font-heading: var(--font-sora), var(--font-noto), "Hiragino Sans", "Yu Gothic UI",
-    Meiryo, sans-serif;
-  --font-body: var(--font-noto), "Hiragino Sans", "Yu Gothic UI", Meiryo, system-ui,
-    sans-serif;
+  --font-heading: var(--font-sora, sans-serif), var(--font-noto, "Hiragino Sans"),
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  --font-body: var(--font-noto, "Hiragino Sans"), "Hiragino Sans", "Yu Gothic UI",
+    Meiryo, system-ui, sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -121,4 +126,54 @@ body {
   .anime-button-secondary:hover {
     transform: none;
   }
+}
+
+/* Unlayered so these beat Tailwind utilities written for the old dark shell. */
+.site-light [class*="text-white"] {
+  color: #1f2430;
+}
+
+.site-light .anime-shell [class*="text-white"],
+.site-light .ag-game [class*="text-white"] {
+  color: #1f2430;
+}
+
+.site-light .anime-shell [class*="text-white/"],
+.site-light .anime-shell [class*="text-pink-50"],
+.site-light .anime-shell [class*="text-pink-100"],
+.site-light .ag-game [class*="text-white/"] {
+  color: #646b79;
+}
+
+.site-light .anime-shell [class*="text-pink-200"],
+.site-light .anime-shell [class*="text-pink-300"] {
+  color: #c2276b;
+}
+
+.site-light .anime-shell [class*="text-cyan-"],
+.site-light .ag-game [class*="text-cyan-"] {
+  color: #0c6b66;
+}
+
+.site-light .anime-shell [class*="bg-black"],
+.site-light .anime-shell [class*="bg-zinc-9"],
+.site-light .anime-shell [class*="bg-white/"],
+.site-light .ag-game [class*="bg-black"] {
+  background-color: #ffffff;
+}
+
+.site-light .anime-shell [class*="border-white"],
+.site-light .ag-game [class*="border-white"] {
+  border-color: #e5e3de;
+}
+
+.site-light .anime-shell [class*="placeholder"]::placeholder {
+  color: #646b79;
+}
+
+.site-light .anime-shell [class*="bg-pink-5"][class*="text-white"],
+.site-light .anime-shell [class*="bg-pink-6"][class*="text-white"],
+.site-light .anime-button,
+.site-light .ag-btn-pink {
+  color: #ffffff;
 }

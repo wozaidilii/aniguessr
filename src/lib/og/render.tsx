@@ -35,7 +35,7 @@ function ClusterLabel({ cluster }: { cluster: MarkerCluster }) {
         fontFamily: "Sora",
         fontWeight: 700,
         fontSize: cluster.n >= 100 ? 22 : 24,
-        color: "#0a0612",
+        color: "#f7f6f3",
       }}
     >
       {formatCount(cluster.n)}
@@ -58,7 +58,7 @@ function Logo() {
           fontWeight: 700,
           fontSize: 26,
           letterSpacing: 3.64,
-          color: "#fff7fb",
+          color: "#1f2430",
         }}
       >
         {OG_CHROME.logo}
@@ -73,7 +73,7 @@ function Logo() {
           borderLeft: "2px solid rgba(255,255,255,0.12)",
           fontSize: 20,
           fontWeight: 400,
-          color: "#8f86a0",
+          color: "#646b79",
           fontFamily: "Sora",
         }}
       >
@@ -101,11 +101,11 @@ function Footer() {
         flexDirection: "row",
         alignItems: "center",
         fontSize: 22,
-        color: "#8f86a0",
+        color: "#646b79",
         fontFamily: "Sora",
       }}
     >
-      <span style={{ fontFamily: "Sora", fontWeight: 600, color: "#c9bfd2" }}>
+      <span style={{ fontFamily: "Sora", fontWeight: 600, color: "#646b79" }}>
         {OG_CHROME.domain}
       </span>
       <div
@@ -113,7 +113,7 @@ function Footer() {
           width: 4,
           height: 4,
           borderRadius: 2,
-          background: "#8f86a0",
+          background: "#646b79",
           marginLeft: 16,
           marginRight: 16,
         }}
@@ -134,7 +134,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
         display: "flex",
         position: "relative",
         overflow: "hidden",
-        background: "#0a0612",
+        background: "#f7f6f3",
         fontFamily: family,
       }}
     >
@@ -157,7 +157,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
           width: 1200,
           height: 630,
           background:
-            "linear-gradient(90deg, #0a0612 0px, #0a0612 470px, rgba(10,6,18,0.86) 560px, rgba(10,6,18,0.25) 720px, rgba(10,6,18,0) 860px)",
+            "linear-gradient(90deg, #f7f6f3 0px, #f7f6f3 470px, rgba(247, 246, 243,0.86) 560px, rgba(247, 246, 243,0.25) 720px, rgba(247, 246, 243,0) 860px)",
         }}
       />
       <div
@@ -168,7 +168,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
           width: 1200,
           height: 630,
           background:
-            "linear-gradient(0deg, rgba(10,6,18,0.55), rgba(10,6,18,0) 120px)",
+            "linear-gradient(0deg, rgba(247, 246, 243,0.55), rgba(247, 246, 243,0) 120px)",
         }}
       />
       <div
@@ -180,7 +180,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
           height: 510,
           display: "flex",
           flexDirection: "column",
-          color: "#fff7fb",
+          color: "#1f2430",
         }}
       >
         <Logo />
@@ -200,7 +200,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
               alignSelf: "flex-start",
               border: "2px solid rgba(103,232,249,0.34)",
               background: "rgba(8,145,178,0.14)",
-              color: "#cffafe",
+              color: "#0c6b66",
               borderRadius: 999,
               padding: "7px 18px",
               fontSize: 24,
@@ -230,7 +230,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
                   height: Math.round(card.titleSize * card.titleLineHeight),
                   fontSize: card.titleSize,
                   fontWeight: 700,
-                  color: "#fff7fb",
+                  color: "#1f2430",
                   whiteSpace: "nowrap",
                   fontFamily: family,
                 }}
@@ -257,7 +257,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
                   {line.body ? (
                     <span
                       style={{
-                        color: "#f9a8d4",
+                        color: "#c2276b",
                         fontWeight: 700,
                         fontFamily: family,
                       }}
@@ -269,7 +269,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
                     <span
                       style={{
                         marginLeft: line.body ? edgeMargin(card.subtitleSize) : 0,
-                        color: "#c9bfd2",
+                        color: "#646b79",
                         fontWeight: 500,
                         fontFamily: family,
                         whiteSpace: "pre",
@@ -290,7 +290,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
               marginTop: 18,
               fontSize: 28,
               fontWeight: 500,
-              color: "#c9bfd2",
+              color: "#646b79",
             }}
           >
             <img alt="" src={PIN_ICON} width={26} height={26} />
@@ -313,7 +313,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
                       marginRight: edge.trail ? edgeMargin(28) : 0,
                       fontFamily: part.strong ? "Sora" : family,
                       fontWeight: part.strong ? 700 : 500,
-                      color: part.strong ? "#fff7fb" : "#c9bfd2",
+                      color: part.strong ? "#1f2430" : "#646b79",
                       whiteSpace: "pre",
                     }}
                   >
@@ -345,7 +345,7 @@ export function OgCardImage({ card }: { card: OgCard }) {
                     padding: "6px 16px",
                     fontSize: 24,
                     lineHeight: 1.3,
-                    color: "#f8e7ff",
+                    color: "#3d4452",
                     fontWeight: 400,
                     marginRight: 10,
                     marginBottom: 10,

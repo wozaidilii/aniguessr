@@ -18,6 +18,11 @@ import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { pilgrimageRedirectPath } from "~/lib/pilgrimage-redirects";
 import { legacyHostRedirectUrl } from "~/lib/site-url";
+import {
+  isLocaleAppRoute,
+  missingPilgrimageShell,
+  notFoundShellPath,
+} from "~/lib/not-found-route";
 
 /** 根据 Cookie 与 Accept-Language 推断首选语言。 */
 function pickPreferredLocale(request: NextRequest): AnimeLocale {
@@ -66,6 +71,25 @@ function applyLocaleContext(
     sameSite: "lax",
   });
   response.headers.set("x-anime-locale", locale);
+  return response;
+}
+
+function rewriteNotFoundShell(
+  request: NextRequest,
+  locale: string,
+  withCookie: boolean,
+): NextResponse {
+  const url = request.nextUrl.clone();
+  url.pathname = notFoundShellPath(
+    locale === "zh-tw" || locale === "ja" || locale === "zh" || locale === "en"
+      ? locale
+      : "ja",
+  );
+  url.search = "";
+  const response = NextResponse.rewrite(url);
+  if (withCookie && isAnimeLocale(locale)) {
+    return applyLocaleContext(response, locale);
+  }
   return response;
 }
 
@@ -137,7 +161,20 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(url, 301);
       }
     }
-    return NextResponse.next();
+    const missingTw = missingPilgrimageShell(request.nextUrl.pathname);
+    if (missingTw) {
+      return rewriteNotFoundShell(request, "zh-tw", false);
+    }
+    if (
+      isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
+      isLocalePrefixedPrivacyPath(request.nextUrl.pathname) ||
+      isLocalePrefixedRightsPath(request.nextUrl.pathname) ||
+      isLocaleHomePath(request.nextUrl.pathname) ||
+      isLocaleHomeOgPath(request.nextUrl.pathname)
+    ) {
+      return NextResponse.next();
+    }
+    return rewriteNotFoundShell(request, "zh-tw", false);
   }
 
   const { locale: pathLocale, pathname: innerPath } = parseLocaleFromPathname(
@@ -163,6 +200,11 @@ export function middleware(request: NextRequest) {
   const legacyRedirect = redirectLegacyLangParam(request);
   if (legacyRedirect) return legacyRedirect;
 
+  const missingShell = missingPilgrimageShell(request.nextUrl.pathname);
+  if (missingShell) {
+    return rewriteNotFoundShell(request, pathLocale ?? "ja", false);
+  }
+
   // Locale is already in the path. Rewriting or Set-Cookie would make Vercel
   // skip the CDN cache for these ISR pages.
   if (
@@ -186,6 +228,12 @@ export function middleware(request: NextRequest) {
     const preferred = pickPreferredLocale(request);
     const url = buildLocalizedUrl(request, preferred);
     return applyLocaleContext(NextResponse.redirect(url, 307), preferred);
+  }
+
+  // Unknown paths render the styled 404 document. Known app routes keep
+  // the internal rewrite onto the unprefixed tree.
+  if (!isLocaleAppRoute(innerPath)) {
+    return rewriteNotFoundShell(request, pathLocale, true);
   }
 
   // 有语言前缀：内部 rewrite 到原有路由，浏览器 URL 保持 /{locale}/...

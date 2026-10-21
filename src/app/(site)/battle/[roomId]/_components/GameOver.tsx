@@ -117,7 +117,7 @@ export function GameOverView({ roomId, players, results, myId, locale }: Props) 
 
   return (
     <div className="anime-shell flex min-h-screen flex-col text-white">
-      <div className="border-b border-white/10 bg-[#0d081a]/90 px-6 py-3 backdrop-blur">
+      <div className="border-b border-white/10 bg-[#ffffff]/90 px-6 py-3 backdrop-blur">
         <h1 className="font-bold text-pink-100">{copy.gameOverTitle}</h1>
       </div>
 

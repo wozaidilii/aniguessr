@@ -455,6 +455,7 @@ export default function AnimeTuxunPage() {
             <GoogleStreetView
               key={streetViewLocation.id}
               location={streetViewLocation}
+              locale="zh"
               onUnavailable={handlePanoramaUnavailable}
             />
 

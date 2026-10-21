@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   HOME_BOUNDS_EVENT,
+  HOME_FOCUS_WORK_EVENT,
+  readHomeFocusWork,
   type HomeBoundsDetail,
+  type HomeFocusWorkDetail,
 } from "~/components/home/home-events";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
@@ -44,48 +47,65 @@ export function HomeNearby({
   const [open, setOpen] = useState(false);
   const [inView, setInView] = useState(0);
   const [spots, setSpots] = useState<ListedSpot[]>([]);
+  const [workHref, setWorkHref] = useState<string | null>(null);
+  const focusRef = useRef<HomeFocusWorkDetail>(readHomeFocusWork());
 
   useEffect(() => {
     let alive = true;
-    const bag: { bounds?: (event: Event) => void } = {};
+    const bag: {
+      bounds?: (event: Event) => void;
+      focus?: (event: Event) => void;
+    } = {};
+    const paint = (catalog: NavCatalog, detail: HomeBoundsDetail) => {
+      const focus = focusRef.current;
+      const focused = focus.subjectId
+        ? catalog.spots.filter((spot) => spot.subjectId === focus.subjectId)
+        : catalog.spots.filter(
+            (spot) =>
+              spot.lng >= detail.west &&
+              spot.lng <= detail.east &&
+              spot.lat >= detail.south &&
+              spot.lat <= detail.north,
+          );
+      const ranked = focused
+        .map((spot) => ({
+          spot,
+          distanceKm: haversineKm(detail.lat, detail.lng, spot.lat, spot.lng),
+        }))
+        .sort((a, b) => a.distanceKm - b.distanceKm);
+      setInView(ranked.length);
+      setSpots(
+        ranked
+          .slice(0, limit)
+          .map((item) => toListed(item.spot, locale, catalog, item.distanceKm)),
+      );
+      setWorkHref(focus.subjectId ? focus.href ?? null : null);
+    };
+    let latest: HomeBoundsDetail | null = null;
     void loadNavCatalog()
       .then((catalog) => {
         if (!alive) return;
         bag.bounds = (event: Event) => {
           const detail = (event as CustomEvent<HomeBoundsDetail>).detail;
-          const ranked = catalog.spots
-            .filter(
-              (spot) =>
-                spot.lng >= detail.west &&
-                spot.lng <= detail.east &&
-                spot.lat >= detail.south &&
-                spot.lat <= detail.north,
-            )
-            .map((spot) => ({
-              spot,
-              distanceKm: haversineKm(
-                detail.lat,
-                detail.lng,
-                spot.lat,
-                spot.lng,
-              ),
-            }))
-            .sort((a, b) => a.distanceKm - b.distanceKm);
-          setInView(ranked.length);
-          setSpots(
-            ranked
-              .slice(0, limit)
-              .map((item) =>
-                toListed(item.spot, locale, catalog, item.distanceKm),
-              ),
-          );
+          if (!detail) return;
+          latest = detail;
+          paint(catalog, detail);
+        };
+        const onFocus = (event: Event) => {
+          const detail = (event as CustomEvent<HomeFocusWorkDetail>).detail;
+          focusRef.current = detail ?? { subjectId: null };
+          if (latest) paint(catalog, latest);
+          else setWorkHref(detail?.subjectId ? detail.href ?? null : null);
         };
         window.addEventListener(HOME_BOUNDS_EVENT, bag.bounds);
+        window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocus);
+        bag.focus = onFocus;
       })
       .catch(() => undefined);
     return () => {
       alive = false;
       if (bag.bounds) window.removeEventListener(HOME_BOUNDS_EVENT, bag.bounds);
+      if (bag.focus) window.removeEventListener(HOME_FOCUS_WORK_EVENT, bag.focus);
     };
   }, [limit, locale]);
 
@@ -124,6 +144,11 @@ export function HomeNearby({
         ) : null}
         <div className="home-nearby-head">
           <p className="home-nearby-label">{title}</p>
+          {workHref ? (
+            <a className="home-work-page" href={workHref}>
+              {copy.workPage}
+            </a>
+          ) : null}
           {variant === "panel" ? (
             <button
               type="button"

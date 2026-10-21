@@ -6,7 +6,7 @@ export function MiniMapArt() {
       preserveAspectRatio="xMidYMid slice"
       role="img"
       aria-hidden="true"
-      style={{ display: "block", width: "100%", height: "100%", background: "#13101f" }}
+      style={{ display: "block", width: "100%", height: "100%", background: "#eef0ec" }}
     >
       <ellipse cx="150" cy="105" rx="72" ry="30" fill="#15261d" />
       <polygon points="270,300 280,250 320,210 380,170 460,120 540,70 600,40 600,300" fill="#0b1d30" />
@@ -33,7 +33,7 @@ export function MiniMapArt() {
       <g transform="translate(330,168)">
         <circle r="16" fill="#f9a8d4" opacity=".18" />
         <path d="M0 0 C -9 -10 -11 -14 -11 -20 A 11 11 0 0 1 11 -20 C 11 -14 9 -10 0 0Z" fill="#f9a8d4" />
-        <circle cy="-20" r="4" fill="#0a0612" />
+        <circle cy="-20" r="4" fill="#f7f6f3" />
       </g>
     </svg>
   );

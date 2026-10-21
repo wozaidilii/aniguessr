@@ -15,4 +15,6 @@ export const notoSansJp = Noto_Sans_JP({
   preload: false,
 });
 
-export const rootFontClassName = `${sora.variable} ${notoSansJp.variable}`;
+export const soraFontClassName = sora.variable;
+export const notoFontClassName = notoSansJp.variable;
+export const rootFontClassName = `${soraFontClassName} ${notoFontClassName}`;

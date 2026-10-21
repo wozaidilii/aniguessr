@@ -281,12 +281,20 @@ export function GoogleGuessMap({
       {state !== "ready" && (
         <div className="absolute inset-0 grid place-items-center bg-stone-950 px-5 text-center">
           <div>
-            <div className="text-base font-semibold text-stone-100">
-              {GOOGLE_MAP_AK ? labels.loadingTitle : labels.missingKeyTitle}
-            </div>
-            <p className="mt-2 text-sm leading-6 text-stone-400">
-              {GOOGLE_MAP_AK ? labels.loadingBody : labels.missingKeyBody}
-            </p>
+            {state === "error" || !GOOGLE_MAP_AK ? (
+              <p className="max-w-md text-sm leading-6 text-stone-100">
+                {labels.missingKeyTitle}
+              </p>
+            ) : (
+              <>
+                <div className="text-base font-semibold text-stone-100">
+                  {labels.loadingTitle}
+                </div>
+                <p className="mt-2 text-sm leading-6 text-stone-400">
+                  {labels.loadingBody}
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}

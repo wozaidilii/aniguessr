@@ -1,15 +1,15 @@
 /* AniGuessr surfaces. Colors come from Ayiora tokens (data-product="aniguessr"). */
 :root {
-  --ag-bg: var(--color-ani-bg, #0a0612);
-  --ag-s1: var(--color-ani-surface, #0d081a);
-  --ag-tx: var(--color-ani-text, #fff7fb);
-  --ag-tx2: #d9d2e3;
-  --ag-tx3: #a69fb5;
-  --ag-tx4: #857e95;
-  --ag-line: rgba(255, 247, 251, 0.1);
-  --ag-line2: rgba(255, 247, 251, 0.2);
-  --ag-pink: var(--color-ani-pink, #f9a8d4);
-  --ag-cyan: var(--color-ani-cyan, #67e8f9);
+  --ag-bg: var(--color-ani-bg, #f7f6f3);
+  --ag-s1: var(--color-ani-surface, #ffffff);
+  --ag-tx: var(--color-ani-text, #1f2430);
+  --ag-tx2: #3d4452;
+  --ag-tx3: #646b79;
+  --ag-tx4: #646b79;
+  --ag-line: #e5e3de;
+  --ag-line2: #e5e3de;
+  --ag-pink: var(--color-ani-pink, #c2276b);
+  --ag-cyan: var(--color-ani-cyan, #0e8f8a);
   --ag-cyan-d: rgba(103, 232, 249, 0.14);
   --ag-font-display: var(--font-heading);
   --ag-font-body: var(--font-body);
@@ -91,7 +91,7 @@
 
 .ag-btn-pink {
   background: var(--ag-pink);
-  color: var(--ag-bg);
+  color: #ffffff;
 }
 
 .ag-btn-line {
@@ -165,7 +165,7 @@
   padding: 3px;
   border: 1px solid var(--ag-line2);
   border-radius: 8px;
-  background: rgba(10, 6, 18, 0.4);
+  background: rgba(247, 246, 243, 0.4);
   backdrop-filter: blur(8px);
 }
 
@@ -228,9 +228,9 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(10, 6, 18, 0.55) 0%, rgba(10, 6, 18, 0) 22%),
-    linear-gradient(90deg, rgba(10, 6, 18, 0.86) 0%, rgba(10, 6, 18, 0.55) 38%, rgba(10, 6, 18, 0) 62%),
-    linear-gradient(180deg, rgba(10, 6, 18, 0) 60%, rgba(10, 6, 18, 0.85) 90%, #0a0612);
+    linear-gradient(180deg, rgba(247, 246, 243, 0.55) 0%, rgba(247, 246, 243, 0) 22%),
+    linear-gradient(90deg, rgba(247, 246, 243, 0.86) 0%, rgba(247, 246, 243, 0.55) 38%, rgba(247, 246, 243, 0) 62%),
+    linear-gradient(180deg, rgba(247, 246, 243, 0) 60%, rgba(247, 246, 243, 0.85) 90%, #f7f6f3);
 }
 
 .ag-hero-copy {
@@ -253,13 +253,13 @@
 .ag-hero h1 {
   max-width: 640px;
   margin-top: 22px;
-  color: #fff;
+  color: #1f2430;
   font-family: var(--ag-font-display);
   font-size: 68px;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: 0;
-  text-shadow: 0 2px 30px rgba(10, 6, 18, 0.35);
+  text-shadow: 0 2px 30px rgba(247, 246, 243, 0.35);
   text-wrap: balance;
 }
 
@@ -279,7 +279,7 @@
 
 .ag-stats b {
   display: block;
-  color: #fff;
+  color: #1f2430;
   font-family: var(--ag-font-display);
   font-size: 26px;
   font-weight: 600;
@@ -298,8 +298,8 @@
   padding: 28px;
   border: 1px solid var(--ag-line2);
   border-radius: 16px;
-  background: rgba(13, 8, 26, 0.78);
-  box-shadow: 0 30px 80px rgba(10, 6, 18, 0.5);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 30px 80px rgba(247, 246, 243, 0.5);
   backdrop-filter: blur(18px) saturate(130%);
 }
 
@@ -361,9 +361,39 @@
 }
 
 .ag-seg button[aria-pressed="true"] {
-  border-color: var(--ag-pink);
-  background: rgba(249, 168, 212, 0.1);
-  color: #fff;
+  border-color: #1f2430;
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.ag-difficulty {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  border: 1px solid #e5e3de;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.ag-difficulty button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #1f2430;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ag-difficulty button[aria-pressed="true"] {
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.ag-difficulty button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .ag-seg button[aria-pressed="true"] i {
@@ -487,7 +517,7 @@
   padding: 7px 10px;
   border: 1px solid var(--ag-line2);
   border-radius: 999px;
-  background: rgba(10, 6, 18, 0.75);
+  background: rgba(247, 246, 243, 0.75);
   color: var(--ag-tx);
   font-size: 11px;
   font-weight: 600;
@@ -540,8 +570,8 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(10, 6, 18, 0.9) 0%, rgba(10, 6, 18, 0.5) 45%, rgba(10, 6, 18, 0.1)),
-    linear-gradient(180deg, #0a0612, rgba(10, 6, 18, 0) 18%, rgba(10, 6, 18, 0) 82%, #0a0612);
+    linear-gradient(90deg, rgba(247, 246, 243, 0.9) 0%, rgba(247, 246, 243, 0.5) 45%, rgba(247, 246, 243, 0.1)),
+    linear-gradient(180deg, #f7f6f3, rgba(247, 246, 243, 0) 18%, rgba(247, 246, 243, 0) 82%, #f7f6f3);
 }
 
 .ag-pilgrim .ag-wrap {
@@ -613,7 +643,7 @@
 
 .ag-tabs button[aria-pressed="true"] {
   background: rgba(255, 247, 251, 0.1);
-  color: #fff;
+  color: #1f2430;
 }
 
 .ag-board {
@@ -743,7 +773,7 @@
 .ag-ftr {
   border-top: 1px solid var(--ag-line);
   padding: 56px 0 32px;
-  background: #08050f;
+  background: #ffffff;
   color: var(--ag-tx3);
   font-size: 13px;
 }
@@ -849,7 +879,7 @@ a.rights-contact-link:hover {
   padding: 16px;
   border: 1px solid var(--ag-line2);
   border-radius: 16px;
-  background: rgba(13, 8, 26, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   text-align: left;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
 }
@@ -884,7 +914,7 @@ a.rights-contact-link:hover {
   position: relative;
   height: 100dvh;
   overflow: hidden;
-  background: #000;
+  background: #f7f6f3;
   color: var(--ag-tx);
 }
 
@@ -902,7 +932,7 @@ a.rights-contact-link:hover {
 .ag-glass {
   border: 1px solid var(--ag-line2);
   border-radius: 12px;
-  background: rgba(13, 8, 26, 0.72);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px) saturate(130%);
 }
 
@@ -950,7 +980,7 @@ a.rights-contact-link:hover {
 }
 
 .ag-hud b {
-  color: #fff;
+  color: #1f2430;
   font-family: var(--ag-font-display);
   font-size: 17px;
   font-weight: 600;
@@ -1020,7 +1050,7 @@ a.rights-contact-link:hover {
   padding: 6px 9px;
   border: 1px solid rgba(249, 168, 212, 0.35);
   border-radius: 999px;
-  background: rgba(10, 6, 18, 0.75);
+  background: rgba(247, 246, 243, 0.75);
   color: var(--ag-pink);
   font-size: 11px;
   font-weight: 700;
@@ -1036,7 +1066,7 @@ a.rights-contact-link:hover {
 }
 
 .ag-clue-cap b {
-  color: #fff;
+  color: #1f2430;
   font-size: 13px;
 }
 
@@ -1126,7 +1156,7 @@ a.rights-contact-link:hover {
   flex-direction: column;
   padding: 32px;
   border-left: 1px solid var(--ag-line);
-  background: rgba(13, 8, 26, 0.86);
+  background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(18px);
 }
 
@@ -1142,7 +1172,7 @@ a.rights-contact-link:hover {
   border: 1px solid var(--ag-line2);
   border-right: 0;
   border-radius: 16px 0 0 16px;
-  background: rgba(13, 8, 26, 0.86);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .ag-game.is-result .ag-map-canvas {
@@ -1173,7 +1203,7 @@ a.rights-contact-link:hover {
 }
 
 .ag-scoreline b {
-  color: #fff;
+  color: #1f2430;
   font-family: var(--ag-font-display);
   font-size: 64px;
   font-weight: 600;
@@ -1223,7 +1253,7 @@ a.rights-contact-link:hover {
 .ag-kv b {
   display: block;
   margin-top: 4px;
-  color: #fff;
+  color: #1f2430;
   font-family: var(--ag-font-display);
   font-size: 22px;
   font-weight: 600;
@@ -1312,7 +1342,7 @@ a.rights-contact-link:hover {
   padding: 8px 12px;
   border: 1px solid var(--ag-line);
   border-radius: 999px;
-  background: rgba(10, 6, 18, 0.8);
+  background: rgba(247, 246, 243, 0.8);
   font-size: 12.5px;
 }
 
@@ -1403,7 +1433,7 @@ a.rights-contact-link:hover {
     padding: 16px;
     border: 1px solid var(--ag-line2);
     border-radius: 12px;
-    background: rgba(13, 8, 26, 0.96);
+    background: rgba(255, 255, 255, 0.96);
   }
 
   .ag-lang button {
@@ -1420,11 +1450,11 @@ a.rights-contact-link:hover {
   .ag-hero-scrim {
     background: linear-gradient(
       180deg,
-      rgba(10, 6, 18, 0.45),
-      rgba(10, 6, 18, 0) 18%,
-      rgba(10, 6, 18, 0.1) 30%,
-      rgba(10, 6, 18, 0.75) 50%,
-      #0a0612 72%
+      rgba(247, 246, 243, 0.45),
+      rgba(247, 246, 243, 0) 18%,
+      rgba(247, 246, 243, 0.1) 30%,
+      rgba(247, 246, 243, 0.75) 50%,
+      #f7f6f3 72%
     );
   }
 
@@ -1508,10 +1538,10 @@ a.rights-contact-link:hover {
   .ag-pilgrim::before {
     background: linear-gradient(
       180deg,
-      #0a0612,
-      rgba(10, 6, 18, 0.55) 25%,
-      rgba(10, 6, 18, 0.75) 60%,
-      #0a0612
+      #f7f6f3,
+      rgba(247, 246, 243, 0.55) 25%,
+      rgba(247, 246, 243, 0.75) 60%,
+      #f7f6f3
     );
   }
 

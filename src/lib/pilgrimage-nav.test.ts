@@ -160,7 +160,7 @@ describe("pilgrimage navigation", () => {
       "utf8",
     );
     const shell = readFileSync(
-      "src/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui.tsx",
+      "src/app/[locale]/pilgrimage/_components/pilgrimage-ui.tsx",
       "utf8",
     );
     expect(source).toContain("SHOW_ANITABI_ATTRIBUTION = true");

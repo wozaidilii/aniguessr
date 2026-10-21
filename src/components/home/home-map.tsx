@@ -5,6 +5,7 @@ import maplibregl from "maplibre-gl";
 import {
   HOME_BOUNDS_EVENT,
   HOME_FOCUS_WORK_EVENT,
+  HOME_MAP_ACTIVE_EVENT,
   HOME_ORIGIN_EVENT,
   signalHomeMapGesture,
   type HomeBoundsDetail,
@@ -40,6 +41,12 @@ import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { workFocusLngLats } from "~/lib/home-work-focus";
 import {
+  aggregateFocusedLabels,
+  bboxSpansCountry,
+  focusZoom,
+  workFocusFrame,
+} from "~/lib/home-map-focus";
+import {
   FAVORITES_CHANGED_EVENT,
   readFavoriteAnimeIds,
 } from "~/lib/pilgrimage-favorites";
@@ -57,14 +64,50 @@ function prefersReducedMotion(): boolean {
 /** Space labels need so they stay clear of the chip band or the search card. */
 function homeMapTopPadding(map: maplibregl.Map): number {
   if (window.matchMedia("(max-width: 1023px)").matches) return 56;
-  const stack = map
-    .getContainer()
-    .closest(".home-mapstage")
-    ?.querySelector(".home-map-searchstack");
+  const stack = document.querySelector(".home-map-searchstack");
   if (!stack) return 28;
   const mapTop = map.getContainer().getBoundingClientRect().top;
   const cardBottom = stack.getBoundingClientRect().bottom;
   return Math.max(28, Math.ceil(cardBottom - mapTop + 8));
+}
+
+interface TileCacheLike {
+  pause?: () => void;
+  resume?: () => void;
+  _paused?: boolean;
+  _shouldReloadOnResume?: boolean;
+  _abortTile?: (tile: { state?: string }) => void;
+  _inViewTiles?: {
+    getAllIds: () => string[];
+    getTileById: (id: string) => { state?: string } | undefined;
+  };
+}
+
+/** Stop tile downloads while the map is parked off the homepage. */
+function setHomeTileLoading(map: maplibregl.Map, active: boolean): void {
+  const caches = (
+    map as unknown as {
+      style?: { sourceCaches?: Record<string, TileCacheLike> };
+    }
+  ).style?.sourceCaches;
+  if (!caches) return;
+  for (const cache of Object.values(caches)) {
+    if (!active) {
+      cache.pause?.();
+      continue;
+    }
+    cache.resume?.();
+  }
+}
+
+/** Keep focused spots above the mobile sheet and the desktop search card. */
+function homeMapBottomPadding(map: maplibregl.Map): number {
+  if (!window.matchMedia("(max-width: 1023px)").matches) return 48;
+  const sheet = document.querySelector(".home-nearby-sheet");
+  const mapRect = map.getContainer().getBoundingClientRect();
+  if (!sheet) return 112;
+  const sheetRect = sheet.getBoundingClientRect();
+  return Math.max(112, Math.ceil(mapRect.bottom - sheetRect.top + 16));
 }
 
 export function HomeMap({ locale }: { locale: HomeLocale }) {
@@ -246,37 +289,58 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
 
     function pushLabels() {
       if (!labelsReady || !map.getSource(HOME_AREA_SOURCE)) return;
+      const labels =
+        focusedId && catalogReady
+          ? aggregateFocusedLabels(
+              labelsReady,
+              catalogReady.spots.filter((spot) => spot.subjectId === focusedId),
+            )
+          : labelsReady;
       setHomeGeoJson(
         map,
         HOME_AREA_SOURCE,
-        labelCollection(labelsReady.areas, locale),
+        labelCollection(labels.areas, locale),
       );
       setHomeGeoJson(
         map,
         HOME_PREF_SOURCE,
-        labelCollection(labelsReady.prefectures, locale),
+        labelCollection(labels.prefectures, locale),
       );
     }
 
     function showFocus() {
       pushSpots();
+      pushLabels();
       if (!focusedId || !catalogReady || !map.getSource(HOME_CLUSTER_SOURCE))
         return;
       const spots = catalogReady.spots.filter(
         (spot) => spot.subjectId === focusedId,
       );
-      const coords = workFocusLngLats(spots, readHomeOrigin());
+      const frame = workFocusFrame(spots);
+      if (!frame) return;
+      const coords = workFocusLngLats(frame.points, readHomeOrigin());
       if (coords.length === 0) return;
       const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
       for (const coord of coords) bounds.extend(coord);
-      map.fitBounds(bounds, {
-        padding: {
-          top: homeMapTopPadding(map),
-          right: 48,
-          bottom: 48,
-          left: 48,
-        },
-        maxZoom: 14,
+      const fitted = {
+        west: bounds.getWest(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        north: bounds.getNorth(),
+      };
+      const padding = {
+        top: homeMapTopPadding(map),
+        right: 48,
+        bottom: homeMapBottomPadding(map),
+        left: 48,
+      };
+      const camera = map.cameraForBounds(bounds, { padding, maxZoom: 14 });
+      if (!camera?.center || camera.zoom == null) return;
+      const zoom = focusZoom(camera.zoom, bboxSpansCountry(fitted));
+      map.getContainer().dataset.cameraZoom = zoom.toFixed(2);
+      map.easeTo({
+        center: camera.center,
+        zoom,
         duration: prefersReducedMotion() ? 0 : 600,
       });
       ensureYou();
@@ -320,6 +384,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       }
       focusedId = null;
       pushSpots();
+      pushLabels();
       if (savedCamera) {
         const camera = savedCamera;
         savedCamera = null;
@@ -339,8 +404,14 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       pushSpots();
     }
 
+    function onMapActive(event: Event) {
+      const active = (event as CustomEvent<boolean>).detail !== false;
+      setHomeTileLoading(map, active);
+    }
+
     window.addEventListener(HOME_ORIGIN_EVENT, onOrigin);
     window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
+    window.addEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
     window.addEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
     window.addEventListener("storage", onFavorites);
     ensureYou();
@@ -368,13 +439,19 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         if (!cancelled) setError(true);
       });
 
-    const observer = new ResizeObserver(() => map.resize());
+    let resizeTimer = 0;
+    const observer = new ResizeObserver(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => map.resize(), 0);
+    });
     observer.observe(container);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      window.clearTimeout(resizeTimer);
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
       window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
+      window.removeEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
       window.removeEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
       window.removeEventListener("storage", onFavorites);
       observer.disconnect();

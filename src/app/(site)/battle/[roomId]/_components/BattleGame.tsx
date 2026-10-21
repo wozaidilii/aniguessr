@@ -1695,7 +1695,7 @@ export function BattleGame({
   function renderBattleHeader() {
     return (
       <>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0d081a]/90 px-4 py-3 backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#ffffff]/90 px-4 py-3 backdrop-blur">
           <div>
             <div className="text-sm font-bold text-pink-100">
               {copy.battlePrefix} · {gameMode?.emoji} {gameModeText?.title}
@@ -1905,7 +1905,7 @@ export function BattleGame({
 
   if (phase === "playing" && !iAmAlive) {
     return (
-      <div className="flex h-screen flex-col bg-[#0a0612] text-white">
+      <div className="flex h-screen flex-col bg-[#f7f6f3] text-white">
         {renderBattleHeader()}
         <div className="grid flex-1 place-items-center px-6">
           <div className="anime-panel max-w-md p-6 text-center">
@@ -1955,7 +1955,7 @@ export function BattleGame({
       : null;
 
     return (
-      <div className="flex h-screen flex-col bg-[#0a0612] text-white">
+      <div className="flex h-screen flex-col bg-[#f7f6f3] text-white">
         {renderBattleHeader()}
 
         <div className="relative min-h-0 flex-1 overflow-hidden bg-black">
@@ -1963,6 +1963,7 @@ export function BattleGame({
             <GoogleStreetView
               key={currentQuestion.id}
               location={currentQuestion.location}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
@@ -1975,6 +1976,7 @@ export function BattleGame({
                 currentQuestion.question,
                 locale,
               )}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
@@ -1984,6 +1986,7 @@ export function BattleGame({
             <GoogleStreetView
               key={currentQuestion.id}
               location={toAnimeTuxunBattleStreetViewLocation(currentQuestion)}
+              locale={locale}
               googleMapsLanguage={googleMapsLanguage}
               onUnavailable={() =>
                 setStreetViewError(copy.googleStreetViewFailed)
@@ -2167,7 +2170,7 @@ export function BattleGame({
   }
 
   return (
-    <div className="flex h-screen flex-col bg-[#0a0612] text-white">
+    <div className="flex h-screen flex-col bg-[#f7f6f3] text-white">
       {renderBattleHeader()}
 
       <div

@@ -9,12 +9,15 @@ import {
   type GoogleMapsLanguage,
   type GoogleStreetViewPanoramaInstance,
 } from "~/lib/google-street-view";
+import { type AnimeLocale } from "~/lib/anime-locale";
+import { streetViewUnavailable } from "~/lib/street-view-status-copy";
 import { type TuxunLocation } from "~/lib/tuxun-locations";
 
 interface Props {
   location: TuxunLocation;
   allowMovement?: boolean;
   googleMapsLanguage?: GoogleMapsLanguage;
+  locale?: AnimeLocale;
   onUnavailable?: () => void;
 }
 
@@ -24,6 +27,7 @@ export function GoogleStreetView({
   location,
   allowMovement = false,
   googleMapsLanguage,
+  locale = "ja",
   onUnavailable,
 }: Props) {
   const { heading, lat, lng, panoId, pitch } = location;
@@ -109,18 +113,15 @@ export function GoogleStreetView({
 
       {state !== "ready" && (
         <div className="absolute inset-0 grid place-items-center bg-stone-950 px-5 text-center">
-          <div>
-            <div className="text-base font-semibold text-stone-100">
-              {GOOGLE_MAP_AK
-                ? "正在加载 Google Street View"
-                : "需要配置 Google Maps AK"}
-            </div>
-            <p className="mt-2 text-sm leading-6 text-stone-400">
-              {GOOGLE_MAP_AK
-                ? "街景加载失败时，将自动跳过当前点位或提示重新生成。"
-                : "在 .env.local 配置 NEXT_PUBLIC_GOOGLE_MAP_AK 后重启开发服务。"}
-            </p>
-          </div>
+          <p className="max-w-md text-sm leading-6 text-stone-100">
+            {state === "error" || !GOOGLE_MAP_AK
+              ? streetViewUnavailable(locale)
+              : locale === "en"
+                ? "Loading Street View"
+                : locale === "ja"
+                  ? "ストリートビューを読み込み中"
+                  : "正在加载街景"}
+          </p>
         </div>
       )}
 

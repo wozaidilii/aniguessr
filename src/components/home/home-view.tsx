@@ -4,9 +4,7 @@ import {
 } from "~/components/home/area-mini-map";
 import { HomeFooter } from "~/components/home/home-footer";
 import { HomeGamePanel } from "~/components/home/home-game-panel";
-import { HomeHeader } from "~/components/home/home-header";
 import { HomeLocate } from "~/components/home/home-locate";
-import { HomeMapLoader } from "~/components/home/home-map-loader";
 import { HomeNearby } from "~/components/home/home-nearby";
 import { HomeWorkSearch } from "~/components/home/home-work-search";
 import { HomeStructuredData } from "~/components/HomeStructuredData";
@@ -59,7 +57,6 @@ export function HomeView({
     <main className="home" data-locale={locale} lang={htmlLang}>
       <HomeStructuredData locale={locale} />
       <HomeLocate message={copy.geoDenied} />
-      <HomeHeader locale={locale} />
       <section className="home-hero" id="pilgrim">
         <div className="home-mapbar">
           <HomeTitle locale={locale} copy={copy} as="h1" />
@@ -86,7 +83,7 @@ export function HomeView({
           </a>
         </div>
         <div className="home-mapstage">
-          <HomeMapLoader locale={locale} />
+          <div id="home-map-slot" className="home-map-slot" />
           <div className="home-map-float">
             <div className="home-map-searchstack">
               <HomeWorkSearch locale={locale} popular={popularAnime} />
