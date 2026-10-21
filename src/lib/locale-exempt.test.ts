@@ -214,12 +214,23 @@ describe("locale middleware exemptions", () => {
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("set-cookie")).toBeNull();
     }
+  });
 
-    const bare = middleware(request("/rights"));
-    expect(bare.status).toBe(307);
-    expect(bare.headers.get("location")).toBe(
+  it("redirects bare /rights to English with 308 and does not Set-Cookie", () => {
+    const response = middleware(
+      new NextRequest(new URL("https://aniguessr.ayiora.com/rights"), {
+        headers: {
+          host: "aniguessr.ayiora.com",
+          "accept-language": "ja,en;q=0.8",
+          cookie: "aniguessr_locale=zh",
+        },
+      }),
+    );
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/en/rights",
     );
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("serves locale privacy pages without rewrite or Set-Cookie", () => {

@@ -168,9 +168,9 @@ export function middleware(request: NextRequest) {
 
   // 无语言前缀：重定向到 /{locale}/...
   if (!pathLocale) {
-    // Bare /privacy always lands on the default locale. Do not Set-Cookie:
-    // the destination page is a cacheable static document.
-    if (innerPath === "/privacy") {
+    // Bare /privacy and /rights always land on the default locale. Do not
+    // Set-Cookie: the destination pages are cacheable static documents.
+    if (innerPath === "/privacy" || innerPath === "/rights") {
       const url = buildLocalizedUrl(request, DEFAULT_ANIME_LOCALE);
       return NextResponse.redirect(url, 308);
     }
