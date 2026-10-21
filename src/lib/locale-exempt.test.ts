@@ -1,3 +1,5 @@
+import { readdirSync, statSync } from "node:fs";
+import path from "node:path";
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { withAnimeLocale } from "~/lib/anime-locale";
@@ -10,7 +12,20 @@ import {
 } from "~/lib/pilgrimage-cache";
 import { PILGRIMAGE_REDIRECT_MAP } from "~/lib/pilgrimage-redirects";
 import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
-import { middleware } from "~/middleware";
+import { config, middleware } from "~/middleware";
+
+function publicPathnames(dir = path.join(process.cwd(), "public")): string[] {
+  const found: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const absolute = path.join(dir, entry);
+    if (statSync(absolute).isDirectory()) {
+      found.push(...publicPathnames(absolute));
+      continue;
+    }
+    found.push(absolute.slice(path.join(process.cwd(), "public").length));
+  }
+  return found;
+}
 
 const GOOGLEBOT =
   "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
@@ -48,7 +63,37 @@ describe("locale middleware exemptions", () => {
       expect(shouldBypassLocale(pathname)).toBe(true);
       const response = middleware(request(pathname));
       expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
     }
+  });
+
+  it("serves public files and other static paths without a locale redirect or cookie", () => {
+    const files = publicPathnames();
+    expect(files).toContain("/img/game-card/ja.svg");
+    expect(files.length).toBeGreaterThan(10);
+
+    const pathnames = [
+      ...files,
+      "/fonts/inter.woff2",
+      "/img/game-card/ja.svg",
+      "/en/img/game-card/ja.svg",
+      "/ja/brand/logo-mark.svg",
+      "/zh-tw/img/game-card/zh-tw.svg",
+    ];
+    for (const pathname of pathnames) {
+      expect(shouldBypassLocale(pathname), pathname).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.headers.get("location"), pathname).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite"), pathname).toBeNull();
+      expect(response.headers.get("set-cookie"), pathname).toBeNull();
+    }
+
+    const matcher = Array.isArray(config.matcher)
+      ? config.matcher.join("\n")
+      : String(config.matcher);
+    expect(matcher).toContain("img/");
+    expect(matcher).toContain("fonts/");
+    expect(matcher).toContain("svg");
   });
 
   it("rewrites sitemap URLs to static XML without a locale redirect", () => {

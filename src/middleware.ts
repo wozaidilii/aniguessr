@@ -132,6 +132,11 @@ export function middleware(request: NextRequest) {
   const sitemapRewrite = rewriteStaticSitemap(request);
   if (sitemapRewrite) return sitemapRewrite;
 
+  // Public files stay on the requested URL. No locale redirect, no cookie.
+  if (shouldBypassLocale(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   // The hub index is the homepage. Subpaths stay. Do not Set-Cookie.
   const hubTarget = pilgrimageHubRedirectTarget(request.nextUrl.pathname);
   if (hubTarget) {
@@ -193,10 +198,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  if (shouldBypassLocale(request.nextUrl.pathname)) {
-    return NextResponse.next();
-  }
-
   const legacyRedirect = redirectLegacyLangParam(request);
   if (legacyRedirect) return legacyRedirect;
 
@@ -250,5 +251,9 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image).*)"],
+  // Skip middleware for public assets. Sitemap XML stays in the matcher so
+  // `/sitemap.xml` can rewrite onto `/sitemaps/*.xml` without a locale cookie.
+  matcher: [
+    "/((?!_next/static|_next/image|img/|fonts/|brand/|images/|backgrounds/|characters/|og/|data/|sitemaps/|.*\\.(?:svg|png|jpe?g|gif|webp|avif|ico|css|woff2?|ttf|otf)$).*)",
+  ],
 };
