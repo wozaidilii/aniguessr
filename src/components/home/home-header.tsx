@@ -14,7 +14,6 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const nav = siteNavModel(pathname, locale);
   const [open, setOpen] = useState(false);
   const labels = {
-    map: copy.navMap,
     anime: copy.navAnime,
     areas: copy.navAreas,
     game: copy.navGame,
@@ -26,20 +25,20 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     <header className="home-hdr" data-testid="site-header">
       <div className="home-hdr-in">
         <div className="home-hdr-left">
-        <BrandLockup href={nav.home} />
-        <nav className="home-nav" aria-label={copy.navMap}>
-          {nav.links.map((link) => (
-            <a
-              key={link.id}
-              href={link.href}
-              aria-current={
-                siteNavIsCurrent(pathname, link.href) ? "page" : undefined
-              }
-            >
-              {labels[link.id]}
-            </a>
-          ))}
-        </nav>
+          <BrandLockup href={nav.home} />
+          <nav className="home-nav" aria-label={copy.menu}>
+            {nav.links.map((link) => (
+              <a
+                key={link.id}
+                href={link.href}
+                aria-current={
+                  siteNavIsCurrent(pathname, link.href) ? "page" : undefined
+                }
+              >
+                {labels[link.id]}
+              </a>
+            ))}
+          </nav>
         </div>
         <div className="home-hdr-right">
           <div className="home-lang" role="group" aria-label={copy.langLabel}>

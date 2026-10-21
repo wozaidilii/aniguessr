@@ -45,7 +45,6 @@ import {
 } from "~/lib/pilgrimage-favorites";
 import {
   googleMapsDirectionsUrl,
-  googleStreetViewUrl,
   loadNavCatalog,
   type NavCatalog,
 } from "~/lib/pilgrimage-nav";
@@ -414,9 +413,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
               return;
             }
             if (!navigator.geolocation) {
-              window.location.assign(
-                withPilgrimageLocale("/pilgrimage#nearby", locale),
-              );
+              window.location.assign(withPilgrimageLocale("/", locale));
               return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -432,9 +429,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
                 );
               },
               () => {
-                window.location.assign(
-                  withPilgrimageLocale("/pilgrimage#nearby", locale),
-                );
+                window.location.assign(withPilgrimageLocale("/", locale));
               },
               {
                 enableHighAccuracy: false,
@@ -508,11 +503,7 @@ function showPopup(
   const copy = getHomePageCopy(locale);
   const root = document.createElement("div");
   root.className = "home-popup";
-  const title = document.createElement("a");
-  title.href = withPilgrimageLocale(
-    `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
-    locale,
-  );
+  const title = document.createElement("div");
   title.textContent = spot.name || spot.id;
   title.className = "home-popup-title";
   root.append(title);
@@ -524,13 +515,18 @@ function showPopup(
   }
   const actions = document.createElement("div");
   actions.className = "home-popup-actions";
+  const spotHref = withPilgrimageLocale(
+    `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
+    locale,
+  );
   actions.append(
+    actionLink(spotHref, copy.details, true, false),
     actionLink(
       googleMapsDirectionsUrl(spot.lat, spot.lng),
       copy.navigate,
+      false,
       true,
     ),
-    actionLink(googleStreetViewUrl(spot.lat, spot.lng), copy.streetView, false),
   );
   root.append(actions);
   popupRef.current?.remove();
@@ -545,11 +541,18 @@ function showPopup(
   popupRef.current = popup;
 }
 
-function actionLink(href: string, label: string, primary: boolean) {
+function actionLink(
+  href: string,
+  label: string,
+  primary: boolean,
+  newTab: boolean,
+) {
   const link = document.createElement("a");
   link.href = href;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
+  if (newTab) {
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+  }
   link.setAttribute("aria-label", label);
   link.className = primary ? "home-popup-go" : "home-popup-alt";
   link.textContent = label;

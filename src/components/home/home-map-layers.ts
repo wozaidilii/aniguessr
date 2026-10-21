@@ -8,7 +8,6 @@ import type {
 } from "maplibre-gl";
 import {
   FAVORITE_CLUSTER_SUM,
-  FAVORITE_COLOR,
   POINT_IS_FAVORITE,
   spotFavProperty,
 } from "~/components/pilgrimage/pilgrimage-map-layers";
@@ -33,6 +32,8 @@ const PILL_LAYERS = [
 export const HOME_PILL_LAYER_IDS: readonly string[] = PILL_LAYERS;
 
 const SPOT_COLOR = "#E0488F";
+/** Homepage favorite ring. The pilgrimage map keeps its own cyan. */
+const HOME_FAVORITE_COLOR = "#0e8f8a";
 const TEXT_FONT = ["Noto Sans Regular"];
 
 type CirclePaint = NonNullable<CircleLayerSpecification["paint"]>;
@@ -276,10 +277,10 @@ export function installHomeMapLayers(map: Map): void {
       [">", ["get", "favCount"], 0],
     ]),
     paint: {
-      "circle-color": "rgba(103, 232, 249, 0.18)",
+      "circle-color": "rgba(14, 143, 138, 0.18)",
       "circle-radius": CLUSTER_RING_RADIUS,
       "circle-stroke-width": 2,
-      "circle-stroke-color": FAVORITE_COLOR,
+      "circle-stroke-color": HOME_FAVORITE_COLOR,
       "circle-opacity": clusterDim,
     } satisfies CirclePaint,
   });
@@ -319,7 +320,7 @@ export function installHomeMapLayers(map: Map): void {
     minzoom: 12,
     filter: asFilter(["all", ["!", ["has", "point_count"]], POINT_IS_FAVORITE]),
     paint: {
-      "circle-color": "rgba(103, 232, 249, 0.28)",
+      "circle-color": "rgba(14, 143, 138, 0.28)",
       "circle-radius": asExpr([
         "interpolate",
         ["linear"],
@@ -330,7 +331,7 @@ export function installHomeMapLayers(map: Map): void {
         9,
       ]),
       "circle-stroke-width": 2,
-      "circle-stroke-color": FAVORITE_COLOR,
+      "circle-stroke-color": HOME_FAVORITE_COLOR,
     } satisfies CirclePaint,
   });
   map.addLayer({
@@ -343,7 +344,7 @@ export function installHomeMapLayers(map: Map): void {
       "circle-color": asExpr([
         "case",
         POINT_IS_FAVORITE,
-        FAVORITE_COLOR,
+        HOME_FAVORITE_COLOR,
         ["==", ["get", "dim"], 1],
         "#9aa4ad",
         SPOT_COLOR,

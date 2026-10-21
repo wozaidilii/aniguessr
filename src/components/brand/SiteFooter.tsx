@@ -9,7 +9,6 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
   const copy = HOME_COPY[locale];
   const homeHref = withAnimeLocale("/", locale);
   const battleHref = withAnimeLocale("/battle", locale);
-  const pilgrimageHref = withAnimeLocale("/pilgrimage", locale);
 
   return (
     <footer className="ag-ftr">
@@ -36,7 +35,7 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
                   <Link href={battleHref}>{copy.navBattle}</Link>
                 </li>
                 <li>
-                  <Link href={pilgrimageHref}>{copy.navPilgrimage}</Link>
+                  <Link href={homeHref}>{copy.navPilgrimage}</Link>
                 </li>
               </ul>
             </div>

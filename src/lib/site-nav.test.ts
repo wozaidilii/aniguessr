@@ -6,7 +6,6 @@ describe("site nav", () => {
     const nav = siteNavModel("/zh", "zh");
     expect(nav.home).toBe("/zh");
     expect(nav.links.map((link) => link.href)).toEqual([
-      "/zh/pilgrimage",
       "/zh/pilgrimage/anime",
       "/zh/pilgrimage/locations",
       "#game",
@@ -31,12 +30,12 @@ describe("site nav", () => {
     expect(nav.languages.find((item) => item.locale === "zh-tw")?.href).toBe(
       "/zh-tw/pilgrimage/anime",
     );
-    expect(siteNavIsCurrent("/zh/pilgrimage/anime", "/zh/pilgrimage/anime")).toBe(
-      true,
-    );
-    expect(siteNavIsCurrent("/zh/pilgrimage/anime/slug", "/zh/pilgrimage")).toBe(
-      false,
-    );
+    expect(
+      siteNavIsCurrent("/zh/pilgrimage/anime", "/zh/pilgrimage/anime"),
+    ).toBe(true);
+    expect(
+      siteNavIsCurrent("/zh/pilgrimage/anime/slug", "/zh/pilgrimage"),
+    ).toBe(false);
     expect(
       siteNavIsCurrent("/zh-tw/pilgrimage/spots/spot-a", "/zh-tw/pilgrimage"),
     ).toBe(true);

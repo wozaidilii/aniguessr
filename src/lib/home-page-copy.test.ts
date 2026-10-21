@@ -7,6 +7,29 @@ import {
 } from "~/lib/home-page-copy";
 
 describe("homepage copy", () => {
+  it("keeps existing game and rank nav labels and uses the marketing browse labels", () => {
+    expect(getHomePageCopy("ja").navAnime).toBe("作品から探す");
+    expect(getHomePageCopy("ja").navAreas).toBe("エリアから探す");
+    expect(getHomePageCopy("ja").navGame).toBe("聖地当てゲーム");
+    expect(getHomePageCopy("ja").navRank).toBe("ランキング");
+    expect(getHomePageCopy("zh").navAnime).toBe("按作品找");
+    expect(getHomePageCopy("zh").navAreas).toBe("按地区找");
+    expect(getHomePageCopy("zh").navGame).toBe("圣地猜猜看");
+    expect(getHomePageCopy("zh").navRank).toBe("排行榜");
+    expect(getHomePageCopy("zh-tw").navAnime).toBe("依作品找");
+    expect(getHomePageCopy("zh-tw").navAreas).toBe("依地區找");
+    expect(getHomePageCopy("zh-tw").navGame).toBe("聖地猜猜看");
+    expect(getHomePageCopy("zh-tw").navRank).toBe("排行榜");
+    expect(getHomePageCopy("en").navAnime).toBe("By title");
+    expect(getHomePageCopy("en").navAreas).toBe("By area");
+    expect(getHomePageCopy("en").navGame).toBe("Guessing game");
+    expect(getHomePageCopy("en").navRank).toBe("Ranking");
+    expect(getHomePageCopy("ja").details).toBe("詳しく");
+    expect(getHomePageCopy("zh").details).toBe("详细");
+    expect(getHomePageCopy("zh-tw").details).toBe("詳細");
+    expect(getHomePageCopy("en").details).toBe("Details");
+  });
+
   it("keeps the game heading and uses the clue-guessing description", () => {
     expect(getHomePageCopy("ja").gameTitle).toBe("聖地当てゲームでも遊べます");
     expect(getHomePageCopy("ja").gameBody).toBe(
@@ -62,7 +85,9 @@ describe("homepage copy", () => {
     expect(getHomePageCopy("ja").popularWorks).toBe("人気の作品から探す");
     expect(getHomePageCopy("zh").popularWorks).toBe("从热门作品找");
     expect(getHomePageCopy("zh-tw").popularWorks).toBe("從熱門作品找");
-    expect(getHomePageCopy("en").popularWorks).toBe("Start with a popular title");
+    expect(getHomePageCopy("en").popularWorks).toBe(
+      "Start with a popular title",
+    );
     expect(getHomePageCopy("ja").showAllWorks).toBe("すべて表示");
     expect(getHomePageCopy("zh").showAllWorks).toBe("展开全部");
     expect(getHomePageCopy("zh-tw").showAllWorks).toBe("展開全部");

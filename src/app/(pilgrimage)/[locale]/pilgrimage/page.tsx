@@ -1,22 +1,8 @@
 import { type Metadata } from "next";
-import Link from "next/link";
-import { FavoritePicker } from "~/components/pilgrimage/favorite-picker";
-import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
-import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
-import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
-import { pilgrimagePageMetadata } from "~/lib/seo";
-import {
-  getPilgrimageSeoIndex,
-  pickLocalizedText,
-} from "~/server/data/pilgrimage-seo";
-import {
-  PilgrimageCard,
-  PilgrimageCardGrid,
-  PilgrimageShell,
-  pilgrimageHref,
-  pilgrimageLocale,
-} from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+import { permanentRedirect } from "next/navigation";
+import { pilgrimageLocale } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+import { homePageMetadata } from "~/lib/home-page-copy";
+import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 export const revalidate = 86_400;
 
@@ -27,19 +13,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: localeParam } = await params;
   const locale = pilgrimageLocale(localeParam);
-  const index = getPilgrimageSeoIndex();
-  const seo = buildPilgrimageHubSeo(locale, {
-    spotCount: index?.spotCount ?? 0,
-    animeCount: index?.animeCount ?? 0,
-    locationCount: index?.locationCount ?? 0,
-  });
-  return pilgrimagePageMetadata(
-    locale,
-    "/pilgrimage",
-    seo.title,
-    seo.description,
-    true,
-  );
+  return homePageMetadata(locale);
 }
 
 export default async function PilgrimageHubPage({
@@ -49,108 +23,5 @@ export default async function PilgrimageHubPage({
 }) {
   const { locale: localeParam } = await params;
   const locale = pilgrimageLocale(localeParam);
-  const copy = getPilgrimageCopy(locale);
-  const index = getPilgrimageSeoIndex();
-
-  if (!index) {
-    return (
-      <PilgrimageShell
-        locale={locale}
-        kicker={copy.siteKicker}
-        title={copy.hubTitle}
-        description={copy.emptyIndex}
-      >
-        <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>
-      </PilgrimageShell>
-    );
-  }
-
-  const topAnime = index.animes
-    .slice(0, 12)
-    .map((anime) => ({ anime, spotCount: anime.spotCount }));
-  const topLocations = index.locations.slice(0, 12);
-
-  return (
-    <PilgrimageShell
-      locale={locale}
-      kicker={copy.siteKicker}
-      title={copy.hubTitle}
-      description={copy.hubDescription}
-    >
-      <section className="mb-10 grid gap-4 sm:grid-cols-3">
-        <StatCard label={copy.spotCountLabel(index.spotCount)} />
-        <StatCard label={copy.animeCountLabel(index.animeCount)} />
-        <StatCard label={copy.locationCountLabel(index.locationCount)} />
-      </section>
-
-      <PilgrimageMapPanel locale={locale} />
-      <NearbySpots locale={locale} />
-      <FavoritePicker
-        locale={locale}
-        animes={index.animes.map((anime) => ({
-          id: anime.subjectId,
-          slug: anime.slug,
-          title: pickLocalizedText(anime.animeTitle, locale),
-          spotCount: anime.spotCount,
-        }))}
-      />
-
-      <section className="mb-10">
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <h2 className="text-xl font-black text-white">{copy.animeArchive}</h2>
-          <Link
-            href={pilgrimageHref("/pilgrimage/anime", locale)}
-            className="text-sm font-bold text-cyan-100/80 hover:text-cyan-50"
-          >
-            {copy.backAnime} →
-          </Link>
-        </div>
-        <PilgrimageCardGrid>
-          {topAnime.map(({ anime, spotCount: count }) => (
-            <PilgrimageCard
-              key={anime.subjectId}
-              href={pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale)}
-              title={pickLocalizedText(anime.animeTitle, locale)}
-              meta={copy.spotCountLabel(count)}
-            />
-          ))}
-        </PilgrimageCardGrid>
-      </section>
-
-      <section>
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <h2 className="text-xl font-black text-white">
-            {copy.locationArchive}
-          </h2>
-          <Link
-            href={pilgrimageHref("/pilgrimage/locations", locale)}
-            className="text-sm font-bold text-cyan-100/80 hover:text-cyan-50"
-          >
-            {copy.backLocation} →
-          </Link>
-        </div>
-        <PilgrimageCardGrid>
-          {topLocations.map((location) => (
-            <PilgrimageCard
-              key={location.slug}
-              href={pilgrimageHref(
-                `/pilgrimage/locations/${location.slug}`,
-                locale,
-              )}
-              title={pickLocalizedText(location.name, locale)}
-              meta={copy.spotCountLabel(location.spotCount)}
-            />
-          ))}
-        </PilgrimageCardGrid>
-      </section>
-    </PilgrimageShell>
-  );
-}
-
-function StatCard({ label }: { label: string }) {
-  return (
-    <div className="anime-panel p-4 text-center">
-      <p className="text-sm font-black text-pink-100">{label}</p>
-    </div>
-  );
+  permanentRedirect(withPilgrimageLocale("/", locale));
 }

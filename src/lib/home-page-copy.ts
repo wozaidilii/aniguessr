@@ -22,6 +22,8 @@ export interface HomePageCopy {
   nearbySorted: string;
   navigate: string;
   streetView: string;
+  /** Homepage map popup. Same-tab link to the spot page. */
+  details: string;
   geoDenied: string;
   walkMinutes: (minutes: number) => string;
   statSpots: string;
@@ -150,6 +152,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     nearbySorted: "現在地から近い順",
     navigate: "ナビ",
     streetView: "ストリートビュー",
+    details: "詳しく",
     geoDenied: "位置情報を利用できないため、巡礼マップを開きます。",
     walkMinutes: (minutes) => `徒歩${minutes}分`,
     statSpots: "撮影地",
@@ -200,8 +203,8 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     difficultyOption: (tier) => DIFFICULTY.ja[tier],
     start: "ゲームをはじめる",
     navMap: "聖地マップ",
-    navAnime: "作品",
-    navAreas: "エリア",
+    navAnime: "作品から探す",
+    navAreas: "エリアから探す",
     navGame: "聖地当てゲーム",
     navRank: "ランキング",
     login: "ログイン",
@@ -257,6 +260,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     nearbySorted: "按离你最近排序",
     navigate: "导航",
     streetView: "街景",
+    details: "详细",
     geoDenied: "无法使用定位，正在打开巡礼地图。",
     walkMinutes: (minutes) => `步行 ${minutes} 分钟`,
     statSpots: "取景地",
@@ -307,8 +311,8 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     difficultyOption: (tier) => DIFFICULTY.zh[tier],
     start: "开始游戏",
     navMap: "圣地地图",
-    navAnime: "作品",
-    navAreas: "地区",
+    navAnime: "按作品找",
+    navAreas: "按地区找",
     navGame: "圣地猜猜看",
     navRank: "排行榜",
     login: "登录",
@@ -364,6 +368,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     nearbySorted: "依離你最近排序",
     navigate: "導航",
     streetView: "街景",
+    details: "詳細",
     geoDenied: "無法使用定位，正在打開巡禮地圖。",
     walkMinutes: (minutes) => `步行 ${minutes} 分鐘`,
     statSpots: "取景地",
@@ -414,8 +419,8 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     difficultyOption: (tier) => DIFFICULTY["zh-tw"][tier],
     start: "開始遊戲",
     navMap: "聖地地圖",
-    navAnime: "作品",
-    navAreas: "地區",
+    navAnime: "依作品找",
+    navAreas: "依地區找",
     navGame: "聖地猜猜看",
     navRank: "排行榜",
     login: "登入",
@@ -472,6 +477,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     nearbySorted: "Closest to you",
     navigate: "Directions",
     streetView: "Street View",
+    details: "Details",
     geoDenied: "Location isn't available. Opening the pilgrimage map.",
     walkMinutes: (minutes) => `${minutes} min walk`,
     statSpots: "Spots",
@@ -522,8 +528,8 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     difficultyOption: (tier) => DIFFICULTY.en[tier],
     start: "Start the game",
     navMap: "Map",
-    navAnime: "Series",
-    navAreas: "Areas",
+    navAnime: "By title",
+    navAreas: "By area",
     navGame: "Guessing game",
     navRank: "Ranking",
     login: "Log in",

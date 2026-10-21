@@ -27,7 +27,12 @@ function source(): HomeCatalogSource {
       {
         subjectId: "1",
         slug: "one-title",
-        animeTitle: { zh: "作品一", ja: "作品一", en: "Work One", tw: "作品一" },
+        animeTitle: {
+          zh: "作品一",
+          ja: "作品一",
+          en: "Work One",
+          tw: "作品一",
+        },
         spotCount: 3,
       },
       {
@@ -45,7 +50,12 @@ function source(): HomeCatalogSource {
         lat: 35.32,
         lng: 139.55,
         answerName: { zh: "坡道", ja: "坂", en: "Slope", tw: "坡道" },
-        animeTitle: { zh: "作品一", ja: "作品一", en: "Work One", tw: "作品一" },
+        animeTitle: {
+          zh: "作品一",
+          ja: "作品一",
+          en: "Work One",
+          tw: "作品一",
+        },
       },
       {
         id: "spot-b",
@@ -54,7 +64,12 @@ function source(): HomeCatalogSource {
         lat: 35.33,
         lng: 139.56,
         answerName: { zh: "车站", ja: "駅", en: "Station", tw: "車站" },
-        animeTitle: { zh: "作品一", ja: "作品一", en: "Work One", tw: "作品一" },
+        animeTitle: {
+          zh: "作品一",
+          ja: "作品一",
+          en: "Work One",
+          tw: "作品一",
+        },
       },
       {
         id: "spot-c",
@@ -72,7 +87,12 @@ function source(): HomeCatalogSource {
         lat: 35.68,
         lng: 139.76,
         answerName: { zh: "塔", ja: "塔", en: "Tower" },
-        animeTitle: { zh: "作品一", ja: "作品一", en: "Work One", tw: "作品一" },
+        animeTitle: {
+          zh: "作品一",
+          ja: "作品一",
+          en: "Work One",
+          tw: "作品一",
+        },
       },
     ],
   };
@@ -116,5 +136,40 @@ describe("homepage catalog", () => {
       "two-title",
     ]);
     expect(catalog.nearby.map((spot) => spot.name)).toEqual(["塔"]);
+  });
+
+  it("drops a district prefix on work-card subtitles and keeps area-card names", () => {
+    const input = source();
+    const fujisawa = input.locations[1];
+    if (!fujisawa) throw new Error("missing fixture");
+    fujisawa.name = {
+      ja: "南巨摩郡身延町",
+      zh: "宮城郡松島町",
+      tw: "南巨摩郡身延町",
+      en: "Kamikawa-gun (Ishikari), Yamanashi",
+    };
+    const cardName = {
+      ja: "身延町",
+      zh: "松島町",
+      "zh-tw": "身延町",
+      en: "Kamikawa (Ishikari), Yamanashi",
+    } as const;
+    const areaName = {
+      ja: "南巨摩郡身延町",
+      zh: "宮城郡松島町",
+      "zh-tw": "南巨摩郡身延町",
+      en: "Kamikawa-gun (Ishikari), Yamanashi",
+    } as const;
+    for (const locale of ["ja", "zh", "zh-tw", "en"] as const) {
+      const catalog = buildHomeCatalog(input, locale);
+      const area = catalog.areas.find(
+        (item) => item.slug === "fujisawa-kanagawa",
+      );
+      const card = catalog.animeCards.find((item) => item.slug === "two-title");
+      expect(area?.name).toBe(areaName[locale]);
+      expect(card?.areaName).toBe(cardName[locale]);
+      expect(area?.href).toContain("/pilgrimage/locations/fujisawa-kanagawa");
+      expect(card?.href).toContain("/pilgrimage/anime/two-title");
+    }
   });
 });

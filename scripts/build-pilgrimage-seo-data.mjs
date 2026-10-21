@@ -48,7 +48,6 @@ const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
 
 const PUBLIC_ROUTES = [
   ["/", 1],
-  ["/pilgrimage", 0.95],
   ["/pilgrimage/anime", 0.9],
   ["/pilgrimage/locations", 0.9],
   ["/game", 0.85],

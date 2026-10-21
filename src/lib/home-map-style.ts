@@ -46,10 +46,10 @@ export function tuneHomeMapStyle(map: Map, locale: HomeLocale): void {
   const style = map.getStyle();
   for (const layer of style.layers ?? []) {
     if (layer.id === "water" && layer.type === "fill") {
-      setPaint(map, layer.id, "fill-color", "#d4e4ee");
+      setPaint(map, layer.id, "fill-color", "#dce9f1");
     }
     if (layer.id === "waterway" && layer.type === "line") {
-      setPaint(map, layer.id, "line-color", "#d4e4ee");
+      setPaint(map, layer.id, "line-color", "#dce9f1");
     }
     if (layer.type !== "symbol" || isShieldLayer(layer.id)) continue;
     if (
