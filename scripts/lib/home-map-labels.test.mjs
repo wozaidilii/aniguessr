@@ -7,6 +7,8 @@ import {
   loadAreaNameOverrides,
   median,
   prefectureKey,
+  shortCjkAreaName,
+  shortEnAreaName,
   shortJaAreaName,
 } from "./home-map-labels.mjs";
 
@@ -21,6 +23,31 @@ describe("homepage map labels", () => {
     expect(shortJaAreaName("藤沢市")).toBe("藤沢");
     expect(shortJaAreaName("さいたま市大宮区")).toBe("さいたま・大宮区");
     expect(shortJaAreaName("郡山市")).toBe("郡山");
+  });
+
+  it("shortens zh and zh-tw labels without dropping 市", () => {
+    expect(shortCjkAreaName("東京都豐島區")).toBe("豐島區");
+    expect(shortCjkAreaName("東京都豊島區")).toBe("豊島區");
+    expect(shortCjkAreaName("东京都豊岛区")).toBe("豊岛区");
+    expect(shortCjkAreaName("橫濱市中區")).toBe("橫濱・中區");
+    expect(shortCjkAreaName("横滨市中区")).toBe("横滨・中区");
+    expect(shortCjkAreaName("藤泽市")).toBe("藤泽市");
+    expect(shortCjkAreaName("藤澤市")).toBe("藤澤市");
+    expect(shortCjkAreaName("鎌倉市")).toBe("鎌倉市");
+    expect(shortCjkAreaName("京都市左京區")).toBe("京都・左京區");
+  });
+
+  it("drops the English prefecture and names a designated-city ward", () => {
+    expect(shortEnAreaName("Toshima, Tokyo")).toBe("Toshima");
+    expect(shortEnAreaName("Fujisawa, Kanagawa")).toBe("Fujisawa");
+    expect(shortEnAreaName("Fujisawa City, Kanagawa")).toBe("Fujisawa");
+    expect(shortEnAreaName("Yokohama, Kanagawa", "横浜市中区")).toBe(
+      "Yokohama · Naka",
+    );
+    expect(shortEnAreaName("Kyoto, Kyoto", "京都市左京区")).toBe(
+      "Kyoto · Sakyo",
+    );
+    expect(shortEnAreaName("Kamakura")).toBe("Kamakura");
   });
 
   it("reads a prefecture from a romaji suffix or a JIS code", () => {
@@ -120,6 +147,39 @@ describe("homepage map labels", () => {
       expect(kanagawa?.count).toBeGreaterThan(0);
       expect(labels.areas.some((area) => area.id === "japan")).toBe(true);
       expect(labels.prefectures.some((item) => item.id === "japan")).toBe(false);
+
+      const byId = new Map(labels.areas.map((area) => [area.id, area]));
+      const toshima = byId.get("toshima-tokyo");
+      expect(toshima).toMatchObject({
+        ja: "豊島区",
+        zh: "豊岛区",
+        tw: "豊島區",
+        en: "Toshima",
+      });
+      const yokohama = byId.get("yokohama-kanagawa-14104");
+      expect(yokohama).toMatchObject({
+        ja: "横浜・中区",
+        zh: "横滨・中区",
+        tw: "橫濱・中區",
+        en: "Yokohama · Naka",
+      });
+      const fujisawa = byId.get("fujisawa-kanagawa");
+      expect(fujisawa).toMatchObject({
+        ja: "江の島",
+        zh: "藤泽市",
+        tw: "藤澤市",
+        en: "Fujisawa",
+      });
+
+      const locations = new Map(
+        index.locations.map((location) => [location.slug, location.name.ja]),
+      );
+      for (const area of labels.areas) {
+        const ja = locations.get(area.id) ?? "";
+        if (!/^(.+?)市(.+区)$/u.test(ja)) continue;
+        expect(area.en, area.id).toMatch(/^[\p{Script=Latin}\d\s.'’·-]+$/u);
+        expect(area.en, area.id).toContain(" · ");
+      }
     },
   );
 });

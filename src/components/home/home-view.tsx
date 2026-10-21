@@ -77,9 +77,6 @@ export function HomeView({
               <dt>{copy.statAreas}</dt>
             </div>
           </dl>
-          <p className="home-privacy home-privacy-bar" title={copy.privacy}>
-            <span>{copy.privacy}</span>
-          </p>
           <a
             className="home-btn home-btn-primary"
             data-find-nearby=""
@@ -190,6 +187,7 @@ export function HomeView({
               </li>
             ))}
           </ol>
+          <p className="home-privacy">{copy.privacy}</p>
         </div>
       </section>
 

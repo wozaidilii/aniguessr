@@ -55,6 +55,19 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Space labels need so they stay clear of the chip band or the search card. */
+function homeMapTopPadding(map: maplibregl.Map): number {
+  if (window.matchMedia("(max-width: 1023px)").matches) return 56;
+  const stack = map
+    .getContainer()
+    .closest(".home-mapstage")
+    ?.querySelector(".home-map-searchstack");
+  if (!stack) return 28;
+  const mapTop = map.getContainer().getBoundingClientRect().top;
+  const cardBottom = stack.getBoundingClientRect().bottom;
+  return Math.max(28, Math.ceil(cardBottom - mapTop + 8));
+}
+
 export function HomeMap({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -116,7 +129,12 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
               [east, north],
             ],
             {
-              padding: { top: 72, right: 48, bottom: 48, left: 48 },
+              padding: {
+                top: homeMapTopPadding(map),
+                right: 48,
+                bottom: 48,
+                left: 48,
+              },
               maxZoom: 14,
               duration: prefersReducedMotion() ? 0 : 600,
             },
@@ -160,7 +178,15 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         });
       });
       if (!focusedId) {
-        map.fitBounds(KANTO_SHONAN_BOUNDS, { padding: 28, animate: false });
+        map.fitBounds(KANTO_SHONAN_BOUNDS, {
+          padding: {
+            top: homeMapTopPadding(map),
+            right: 28,
+            bottom: 28,
+            left: 28,
+          },
+          animate: false,
+        });
       }
       publishBounds(map);
       mapRef.current = map;
@@ -245,7 +271,12 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
       for (const coord of coords) bounds.extend(coord);
       map.fitBounds(bounds, {
-        padding: 48,
+        padding: {
+          top: homeMapTopPadding(map),
+          right: 48,
+          bottom: 48,
+          left: 48,
+        },
         maxZoom: 14,
         duration: prefersReducedMotion() ? 0 : 600,
       });
@@ -358,6 +389,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
 
   return (
     <div className="home-map" data-testid="home-map">
+      <div className="home-chip-scrim" aria-hidden="true" />
       <div
         ref={containerRef}
         className="home-map-canvas"

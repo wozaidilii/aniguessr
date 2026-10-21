@@ -12,7 +12,9 @@ describe("homepage map style", () => {
       "https://tiles.openfreemap.org/styles/positron",
     );
     expect(HOME_MAP_STYLE).not.toContain("key=");
-    expect(HOME_IDEOGRAPH_FONT).toBe("Hiragino Sans, Noto Sans CJK JP");
+    expect(HOME_IDEOGRAPH_FONT).toBe(
+      "Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif",
+    );
   });
 
   it("prefers the locale name and falls back to name", () => {

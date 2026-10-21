@@ -4,7 +4,8 @@ import type { HomeLocale } from "~/lib/home-locale";
 /** Light basemap for the homepage. Pilgrimage pages stay on the dark style. */
 export const HOME_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 
-export const HOME_IDEOGRAPH_FONT = "Hiragino Sans, Noto Sans CJK JP";
+export const HOME_IDEOGRAPH_FONT =
+  "Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif";
 
 const PLACE_LABEL_LAYERS = new Set([
   "label_city",

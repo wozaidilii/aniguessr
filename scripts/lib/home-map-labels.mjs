@@ -134,6 +134,158 @@ export function shortJaAreaName(name) {
   return text || name.trim();
 }
 
+/** Ward names of designated cities, used only for English map pills. */
+const WARD_ROMAJI = {
+  上京区: "Kamigyo",
+  下京区: "Shimogyo",
+  中京区: "Nakagyo",
+  中区: "Naka",
+  中原区: "Nakahara",
+  中央区: "Chuo",
+  中村区: "Nakamura",
+  伏見区: "Fushimi",
+  住吉区: "Sumiyoshi",
+  佐伯区: "Saeki",
+  保土ケ谷区: "Hodogaya",
+  八幡東区: "Yahatahigashi",
+  八幡西区: "Yahatanishi",
+  兵庫区: "Hyogo",
+  北区: "Kita",
+  千種区: "Chikusa",
+  南区: "Minami",
+  博多区: "Hakata",
+  厚別区: "Atsubetsu",
+  右京区: "Ukyo",
+  垂水区: "Tarumi",
+  城南区: "Jonan",
+  多摩区: "Tama",
+  大宮区: "Omiya",
+  天王寺区: "Tennoji",
+  天白区: "Tempaku",
+  天竜区: "Tenryu",
+  太白区: "Taihaku",
+  宮前区: "Miyamae",
+  宮城野区: "Miyagino",
+  小倉北区: "Kokurakita",
+  山科区: "Yamashina",
+  岩槻区: "Iwatsuki",
+  川崎区: "Kawasaki",
+  左京区: "Sakyo",
+  幸区: "Saiwai",
+  戸塚区: "Totsuka",
+  手稲区: "Teine",
+  早良区: "Sawara",
+  旭区: "Asahi",
+  昭和区: "Showa",
+  東住吉区: "Higashisumiyoshi",
+  東区: "Higashi",
+  東山区: "Higashiyama",
+  東淀川区: "Higashiyodogawa",
+  東灘区: "Higashinada",
+  栄区: "Sakae",
+  桜区: "Sakura",
+  此花区: "Konohana",
+  泉区: "Izumi",
+  浦和区: "Urawa",
+  浪速区: "Naniwa",
+  淀川区: "Yodogawa",
+  清水区: "Shimizu",
+  清田区: "Kiyota",
+  港北区: "Kohoku",
+  港区: "Minato",
+  港南区: "Konan",
+  瀬谷区: "Seya",
+  灘区: "Nada",
+  熱田区: "Atsuta",
+  瑞穂区: "Mizuho",
+  白石区: "Shiroishi",
+  磯子区: "Isogo",
+  神奈川区: "Kanagawa",
+  福島区: "Fukushima",
+  稲毛区: "Inage",
+  緑区: "Midori",
+  美浜区: "Mihama",
+  花見川区: "Hanamigawa",
+  若林区: "Wakabayashi",
+  葵区: "Aoi",
+  西京区: "Nishikyo",
+  西区: "Nishi",
+  西成区: "Nishinari",
+  西淀川区: "Nishiyodogawa",
+  西蒲区: "Nishikan",
+  豊平区: "Toyohira",
+  都島区: "Miyakojima",
+  都筑区: "Tsuzuki",
+  金沢区: "Kanazawa",
+  門司区: "Moji",
+  阿倍野区: "Abeno",
+  青葉区: "Aoba",
+  須磨区: "Suma",
+  駿河区: "Suruga",
+  高津区: "Takatsu",
+  鶴見区: "Tsurumi",
+  麻生区: "Asao",
+};
+
+function cjkPrefecturePrefixes() {
+  /** @type {string[]} */
+  const prefixes = ["北海道"];
+  for (const pref of Object.values(PREFECTURES)) {
+    if (pref.ja === "北海道") continue;
+    if (pref.ja === "東京") prefixes.push("東京都", "东京都");
+    else if (pref.ja === "大阪") prefixes.push("大阪府");
+    else if (pref.ja === "京都") prefixes.push("京都府");
+    else prefixes.push(`${pref.ja}県`, `${pref.zh}县`, `${pref.tw}縣`);
+  }
+  return [...new Set(prefixes)].sort((a, b) => b.length - a.length);
+}
+
+const CJK_PREFECTURE_PREFIXES = cjkPrefecturePrefixes();
+
+/**
+ * zh / zh-tw map pills. Drop a leading prefecture, and write a designated
+ * city's ward as 市名・区. A trailing 市 stays.
+ * @param {string} name
+ */
+export function shortCjkAreaName(name) {
+  let text = name.trim();
+  for (const prefix of CJK_PREFECTURE_PREFIXES) {
+    if (text.startsWith(prefix) && text.length > prefix.length) {
+      text = text.slice(prefix.length);
+      break;
+    }
+  }
+  const cityWard = /^(.+?)市(.+[区區])$/u.exec(text);
+  if (cityWard) text = `${cityWard[1]}・${cityWard[2]}`;
+  return text || name.trim();
+}
+
+/**
+ * English map pills. Drop the prefecture and a trailing place suffix.
+ * A designated-city ward keeps the city and the ward: "Yokohama · Naka".
+ * `ja` is the unshortened Japanese name, used only to find that ward.
+ * @param {string} en
+ * @param {string} [ja]
+ */
+export function shortEnAreaName(en, ja = "") {
+  const source = en.trim();
+  const city = source.split(",")[0]?.trim() ?? "";
+  const ward = /^(.+?)市(.+区)$/u.exec(ja.trim());
+  const latin = /^[\p{Script=Latin}\d\s.'’-]+$/u.test(city);
+  if (ward && latin && city) {
+    const romaji = WARD_ROMAJI[ward[2]] ?? ward[2].replace(/区$/u, "");
+    return `${stripEnPlaceSuffix(city)} · ${romaji}`;
+  }
+  return stripEnPlaceSuffix(city) || source;
+}
+
+/** @param {string} name */
+function stripEnPlaceSuffix(name) {
+  return name
+    .replace(/\s+(City|Ward|Town|Village|District|Prefecture)$/iu, "")
+    .trim();
+}
+
 /** @param {number[]} values */
 export function median(values) {
   if (values.length === 0) return 0;
@@ -203,15 +355,18 @@ export function buildHomeMapLabels(input) {
     const location = bySlug.get(id);
     const jaSource = filled(location?.name.ja) || filled(location?.name.zh) || id;
     const jaShort = shortJaAreaName(jaSource);
+    const zhSource = filled(location?.name.zh);
+    const twSource = filled(location?.name.tw) ?? zhSource;
+    const enSource = filled(location?.name.en);
     const names = {
       ja: overrideName(overrides, "ja", id) ?? jaShort,
-      zh: overrideName(overrides, "zh", id) ?? filled(location?.name.zh) ?? jaShort,
+      zh: overrideName(overrides, "zh", id) ?? (zhSource ? shortCjkAreaName(zhSource) : jaShort),
       tw:
         overrideName(overrides, "zh-tw", id) ??
-        filled(location?.name.tw) ??
-        filled(location?.name.zh) ??
-        jaShort,
-      en: overrideName(overrides, "en", id) ?? filled(location?.name.en) ?? jaShort,
+        (twSource ? shortCjkAreaName(twSource) : jaShort),
+      en:
+        overrideName(overrides, "en", id) ??
+        (enSource ? shortEnAreaName(enSource, jaSource) : jaShort),
     };
     return labelFromPoints(id, names, points, AREA_MAJOR);
   });

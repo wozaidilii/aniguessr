@@ -1748,6 +1748,20 @@
   height: auto;
 }
 
+.home-chip-scrim {
+  display: none;
+}
+
+.home-map .maplibregl-ctrl-bottom-left,
+.home-map .maplibregl-ctrl-bottom-right {
+  max-width: calc(100% - 8px);
+}
+
+.home-map .maplibregl-ctrl-attrib {
+  max-width: min(320px, calc(100vw - 24px));
+  overflow: hidden;
+}
+
 .home-map-float {
   right: auto;
   width: 380px;
@@ -1755,8 +1769,11 @@
 }
 
 .home-map-searchstack {
+  box-sizing: border-box;
   width: 380px;
   max-width: 100%;
+  min-width: min(380px, 100%);
+  flex: 0 0 auto;
 }
 
 .home-work-search {
@@ -1768,7 +1785,10 @@
 }
 
 .home-search-field {
+  box-sizing: border-box;
   width: 100%;
+  height: 44px;
+  min-width: 0;
   border: 0;
   background: #fff;
   color: #2a2430;
@@ -1804,6 +1824,32 @@
   color: #5c5568;
 }
 
+.home-popular {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-popular-scroll {
+  position: relative;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.home-popular-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
+  pointer-events: none;
+}
+
 .home-popular-row,
 .home-popular-row.is-all {
   max-height: none;
@@ -1811,6 +1857,11 @@
   gap: 6px;
   overflow-x: auto;
   overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.home-popular-row::-webkit-scrollbar {
+  display: none;
 }
 
 .home-popular-chip,
@@ -1961,8 +2012,11 @@
   }
 
   .home-mapbar .home-h1 {
+    max-width: 100%;
+    overflow: hidden;
     font-size: 22px;
     line-height: 1.3;
+    text-overflow: ellipsis;
   }
 
   .home-mapbar .home-stats,
@@ -1977,11 +2031,13 @@
   }
 
   .home-map-float {
+    box-sizing: border-box;
     display: block;
     position: static;
     grid-row: 2;
-    width: auto;
+    width: 100%;
     max-width: none;
+    min-width: 0;
     padding: 8px 16px 12px;
     background: #0a0612;
     pointer-events: auto;
@@ -1993,6 +2049,22 @@
     grid-row: 3;
     height: 100%;
     min-height: 0;
+  }
+
+  .home-chip-scrim {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 56px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0)
+    );
+    pointer-events: none;
   }
 
   .home-map-searchstack {

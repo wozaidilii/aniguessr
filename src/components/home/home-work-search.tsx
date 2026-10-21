@@ -230,29 +230,31 @@ export function HomeWorkSearch({
       </div>
       {popular.length > 0 ? (
         <div className="home-popular" data-testid="home-popular">
-          <div className="home-popular-row">
-            {popular.map((work) => (
-              <a
-                key={work.subjectId}
-                href={work.href}
-                className="home-popular-chip"
-              >
-                <b>{work.title}</b>
-                <small>{work.spotCount.toLocaleString(countTag)}</small>
-              </a>
-            ))}
-            <a className="home-popular-all" href={animeHref}>
-              {copy.popularAll}
-            </a>
-            <button
-              type="button"
-              className="home-popular-dismiss"
-              aria-label={copy.dismissPopular}
-              onClick={() => setChipsOpen(false)}
-            >
-              ×
-            </button>
+          <div className="home-popular-scroll">
+            <div className="home-popular-row">
+              {popular.map((work) => (
+                <a
+                  key={work.subjectId}
+                  href={work.href}
+                  className="home-popular-chip"
+                >
+                  <b>{work.title}</b>
+                  <small>{work.spotCount.toLocaleString(countTag)}</small>
+                </a>
+              ))}
+            </div>
           </div>
+          <a className="home-popular-all" href={animeHref}>
+            {copy.popularAll}
+          </a>
+          <button
+            type="button"
+            className="home-popular-dismiss"
+            aria-label={copy.dismissPopular}
+            onClick={() => setChipsOpen(false)}
+          >
+            ×
+          </button>
         </div>
       ) : null}
     </div>
