@@ -18,6 +18,9 @@ db.sqlite
 # next.js
 /.next/
 /out/
+
+# Frozen 404 documents copied at the end of next build (CSS hashes).
+/assets/not-found-shell/
 next-env.d.ts
 
 # 题库原始数据与配图（本地保留，图片走 Vercel Blob，题目导入进数据库）

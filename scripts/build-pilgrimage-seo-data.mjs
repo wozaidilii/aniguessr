@@ -864,6 +864,13 @@ async function main() {
 
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(path.join(OUTPUT_DIR, "index.json"), JSON.stringify(output));
+  await writeFile(
+    path.join(process.cwd(), "src/lib/pilgrimage-known-slugs.json"),
+    JSON.stringify({
+      anime: animes.map((anime) => anime.slug),
+      location: locations.map((location) => location.slug),
+    }),
+  );
   await writeFile(NAV_PATH, JSON.stringify(nav));
   await writeFile(HOME_LABELS_PATH, JSON.stringify(homeMapLabels));
   await writeFile(

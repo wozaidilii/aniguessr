@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-pilgrimage-seo-data.mjs && node scripts/subset-og-fonts.mjs && next build",
+    "build": "node scripts/build-pilgrimage-seo-data.mjs && node scripts/subset-og-fonts.mjs && next build && node scripts/not-found-shell-files.mjs --require",
     "check": "next lint && tsc --noEmit",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed": "node scripts/db-seed-events.mjs",

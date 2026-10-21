@@ -151,7 +151,7 @@ describe("locale middleware exemptions", () => {
     for (const pathname of [
       "/zh/pilgrimage/locations",
       "/en/pilgrimage/spots/anitabi_1_2",
-      "/ja/pilgrimage/anime/123-title",
+      "/ja/pilgrimage/anime/294993-%E5%92%92%E6%9C%AF%E5%9B%9E%E6%88%98",
       "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
       "/ja/pilgrimage/spots/anitabi_1_2/opengraph-image",
@@ -173,7 +173,9 @@ describe("locale middleware exemptions", () => {
     const game = middleware(request("/zh-tw/game/anime"));
     expect(game.status).toBe(200);
     expect(game.headers.get("location")).toBeNull();
-    expect(game.headers.get("x-middleware-rewrite")).toBeNull();
+    expect(game.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/not-found-shell/zh-tw",
+    );
     expect(game.headers.get("set-cookie")).toBeNull();
 
     const preferred = middleware(
@@ -281,6 +283,31 @@ describe("locale middleware exemptions", () => {
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("set-cookie")).toBeNull();
     }
+  });
+
+  it("rewrites unknown work, area, and unmatched paths to the styled shell", () => {
+    const work = middleware(
+      request("/ja/pilgrimage/anime/does-not-exist"),
+    );
+    expect(work.status).toBe(200);
+    expect(work.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/not-found-shell/ja",
+    );
+    expect(work.headers.get("set-cookie")).toBeNull();
+
+    const area = middleware(
+      request("/en/pilgrimage/locations/does-not-exist"),
+    );
+    expect(area.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/not-found-shell/en",
+    );
+    expect(area.headers.get("set-cookie")).toBeNull();
+
+    const unmatched = middleware(request("/ja/xyz"));
+    expect(unmatched.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/not-found-shell/ja",
+    );
+    expect(unmatched.headers.get("set-cookie")).toContain("aniguessr_locale=ja");
   });
 
   it("still rewrites other locale-prefixed pages", () => {
