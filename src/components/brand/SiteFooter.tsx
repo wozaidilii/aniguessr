@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowIcon } from "~/components/brand/ArrowIcon";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { RightsContactLink } from "~/components/rights-contact-link";
 import { COMPANY_SITE_URL, HOME_COPY } from "~/lib/aniguessr-copy";
 import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 
@@ -50,7 +51,10 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
           </div>
         </div>
         <div className="ag-ftr-copy">
-          <span>{copy.footerCopy}</span>
+          <div>
+            <span>{copy.footerCopy}</span>
+            <RightsContactLink locale={locale} className="mt-2 block" />
+          </div>
           <span>aniguessr.ayiora.com</span>
         </div>
       </div>

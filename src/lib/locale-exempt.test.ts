@@ -7,6 +7,7 @@ import {
   isLocalePrefixedPilgrimagePath,
 } from "~/lib/pilgrimage-cache";
 import { PILGRIMAGE_REDIRECT_MAP } from "~/lib/pilgrimage-redirects";
+import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
 import { middleware } from "~/middleware";
 
 const GOOGLEBOT =
@@ -172,6 +173,28 @@ describe("locale middleware exemptions", () => {
     expect(preferred.status).toBe(307);
     expect(preferred.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/zh/pilgrimage",
+    );
+  });
+
+  it("serves locale rights pages without rewrite or Set-Cookie", () => {
+    for (const pathname of [
+      "/ja/rights",
+      "/zh/rights",
+      "/en/rights",
+      "/zh-tw/rights",
+    ]) {
+      expect(isLocalePrefixedRightsPath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
+
+    const bare = middleware(request("/rights"));
+    expect(bare.status).toBe(307);
+    expect(bare.headers.get("location")).toBe(
+      "https://aniguessr.ayiora.com/en/rights",
     );
   });
 
