@@ -1752,16 +1752,6 @@
   display: none;
 }
 
-.home-map .maplibregl-ctrl-bottom-left,
-.home-map .maplibregl-ctrl-bottom-right {
-  max-width: calc(100% - 8px);
-}
-
-.home-map .maplibregl-ctrl-attrib {
-  max-width: min(320px, calc(100vw - 24px));
-  overflow: hidden;
-}
-
 .home-map-float {
   right: auto;
   width: 380px;
@@ -1998,6 +1988,7 @@
   .home-hero {
     position: relative;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(320px, 1fr);
     min-height: calc(100svh - 56px);
   }
@@ -2011,7 +2002,14 @@
     padding: 10px 16px 0;
   }
 
+  .home-mapbar {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .home-mapbar .home-h1 {
+    width: 100%;
+    min-width: 0;
     max-width: 100%;
     overflow: hidden;
     font-size: 22px;
@@ -2035,8 +2033,9 @@
     display: block;
     position: static;
     grid-row: 2;
+    left: auto;
     width: 100%;
-    max-width: none;
+    max-width: 100%;
     min-width: 0;
     padding: 8px 16px 12px;
     background: #0a0612;
@@ -2049,6 +2048,16 @@
     grid-row: 3;
     height: 100%;
     min-height: 0;
+  }
+
+  .home-map .maplibregl-ctrl-bottom-left,
+  .home-map .maplibregl-ctrl-bottom-right {
+    max-width: calc(100% - 8px);
+  }
+
+  .home-map .maplibregl-ctrl-attrib {
+    max-width: calc(100vw - 24px);
+    overflow: hidden;
   }
 
   .home-chip-scrim {
@@ -2073,6 +2082,8 @@
     right: auto;
     left: auto;
     width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .home-popular {
