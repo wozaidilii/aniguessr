@@ -13,8 +13,8 @@ import {
 describe("rights contact", () => {
   it("publishes the notice and mailto address in every locale", () => {
     expect(RIGHTS_LOCALES).toEqual(["ja", "zh", "zh-tw", "en"]);
-    expect(RIGHTS_EMAIL).toBe("rights@ayiora.com");
-    expect(rightsMailto()).toBe("mailto:rights@ayiora.com");
+    expect(RIGHTS_EMAIL).toBe("support@ayiora.com");
+    expect(rightsMailto()).toBe("mailto:support@ayiora.com");
     expect(rightsLinkLabel("ja")).toBe("権利者の方へ");
     expect(rightsLinkLabel("zh")).toBe("致版权方");
     expect(rightsLinkLabel("zh-tw")).toBe("致版權方");

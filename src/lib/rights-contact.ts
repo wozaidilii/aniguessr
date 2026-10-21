@@ -1,11 +1,12 @@
+import { CONTACT_SUPPORT_EMAIL } from "~/lib/aniguessr-copy";
 import {
   splitLocalePath,
   withPilgrimageLocale,
   type PilgrimageLocale,
 } from "~/lib/pilgrimage-locale";
 
-/** Public rights inbox. The address is the visible link text. */
-export const RIGHTS_EMAIL = "rights@ayiora.com";
+/** Rights notices use the support inbox. The address is the visible link text. */
+export const RIGHTS_EMAIL = CONTACT_SUPPORT_EMAIL;
 
 export const RIGHTS_LOCALES = ["ja", "zh", "zh-tw", "en"] as const;
 
