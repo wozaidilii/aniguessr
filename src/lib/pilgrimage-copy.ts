@@ -26,6 +26,9 @@ export const PILGRIMAGE_COPY: Record<
     relatedAnime: string;
     relatedLocation: string;
     emptyIndex: string;
+    searchWorks: string;
+    searchWorksEmpty: string;
+    alsoKnownAs: string;
     viewSpot: string;
     seoSpotTitle: (anime: string, place: string) => string;
     seoSpotDescription: (
@@ -91,6 +94,9 @@ export const PILGRIMAGE_COPY: Record<
     relatedAnime: "所属作品",
     relatedLocation: "所在地区",
     emptyIndex: "SEO 索引尚未生成，请先运行 npm run data:build-pilgrimage-seo",
+    searchWorks: "搜索作品名",
+    searchWorksEmpty: "没有找到相关作品",
+    alsoKnownAs: "别名",
     viewSpot: "查看详情",
     seoSpotTitle: (anime, place) => `${anime} 圣地：${place}`,
     seoSpotDescription: (anime, place, location) =>
@@ -157,6 +163,9 @@ export const PILGRIMAGE_COPY: Record<
     relatedLocation: "地域",
     emptyIndex:
       "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
+    searchWorks: "作品名で検索",
+    searchWorksEmpty: "該当する作品が見つかりません",
+    alsoKnownAs: "別名",
     viewSpot: "詳細を見る",
     seoSpotTitle: (anime, place) => `${anime} 聖地：${place}`,
     seoSpotDescription: (anime, place, location) =>
@@ -226,6 +235,9 @@ export const PILGRIMAGE_COPY: Record<
     relatedLocation: "Region",
     emptyIndex:
       "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
+    searchWorks: "Search anime titles",
+    searchWorksEmpty: "No matching titles",
+    alsoKnownAs: "Also known as",
     viewSpot: "View details",
     seoSpotTitle: (anime, place) => `${anime} pilgrimage: ${place}`,
     seoSpotDescription: (anime, place, location) =>
@@ -295,6 +307,9 @@ export const PILGRIMAGE_COPY: Record<
     relatedAnime: "所屬作品",
     relatedLocation: "所在地區",
     emptyIndex: "SEO 索引尚未生成，請先執行 npm run data:build-pilgrimage-seo",
+    searchWorks: "搜尋作品名稱",
+    searchWorksEmpty: "找不到相關作品",
+    alsoKnownAs: "別名",
     viewSpot: "檢視詳情",
     seoSpotTitle: (anime, place) => `${anime} 聖地：${place}`,
     seoSpotDescription: (anime, place, location) =>

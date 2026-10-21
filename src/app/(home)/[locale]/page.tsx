@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { HomeView } from "~/components/home/home-view";
 import { buildHomeCatalog } from "~/lib/home-catalog";
+import { resolvePopularAnime } from "~/lib/popular-anime";
 import { isHomeLocale } from "~/lib/home-locale";
 import { homePageMetadata } from "~/lib/home-page-copy";
 import { withHomeOg } from "~/lib/og/metadata";
@@ -52,5 +53,8 @@ export default async function HomePage({
       : null,
     locale,
   );
-  return <HomeView locale={locale} catalog={catalog} />;
+  const popularAnime = resolvePopularAnime(index?.animes ?? [], locale);
+  return (
+    <HomeView locale={locale} catalog={catalog} popularAnime={popularAnime} />
+  );
 }

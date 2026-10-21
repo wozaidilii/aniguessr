@@ -6,9 +6,8 @@ import {
   getPilgrimageSeoIndex,
   pickLocalizedText,
 } from "~/server/data/pilgrimage-seo";
+import { AnimeIndexBrowser } from "~/components/pilgrimage/anime-index-browser";
 import {
-  PilgrimageCard,
-  PilgrimageCardGrid,
   PilgrimageShell,
   pilgrimageHref,
   pilgrimageLocale,
@@ -47,9 +46,12 @@ export default async function PilgrimageAnimeIndexPage({
   const locale = pilgrimageLocale(localeParam);
   const copy = getPilgrimageCopy(locale);
   const index = getPilgrimageSeoIndex();
-  const cards = (index?.animes ?? []).map((anime) => ({
-    anime,
-    spotCount: anime.spotCount,
+  const items = (index?.animes ?? []).map((anime) => ({
+    subjectId: anime.subjectId,
+    titles: anime.animeTitle,
+    href: pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale),
+    title: pickLocalizedText(anime.animeTitle, locale),
+    meta: copy.spotCountLabel(anime.spotCount),
   }));
 
   return (
@@ -62,16 +64,7 @@ export default async function PilgrimageAnimeIndexPage({
       {!index ? (
         <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>
       ) : (
-        <PilgrimageCardGrid>
-          {cards.map(({ anime, spotCount }) => (
-            <PilgrimageCard
-              key={anime.subjectId}
-              href={pilgrimageHref(`/pilgrimage/anime/${anime.slug}`, locale)}
-              title={pickLocalizedText(anime.animeTitle, locale)}
-              meta={copy.spotCountLabel(spotCount)}
-            />
-          ))}
-        </PilgrimageCardGrid>
+        <AnimeIndexBrowser locale={locale} items={items} />
       )}
     </PilgrimageShell>
   );
