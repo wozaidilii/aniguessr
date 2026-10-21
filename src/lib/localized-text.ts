@@ -7,11 +7,18 @@ export interface LocalizedText {
   /** Traditional Chinese for pilgrimage records. zh-TW does not fall back to zh. */
   tw?: string;
   /**
-   * Anime titles only. `ja-fallback` means `tw` is a copy of the Japanese
-   * title, not an official Traditional title. Pages still display `tw`.
-   * Open Graph cards treat that copy as empty.
+   * Anime titles only. `ja` (and the older `ja-fallback`) means `tw` is a
+   * copy of the Japanese title. Pages still display `tw`. Open Graph cards
+   * treat that copy as empty. `explicit`, `override`, and `opencc` are real
+   * Traditional titles chosen at SEO build time.
    */
-  twSource?: "official-title" | "ja-fallback";
+  twSource?:
+    | "explicit"
+    | "override"
+    | "opencc"
+    | "ja"
+    | "official-title"
+    | "ja-fallback";
 }
 
 export interface LocalizedLines {

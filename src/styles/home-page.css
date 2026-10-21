@@ -439,20 +439,46 @@
     0 0 0 16px rgba(103, 232, 249, 0.14);
 }
 
-.home-map-searchstack {
+.home-map-float {
   position: absolute;
   top: 16px;
+  right: 16px;
   left: 16px;
+  z-index: 7;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.home-map-searchstack {
+  position: relative;
   z-index: 8;
   display: flex;
-  width: 320px;
-  max-width: calc(100% - 32px);
+  width: 360px;
+  max-width: 100%;
   min-width: 0;
   flex-direction: column;
   gap: 8px;
+  pointer-events: auto;
 }
 
-.home-work-search,
+.home-work-search {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(13, 8, 26, 0.94);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
 .home-popular {
   min-width: 0;
   max-width: 100%;
@@ -603,15 +629,15 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
+  overflow: visible;
 }
 
 .home-popular-chip {
   display: flex;
-  flex: 0 0 auto;
-  max-width: 220px;
+  flex: 0 1 auto;
+  max-width: 100%;
   flex-direction: column;
   gap: 2px;
   padding: 6px 12px;
@@ -623,15 +649,10 @@
 }
 
 .home-popular-chip b {
-  overflow: hidden;
+  overflow-wrap: anywhere;
   font-size: 13px;
   font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home-popular-chip.is-selected {
-  border-color: rgba(249, 168, 212, 0.7);
+  white-space: normal;
 }
 
 .home-tool-locate {
@@ -640,17 +661,17 @@
 }
 
 .home-nearby-panel {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  position: relative;
   z-index: 6;
   display: flex;
   width: 320px;
-  max-height: calc(100% - 180px);
+  max-width: 100%;
+  max-height: calc(640px - 180px);
   flex-direction: column;
   padding: 14px;
   border-radius: 16px;
   background: rgba(13, 8, 26, 0.94);
+  pointer-events: auto;
   backdrop-filter: blur(16px);
 }
 
@@ -1283,12 +1304,43 @@
     top: 118px;
   }
 
+  .home-map-float {
+    display: contents;
+  }
+
   .home-map-searchstack {
+    position: absolute;
     top: 12px;
     right: 12px;
     left: 12px;
     width: auto;
     max-width: none;
+  }
+
+  .home-work-search {
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .home-popular-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .home-popular-chip {
+    flex: 0 0 auto;
+    max-width: 220px;
+  }
+
+  .home-popular-chip b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .home-map-searchstack .home-pills {

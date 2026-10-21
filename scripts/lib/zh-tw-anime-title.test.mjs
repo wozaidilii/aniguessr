@@ -3,7 +3,16 @@ import { toZhTw } from "./zh-tw.mjs";
 import { zhTwAnimeTitle } from "./zh-tw-anime-title.mjs";
 
 describe("zh-TW anime titles", () => {
-  it("uses the Taiwan official title and never OpenCC of simplified", () => {
+  it("prefers an explicit traditional title over the override map and OpenCC", () => {
+    const chosen = zhTwAnimeTitle("294993", {
+      tw: "明示標題",
+      zh: "咒术回战",
+      ja: "呪術廻戦",
+    });
+    expect(chosen).toEqual({ text: "明示標題", source: "explicit" });
+  });
+
+  it("uses the manual override, including a merged member id", () => {
     const titles = {
       zh: "青春笨蛋少年不做兔女郎学姐的梦",
       ja: "青春ブタ野郎はバニーガール先輩の夢を見ない",
@@ -11,29 +20,52 @@ describe("zh-TW anime titles", () => {
     };
     const chosen = zhTwAnimeTitle("240038", titles);
     expect(chosen).toEqual({
-      text: "青春豬頭少年不會夢到兔女郎學姊",
-      source: "official-title",
+      text: "青春豬頭少年",
+      source: "override",
     });
     expect(chosen.text).not.toBe(toZhTw(titles.zh));
-    expect(zhTwAnimeTitle("1608", { zh: "灌篮高手", ja: "スラムダンク" })).toEqual({
-      text: "灌籃高手",
-      source: "official-title",
-    });
-  });
-
-  it("falls back to Japanese when the map has no entry", () => {
-    const titles = {
+    expect(zhTwAnimeTitle(["999999", "328609"], {
       zh: "孤独摇滚！",
       ja: "ぼっち・ざ・ろっく！",
-      en: "Bocchi the Rock!",
-    };
-    expect(zhTwAnimeTitle("328609", titles)).toEqual({
-      text: "ぼっち・ざ・ろっく！",
-      source: "ja-fallback",
+    })).toEqual({ text: "孤獨搖滾！", source: "override" });
+    expect(zhTwAnimeTitle("1608", { zh: "灌篮高手", ja: "スラムダンク" })).toEqual({
+      text: "灌籃高手",
+      source: "override",
     });
-    expect(zhTwAnimeTitle(["999999", "328609"], titles).text).toBe(
-      "ぼっち・ざ・ろっく！",
+    expect(zhTwAnimeTitle("294993", { zh: "咒术回战", ja: "呪術廻戦" }).text).toBe(
+      "咒術迴戰",
     );
-    expect(zhTwAnimeTitle("328609", { zh: "孤独摇滚！", ja: "" }).text).toBe("");
+    expect(zhTwAnimeTitle("207195", { zh: "摇曳露营△", ja: "ゆるキャン△" }).text).toBe(
+      "搖曳露營△",
+    );
+    expect(zhTwAnimeTitle("115908", { zh: "吹响！悠风号", ja: "響け！ユーフォニアム" }).text).toBe(
+      "吹響吧！上低音號",
+    );
+    expect(zhTwAnimeTitle("386809", { zh: "我推的孩子", ja: "【推しの子】" }).text).toBe(
+      "【我推的孩子】",
+    );
+    expect(zhTwAnimeTitle("899", { zh: "名侦探柯南", ja: "名探偵コナン" }).text).toBe(
+      "名偵探柯南",
+    );
+  });
+
+  it("converts simplified Chinese with OpenCC s2twp before Japanese", () => {
+    expect(
+      zhTwAnimeTitle("999001", {
+        zh: "孤独摇滚！",
+        ja: "ぼっち・ざ・ろっく！",
+      }),
+    ).toEqual({ text: "孤獨搖滾！", source: "opencc" });
+    expect(zhTwAnimeTitle("999001", { zh: "灌篮高手", ja: "スラムダンク" }).text).toBe(
+      "灌籃高手",
+    );
+  });
+
+  it("falls back to Japanese when simplified text is missing", () => {
+    expect(zhTwAnimeTitle("999001", { zh: "", ja: "ぼっち・ざ・ろっく！" })).toEqual({
+      text: "ぼっち・ざ・ろっく！",
+      source: "ja",
+    });
+    expect(zhTwAnimeTitle("999001", { zh: "   ", ja: "" }).text).toBe("");
   });
 });

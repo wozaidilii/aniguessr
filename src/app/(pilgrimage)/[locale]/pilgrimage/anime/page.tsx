@@ -26,13 +26,11 @@ export async function generateMetadata({
   const seo = buildAnimeIndexSeo(locale, {
     animeCount: index?.animeCount ?? 0,
   });
-  const title = locale === "zh-tw" ? "" : seo.title;
-  const description = locale === "zh-tw" ? "" : seo.description;
   return pilgrimagePageMetadata(
     locale,
     "/pilgrimage/anime",
-    title,
-    description,
+    seo.title,
+    seo.description,
     true,
   );
 }

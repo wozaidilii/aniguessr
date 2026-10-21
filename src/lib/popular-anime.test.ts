@@ -55,7 +55,16 @@ describe("popular anime chips", () => {
       spotCount: 400,
       href: "/ja/pilgrimage/anime/canon-buta",
     });
-    expect(POPULAR_ANIME_SUBJECT_IDS).not.toContain("899");
+    expect([...POPULAR_ANIME_SUBJECT_IDS]).toEqual([
+      "294993",
+      "362577",
+      "160209",
+      "328609",
+      "3128",
+      "207195",
+      "115908",
+      "240038",
+    ]);
   });
 
   it("skips ids that are not in the index and uses the locale title", () => {

@@ -227,28 +227,7 @@ export function HomeWorkSearch({
           <p className="home-popular-label">{copy.popularWorks}</p>
           <div className="home-popular-row">
             {popular.map((work) => (
-              <a
-                key={work.subjectId}
-                href={work.href}
-                className={
-                  selectedId === work.subjectId
-                    ? "home-popular-chip is-selected"
-                    : "home-popular-chip"
-                }
-                onClick={(event) => {
-                  if (
-                    event.metaKey ||
-                    event.ctrlKey ||
-                    event.shiftKey ||
-                    event.altKey ||
-                    event.button !== 0
-                  ) {
-                    return;
-                  }
-                  event.preventDefault();
-                  select(work);
-                }}
-              >
+              <a key={work.subjectId} href={work.href} className="home-popular-chip">
                 <b>{work.title}</b>
                 <small>{copy.searchSpotCount(work.spotCount)}</small>
               </a>
