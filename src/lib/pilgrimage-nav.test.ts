@@ -12,14 +12,18 @@ import {
   PILGRIMAGE_MAP_STYLE,
   anitabiSourceUrl,
   anitabiUrlFromSpotId,
+  clusterSamePlaces,
   filterNavSpots,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   haversineKm,
   localizedNavText,
   parseNavCatalog,
+  placeNamesSimilar,
   rankNearbySpots,
+  samePlaceWorkLabel,
   type NavSpot,
+  type NavText,
 } from "~/lib/pilgrimage-nav";
 
 const spot = (
@@ -27,13 +31,14 @@ const spot = (
   subjectId: string,
   lat: number,
   lng: number,
+  name?: Partial<NavText>,
 ): NavSpot => ({
   id,
   subjectId,
   locationSlug: "tokyo",
   lat,
   lng,
-  name: { zh: id, ja: id, en: id },
+  name: { zh: id, ja: id, en: id, ...name },
 });
 
 describe("pilgrimage navigation", () => {
@@ -113,6 +118,125 @@ describe("pilgrimage navigation", () => {
     expect(() => parseNavCatalog({ version: 2, spots: [] })).toThrow(
       /Invalid navigation catalog/,
     );
+  });
+
+  it("groups the same place and keeps each spot id", () => {
+    const nakatsu = spot(
+      "anitabi_215158_51i53xo8n",
+      "215158",
+      35.2994,
+      139.4802,
+      {
+        ja: "中津宮（江の島）",
+        zh: "中津宫",
+      },
+    );
+    const shrine = spot(
+      "anitabi_321885_csisxbghx",
+      "321885",
+      35.2993,
+      139.4802,
+      {
+        ja: "江島神社中津宮",
+        zh: "江岛神社中津宫",
+      },
+    );
+    const other = spot("stairs-far", "1", 35.302, 139.4802, {
+      ja: "中津宮（江の島）",
+    });
+    const unrelated = spot("hachi", "2", 35.2994, 139.4802, {
+      ja: "ハチ公",
+      zh: "八公",
+    });
+    const groups = clusterSamePlaces([nakatsu, shrine, unrelated, other]);
+    const paired = groups.find((group) => group.length > 1);
+    expect(paired?.map((item) => item.id)).toEqual([
+      "anitabi_215158_51i53xo8n",
+      "anitabi_321885_csisxbghx",
+    ]);
+    expect(groups.map((group) => group[0]?.id)).toEqual([
+      "anitabi_215158_51i53xo8n",
+      "hachi",
+      "stairs-far",
+    ]);
+    expect(placeNamesSimilar(nakatsu.name, shrine.name)).toBe(true);
+    expect(
+      samePlaceWorkLabel(
+        nakatsu,
+        [nakatsu, shrine],
+        { "215158": { zh: "刀使", ja: "刀使ノ巫女", en: "Toji" } },
+        "ja",
+      ),
+    ).toBe("刀使ノ巫女");
+    const stairs = spot("stairs", "215158", 35.2994, 139.4804, {
+      ja: "中津宮階段",
+    });
+    expect(
+      samePlaceWorkLabel(
+        nakatsu,
+        [nakatsu, stairs],
+        { "215158": { zh: "刀使", ja: "刀使ノ巫女", en: "Toji" } },
+        "ja",
+      ),
+    ).toBe("刀使ノ巫女 · 中津宮（江の島）");
+    expect(
+      placeNamesSimilar(
+        { ja: "中津駅", zh: "中津站", en: "" },
+        { ja: "大阪市中津地区", zh: "大阪市中津地区", en: "" },
+      ),
+    ).toBe(false);
+  });
+
+  it("counts same-place groups in the navigation catalog", () => {
+    const catalog = parseNavCatalog(
+      JSON.parse(readFileSync("public/data/seo/spots-nav.json", "utf8")),
+    );
+    const groups = clusterSamePlaces(catalog.spots);
+    const multi = groups.filter((group) => group.length >= 2);
+    const enoshima = multi.find((group) =>
+      group.some((item) => item.id === "anitabi_215158_51i53xo8n"),
+    );
+    expect(
+      enoshima?.some((item) => item.id === "anitabi_321885_csisxbghx"),
+    ).toBe(true);
+    expect(new Set(enoshima?.map((item) => item.id)).size).toBe(
+      enoshima?.length,
+    );
+    expect(multi.length).toBe(1662);
+    expect(enoshima?.map((item) => item.id).sort()).toEqual([
+      "anitabi_212278_3aa8nhf3",
+      "anitabi_215158_51i53xhbx",
+      "anitabi_215158_51i53xo8n",
+      "anitabi_321885_csisxbghx",
+    ]);
+    expect(groups.reduce((sum, group) => sum + group.length, 0)).toBe(
+      catalog.spots.length,
+    );
+  });
+
+  it("keeps the open nearby sheet from stretching the card list", () => {
+    const css = readFileSync("src/styles/home-page.css", "utf8");
+    expect(css).toMatch(
+      /\.home-nearby-sheet\.is-open \.home-spot-list \{\s*flex: 0 0 auto;/,
+    );
+    expect(css).toMatch(
+      /\.home-nearby-sheet\.is-open \{\s*height: auto;\s*max-height: min\(78svh, 680px\);/,
+    );
+    const home = readFileSync("src/components/home/home-nearby.tsx", "utf8");
+    const near = readFileSync(
+      "src/components/pilgrimage/nearby-spots.tsx",
+      "utf8",
+    );
+    const spotPage = readFileSync(
+      "src/app/[locale]/pilgrimage/spots/[id]/page.tsx",
+      "utf8",
+    );
+    expect(home).toContain("clusterSamePlaces");
+    expect(home).toContain("/pilgrimage/spots/${encodeSpotId(item.id)}");
+    expect(near).toContain("clusterSamePlaces");
+    expect(near).toContain("/pilgrimage/spots/${encodeSpotId(item.id)}");
+    expect(spotPage).not.toContain("NearbySpots");
+    expect(spotPage).not.toContain("clusterSamePlaces");
   });
 
   it("ranks favorite spots ahead of closer spots from other anime", () => {

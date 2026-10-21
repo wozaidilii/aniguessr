@@ -4,7 +4,8 @@ import { applySpotDisplayName } from "~/lib/spot-name-overrides";
 export const ANITABI_SITE = "https://anitabi.cn";
 export const CC_BY_NC_SA_4_URL =
   "https://creativecommons.org/licenses/by-nc-sa/4.0/";
-export const PILGRIMAGE_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
+export const PILGRIMAGE_MAP_STYLE =
+  "https://tiles.openfreemap.org/styles/positron";
 export const SPOTS_NAV_URL = "/data/seo/spots-nav.json";
 
 export interface NavText {
@@ -187,6 +188,118 @@ export function filterNavSpots(
   });
 }
 
+/** Spots this close, with similar names, are one place in nearby lists. */
+export const SAME_PLACE_METERS = 30;
+
+function normalizePlaceName(value: string): string {
+  return value
+    .normalize("NFKC")
+    .replace(/[（(][^）)]*[）)]/gu, "")
+    .replace(/[\s・･、,，。．.ー\-－]/gu, "")
+    .replace(/の/gu, "")
+    .toLowerCase();
+}
+
+function placeNameForms(name: NavText): string[] {
+  return [name.ja, name.zh, name.tw ?? ""]
+    .map((value) => normalizePlaceName(value))
+    .filter((value) => value.length >= 3);
+}
+
+/** True when one stored name contains the other after light normalization. */
+export function placeNamesSimilar(left: NavText, right: NavText): boolean {
+  const formsA = placeNameForms(left);
+  const formsB = placeNameForms(right);
+  for (const a of formsA) {
+    for (const b of formsB) {
+      if (a === b) return true;
+      const shorter = a.length <= b.length ? a : b;
+      const longer = a.length <= b.length ? b : a;
+      if (shorter.length >= 3 && longer.includes(shorter)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Cluster a distance-sorted list. The first member of each group stays first,
+ * so a nearest-first list keeps the closest spot as the card.
+ */
+export function clusterSamePlaces<
+  T extends { lat: number; lng: number; name: NavText },
+>(spots: readonly T[], meters = SAME_PLACE_METERS): T[][] {
+  const count = spots.length;
+  const parent = Array.from({ length: count }, (_, index) => index);
+  const find = (index: number): number => {
+    let root = index;
+    while (parent[root] !== root) root = parent[root] ?? root;
+    let cursor = index;
+    while (cursor !== root) {
+      const next = parent[cursor] ?? root;
+      parent[cursor] = root;
+      cursor = next;
+    }
+    return root;
+  };
+  const union = (left: number, right: number) => {
+    let a = find(left);
+    let b = find(right);
+    if (a === b) return;
+    if (a > b) [a, b] = [b, a];
+    parent[b] = a;
+  };
+
+  const cell = 0.0004;
+  const buckets = new Map<string, number[]>();
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const key = `${Math.floor(spot.lat / cell)}:${Math.floor(spot.lng / cell)}`;
+    const list = buckets.get(key);
+    if (list) list.push(index);
+    else buckets.set(key, [index]);
+  }
+
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const latCell = Math.floor(spot.lat / cell);
+    const lngCell = Math.floor(spot.lng / cell);
+    for (let dLat = -1; dLat <= 1; dLat += 1) {
+      for (let dLng = -1; dLng <= 1; dLng += 1) {
+        const list = buckets.get(`${latCell + dLat}:${lngCell + dLng}`);
+        if (!list) continue;
+        for (const other of list) {
+          if (other <= index) continue;
+          const candidate = spots[other];
+          if (!candidate) continue;
+          const distance =
+            haversineKm(spot.lat, spot.lng, candidate.lat, candidate.lng) *
+            1000;
+          if (distance > meters) continue;
+          if (!placeNamesSimilar(spot.name, candidate.name)) continue;
+          union(index, other);
+        }
+      }
+    }
+  }
+
+  const groups = new Map<number, T[]>();
+  const order: number[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const root = find(index);
+    const list = groups.get(root);
+    if (list) list.push(spot);
+    else {
+      groups.set(root, [spot]);
+      order.push(root);
+    }
+  }
+  return order.map((root) => groups.get(root) ?? []);
+}
+
 export function rankNearbySpots(
   spots: readonly NavSpot[],
   origin: { lat: number; lng: number },
@@ -218,6 +331,26 @@ export function animeTitle(
   locale: PilgrimageLocale,
 ): string {
   return localizedNavText(animes[subjectId] ?? EMPTY_TEXT, locale);
+}
+
+/** Work title for a grouped card. Repeated titles keep the spot name. */
+export function samePlaceWorkLabel(
+  spot: NavSpot,
+  peers: readonly NavSpot[],
+  animes: Record<string, NavText>,
+  locale: PilgrimageLocale,
+): string {
+  const place = localizedSpotName(spot, locale);
+  const label = animeTitle(animes, spot.subjectId, locale) || place;
+  const repeated = peers.some((other) => {
+    if (other.id === spot.id) return false;
+    const otherPlace = localizedSpotName(other, locale);
+    const otherLabel =
+      animeTitle(animes, other.subjectId, locale) || otherPlace;
+    return otherLabel === label;
+  });
+  if (!repeated || !place || place === label) return label;
+  return `${label} · ${place}`;
 }
 
 let catalogRequest: Promise<NavCatalog> | null = null;
