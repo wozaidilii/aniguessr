@@ -81,13 +81,12 @@ function spotPageSeo(
   spot: PilgrimageSpot,
   fields: SpotSeoFields,
 ) {
-  if (locale === "zh-tw") {
-    return applyPilgrimageSeoOverride("spot", spot.id, "zh-tw", {
-      title: "",
-      description: "",
-    });
-  }
-  return buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
+  return applyPilgrimageSeoOverride(
+    "spot",
+    spot.id,
+    locale,
+    buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale)),
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -50,6 +50,6 @@ describe("pilgrimage SEO overrides", () => {
     ).toEqual({ title: "", description: "" });
     expect(
       applyPilgrimageSeoOverride("spot", "anitabi_1", "zh-tw", template),
-    ).toEqual({ title: "", description: "" });
+    ).toEqual(template);
   });
 });

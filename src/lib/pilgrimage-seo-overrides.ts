@@ -12,9 +12,9 @@ export interface SeoOverride {
  * Anime slugs stay `{subjectId}-{suffix}` (`/pilgrimage/anime/{slug}`).
  * Location slugs are `{city}-{prefecture}` from the geocoder.
  * Spot keys are spot ids.
- * Leave en, ja, or zh blank to keep the generated template.
- * zh-TW document titles and descriptions come only from this map.
- * A missing or blank zh-TW entry stays empty until copy is supplied.
+ * Leave a locale blank to keep the generated template.
+ * zh-TW spot pages use the generated spot templates.
+ * Other zh-TW documents stay empty until this map supplies copy.
  */
 export const PILGRIMAGE_SEO_OVERRIDES: {
   anime: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
@@ -51,7 +51,7 @@ export function applyPilgrimageSeoOverride(
   seo: RenderedSeo,
 ): RenderedSeo {
   const entry = PILGRIMAGE_SEO_OVERRIDES[kind][slug]?.[locale];
-  if (locale === "zh-tw") {
+  if (locale === "zh-tw" && kind !== "spot") {
     return {
       title: nonempty(entry?.title) ?? "",
       description: nonempty(entry?.description) ?? "",
