@@ -20,7 +20,7 @@ describe("zh-TW anime titles", () => {
     };
     const chosen = zhTwAnimeTitle("240038", titles);
     expect(chosen).toEqual({
-      text: "青春豬頭少年不會夢到兔女郎學姐",
+      text: "青春豬頭少年",
       source: "override",
     });
     expect(chosen.text).not.toBe(toZhTw(titles.zh));
@@ -32,6 +32,21 @@ describe("zh-TW anime titles", () => {
       text: "灌籃高手",
       source: "override",
     });
+    expect(zhTwAnimeTitle("294993", { zh: "咒术回战", ja: "呪術廻戦" }).text).toBe(
+      "咒術迴戰",
+    );
+    expect(zhTwAnimeTitle("207195", { zh: "摇曳露营△", ja: "ゆるキャン△" }).text).toBe(
+      "搖曳露營△",
+    );
+    expect(zhTwAnimeTitle("115908", { zh: "吹响！悠风号", ja: "響け！ユーフォニアム" }).text).toBe(
+      "吹響吧！上低音號",
+    );
+    expect(zhTwAnimeTitle("386809", { zh: "我推的孩子", ja: "【推しの子】" }).text).toBe(
+      "【我推的孩子】",
+    );
+    expect(zhTwAnimeTitle("899", { zh: "名侦探柯南", ja: "名探偵コナン" }).text).toBe(
+      "名偵探柯南",
+    );
   });
 
   it("converts simplified Chinese with OpenCC s2twp before Japanese", () => {

@@ -15,8 +15,10 @@ const titleMap = JSON.parse(
 
 /**
  * zh-TW anime title, chosen at SEO build time.
- * explicit `tw` > manual override map > OpenCC s2twp of simplified `zh` > ja.
- * Slugs stay on the simplified title. This module is not imported by the client.
+ * explicit `tw` > `scripts/data/zh-tw-anime-titles.json` (subject id → title)
+ * > OpenCC s2twp of simplified `zh` > ja.
+ * Add bulk overrides as new keys in that JSON file. Slugs stay on the
+ * simplified title. This module is not imported by the client.
  * @param {string | Array<string | undefined>} subjectIds canonical id first
  * @param {{ tw?: string, ja?: string, zh?: string } | null | undefined} titles
  * @param {Record<string, string>} [map]

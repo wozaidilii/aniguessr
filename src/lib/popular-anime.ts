@@ -9,13 +9,13 @@ import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
  */
 export const POPULAR_ANIME_SUBJECT_IDS = [
   "294993",
-  "160209",
   "362577",
+  "160209",
   "328609",
-  "386809",
-  "240038",
-  "899",
   "3128",
+  "207195",
+  "115908",
+  "240038",
 ] as const;
 
 export interface PopularAnimeSource {

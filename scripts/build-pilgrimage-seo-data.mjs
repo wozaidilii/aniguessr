@@ -686,13 +686,15 @@ async function main() {
         openccSamples,
         curated: [
           "294993",
-          "160209",
           "362577",
+          "160209",
           "328609",
-          "386809",
-          "240038",
-          "899",
           "3128",
+          "207195",
+          "115908",
+          "240038",
+          "386809",
+          "899",
         ].map((id) => {
           const anime = animes.find(
             (item) => item.subjectId === id || item.subjectIds?.includes(id),
