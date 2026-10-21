@@ -127,14 +127,14 @@ export function displaySpotPlace(
   derivedJa?: string,
 ): string {
   if (locale !== "ja") return displayName(locale, base, ogTitle, shortName);
-  return (
-    preferredName("ja", base, ogTitle, shortName) ||
-    preferredName("zh", base, ogTitle, shortName) ||
-    derivedJa?.trim() ||
-    preferredName("en", base, ogTitle, shortName) ||
-    preferredName("zh-tw", base, ogTitle, shortName) ||
-    ""
-  );
+  const ordered = [
+    preferredName("ja", base, ogTitle, shortName),
+    preferredName("zh", base, ogTitle, shortName),
+    derivedJa?.trim() ?? "",
+    preferredName("en", base, ogTitle, shortName),
+    preferredName("zh-tw", base, ogTitle, shortName),
+  ];
+  return ordered.find((value) => value.length > 0) ?? "";
 }
 
 export function resolveContentLocale(

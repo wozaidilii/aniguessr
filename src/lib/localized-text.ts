@@ -51,12 +51,14 @@ export function pickSpotPlaceName(
   derivedJa?: string,
 ): string {
   if (locale !== "ja") return pickLocalizedText(text, locale);
-  const ja = text?.ja?.trim() ?? "";
-  const zh = text?.zh?.trim() ?? "";
-  const derived = derivedJa?.trim() ?? "";
-  const en = text?.en?.trim() ?? "";
-  const tw = text?.tw?.trim() ?? "";
-  return ja || zh || derived || en || tw;
+  const ordered = [
+    text?.ja?.trim() ?? "",
+    text?.zh?.trim() ?? "",
+    derivedJa?.trim() ?? "",
+    text?.en?.trim() ?? "",
+    text?.tw?.trim() ?? "",
+  ];
+  return ordered.find((value) => value.length > 0) ?? "";
 }
 
 export function pickLocalizedLines(
