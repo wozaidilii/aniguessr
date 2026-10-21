@@ -242,10 +242,10 @@ export default function LoginPage() {
           </div>
         </header>
 
-        <section className="grid flex-1 items-center gap-8 py-10 lg:grid-cols-[0.95fr_1.05fr]">
-          <div>
+        <section className="grid min-w-0 flex-1 items-center gap-8 py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="min-w-0">
             <div className="anime-chip mb-5 w-fit">{copy.modeLabel[mode]}</div>
-            <h1 className="text-5xl leading-none font-black text-white sm:text-6xl">
+            <h1 className="text-5xl leading-none font-black break-words text-white sm:text-6xl">
               {copy.heroTitle}
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-pink-50/70">
@@ -253,7 +253,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="anime-panel p-5 sm:p-6">
+          <div className="anime-panel min-w-0 p-5 sm:p-6">
             <div
               className="mb-5 grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-black/25 p-1"
               role="tablist"
