@@ -63,6 +63,10 @@ describe("homepage copy", () => {
     expect(getHomePageCopy("zh").popularWorks).toBe("从热门作品找");
     expect(getHomePageCopy("zh-tw").popularWorks).toBe("從熱門作品找");
     expect(getHomePageCopy("en").popularWorks).toBe("Start with a popular title");
+    expect(getHomePageCopy("ja").showAllWorks).toBe("すべて表示");
+    expect(getHomePageCopy("zh").showAllWorks).toBe("展开全部");
+    expect(getHomePageCopy("zh-tw").showAllWorks).toBe("展開全部");
+    expect(getHomePageCopy("en").showAllWorks).toBe("Show all");
     expect(getHomePageCopy("ja").myLocation).toBe("現在地");
     expect(getHomePageCopy("zh").myLocation).toBe("我的位置");
     expect(getHomePageCopy("en").myLocation).toBe("My location");

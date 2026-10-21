@@ -136,6 +136,14 @@ export function HomeNearby({
       ) : null}
       {variant === "sheet" ? (
         <>
+          <div className="home-sheet-pills">
+            <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
+              {copy.searchPill}
+            </a>
+            <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
+              {copy.favoritesPill}
+            </a>
+          </div>
           <a className="home-btn home-btn-primary home-btn-block" data-find-nearby="" href={nearbyHref}>
             <LocateIcon />
             {copy.primaryCta}

@@ -57,47 +57,15 @@ export function HomeView({
       <HomeLocate message={copy.geoDenied} />
       <HomeHeader locale={locale} />
       <section className="home-hero" id="pilgrim">
-        <div className="home-mapstage">
-          <HomeMapLoader locale={locale} />
-          <div className="home-overlay" aria-hidden="true">
+        <div className="home-lead">
+          <div className="home-titleband">
             <p className="home-chip">
               <i />
               {copy.chip}
             </p>
-            <HomeTitle locale={locale} copy={copy} as="p" />
+            <HomeTitle locale={locale} copy={copy} as="h1" />
           </div>
-          <div className="home-map-float">
-            <div className="home-map-searchstack">
-              <HomeWorkSearch locale={locale} popular={popularAnime} />
-              <div className="home-pills">
-                <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
-                  {copy.searchPill}
-                </a>
-                <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
-                  {copy.favoritesPill}
-                </a>
-              </div>
-            </div>
-            <HomeNearby
-              locale={locale}
-              variant="panel"
-              seeds={catalog.nearby}
-              popularLocationSlugs={catalog.popularLocationSlugs}
-            />
-          </div>
-          <HomeNearby
-            locale={locale}
-            variant="sheet"
-            seeds={catalog.nearby}
-            popularLocationSlugs={catalog.popularLocationSlugs}
-          />
-        </div>
-        <div className="home-copy">
-          <p className="home-chip">
-            <i />
-            {copy.chip}
-          </p>
-          <HomeTitle locale={locale} copy={copy} as="h1" />
+          <div className="home-copy-body">
           <p className="home-intro">{copy.intro}</p>
           <div className="home-ctas">
             <a
@@ -128,6 +96,27 @@ export function HomeView({
               <dt>{copy.statAreas}</dt>
             </div>
           </dl>
+          </div>
+        </div>
+        <div className="home-mapstage">
+          <HomeMapLoader locale={locale} />
+          <div className="home-map-float">
+            <div className="home-map-searchstack">
+              <HomeWorkSearch locale={locale} popular={popularAnime} />
+            </div>
+            <HomeNearby
+              locale={locale}
+              variant="panel"
+              seeds={catalog.nearby}
+              popularLocationSlugs={catalog.popularLocationSlugs}
+            />
+          </div>
+          <HomeNearby
+            locale={locale}
+            variant="sheet"
+            seeds={catalog.nearby}
+            popularLocationSlugs={catalog.popularLocationSlugs}
+          />
         </div>
       </section>
 

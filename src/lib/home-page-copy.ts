@@ -75,6 +75,7 @@ export interface HomePageCopy {
   searchWorksEmpty: string;
   searchClear: string;
   popularWorks: string;
+  showAllWorks: string;
   searchSpotCount: (count: number) => string;
   footerTagline: string;
   footerMap: string;
@@ -216,6 +217,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     searchWorksEmpty: "該当する作品が見つかりません",
     searchClear: "クリア",
     popularWorks: "人気の作品から探す",
+    showAllWorks: "すべて表示",
     searchSpotCount: (count) => `${formatCount("ja", count)} か所`,
     footerTagline: "アニメ聖地巡礼マップと聖地当てゲーム。",
     footerMap: "MAP",
@@ -319,6 +321,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     searchWorksEmpty: "没有找到相关作品",
     searchClear: "清除",
     popularWorks: "从热门作品找",
+    showAllWorks: "展开全部",
     searchSpotCount: (count) => `${formatCount("zh", count)} 处`,
     footerTagline: "动漫圣地巡礼地图和圣地猜猜看小游戏。",
     footerMap: "MAP",
@@ -422,6 +425,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     searchWorksEmpty: "找不到相關作品",
     searchClear: "清除",
     popularWorks: "從熱門作品找",
+    showAllWorks: "展開全部",
     searchSpotCount: (count) => `${formatCount("zh-tw", count)} 處`,
     footerTagline: "動漫聖地巡禮地圖和聖地猜猜看小遊戲。",
     footerMap: "MAP",
@@ -525,6 +529,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     searchWorksEmpty: "No matching titles",
     searchClear: "Clear",
     popularWorks: "Start with a popular title",
+    showAllWorks: "Show all",
     searchSpotCount: (count) =>
       `${formatCount("en", count)} ${count === 1 ? "spot" : "spots"}`,
     mapLabel: "Anime pilgrimage map",
