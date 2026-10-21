@@ -506,6 +506,32 @@ async function main() {
   let zhTwSpotCount = 0;
   /** @type {ReturnType<typeof reviewRow>[]} */
   const reviewRows = [];
+  const animeTitleSources = { explicit: 0, override: 0, opencc: 0, ja: 0 };
+  /** @type {Array<{ id: string, zh: string, tw: string }>} */
+  const openccSamples = [];
+  /** @type {Map<string, { text: string, source: string }>} */
+  const animeTitleChoice = new Map();
+  for (const anime of animes) {
+    const chosen = zhTwAnimeTitle(
+      anime.subjectIds?.length ? anime.subjectIds : anime.subjectId,
+      anime.animeTitle,
+    );
+    anime.animeTitle.tw = chosen.text;
+    animeTitleChoice.set(anime.subjectId, chosen);
+    animeTitleSources[chosen.source] = (animeTitleSources[chosen.source] ?? 0) + 1;
+    const simplified = anime.animeTitle?.zh?.trim() ?? "";
+    if (
+      chosen.source === "opencc" &&
+      openccSamples.length < 10 &&
+      chosen.text !== simplified
+    ) {
+      openccSamples.push({
+        id: anime.subjectId,
+        zh: simplified,
+        tw: chosen.text,
+      });
+    }
+  }
 
   const attachTw = (record) => {
     if (!record || typeof record !== "object" || Array.isArray(record)) return;
@@ -555,10 +581,9 @@ async function main() {
       attachTw(spot.episodeContext);
     }
     attachTwLines(spot.funfact);
-    const chosen = zhTwAnimeTitle(
-      [spot.workSubjectId, spot.subjectId],
-      spot.animeTitle,
-    );
+    const chosen =
+      animeTitleChoice.get(spot.workSubjectId) ??
+      zhTwAnimeTitle([spot.workSubjectId, spot.subjectId], spot.animeTitle);
     spot.animeTitle.tw = chosen.text;
     rememberField("spot", spot.id, "title", spot.title);
     rememberField("spot", spot.id, "description", spot.description);
@@ -576,15 +601,14 @@ async function main() {
     );
   }
   for (const anime of animes) {
-    const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
-    anime.animeTitle.tw = chosen.text;
+    const chosen = animeTitleChoice.get(anime.subjectId);
     remember(
       "anime",
       anime.subjectId,
       "animeTitle",
-      chosen.source,
+      chosen?.source ?? "ja",
       anime.animeTitle?.zh ?? "",
-      chosen.text,
+      anime.animeTitle?.tw ?? "",
     );
   }
   for (const location of locations) {
@@ -647,6 +671,34 @@ async function main() {
       spotCount: zhTwSpotCount,
       animeCount: animes.length,
       review: zhTwReview,
+      animeTitles: {
+        sources: animeTitleSources,
+        openccSamples,
+        curated: [
+          "294993",
+          "160209",
+          "362577",
+          "328609",
+          "386809",
+          "240038",
+          "899",
+          "3128",
+        ].map((id) => {
+          const anime = animes.find(
+            (item) => item.subjectId === id || item.subjectIds?.includes(id),
+          );
+          if (!anime) return { id, missing: true };
+          return {
+            id,
+            canonical: anime.subjectId,
+            slug: anime.slug,
+            source: animeTitleChoice.get(anime.subjectId)?.source ?? "",
+            zh: anime.animeTitle?.zh ?? "",
+            tw: anime.animeTitle?.tw ?? "",
+            ja: anime.animeTitle?.ja ?? "",
+          };
+        }),
+      },
     },
     spotIds,
     spots,
@@ -758,18 +810,15 @@ async function main() {
   const nav = {
     version: 1,
     animes: Object.fromEntries(
-      animes.map((anime) => {
-        const chosen = zhTwAnimeTitle(anime.subjectId, anime.animeTitle);
-        return [
-          anime.subjectId,
-          [
-            anime.animeTitle?.zh ?? "",
-            anime.animeTitle?.ja ?? "",
-            anime.animeTitle?.en ?? "",
-            chosen.text,
-          ],
-        ];
-      }),
+      animes.map((anime) => [
+        anime.subjectId,
+        [
+          anime.animeTitle?.zh ?? "",
+          anime.animeTitle?.ja ?? "",
+          anime.animeTitle?.en ?? "",
+          anime.animeTitle?.tw ?? "",
+        ],
+      ]),
     ),
     spots: visibleSpots.map((spot) => [
       spot.id,

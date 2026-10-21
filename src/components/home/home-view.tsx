@@ -56,23 +56,25 @@ export function HomeView({
               <span className="home-h1-line">{copy.h1Tail}</span>
             </p>
           </div>
-          <div className="home-map-searchstack">
-            <HomeWorkSearch locale={locale} popular={popularAnime} />
-            <div className="home-pills">
-              <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
-                {copy.searchPill}
-              </a>
-              <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
-                {copy.favoritesPill}
-              </a>
+          <div className="home-map-float">
+            <div className="home-map-searchstack">
+              <HomeWorkSearch locale={locale} popular={popularAnime} />
+              <div className="home-pills">
+                <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
+                  {copy.searchPill}
+                </a>
+                <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
+                  {copy.favoritesPill}
+                </a>
+              </div>
             </div>
+            <HomeNearby
+              locale={locale}
+              variant="panel"
+              seeds={catalog.nearby}
+              popularLocationSlugs={catalog.popularLocationSlugs}
+            />
           </div>
-          <HomeNearby
-            locale={locale}
-            variant="panel"
-            seeds={catalog.nearby}
-            popularLocationSlugs={catalog.popularLocationSlugs}
-          />
           <HomeNearby
             locale={locale}
             variant="sheet"
