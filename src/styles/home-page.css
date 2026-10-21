@@ -34,11 +34,22 @@
 .home-hdr {
   position: sticky;
   top: 0;
-  z-index: 40;
-  height: 64px;
+  z-index: 60;
+  height: auto;
+  min-height: 64px;
   background: rgba(10, 6, 18, 0.92);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
+}
+
+.home-hdr-in {
+  min-height: 64px;
+}
+
+.home-hdr a:focus-visible,
+.home-hdr button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #67e8f9;
 }
 
 .home-hdr-in,
@@ -50,7 +61,7 @@
 }
 
 .home-hdr-in {
-  height: 100%;
+  height: 64px;
   justify-content: space-between;
   gap: 16px;
   padding: 0 32px;
@@ -970,11 +981,14 @@
     width: min(100% - 32px, 1248px);
   }
 
-  .home-hdr {
-    height: 56px;
+  .home-hdr,
+  .home-hdr-in {
+    height: auto;
+    min-height: 56px;
   }
 
   .home-hdr-in {
+    height: 56px;
     padding: 0 16px;
   }
 

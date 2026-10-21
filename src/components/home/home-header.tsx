@@ -1,57 +1,50 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { BrandLockup } from "~/components/brand/BrandLockup";
 import { HomeAccount } from "~/components/home/home-account";
-import {
-  HOME_LANG_LINKS,
-  getHomePageCopy,
-} from "~/lib/home-page-copy";
+import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
-import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
-
-function homeHref(locale: HomeLocale): string {
-  return locale === "zh-tw" ? "/zh-tw" : `/${locale}`;
-}
+import { siteNavIsCurrent, siteNavModel } from "~/lib/site-nav";
 
 export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
+  const pathname = usePathname() || `/${locale}`;
+  const nav = siteNavModel(pathname, locale);
   const [open, setOpen] = useState(false);
-  const links = [
-    {
-      href: withPilgrimageLocale("/pilgrimage", locale),
-      label: copy.navMap,
-    },
-    {
-      href: withPilgrimageLocale("/pilgrimage/anime", locale),
-      label: copy.navAnime,
-    },
-    {
-      href: withPilgrimageLocale("/pilgrimage/locations", locale),
-      label: copy.navAreas,
-    },
-    { href: "#game", label: copy.navGame },
-    { href: "#rank", label: copy.navRank },
-  ];
-  const current = HOME_LANG_LINKS.find((item) => item.locale === locale);
+  const labels = {
+    map: copy.navMap,
+    anime: copy.navAnime,
+    areas: copy.navAreas,
+    game: copy.navGame,
+    rank: copy.navRank,
+  } as const;
+  const currentLang = nav.languages.find((item) => item.locale === locale);
 
   return (
-    <header className="home-hdr">
+    <header className="home-hdr" data-testid="site-header">
       <div className="home-hdr-in">
-        <BrandLockup href={homeHref(locale)} />
+        <BrandLockup href={nav.home} />
         <nav className="home-nav" aria-label={copy.navMap}>
-          {links.map((link) => (
-            <a key={link.href} href={link.href}>
-              {link.label}
+          {nav.links.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              aria-current={
+                siteNavIsCurrent(pathname, link.href) ? "page" : undefined
+              }
+            >
+              {labels[link.id]}
             </a>
           ))}
         </nav>
         <div className="home-hdr-right">
           <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {HOME_LANG_LINKS.map((item) => (
+            {nav.languages.map((item) => (
               <a
                 key={item.locale}
-                href={homeHref(item.locale)}
+                href={item.href}
                 aria-current={item.locale === locale ? "true" : undefined}
                 hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
               >
@@ -59,7 +52,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
               </a>
             ))}
           </div>
-          <span className="home-lang-current">{current?.label}</span>
+          <span className="home-lang-current">{currentLang?.label}</span>
           <div className="home-hdr-login">
             <HomeAccount locale={locale} />
           </div>
@@ -78,17 +71,25 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
       </div>
       {open ? (
         <div className="home-sheet-nav">
-          {links.map((link) => (
-            <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
-              {link.label}
+          {nav.links.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              aria-current={
+                siteNavIsCurrent(pathname, link.href) ? "page" : undefined
+              }
+              onClick={() => setOpen(false)}
+            >
+              {labels[link.id]}
             </a>
           ))}
           <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {HOME_LANG_LINKS.map((item) => (
+            {nav.languages.map((item) => (
               <a
                 key={item.locale}
-                href={homeHref(item.locale)}
+                href={item.href}
                 aria-current={item.locale === locale ? "true" : undefined}
+                hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
               >
                 {item.label}
               </a>
