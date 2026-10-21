@@ -1,4 +1,5 @@
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
+import { applySpotDisplayName } from "~/lib/spot-name-overrides";
 
 export const ANITABI_SITE = "https://anitabi.cn";
 export const CC_BY_NC_SA_4_URL =
@@ -75,6 +76,18 @@ export function localizedNavText(
   if (locale === "zh-tw") return firstFilled([text.tw, text.ja, text.en]);
   if (locale === "ja") return firstFilled([text.ja, text.zh, text.tw, text.en]);
   return firstFilled([text[locale], text.en, text.zh, text.ja]);
+}
+
+/** Nav label, then the per-spot display-name file for that locale only. */
+export function localizedSpotName(
+  spot: { id: string; name: NavText },
+  locale: PilgrimageLocale,
+): string {
+  return applySpotDisplayName(
+    locale,
+    spot.id,
+    localizedNavText(spot.name, locale),
+  );
 }
 
 export function haversineKm(

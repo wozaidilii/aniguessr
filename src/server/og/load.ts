@@ -10,12 +10,19 @@ import {
 import { kantoBoundsContain } from "~/lib/home-map-bounds";
 import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
+  clearOverriddenSpotAliases,
+  withSpotDisplayNames,
+} from "~/lib/spot-name-overrides";
+import {
   haversineMeters,
   otherWorkCounts,
   type LatLng,
   type MapArt,
 } from "~/lib/og/map";
-import { isPilgrimageLocale, type PilgrimageLocale } from "~/lib/pilgrimage-locale";
+import {
+  isPilgrimageLocale,
+  type PilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { animeSlugMatches } from "~/lib/pilgrimage-slug";
 import {
   getAnimeBySlug,
@@ -84,7 +91,10 @@ function optionalNames(record: object, key: string): OgNames | undefined {
   return names;
 }
 
-function primaryWorkId(spot: { workSubjectId?: string | null; subjectId: string }): string {
+function primaryWorkId(spot: {
+  workSubjectId?: string | null;
+  subjectId: string;
+}): string {
   const workId = spot.workSubjectId?.trim();
   if (workId) return workId;
   return spot.subjectId;
@@ -98,7 +108,10 @@ function artFor(coastal: boolean): MapArt {
   return coastal ? "coast" : "city";
 }
 
-function indexPlaces(): { spots: PlaceSpot[]; others: Map<string, number> } | null {
+function indexPlaces(): {
+  spots: PlaceSpot[];
+  others: Map<string, number>;
+} | null {
   const index = getPilgrimageSeoIndex();
   if (!index) return null;
   if (placeSpots && otherWorkCountCache) {
@@ -124,8 +137,9 @@ function indexPlaces(): { spots: PlaceSpot[]; others: Map<string, number> } | nu
 
 function locationBySlug(slug: string): PilgrimageLocationSummary | null {
   return (
-    getPilgrimageSeoIndex()?.locations.find((location) => location.slug === slug) ??
-    null
+    getPilgrimageSeoIndex()?.locations.find(
+      (location) => location.slug === slug,
+    ) ?? null
   );
 }
 
@@ -138,10 +152,15 @@ function nearbyPoints(origin: PlaceSpot, spots: PlaceSpot[]): LatLng[] {
     points.push({ lat: spot.lat, lng: spot.lng, distance });
   }
   points.sort((a, b) => a.distance - b.distance);
-  return points.slice(0, 24).map((point) => ({ lat: point.lat, lng: point.lng }));
+  return points
+    .slice(0, 24)
+    .map((point) => ({ lat: point.lat, lng: point.lng }));
 }
 
-function spotCard(locale: PilgrimageLocale, spot: PilgrimageSpot): OgCard | null {
+function spotCard(
+  locale: PilgrimageLocale,
+  spot: PilgrimageSpot,
+): OgCard | null {
   const places = indexPlaces();
   if (!places) return null;
   const origin = places.spots.find((item) => item.id === spot.id) ?? {
@@ -157,9 +176,15 @@ function spotCard(locale: PilgrimageLocale, spot: PilgrimageSpot): OgCard | null
   const location = locationBySlug(spot.locationSlug);
   return buildSpotCard({
     requestedLocale: locale,
-    spotName: namesOf(spot.answerName),
-    ogTitle: optionalNames(spot, "ogTitle"),
-    shortName: optionalNames(spot, "shortName"),
+    spotName: withSpotDisplayNames(namesOf(spot.answerName), spot.id),
+    ogTitle: clearOverriddenSpotAliases(
+      optionalNames(spot, "ogTitle"),
+      spot.id,
+    ),
+    shortName: clearOverriddenSpotAliases(
+      optionalNames(spot, "shortName"),
+      spot.id,
+    ),
     workTitle: animeNames(anime?.animeTitle ?? spot.animeTitle),
     derivedJa: namesOf(spot.title).ja,
     titleZh: namesOf(spot.title).zh,
@@ -192,7 +217,11 @@ function areaNamesFor(spots: PilgrimageSpot[]): OgNames[] {
   for (const spot of spots) {
     const current = counts.get(spot.locationSlug);
     if (current) current.count += 1;
-    else counts.set(spot.locationSlug, { names: namesOf(spot.location), count: 1 });
+    else
+      counts.set(spot.locationSlug, {
+        names: namesOf(spot.location),
+        count: 1,
+      });
   }
   return [...counts.values()]
     .sort((a, b) => b.count - a.count)
@@ -268,7 +297,8 @@ function workNamesFor(spots: PilgrimageSpot[]): OgNames[] {
 export function loadLocationOg(locale: PilgrimageLocale, slug: string): OgLoad {
   const resolved = resolveLocationSlug(slug);
   if (!resolved) return { status: "missing" };
-  if (resolved.redirect) return { status: "redirect", id: resolved.location.slug };
+  if (resolved.redirect)
+    return { status: "redirect", id: resolved.location.slug };
   const location = resolved.location;
   const spots = listSpotsForLocation(location.slug);
   const card = buildAreaCard({

@@ -19,7 +19,7 @@ import {
   googleStreetViewUrl,
   haversineKm,
   loadNavCatalog,
-  localizedNavText,
+  localizedSpotName,
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
@@ -209,7 +209,7 @@ function toListed(
 ): ListedSpot {
   return {
     id: spot.id,
-    name: localizedNavText(spot.name, locale),
+    name: localizedSpotName(spot, locale),
     anime: animeTitle(catalog.animes, spot.subjectId, locale),
     lat: spot.lat,
     lng: spot.lng,

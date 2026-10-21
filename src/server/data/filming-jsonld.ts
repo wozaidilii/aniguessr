@@ -1,9 +1,8 @@
-import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   pickLocalizedText,
   pickMaybeLocalizedText,
-  pickSpotPlaceFromRecord,
 } from "~/lib/localized-text";
+import { spotPlaceName } from "~/lib/spot-name-overrides";
 import {
   withPilgrimageLocale,
   type PilgrimageLocale,
@@ -22,12 +21,7 @@ export function toFilmingLocation(
     pickLocalizedText(spot.description, locale) || fallbackDescription;
   // Spot screenshots stay on the page. They are not a TouristAttraction image.
   return {
-    name: pickSpotPlaceFromRecord(
-      spot.answerName,
-      spot.title,
-      locale,
-      jaSpotPlaceOverride(spot.id),
-    ),
+    name: spotPlaceName(spot, locale),
     description,
     url: absoluteUrl(
       withPilgrimageLocale(

@@ -3,8 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
-import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
-import { pickSpotPlaceFromRecord } from "~/lib/localized-text";
+import { spotPlaceName } from "~/lib/spot-name-overrides";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { locationDocumentSeo } from "~/lib/location-meta-overrides";
@@ -151,12 +150,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           ),
-          title: pickSpotPlaceFromRecord(
-            spot.answerName,
-            spot.title,
-            locale,
-            jaSpotPlaceOverride(spot.id),
-          ),
+          title: spotPlaceName(spot, locale),
           subtitle: pickLocalizedText(spot.animeTitle, locale),
         }))}
       />

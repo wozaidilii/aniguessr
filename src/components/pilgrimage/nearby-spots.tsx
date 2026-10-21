@@ -4,14 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useFavoriteAnime } from "~/components/pilgrimage/favorites";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
+import {
+  type PilgrimageLocale,
+  withPilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
   animeTitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   loadNavCatalog,
-  localizedNavText,
+  localizedSpotName,
   rankNearbySpots,
   type NavCatalog,
   type NearbySpot,
@@ -136,7 +139,7 @@ function SpotGroup({
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           );
-          const title = localizedNavText(spot.name, locale);
+          const title = localizedSpotName(spot, locale);
           return (
             <li
               key={spot.id}
