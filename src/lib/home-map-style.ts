@@ -33,7 +33,7 @@ function isShieldLayer(id: string): boolean {
 
 function setPaint(map: Map, id: string, name: string, value: unknown): void {
   try {
-    map.setPaintProperty(id, name as "text-color", value as string);
+    map.setPaintProperty(id, name, value);
   } catch {
     // A basemap layer can omit the property. Leave that layer alone.
   }
