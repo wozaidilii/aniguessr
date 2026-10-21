@@ -3,12 +3,11 @@ import Link from "next/link";
 import { FavoritePicker } from "~/components/pilgrimage/favorite-picker";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
-import { ZH_TW_AREA_COPY, getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { buildPilgrimageHubSeo } from "~/lib/pilgrimage-seo-meta";
-import { localizedPageMetadata, zhTwOnlyPageMetadata } from "~/lib/seo";
+import { pilgrimagePageMetadata } from "~/lib/seo";
 import {
   getPilgrimageSeoIndex,
-  getZhTwCatalog,
   pickLocalizedText,
 } from "~/server/data/pilgrimage-seo";
 import {
@@ -28,25 +27,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale: localeParam } = await params;
   const locale = pilgrimageLocale(localeParam);
-  if (locale === "zh-tw") {
-    return zhTwOnlyPageMetadata(
-      "/pilgrimage",
-      ZH_TW_AREA_COPY.title,
-      ZH_TW_AREA_COPY.description,
-    );
-  }
   const index = getPilgrimageSeoIndex();
   const seo = buildPilgrimageHubSeo(locale, {
     spotCount: index?.spotCount ?? 0,
     animeCount: index?.animeCount ?? 0,
     locationCount: index?.locationCount ?? 0,
   });
-  return localizedPageMetadata(
-    locale,
-    "/pilgrimage",
-    seo.title,
-    seo.description,
-  );
+  // zh-TW document titles stay on the override map. It is empty until supplied.
+  const title = locale === "zh-tw" ? "" : seo.title;
+  const description = locale === "zh-tw" ? "" : seo.description;
+  return pilgrimagePageMetadata(locale, "/pilgrimage", title, description, true);
 }
 
 export default async function PilgrimageHubPage({
@@ -72,28 +62,22 @@ export default async function PilgrimageHubPage({
     );
   }
 
-  const zhTw = locale === "zh-tw" ? getZhTwCatalog() : null;
-  const topAnime = zhTw
-    ? zhTw.animes.slice(0, 12)
-    : index.animes.slice(0, 12).map((anime) => ({ anime, spotCount: anime.spotCount }));
-  const topLocations = zhTw
-    ? zhTw.locations.slice(0, 12)
-    : index.locations.slice(0, 12);
-  const spotCount = zhTw ? zhTw.spotCount : index.spotCount;
-  const animeCount = zhTw ? zhTw.animes.length : index.animeCount;
-  const locationCount = zhTw ? zhTw.locations.length : index.locationCount;
+  const topAnime = index.animes
+    .slice(0, 12)
+    .map((anime) => ({ anime, spotCount: anime.spotCount }));
+  const topLocations = index.locations.slice(0, 12);
 
   return (
     <PilgrimageShell
       locale={locale}
       kicker={copy.siteKicker}
-      title={zhTw ? ZH_TW_AREA_COPY.title : copy.hubTitle}
-      description={zhTw ? ZH_TW_AREA_COPY.description : copy.hubDescription}
+      title={copy.hubTitle}
+      description={copy.hubDescription}
     >
       <section className="mb-10 grid gap-4 sm:grid-cols-3">
-        <StatCard label={copy.spotCountLabel(spotCount)} />
-        <StatCard label={copy.animeCountLabel(animeCount)} />
-        <StatCard label={copy.locationCountLabel(locationCount)} />
+        <StatCard label={copy.spotCountLabel(index.spotCount)} />
+        <StatCard label={copy.animeCountLabel(index.animeCount)} />
+        <StatCard label={copy.locationCountLabel(index.locationCount)} />
       </section>
 
       <PilgrimageMapPanel locale={locale} />
@@ -103,12 +87,7 @@ export default async function PilgrimageHubPage({
         animes={index.animes.map((anime) => ({
           id: anime.subjectId,
           slug: anime.slug,
-          title:
-            locale === "zh-tw"
-              ? pickLocalizedText(anime.animeTitle, locale) ||
-                anime.animeTitle.ja ||
-                anime.animeTitle.en
-              : pickLocalizedText(anime.animeTitle, locale),
+          title: pickLocalizedText(anime.animeTitle, locale),
           spotCount: anime.spotCount,
         }))}
       />

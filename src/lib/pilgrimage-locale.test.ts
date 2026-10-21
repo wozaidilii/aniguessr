@@ -10,7 +10,7 @@ import {
 } from "~/lib/pilgrimage-locale";
 
 describe("pilgrimage zh-TW locale", () => {
-  it("treats /zh-tw as its own prefix and does not cover other cities", () => {
+  it("treats /zh-tw as its own prefix and covers every pilgrimage city", () => {
     expect(splitLocalePath("/zh-tw/pilgrimage/locations/fujisawa-kanagawa")).toEqual({
       locale: "zh-tw",
       pathname: "/pilgrimage/locations/fujisawa-kanagawa",
@@ -18,7 +18,7 @@ describe("pilgrimage zh-TW locale", () => {
     expect(withPilgrimageLocale("/pilgrimage", "zh-tw")).toBe("/zh-tw/pilgrimage");
     expect(isZhTwCoveredLocationSlug("kamakura-kanagawa")).toBe(true);
     expect(isZhTwCoveredLocationSlug("fujisawa-kanagawa")).toBe(true);
-    expect(isZhTwCoveredLocationSlug("shinjuku-tokyo")).toBe(false);
+    expect(isZhTwCoveredLocationSlug("shinjuku-tokyo")).toBe(true);
   });
 
   it("advertises zh-Hant only on pages that have a zh-TW version", () => {
