@@ -7,6 +7,7 @@ import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildAnimePageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
+import { otherAnimeTitles } from "~/lib/anime-title-search";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { withPilgrimageOg } from "~/lib/og/metadata";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
@@ -100,6 +101,7 @@ export default async function PilgrimageAnimePage({ params }: Props) {
   const spotCount = anime.spotCount;
 
   const title = pickLocalizedText(anime.animeTitle, locale);
+  const aliases = otherAnimeTitles(anime.animeTitle, locale);
   const seo = animePageSeo(locale, anime, spotCount);
   const visibleTitle = copy.spotsInAnime(title, spotCount);
   const visibleDescription = copy.seoAnimeDescription(title, spotCount);
@@ -122,6 +124,13 @@ export default async function PilgrimageAnimePage({ params }: Props) {
       description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
+      {aliases.length > 0 ? (
+        <p className="mb-6 text-sm leading-6 text-pink-100/75">
+          {copy.alsoKnownAs}
+          {locale === "en" ? ": " : "："}
+          {aliases.join(locale === "en" ? ", " : "、")}
+        </p>
+      ) : null}
       <PilgrimageMapPanel locale={locale} subjectId={anime.subjectId} />
       <NearbySpots locale={locale} />
       <PilgrimageSpotList

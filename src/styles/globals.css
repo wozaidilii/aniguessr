@@ -28,6 +28,11 @@ body {
   color: white;
 }
 
+.anime-search-input::-webkit-search-cancel-button,
+.anime-search-input::-webkit-search-decoration {
+  display: none;
+}
+
 @layer components {
   .anime-shell {
     background: var(--color-bg, #0a0612);

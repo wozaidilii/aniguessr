@@ -69,7 +69,13 @@ export interface HomePageCopy {
   zoomIn: string;
   zoomOut: string;
   locate: string;
+  myLocation: string;
   mapLabel: string;
+  searchWorks: string;
+  searchWorksEmpty: string;
+  searchClear: string;
+  popularWorks: string;
+  searchSpotCount: (count: number) => string;
   footerTagline: string;
   footerMap: string;
   footerGame: string;
@@ -203,7 +209,13 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     zoomIn: "拡大",
     zoomOut: "縮小",
     locate: "現在地",
+    myLocation: "現在地",
     mapLabel: "アニメ聖地巡礼マップ",
+    searchWorks: "作品名で検索",
+    searchWorksEmpty: "該当する作品が見つかりません",
+    searchClear: "クリア",
+    popularWorks: "人気の作品",
+    searchSpotCount: (count) => `${formatCount("ja", count)} か所`,
     footerTagline: "アニメ聖地巡礼マップと聖地当てゲーム。",
     footerMap: "MAP",
     footerGame: "GAME",
@@ -299,7 +311,13 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     zoomIn: "放大",
     zoomOut: "缩小",
     locate: "当前位置",
+    myLocation: "我的位置",
     mapLabel: "动漫圣地巡礼地图",
+    searchWorks: "搜索作品名",
+    searchWorksEmpty: "没有找到相关作品",
+    searchClear: "清除",
+    popularWorks: "热门作品",
+    searchSpotCount: (count) => `${formatCount("zh", count)} 处`,
     footerTagline: "动漫圣地巡礼地图和圣地猜猜看小游戏。",
     footerMap: "MAP",
     footerGame: "GAME",
@@ -395,7 +413,13 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     zoomIn: "放大",
     zoomOut: "縮小",
     locate: "目前位置",
+    myLocation: "我的位置",
     mapLabel: "動漫聖地巡禮地圖",
+    searchWorks: "搜尋作品名稱",
+    searchWorksEmpty: "找不到相關作品",
+    searchClear: "清除",
+    popularWorks: "熱門作品",
+    searchSpotCount: (count) => `${formatCount("zh-tw", count)} 處`,
     footerTagline: "動漫聖地巡禮地圖和聖地猜猜看小遊戲。",
     footerMap: "MAP",
     footerGame: "GAME",
@@ -492,6 +516,13 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
     locate: "Your location",
+    myLocation: "My location",
+    searchWorks: "Search anime titles",
+    searchWorksEmpty: "No matching titles",
+    searchClear: "Clear",
+    popularWorks: "Popular anime",
+    searchSpotCount: (count) =>
+      `${formatCount("en", count)} ${count === 1 ? "spot" : "spots"}`,
     mapLabel: "Anime pilgrimage map",
     footerTagline: "An anime pilgrimage map and location guessing game.",
     footerMap: "MAP",
@@ -511,26 +542,28 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
   },
 };
 
-export const HOME_SEO: Record<HomeLocale, { title: string; description: string }> =
-  {
-    ja: {
-      title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
-      description: HOME_PAGE_COPY.ja.intro,
-    },
-    zh: {
-      title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
-      description: HOME_PAGE_COPY.zh.intro,
-    },
-    "zh-tw": {
-      title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
-      description: HOME_PAGE_COPY["zh-tw"].intro,
-    },
-    en: {
-      title:
-        "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
-      description: HOME_PAGE_COPY.en.intro,
-    },
-  };
+export const HOME_SEO: Record<
+  HomeLocale,
+  { title: string; description: string }
+> = {
+  ja: {
+    title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
+    description: HOME_PAGE_COPY.ja.intro,
+  },
+  zh: {
+    title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
+    description: HOME_PAGE_COPY.zh.intro,
+  },
+  "zh-tw": {
+    title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
+    description: HOME_PAGE_COPY["zh-tw"].intro,
+  },
+  en: {
+    title:
+      "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
+    description: HOME_PAGE_COPY.en.intro,
+  },
+};
 
 export const HOME_LANG_LINKS: Array<{ locale: HomeLocale; label: string }> = [
   { locale: "ja", label: "日本語" },
@@ -551,7 +584,9 @@ export function homeDifficultyTiers(): readonly AnimeGuessrDifficultyTier[] {
 export function homePageMetadata(locale: HomeLocale): Metadata {
   const seo = HOME_SEO[locale];
   const canonical =
-    locale === "zh-tw" ? "/zh-tw" : withAnimeLocale("/", homeSiteLocale(locale));
+    locale === "zh-tw"
+      ? "/zh-tw"
+      : withAnimeLocale("/", homeSiteLocale(locale));
   const languages = localeAlternates("/");
   const zhTwUrl = absoluteUrl(withPilgrimageLocale("/", "zh-tw"));
   languages["zh-Hant"] = zhTwUrl;

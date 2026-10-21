@@ -1,4 +1,7 @@
-import { AreaMiniMap, ANIME_GLYPH_COLORS } from "~/components/home/area-mini-map";
+import {
+  AreaMiniMap,
+  ANIME_GLYPH_COLORS,
+} from "~/components/home/area-mini-map";
 import { HomeFooter } from "~/components/home/home-footer";
 import { HomeGamePanel } from "~/components/home/home-game-panel";
 import { HomeHeader } from "~/components/home/home-header";
@@ -6,8 +9,10 @@ import { HomeLeaderboard } from "~/components/home/home-leaderboard";
 import { HomeLocate } from "~/components/home/home-locate";
 import { HomeMapLoader } from "~/components/home/home-map-loader";
 import { HomeNearby } from "~/components/home/home-nearby";
+import { HomeWorkSearch } from "~/components/home/home-work-search";
 import { HomeStructuredData } from "~/components/HomeStructuredData";
 import type { HomeCatalog } from "~/lib/home-catalog";
+import type { PopularAnimeChip } from "~/lib/popular-anime";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -19,9 +24,11 @@ function formatCount(locale: HomeLocale, value: number): string {
 export function HomeView({
   locale,
   catalog,
+  popularAnime,
 }: {
   locale: HomeLocale;
   catalog: HomeCatalog;
+  popularAnime: PopularAnimeChip[];
 }) {
   const copy = getHomePageCopy(locale);
   const pilgrimageHref = withPilgrimageLocale("/pilgrimage", locale);
@@ -49,13 +56,16 @@ export function HomeView({
               <span className="home-h1-line">{copy.h1Tail}</span>
             </p>
           </div>
-          <div className="home-pills">
-            <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
-              {copy.searchPill}
-            </a>
-            <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
-              {copy.favoritesPill}
-            </a>
+          <div className="home-map-searchstack">
+            <HomeWorkSearch locale={locale} popular={popularAnime} />
+            <div className="home-pills">
+              <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
+                {copy.searchPill}
+              </a>
+              <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
+                {copy.favoritesPill}
+              </a>
+            </div>
           </div>
           <HomeNearby
             locale={locale}
@@ -84,7 +94,11 @@ export function HomeView({
           </h1>
           <p className="home-intro">{copy.intro}</p>
           <div className="home-ctas">
-            <a className="home-btn home-btn-primary" data-find-nearby="" href={nearbyHref}>
+            <a
+              className="home-btn home-btn-primary"
+              data-find-nearby=""
+              href={nearbyHref}
+            >
               {copy.primaryCta}
             </a>
             <a className="home-btn home-btn-secondary" href={pilgrimageHref}>
@@ -119,7 +133,10 @@ export function HomeView({
               <h2>{copy.areasTitle}</h2>
               <p>{copy.areasSubtitle}</p>
             </div>
-            <a className="home-more" href={withPilgrimageLocale("/pilgrimage/locations", locale)}>
+            <a
+              className="home-more"
+              href={withPilgrimageLocale("/pilgrimage/locations", locale)}
+            >
               {copy.areasAll}
             </a>
           </div>
@@ -145,7 +162,10 @@ export function HomeView({
               <h2>{copy.animeTitle}</h2>
               <p>{copy.animeSubtitle}</p>
             </div>
-            <a className="home-more" href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
+            <a
+              className="home-more"
+              href={withPilgrimageLocale("/pilgrimage/anime", locale)}
+            >
               {copy.animeAll}
             </a>
           </div>
@@ -160,7 +180,9 @@ export function HomeView({
                 </span>
                 <span>
                   <b>{anime.title}</b>
-                  <small>{copy.animeMeta(anime.spotCount, anime.areaName)}</small>
+                  <small>
+                    {copy.animeMeta(anime.spotCount, anime.areaName)}
+                  </small>
                 </span>
               </a>
             ))}
