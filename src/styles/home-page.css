@@ -2486,7 +2486,20 @@
 }
 
 .site-content {
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
   animation: site-fade 150ms ease-out;
+}
+
+.site-content > * {
+  pointer-events: auto;
+}
+
+.site-content > .home,
+.home-hero,
+.home-mapstage {
+  pointer-events: none;
 }
 
 @keyframes site-fade {
@@ -2526,31 +2539,44 @@
   inset: 0;
 }
 
+.home-map-slot {
+  pointer-events: none;
+}
+
+.home-mapbar,
+.home-sec,
+.home-game,
+.home-ftr,
+.home-map-searchstack,
 .home-nearby,
 .home-nearby-sheet,
 .home-nearby-panel,
 .home-map-tools,
-.home-map-slot {
+.privacy-page {
   pointer-events: auto;
 }
 
-.home-map-slot .home-map,
+.home {
+  background: transparent;
+}
+
+.home-map-persist {
+  position: fixed;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.home-map-persist[data-parked="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .home-map-persist .home-map {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.home-map-persist {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 64px;
-  height: 64px;
-  overflow: hidden;
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .home-play-art {
