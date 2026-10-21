@@ -6,7 +6,10 @@ import { buildHomeCatalog } from "~/lib/home-catalog";
 import { resolvePopularAnime } from "~/lib/popular-anime";
 import { isHomeLocale } from "~/lib/home-locale";
 import { homePageMetadata } from "~/lib/home-page-copy";
+import { withHomeOg } from "~/lib/og/metadata";
 import { getPilgrimageSeoIndex } from "~/server/data/pilgrimage-seo";
+import { homeOgStaticExists } from "~/server/og/home-art";
+import { loadHomeOg } from "~/server/og/load";
 
 export const revalidate = 86_400;
 
@@ -17,7 +20,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isHomeLocale(locale)) return {};
-  return homePageMetadata(locale);
+  const metadata = homePageMetadata(locale);
+  if (homeOgStaticExists(locale)) {
+    return withHomeOg(metadata, locale, { staticArt: true });
+  }
+  const og = loadHomeOg(locale);
+  if (og.status !== "ready") return metadata;
+  return withHomeOg(metadata, locale, {
+    staticArt: false,
+    version: og.card.version,
+  });
 }
 
 export default async function HomePage({

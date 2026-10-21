@@ -5,7 +5,6 @@ import {
 import { HomeFooter } from "~/components/home/home-footer";
 import { HomeGamePanel } from "~/components/home/home-game-panel";
 import { HomeHeader } from "~/components/home/home-header";
-import { HomeLeaderboard } from "~/components/home/home-leaderboard";
 import { HomeLocate } from "~/components/home/home-locate";
 import { HomeMapLoader } from "~/components/home/home-map-loader";
 import { HomeNearby } from "~/components/home/home-nearby";
@@ -19,6 +18,23 @@ import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 function formatCount(locale: HomeLocale, value: number): string {
   return value.toLocaleString(locale === "zh-tw" ? "zh-TW" : locale);
+}
+
+function HomeTitle({
+  locale,
+  copy,
+  as,
+}: {
+  locale: HomeLocale;
+  copy: ReturnType<typeof getHomePageCopy>;
+  as: "h1" | "p";
+}) {
+  const Tag = as;
+  return (
+    <Tag className="home-h1">
+      <span className="home-h1-line">{copy.h1Lead}<span className="home-accent">{copy.h1Accent}</span></span>{locale === "en" ? " " : null}<span className="home-h1-line">{copy.h1Tail}</span>
+    </Tag>
+  );
 }
 
 export function HomeView({
@@ -48,13 +64,7 @@ export function HomeView({
               <i />
               {copy.chip}
             </p>
-            <p className="home-h1">
-              <span className="home-h1-line">
-                {copy.h1Lead}
-                <span className="home-accent">{copy.h1Accent}</span>
-              </span>
-              <span className="home-h1-line">{copy.h1Tail}</span>
-            </p>
+            <HomeTitle locale={locale} copy={copy} as="p" />
           </div>
           <div className="home-map-searchstack">
             <HomeWorkSearch locale={locale} popular={popularAnime} />
@@ -85,13 +95,7 @@ export function HomeView({
             <i />
             {copy.chip}
           </p>
-          <h1 className="home-h1">
-            <span className="home-h1-line">
-              {copy.h1Lead}
-              <span className="home-accent">{copy.h1Accent}</span>
-            </span>
-            <span className="home-h1-line">{copy.h1Tail}</span>
-          </h1>
+          <HomeTitle locale={locale} copy={copy} as="h1" />
           <p className="home-intro">{copy.intro}</p>
           <div className="home-ctas">
             <a
@@ -229,7 +233,6 @@ export function HomeView({
         </div>
       </section>
 
-      <HomeLeaderboard locale={locale} />
       <HomeFooter locale={locale} />
     </main>
   );

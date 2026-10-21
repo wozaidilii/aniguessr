@@ -7,11 +7,14 @@ import {
   googleStreetViewUrl,
 } from "~/lib/pilgrimage-nav";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   pickLocalizedLines,
   pickLocalizedText,
   pickMaybeLocalizedText,
+  pickSpotPlaceFromRecord,
 } from "~/lib/localized-text";
+import { screenshotCaption } from "~/lib/screenshot-caption";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
@@ -51,7 +54,12 @@ function spotSeoFields(
   return {
     id: spot.id,
     anime: pickLocalizedText(spot.animeTitle, locale),
-    place: pickLocalizedText(spot.answerName, locale),
+    place: pickSpotPlaceFromRecord(
+      spot.answerName,
+      spot.title,
+      locale,
+      jaSpotPlaceOverride(spot.id),
+    ),
     area: pickLocalizedText(spot.location, locale),
     episode: pickMaybeLocalizedText(spot.episodeContext, locale),
     scene: pickLocalizedText(spot.title, locale),
@@ -61,7 +69,10 @@ function spotSeoFields(
 function redirectDuplicateSpot(locale: PilgrimageLocale, spot: PilgrimageSpot) {
   if (!spot.redirectTo || spot.redirectTo === spot.id) return;
   permanentRedirect(
-    pilgrimageHref(`/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`, locale),
+    pilgrimageHref(
+      `/pilgrimage/spots/${encodeSpotId(spot.redirectTo)}`,
+      locale,
+    ),
   );
 }
 
@@ -77,11 +88,6 @@ function spotPageSeo(
     });
   }
   return buildSpotSeo(locale, fields, getSpotSeoVariant(spot, locale));
-}
-
-function absoluteAssetUrl(url: string | undefined): string | null {
-  if (!url) return null;
-  return /^https?:\/\//i.test(url) ? url : absoluteUrl(url);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -115,7 +121,12 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   redirectDuplicateSpot(locale, spot);
 
   const anime = pickLocalizedText(spot.animeTitle, locale);
-  const place = pickLocalizedText(spot.answerName, locale);
+  const place = pickSpotPlaceFromRecord(
+    spot.answerName,
+    spot.title,
+    locale,
+    jaSpotPlaceOverride(spot.id),
+  );
   const location = pickLocalizedText(spot.location, locale);
   const title = pickLocalizedText(spot.title, locale);
   const description = pickLocalizedText(spot.description, locale);
@@ -128,15 +139,13 @@ export default async function PilgrimageSpotPage({ params }: Props) {
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
-  const visibleDescription = pickLocalizedText(spot.description, locale);
   const jsonLd = buildTouristAttractionJsonLd({
     name: fields.place,
     description:
       locale === "zh-tw"
-        ? seo.description || visibleDescription
-        : visibleDescription || seo.description,
+        ? seo.description || description
+        : description || seo.description,
     url: absoluteUrl(pilgrimageHref(`/pilgrimage/spots/${spot.id}`, locale)),
-    image: absoluteAssetUrl(imageUrl),
     latitude: spot.lat,
     longitude: spot.lng,
     area: fields.area,
@@ -149,7 +158,6 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       locale={locale}
       kicker={copy.spotDetail}
       title={copy.seoSpotTitle(anime, place)}
-      description={description}
     >
       <JsonLd data={jsonLd} />
 
@@ -157,12 +165,16 @@ export default async function PilgrimageSpotPage({ params }: Props) {
         <div className="anime-panel p-5 sm:p-6">
           {imageUrl ? (
             <figure className="mb-5">
+              {/* Decorative: the scene title and caption name the work. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl}
-                alt={title}
+                alt=""
                 className="aspect-video w-full rounded-xl border border-white/10 object-cover"
               />
+              <figcaption className="mt-2 text-xs leading-5 text-pink-100/55">
+                {screenshotCaption(anime)}
+              </figcaption>
             </figure>
           ) : null}
 

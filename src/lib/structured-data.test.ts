@@ -73,6 +73,21 @@ describe("structured data", () => {
     });
   });
 
+  it("omits image unless the caller supplies one", () => {
+    const withoutImage = { ...spot, image: null };
+    const data = buildTouristAttractionJsonLd(withoutImage);
+    expect(data).not.toHaveProperty("image");
+    const nested = buildPlaceCollectionJsonLd({
+      name: "Tokyo",
+      description: "Anime filming locations in Tokyo.",
+      url: "https://aniguessr.ayiora.com/en/pilgrimage/locations/tokyo",
+      places: [withoutImage],
+    });
+    const places = nested.containsPlace as Array<Record<string, unknown>>;
+    expect(places[0]).not.toHaveProperty("image");
+    expect(JSON.stringify(nested)).not.toContain("clannad.jpg");
+  });
+
   it("rejects a filming location that is missing coordinates", () => {
     const invalid = buildTouristAttractionJsonLd({
       ...spot,

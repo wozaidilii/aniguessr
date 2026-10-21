@@ -1,5 +1,9 @@
-import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
-import { pickLocalizedText, pickMaybeLocalizedText } from "~/lib/localized-text";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
+import {
+  pickLocalizedText,
+  pickMaybeLocalizedText,
+  pickSpotPlaceFromRecord,
+} from "~/lib/localized-text";
 import {
   withPilgrimageLocale,
   type PilgrimageLocale,
@@ -7,18 +11,23 @@ import {
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { absoluteUrl } from "~/lib/seo";
 import { type FilmingLocationInput } from "~/lib/structured-data";
-import { type PilgrimageSpot } from "~/server/data/pilgrimage-seo";
+import type { PilgrimageSpot } from "~/server/data/pilgrimage-seo";
 
 export function toFilmingLocation(
   spot: PilgrimageSpot,
   locale: PilgrimageLocale,
   fallbackDescription = "",
 ): FilmingLocationInput {
-  const image = buildAnimeGuessrImageUrl(spot.imagePath ?? undefined);
   const description =
     pickLocalizedText(spot.description, locale) || fallbackDescription;
+  // Spot screenshots stay on the page. They are not a TouristAttraction image.
   return {
-    name: pickLocalizedText(spot.answerName, locale),
+    name: pickSpotPlaceFromRecord(
+      spot.answerName,
+      spot.title,
+      locale,
+      jaSpotPlaceOverride(spot.id),
+    ),
     description,
     url: absoluteUrl(
       withPilgrimageLocale(
@@ -26,11 +35,6 @@ export function toFilmingLocation(
         locale,
       ),
     ),
-    image: image
-      ? /^https?:\/\//i.test(image)
-        ? image
-        : absoluteUrl(image)
-      : null,
     latitude: spot.lat,
     longitude: spot.lng,
     area: pickLocalizedText(spot.location, locale),

@@ -62,6 +62,7 @@ export function PilgrimageShell({
         <div className="mt-2 text-center">
           <RightsContactLink locale={locale} />
         </div>
+        <p className="mt-1.5 text-center text-xs text-white/45">© 2026 Ayiora</p>
       </div>
     </main>
   );

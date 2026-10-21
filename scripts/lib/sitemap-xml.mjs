@@ -137,6 +137,7 @@ export function chunkSitemapPaths(items, limit = SITEMAP_URL_LIMIT) {
   return chunks;
 }
 
+/** Page URLs and hreflang only. Spot screenshots are not image-sitemap entries. */
 export function buildUrlSetXml(entries) {
   const body = entries
     .map((entry) => {

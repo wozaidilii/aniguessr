@@ -1,6 +1,10 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadMunicipalities, locateMunicipality } from "./japan-area.mjs";
+import {
+  loadMunicipalities,
+  locateMunicipality,
+  municipalityTouchesSea,
+} from "./japan-area.mjs";
 
 loadMunicipalities(
   path.join(process.cwd(), "scripts/data/japan-municipalities.json"),
@@ -30,5 +34,16 @@ describe("Japan municipality reverse geocoding", () => {
     const place = locateMunicipality(139.5503, 35.3192);
     expect(place?.code).toBe("14204");
     expect(place?.ja).toBe("鎌倉市");
+  });
+
+  it("marks the Shonan coast and not inland cities", () => {
+    const kamakura = locateMunicipality(139.5503, 35.3192);
+    const fujisawa = locateMunicipality(139.4806, 35.2998);
+    const shinjuku = locateMunicipality(139.6917, 35.6895);
+    const takayama = locateMunicipality(137.2521, 36.1408);
+    expect(municipalityTouchesSea(kamakura)).toBe(true);
+    expect(municipalityTouchesSea(fujisawa)).toBe(true);
+    expect(municipalityTouchesSea(shinjuku)).toBe(false);
+    expect(municipalityTouchesSea(takayama)).toBe(false);
   });
 });

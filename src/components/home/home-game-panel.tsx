@@ -99,7 +99,7 @@ export function HomeGamePanel({ locale }: { locale: HomeLocale }) {
         >
           {copy.start}
         </a>
-        <p className="home-play-links">
+        <p className="home-play-links" id="rank">
           <a
             href={battleHref}
             onClick={() =>

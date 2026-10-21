@@ -10,6 +10,11 @@ import {
   type HomeFocusWorkDetail,
   type HomeOriginDetail,
 } from "~/components/home/home-events";
+import {
+  KANTO_INITIAL_CENTER,
+  KANTO_INITIAL_ZOOM,
+  KANTO_SHONAN_BOUNDS,
+} from "~/lib/home-map-bounds";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { readHomeOrigin, rememberHomeOrigin } from "~/lib/home-origin";
@@ -29,10 +34,6 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const SOURCE_ID = "home-spots";
-const JAPAN_BOUNDS: [[number, number], [number, number]] = [
-  [122.9, 24.0],
-  [145.8, 45.6],
-];
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -80,8 +81,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     const map = new maplibregl.Map({
       container,
       style: PILGRIMAGE_MAP_STYLE,
-      center: [138.2, 36.2],
-      zoom: 4.4,
+      center: KANTO_INITIAL_CENTER,
+      zoom: KANTO_INITIAL_ZOOM,
       attributionControl: false,
       cooperativeGestures: false,
       maxZoom: 18,
@@ -239,8 +240,9 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           lat: lat ?? 0,
         });
       });
-      if (!focusedId)
-        map.fitBounds(JAPAN_BOUNDS, { padding: 28, animate: false });
+      if (!focusedId) {
+        map.fitBounds(KANTO_SHONAN_BOUNDS, { padding: 28, animate: false });
+      }
       publishBounds(map);
       mapRef.current = map;
       ensureYou();

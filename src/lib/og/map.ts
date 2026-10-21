@@ -78,7 +78,10 @@ const COAST = `<g transform="scale(.73) translate(-330 -150)">
 
 function cityArt(): string {
   const roads = [
-    ...Array.from({ length: 9 }, (_, index) => `<path d="M-100 ${index * 80} H850"/>`),
+    ...Array.from(
+      { length: 9 },
+      (_, index) => `<path d="M-100 ${index * 80} H850"/>`,
+    ),
     ...Array.from(
       { length: 10 },
       (_, index) => `<path d="M${index * 90} -100 V750"/>`,
@@ -95,15 +98,27 @@ function cityArt(): string {
 const PIN = `<path d="M0 0c-9-11-14-18-14-25a14 14 0 0 1 28 0c0 7-5 14-14 25z" fill="#f9a8d4" stroke="#0a0612" stroke-width="2.5"/><circle cy="-25" r="5" fill="#0a0612"/>`;
 const PIN_S = `<path d="M0 0c-6-8-10-12-10-18a10 10 0 0 1 20 0c0 6-4 10-10 18z" fill="#f9a8d4" stroke="#0a0612" stroke-width="2" opacity=".75"/>`;
 
+/** Painted halo outside the solid cluster circle. */
+export const CLUSTER_HALO = 11;
+/** Extra gap so two halos that merely touch are still merged. */
+export const CLUSTER_HALO_GAP = 6;
+/** Small-pin head: circle r=10 centered 18px above the tip. */
+export const PIN_HEAD_RADIUS = 10;
+export const PIN_HEAD_OFFSET_Y = 18;
+
 export function clusterRadius(count: number): number {
   if (count >= 100) return 34;
   if (count >= 10) return 29;
   return 24;
 }
 
-export function otherWorkCounts<T extends LatLng & { id: string; workId: string }>(
-  spots: readonly T[],
-): Map<string, number> {
+export function clusterHaloRadius(count: number): number {
+  return clusterRadius(count) + CLUSTER_HALO;
+}
+
+export function otherWorkCounts<
+  T extends LatLng & { id: string; workId: string },
+>(spots: readonly T[]): Map<string, number> {
   const cell = 0.00045;
   const grid = new Map<string, T[]>();
   const bucketKey = (lat: number, lng: number) =>
@@ -125,7 +140,8 @@ export function otherWorkCounts<T extends LatLng & { id: string; workId: string 
         if (!bucket) continue;
         for (const other of bucket) {
           if (other.workId === spot.workId) continue;
-          if (haversineMeters(spot, other) <= SAME_PLACE_METERS) works.add(other.workId);
+          if (haversineMeters(spot, other) <= SAME_PLACE_METERS)
+            works.add(other.workId);
         }
       }
     }
@@ -141,8 +157,7 @@ export function haversineMeters(a: LatLng, b: LatLng): number {
   const dφ = ((b.lat - a.lat) * Math.PI) / 180;
   const dλ = ((b.lng - a.lng) * Math.PI) / 180;
   const h =
-    Math.sin(dφ / 2) ** 2 +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2;
+    Math.sin(dφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2;
   return 2 * radius * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
@@ -153,7 +168,8 @@ function round(value: number): number {
 function projectToFocus(points: LatLng[], art: MapArt): MarkerPoint[] {
   if (points.length === 0) return [];
   const lats = points.map((point) => point.lat);
-  const midLat = ((Math.min(...lats) + Math.max(...lats)) / 2) * (Math.PI / 180);
+  const midLat =
+    ((Math.min(...lats) + Math.max(...lats)) / 2) * (Math.PI / 180);
   const cos = Math.cos(midLat);
   const raw = points.map((point) => ({ x: point.lng * cos, y: -point.lat }));
   let minX = Math.min(...raw.map((point) => point.x));
@@ -181,6 +197,86 @@ function projectToFocus(points: LatLng[], art: MapArt): MarkerPoint[] {
   }));
 }
 
+function clusterHalosOverlap(a: MarkerCluster, b: MarkerCluster): boolean {
+  const distance = Math.hypot(a.x - b.x, a.y - b.y);
+  const limit =
+    clusterHaloRadius(a.n) + clusterHaloRadius(b.n) + CLUSTER_HALO_GAP;
+  return distance < limit;
+}
+
+/**
+ * After the 80px grid, neighboring cells can still sit on top of each other.
+ * Merge halos that touch: sum the counts and keep a count-weighted center.
+ * Repeat until no pair overlaps. Positions are not nudged for geography.
+ */
+export function mergeOverlappingClusters(
+  clusters: readonly MarkerCluster[],
+): MarkerCluster[] {
+  const pending = clusters.map((item) => ({ ...item }));
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let left = 0; left < pending.length; left += 1) {
+      const current = pending[left];
+      if (!current) continue;
+      for (let right = pending.length - 1; right > left; right -= 1) {
+        const other = pending[right];
+        if (!other || !clusterHalosOverlap(current, other)) continue;
+        const total = current.n + other.n;
+        current.x = round((current.x * current.n + other.x * other.n) / total);
+        current.y = round((current.y * current.n + other.y * other.n) / total);
+        current.n = total;
+        pending.splice(right, 1);
+        changed = true;
+      }
+    }
+  }
+  return pending;
+}
+
+function pinHead(point: MarkerPoint): MarkerPoint & { r: number } {
+  return { x: point.x, y: point.y - PIN_HEAD_OFFSET_Y, r: PIN_HEAD_RADIUS };
+}
+
+function circlesTouch(
+  a: MarkerPoint & { r: number },
+  b: MarkerPoint & { r: number },
+): boolean {
+  return Math.hypot(a.x - b.x, a.y - b.y) <= a.r + b.r;
+}
+
+/**
+ * Drop a small pin whose head touches a cluster halo or a pin already kept.
+ * The point is already counted in the nearby cluster.
+ */
+export function dropTouchingSingles(
+  singles: readonly MarkerPoint[],
+  clusters: readonly MarkerCluster[],
+): MarkerPoint[] {
+  const halos = clusters.map((cluster) => ({
+    x: cluster.x,
+    y: cluster.y,
+    r: clusterHaloRadius(cluster.n),
+  }));
+  const kept: MarkerPoint[] = [];
+  for (const pin of singles) {
+    const head = pinHead(pin);
+    if (halos.some((halo) => circlesTouch(head, halo))) continue;
+    if (kept.some((placed) => circlesTouch(head, pinHead(placed)))) continue;
+    kept.push(pin);
+  }
+  return kept;
+}
+
+/** Grid result plus the halo-merge and pin-drop pass. */
+export function resolveMarkers(
+  singles: readonly MarkerPoint[],
+  clusters: readonly MarkerCluster[],
+): { singles: MarkerPoint[]; clusters: MarkerCluster[] } {
+  const merged = mergeOverlappingClusters(clusters);
+  return { singles: dropTouchingSingles(singles, merged), clusters: merged };
+}
+
 export function clusterMarkers(points: MarkerPoint[]): {
   singles: MarkerPoint[];
   clusters: MarkerCluster[];
@@ -195,8 +291,12 @@ export function clusterMarkers(points: MarkerPoint[]): {
   const singles: MarkerPoint[] = [];
   const clusters: MarkerCluster[] = [];
   for (const group of buckets.values()) {
-    const x = round(group.reduce((sum, point) => sum + point.x, 0) / group.length);
-    const y = round(group.reduce((sum, point) => sum + point.y, 0) / group.length);
+    const x = round(
+      group.reduce((sum, point) => sum + point.x, 0) / group.length,
+    );
+    const y = round(
+      group.reduce((sum, point) => sum + point.y, 0) / group.length,
+    );
     if (group.length > 1) clusters.push({ x, y, n: group.length });
     else singles.push({ x, y });
   }
@@ -209,21 +309,23 @@ export function layoutWorkMarkers(points: LatLng[], art: MapArt): MarkerLayout {
     return { art, minorPins: [], pins: projected, clusters: [] };
   }
   const grouped = clusterMarkers(projected);
+  const resolved = resolveMarkers(grouped.singles, grouped.clusters);
   return {
     art,
-    minorPins: grouped.singles,
+    minorPins: resolved.singles,
     pins: [],
-    clusters: grouped.clusters,
+    clusters: resolved.clusters,
   };
 }
 
 export function layoutAreaMarkers(points: LatLng[], art: MapArt): MarkerLayout {
   const grouped = clusterMarkers(projectToFocus(points, art));
+  const resolved = resolveMarkers(grouped.singles, grouped.clusters);
   return {
     art,
-    minorPins: grouped.singles,
+    minorPins: resolved.singles,
     pins: [],
-    clusters: grouped.clusters,
+    clusters: resolved.clusters,
   };
 }
 
@@ -257,7 +359,10 @@ export function layoutSpotMarkers(
     .slice(0, NEARBY_MAX);
   return {
     art,
-    minorPins: ranked.map((point) => ({ x: round(point.x), y: round(point.y) })),
+    minorPins: ranked.map((point) => ({
+      x: round(point.x),
+      y: round(point.y),
+    })),
     pins: [],
     activePin: { ...SPOT_PIN },
     clusters: [],
@@ -271,7 +376,9 @@ function clusterCircle(cluster: MarkerCluster): string {
 
 export function buildMapSvg(layout: MarkerLayout): string {
   const minor = layout.minorPins
-    .map((point) => `<g transform="translate(${point.x} ${point.y})">${PIN_S}</g>`)
+    .map(
+      (point) => `<g transform="translate(${point.x} ${point.y})">${PIN_S}</g>`,
+    )
     .join("");
   const clusters = layout.clusters.map(clusterCircle).join("");
   const pins = layout.pins

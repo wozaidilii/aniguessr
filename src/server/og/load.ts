@@ -1,7 +1,14 @@
 import "server-only";
 
 import type { OgCard, OgNames } from "~/lib/og/card";
-import { buildAreaCard, buildSpotCard, buildWorkCard } from "~/lib/og/card";
+import {
+  buildAreaCard,
+  buildHomeCard,
+  buildSpotCard,
+  buildWorkCard,
+} from "~/lib/og/card";
+import { kantoBoundsContain } from "~/lib/home-map-bounds";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   haversineMeters,
   otherWorkCounts,
@@ -55,6 +62,18 @@ function namesOf(text: unknown): OgNames {
     "zh-tw": textField(text, "tw"),
     en: textField(text, "en"),
   };
+}
+
+/**
+ * Anime titles store a Japanese string in `tw` when no official Traditional
+ * title exists (`twSource: "ja-fallback"`). Treat that as empty so the card
+ * falls through zh-tw → zh → ja instead of painting Japanese as Traditional.
+ * Page titles still read `tw` and are unchanged.
+ */
+function animeNames(text: unknown): OgNames {
+  const names = namesOf(text);
+  if (isRecord(text) && text.twSource === "ja-fallback") names["zh-tw"] = "";
+  return names;
 }
 
 function optionalNames(record: object, key: string): OgNames | undefined {
@@ -140,7 +159,10 @@ function spotCard(locale: PilgrimageLocale, spot: PilgrimageSpot): OgCard | null
     spotName: namesOf(spot.answerName),
     ogTitle: optionalNames(spot, "ogTitle"),
     shortName: optionalNames(spot, "shortName"),
-    workTitle: namesOf(anime?.animeTitle ?? spot.animeTitle),
+    workTitle: animeNames(anime?.animeTitle ?? spot.animeTitle),
+    derivedJa: namesOf(spot.title).ja,
+    titleZh: namesOf(spot.title).zh,
+    placeOverride: jaSpotPlaceOverride(spot.id),
     workOgTitle: anime ? optionalNames(anime, "ogTitle") : undefined,
     workShortName: anime ? optionalNames(anime, "shortName") : undefined,
     areaName: namesOf(location?.name ?? spot.location),
@@ -211,7 +233,7 @@ function animeCard(
   const spots = listSpotsForAnime(anime.subjectId);
   return buildWorkCard({
     requestedLocale: locale,
-    title: namesOf(anime.animeTitle),
+    title: animeNames(anime.animeTitle),
     ogTitle: optionalNames(anime, "ogTitle"),
     shortName: optionalNames(anime, "shortName"),
     spotCount: anime.spotCount,
@@ -233,7 +255,7 @@ function workNamesFor(spots: PilgrimageSpot[]): OgNames[] {
     }
     const anime = index?.animes.find((item) => item.subjectId === workId);
     counts.set(workId, {
-      names: namesOf(anime?.animeTitle ?? spot.animeTitle),
+      names: animeNames(anime?.animeTitle ?? spot.animeTitle),
       count: 1,
     });
   }
@@ -260,6 +282,32 @@ export function loadLocationOg(locale: PilgrimageLocale, slug: string): OgLoad {
     art: artFor(coastalFlag(location)),
   });
   return { status: "ready", card, id: location.slug };
+}
+
+const HOME_POINT_CAP = 80;
+
+function homeMapPoints(): LatLng[] {
+  const index = getPilgrimageSeoIndex();
+  const sampled: LatLng[] = [];
+  if (!index) return sampled;
+  for (const id of index.spotIds) {
+    const spot = index.spots[id];
+    if (!spot || spot.redirectTo) continue;
+    if (!kantoBoundsContain(spot.lng, spot.lat)) continue;
+    sampled.push({ lat: spot.lat, lng: spot.lng });
+    if (sampled.length >= HOME_POINT_CAP) break;
+  }
+  return sampled;
+}
+
+export function loadHomeOg(locale: PilgrimageLocale): OgLoad {
+  const index = getPilgrimageSeoIndex();
+  const card = buildHomeCard({
+    requestedLocale: locale,
+    spotCount: index?.spotCount ?? 0,
+    points: homeMapPoints(),
+  });
+  return { status: "ready", card, id: "home" };
 }
 
 export function parseOgLocale(value: string): PilgrimageLocale | null {
