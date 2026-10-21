@@ -46,7 +46,10 @@ describe("privacy policy text", () => {
       expect(markdown).not.toContain("{EFFECTIVE_DATE}");
       expect(markdown).not.toContain("{PRIVACY_URL}");
       expect(plain).not.toMatch(LEGAL_ENTITY);
-      expect(markdown).toContain(`/${locale}/photo-terms`);
+      expect(markdown).not.toContain("/photo-terms");
+      expect(markdown).not.toMatch(/exif/i);
+      expect(markdown).not.toMatch(/写真|投稿照片|照片投稿/);
+      expect(markdown).not.toMatch(/photo submission/i);
       expect(markdown).toContain("rights@ayiora.com");
       expect(markdown).toContain(
         locale === "en" ? "October 21, 2026" : "2026年10月21日",
@@ -57,6 +60,22 @@ describe("privacy policy text", () => {
       ).toBe(true);
     },
   );
+
+  it("keeps the 30-day deletion request and drops photo sections", () => {
+    const ja = privacyMarkdown("ja");
+    const en = privacyMarkdown("en");
+    expect(ja).toContain("30日以内");
+    expect(en).toContain("within 30 days");
+    expect(privacyMarkdown("zh")).toContain("30 天内");
+    expect(privacyMarkdown("zh-tw")).toContain("30 日內");
+    expect(ja).toContain("### 3.4 お問い合わせ・申立ての際に取得する情報");
+    expect(ja).toContain("### 3.5 運営者が取得しない情報");
+    expect(ja).not.toContain("### 3.6");
+    expect(en).toContain("### 3.4 When you contact us or file a notice");
+    expect(en).toContain("### 3.5 Information we do not collect");
+    expect(en).not.toContain("### 3.6");
+    expect(en).toContain("## 12. Requests for disclosure and other actions");
+  });
 
   it("states the operator without naming a company in Japanese", () => {
     const plain = privacyPlainText(privacyMarkdown("ja"));
