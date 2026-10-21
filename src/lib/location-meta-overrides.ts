@@ -25,12 +25,16 @@ export function applyLocationMetaOverride(
 ): RenderedSeo {
   const entry = LOCATION_META_OVERRIDES[locale]?.[slug];
   if (!entry) return seo;
-  const title = entry.title?.trim();
-  const description = entry.description?.trim();
   return {
-    title: title ? title : seo.title,
-    description: description ? description : seo.description,
+    title: filled(entry.title) ?? seo.title,
+    description: filled(entry.description) ?? seo.description,
   };
+}
+
+function filled(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  return trimmed;
 }
 
 /** Template, then the TypeScript override map, then the JSON file. */
