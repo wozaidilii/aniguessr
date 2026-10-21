@@ -4,6 +4,7 @@ import {
   ellipsize,
   fitText,
   layout,
+  mergeStations,
   NOBREAK,
   segmentForOg,
   splitEdgeSpace,
@@ -22,15 +23,28 @@ describe("og text fit", () => {
   it("balances a Chinese place name instead of leaving one character", () => {
     const text = "镰仓高校前站旁的道口";
     const fit = fitText(text, "zh", cjkTitle);
-    expect(fit.lines).toEqual(["镰仓高校前", "站旁的道口"]);
+    expect(fit.lines).toEqual(["镰仓高校前站", "旁的道口"]);
     expect(fit.truncated).toBe(false);
+  });
+
+  it("keeps a Traditional station name whole and breaks after 站", () => {
+    const text = "鎌倉高校前站旁的平交道";
+    const tokens = tokenize(text, "zh-tw");
+    expect(tokens.join("")).toBe(text);
+    expect(tokens[0]).toBe("鎌倉高校前站");
+    expect(tokens).not.toContain("站旁");
+    const fit = fitText(text, "zh-tw", cjkTitle);
+    expect(fit.lines).toEqual(["鎌倉高校前站", "旁的平交道"]);
+    expect(fit.lines).not.toEqual(["鎌倉高校前", "站旁的平交道"]);
+    expect(tokenize("平交道", "zh")).toEqual(["平交道"]);
+    expect(tokenize("平交道", "zh-tw")).toEqual(["平交道"]);
   });
 
   it("keeps the Chinese no-break list whole after BudouX", () => {
     const sentence = (lang: "zh" | "zh-tw") =>
       lang === "zh"
-        ? "真实取景地就在Google 地图上，浏览附近地点和动漫圣地巡礼地图，以及作品地区导航"
-        : "真實取景地就在Google 地圖上，瀏覽附近地點和動漫聖地巡禮地圖，以及作品地區導航";
+        ? "真实取景地和平交道就在Google 地图上，浏览附近地点和动漫圣地巡礼地图，以及作品地区导航"
+        : "真實取景地和平交道就在Google 地圖上，瀏覽附近地點和動漫聖地巡禮地圖，以及作品地區導航";
     for (const lang of ["zh", "zh-tw"] as const) {
       const text = sentence(lang);
       const tokens = tokenize(text, lang);
@@ -50,6 +64,29 @@ describe("og text fit", () => {
     expect(tokenize("动漫", "zh")).toEqual(["动漫"]);
     expect(tokenize("Google 地圖", "zh-tw")).toEqual(["Google 地圖"]);
     expect(tokenize("動漫", "zh-tw")).toEqual(["動漫"]);
+    expect(tokenize("平交道", "zh")).toEqual(["平交道"]);
+    expect(NOBREAK.zh).toContain("平交道");
+    expect(NOBREAK["zh-tw"]).toContain("平交道");
+  });
+
+  it("merges a station name back to a particle and stops at 8 characters", () => {
+    expect(
+      mergeStations(["鎌倉", "高校", "前", "站旁", "的", "平交道"]),
+    ).toEqual(["鎌倉高校前站", "旁", "的", "平交道"]);
+    expect(mergeStations(["鎌倉", "高校", "前", "駅", "の", "踏切"])).toEqual([
+      "鎌倉高校前駅",
+      "の",
+      "踏切",
+    ]);
+    expect(mergeStations(["甲", "的", "乙", "站"])).toEqual([
+      "甲",
+      "的",
+      "乙站",
+    ]);
+    expect(mergeStations(["東京", "ディズニー", "シー", "駅"])).toEqual([
+      "東京",
+      "ディズニーシー駅",
+    ]);
   });
 
   it("keeps closing punctuation off the start of a Chinese line", () => {

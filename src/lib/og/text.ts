@@ -9,7 +9,7 @@ import type { OgLocale } from "~/lib/og/copy";
 /**
  * Line breaking from the OG template (spec §5).
  * Ported from the designer's og.js so Satori never wraps on its own.
- * `units / tokenize / layout / balance / fitText / ellipsize` match that file.
+ * `units / tokenize / keepWords / mergeStations / layout / balance / fitText / ellipsize` match that file.
  */
 
 export const COL_W = 640;
@@ -31,6 +31,7 @@ const traditionalChinese = loadDefaultTraditionalChineseParser();
 export const NOBREAK: Record<"zh" | "zh-tw", readonly string[]> = {
   zh: [
     "取景地",
+    "平交道",
     "Google 地图",
     "动漫",
     "圣地",
@@ -45,6 +46,7 @@ export const NOBREAK: Record<"zh" | "zh-tw", readonly string[]> = {
   ],
   "zh-tw": [
     "取景地",
+    "平交道",
     "Google 地圖",
     "動漫",
     "聖地",
@@ -58,6 +60,11 @@ export const NOBREAK: Record<"zh" | "zh-tw", readonly string[]> = {
     "瀏覽",
   ],
 };
+
+/** Preceding phrase ends a station-name merge (spec §5.2 `mergeStations`). */
+const STOP_END = /[的之のとや、，。・·\s]$/u;
+/** BudouX may glue 站/駅 to the next character (`站旁`). Cut after the station char first. */
+const STATION_SPLIT = /(?<=[站駅])(?=[^\s，。、！？：；」』）》·・…])/u;
 
 const CLOSING_PUNCT = /^[，。、！？：；」』）》·・…]+/u;
 
@@ -164,10 +171,38 @@ export function segmentForOg(text: string, lang: OgLocale): string {
   return parser.parse(text).join("\u200B");
 }
 
-/** Drop boundaries that fall inside a no-break word. */
+/**
+ * A CJK token ending in 站/駅 joins the phrases before it, back to the last
+ * particle, punctuation, or space, and at most 8 characters in total.
+ */
+export function mergeStations(tokens: readonly string[]): string[] {
+  const out: string[] = [];
+  const split = tokens.flatMap((token) =>
+    token ? token.split(STATION_SPLIT) : [],
+  );
+  for (const token of split) {
+    if (/[站駅]$/u.test(token) && out.length > 0) {
+      let merged = token;
+      while (out.length > 0) {
+        const previous = out[out.length - 1] ?? "";
+        if (STOP_END.test(previous) || [...(previous + merged)].length > 8) {
+          break;
+        }
+        out.pop();
+        merged = previous + merged;
+      }
+      out.push(merged);
+      continue;
+    }
+    if (token) out.push(token);
+  }
+  return out;
+}
+
+/** Drop boundaries that fall inside a no-break word, then keep station names whole. */
 export function keepWords(tokens: readonly string[], lang: OgLocale): string[] {
   const terms = lang === "zh" || lang === "zh-tw" ? NOBREAK[lang] : undefined;
-  if (!terms || tokens.length === 0) return [...tokens];
+  if (!terms || tokens.length === 0) return mergeStations(tokens);
   const full = tokens.join("");
   const cut = new Set<number>();
   let offset = 0;
@@ -191,7 +226,7 @@ export function keepWords(tokens: readonly string[], lang: OgLocale): string[] {
     last = boundary;
   }
   merged.push(full.slice(last));
-  return merged.filter((token) => token.length > 0);
+  return mergeStations(merged.filter((token) => token.length > 0));
 }
 
 /** Closing punctuation stays on the previous phrase so it never starts a line. */

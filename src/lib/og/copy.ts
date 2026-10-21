@@ -7,7 +7,7 @@ import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 export type OgLocale = "ja" | "zh" | "zh-tw" | "en";
 
 /** Bump when card pixels change so CDN and crawler URLs fetch the new image. */
-export const OG_TEMPLATE_VERSION = "2";
+export const OG_TEMPLATE_VERSION = "3";
 
 export const OG_CHROME = {
   logo: "ANIGUESSR",
