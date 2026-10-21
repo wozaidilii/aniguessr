@@ -65,14 +65,15 @@ function namesOf(text: unknown): OgNames {
 }
 
 /**
- * Anime titles store a Japanese string in `tw` when no official Traditional
- * title exists (`twSource: "ja-fallback"`). Treat that as empty so the card
- * falls through zh-tw → zh → ja instead of painting Japanese as Traditional.
- * Page titles still read `tw` and are unchanged.
+ * Anime titles store a Japanese string in `tw` when conversion found nothing
+ * (`twSource: "ja"` or the older `"ja-fallback"`). Treat that as empty so the
+ * card falls through zh-tw → zh → ja instead of painting Japanese as
+ * Traditional. Explicit, override, and OpenCC titles stay on the card.
  */
 function animeNames(text: unknown): OgNames {
   const names = namesOf(text);
-  if (isRecord(text) && text.twSource === "ja-fallback") names["zh-tw"] = "";
+  const source = isRecord(text) ? text.twSource : undefined;
+  if (source === "ja" || source === "ja-fallback") names["zh-tw"] = "";
   return names;
 }
 

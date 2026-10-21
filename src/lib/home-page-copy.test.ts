@@ -59,9 +59,10 @@ describe("homepage copy", () => {
     expect(getHomePageCopy("ja").searchWorksEmpty).toBe(
       "該当する作品が見つかりません",
     );
-    expect(getHomePageCopy("zh").popularWorks).toBe("热门作品");
-    expect(getHomePageCopy("zh-tw").popularWorks).toBe("熱門作品");
-    expect(getHomePageCopy("en").popularWorks).toBe("Popular anime");
+    expect(getHomePageCopy("ja").popularWorks).toBe("人気の作品から探す");
+    expect(getHomePageCopy("zh").popularWorks).toBe("从热门作品找");
+    expect(getHomePageCopy("zh-tw").popularWorks).toBe("從熱門作品找");
+    expect(getHomePageCopy("en").popularWorks).toBe("Start with a popular title");
     expect(getHomePageCopy("ja").myLocation).toBe("現在地");
     expect(getHomePageCopy("zh").myLocation).toBe("我的位置");
     expect(getHomePageCopy("en").myLocation).toBe("My location");

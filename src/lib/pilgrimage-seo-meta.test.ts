@@ -81,7 +81,7 @@ describe("pilgrimage seo templates", () => {
       "Only 聖地：Bridge（Tokyo）| AniGuessr",
     );
     expect(buildSpotSeo("zh", shared[0]!, "base").title).toBe(
-      "Only圣地：Bridge（Tokyo）| AniGuessr",
+      "Only 圣地：Bridge（Tokyo）| AniGuessr",
     );
   });
 
@@ -90,10 +90,10 @@ describe("pilgrimage seo templates", () => {
       "{anime} 聖地：{place}（{area}）| AniGuessr",
     );
     expect(PILGRIMAGE_SEO_TEMPLATES.zh.spotTitle).toBe(
-      "{anime}圣地：{place}（{area}）| AniGuessr",
+      "{anime} 圣地：{place}（{area}）| AniGuessr",
     );
     expect(PILGRIMAGE_SEO_TEMPLATES["zh-tw"].spotTitle).toBe(
-      "{anime}聖地：{place}（{area}）| AniGuessr",
+      "{anime} 聖地：{place}（{area}）| AniGuessr",
     );
     expect(PILGRIMAGE_SEO_TEMPLATES.en.spotTitle).toBe(
       "{place} — {anime} Real-Life Location | AniGuessr",
@@ -160,8 +160,21 @@ describe("pilgrimage seo templates", () => {
       "base",
     );
     expect(zhTw.title).toBe(
-      "偶像大師 灰姑娘女孩聖地：竹下口（原宿）| AniGuessr",
+      "偶像大師 灰姑娘女孩 聖地：竹下口（原宿）| AniGuessr",
     );
+    expect(
+      buildSpotSeo(
+        "zh",
+        spot({
+          id: "zh-takeshita",
+          anime: "偶像大师 灰姑娘女孩",
+          place: "竹下口（原宿）",
+          area: "东京都涩谷区",
+          episode: "第3话，角色外出购物场景",
+        }),
+        "base",
+      ).title,
+    ).toBe("偶像大师 灰姑娘女孩 圣地：竹下口（原宿）| AniGuessr");
     expect(zhTw.description).toContain("第3集");
     expect(zhTw.description).toContain("街景");
     expect(zhTw.description).toContain("Google 地圖");
@@ -181,8 +194,44 @@ describe("pilgrimage seo templates", () => {
       SPOT_SEO_CHAR_LIMIT.ja,
     );
     expect(long.title.includes("（")).toBe(false);
-    expect(codePointLength(long.description)).toBeLessThanOrEqual(
-      SPOT_SEO_CHAR_LIMIT.ja,
+
+    const alta = buildSpotSeo(
+      "en",
+      spot({
+        id: "alta",
+        anime: "The Idolmaster Cinderella Girls",
+        place: "In front of Studio Alta (Shinjuku Station East Exit)",
+        area: "Shinjuku, Tokyo",
+        episode: "Unknown",
+      }),
+      "base",
+    );
+    expect(alta.description).toBe(
+      "In front of Studio Alta (Shinjuku Station East Exit) appears in The Idolmaster Cinderella Girls.",
+    );
+    expect(alta.description.includes("…")).toBe(false);
+    expect(alta.description.includes("Shinjuku, Tokyo")).toBe(false);
+    expect(codePointLength(alta.description)).toBeLessThanOrEqual(
+      SPOT_SEO_CHAR_LIMIT.en,
+    );
+
+    const takeshitaEn = buildSpotSeo(
+      "en",
+      spot({
+        id: "takeshita-en",
+        anime: "The Idolmaster Cinderella Girls",
+        place: "Takeshita Exit (Harajuku)",
+        area: "Shibuya, Tokyo",
+        episode: "Episode 3, character shopping scene",
+      }),
+      "base",
+    );
+    expect(takeshitaEn.description).toBe(
+      "Takeshita Exit (Harajuku) appears in The Idolmaster Cinderella Girls, Episode 3. Preview it on Street View and get directions in Google Maps.",
+    );
+    expect(takeshitaEn.description.includes("Shibuya, Tokyo")).toBe(false);
+    expect(codePointLength(takeshitaEn.description)).toBeLessThanOrEqual(
+      SPOT_SEO_CHAR_LIMIT.en,
     );
   });
 

@@ -12,9 +12,9 @@ export interface SeoOverride {
  * Anime slugs stay `{subjectId}-{suffix}` (`/pilgrimage/anime/{slug}`).
  * Location slugs are `{city}-{prefecture}` from the geocoder.
  * Spot keys are spot ids.
- * Leave a locale blank to keep the generated template.
- * zh-TW spot pages use the generated spot templates.
- * Other zh-TW documents stay empty until this map supplies copy.
+ * Leave a locale blank to keep the generated template, including zh-TW.
+ * zh-TW templates are the Traditional wording of zh. Work and place names
+ * come from the build-time zh-TW title resolver.
  */
 export const PILGRIMAGE_SEO_OVERRIDES: {
   anime: Record<string, Partial<Record<PilgrimageLocale, SeoOverride>>>;
@@ -39,6 +39,10 @@ export const PILGRIMAGE_SEO_OVERRIDES: {
         title: `江之岛 / 江の島 现实取景地 | ${BRAND_NAME}`,
         description: "神奈川县藤泽市江之岛一带的现实取景地，含坐标与场景信息。",
       },
+      "zh-tw": {
+        title: `江之島 / 江の島 動畫取景地 | ${BRAND_NAME}`,
+        description: "神奈川縣藤澤市江之島一帶的現實取景地，含座標與場景資訊。",
+      },
     },
   },
   spot: {},
@@ -51,12 +55,6 @@ export function applyPilgrimageSeoOverride(
   seo: RenderedSeo,
 ): RenderedSeo {
   const entry = PILGRIMAGE_SEO_OVERRIDES[kind][slug]?.[locale];
-  if (locale === "zh-tw" && kind !== "spot") {
-    return {
-      title: nonempty(entry?.title) ?? "",
-      description: nonempty(entry?.description) ?? "",
-    };
-  }
   if (!entry) return seo;
   return {
     title: nonempty(entry.title) ?? seo.title,

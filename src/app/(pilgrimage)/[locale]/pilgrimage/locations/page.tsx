@@ -27,13 +27,11 @@ export async function generateMetadata({
   const seo = buildLocationIndexSeo(locale, {
     locationCount: index?.locationCount ?? 0,
   });
-  const title = locale === "zh-tw" ? "" : seo.title;
-  const description = locale === "zh-tw" ? "" : seo.description;
   return pilgrimagePageMetadata(
     locale,
     "/pilgrimage/locations",
-    title,
-    description,
+    seo.title,
+    seo.description,
     true,
   );
 }

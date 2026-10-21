@@ -107,6 +107,7 @@ export function withPilgrimageOg(
       images: [{ url, width: 1200, height: 630, alt: card.alt }],
     },
     twitter: {
+      ...metadata.twitter,
       card: "summary_large_image",
       images: [url],
     },

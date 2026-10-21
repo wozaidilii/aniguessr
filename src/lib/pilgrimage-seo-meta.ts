@@ -97,10 +97,10 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexDescription: "アニメ撮影地がある地域 {locationCount} 件。",
   },
   zh: {
-    spotTitle: "{anime}圣地：{place}（{area}）| AniGuessr",
-    spotTitleWithEpisode: "{anime}圣地：{place}（{area}）| AniGuessr",
-    spotTitleWithScene: "{anime}圣地：{place}（{area}）| AniGuessr",
-    spotTitleWithId: "{anime}圣地：{place}（{area}）| AniGuessr",
+    spotTitle: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithEpisode: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithScene: "{anime} 圣地：{place}（{area}）| AniGuessr",
+    spotTitleWithId: "{anime} 圣地：{place}（{area}）| AniGuessr",
     spotDescription:
       "《{anime}》取景地「{place}」，位于{area}。可以在街景里预览，并用 Google 地图导航。",
     spotDescriptionWithEpisode:
@@ -124,13 +124,13 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
     locationIndexTitle: "按地区浏览动漫取景地 | {brand}",
     locationIndexDescription: "已收录动漫取景地的地区共 {locationCount} 个。",
   },
-  // Spot pages use these templates. Other zh-TW documents still come
-  // only from PILGRIMAGE_SEO_OVERRIDES.
+  // Traditional wording of the zh templates. 動漫 stays 動畫, matching
+  // the visible zh-TW copy. Place and work names come from the zh-TW resolver.
   "zh-tw": {
-    spotTitle: "{anime}聖地：{place}（{area}）| AniGuessr",
-    spotTitleWithEpisode: "{anime}聖地：{place}（{area}）| AniGuessr",
-    spotTitleWithScene: "{anime}聖地：{place}（{area}）| AniGuessr",
-    spotTitleWithId: "{anime}聖地：{place}（{area}）| AniGuessr",
+    spotTitle: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithEpisode: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithScene: "{anime} 聖地：{place}（{area}）| AniGuessr",
+    spotTitleWithId: "{anime} 聖地：{place}（{area}）| AniGuessr",
     spotDescription:
       "《{anime}》取景地「{place}」，位於{area}。可以在街景裡預覽，並用 Google 地圖導航。",
     spotDescriptionWithEpisode:
@@ -141,18 +141,18 @@ export const PILGRIMAGE_SEO_TEMPLATES: Record<
       "《{anime}》{episode}取景地「{place}」。最近車站是{station}。可以在街景裡預覽，並用 Google 地圖導航。",
     animeTitle: "{anime} 取景地 | {brand}",
     animeTitleWithId: "{anime}（{id}）取景地 | {brand}",
-    animeDescription: "{anime} 的實景取景地共 {count} 處，含座標與場景資訊。",
+    animeDescription: "{anime} 的現實取景地共 {count} 處，含座標與場景資訊。",
     animeDescriptionWithId:
-      "{anime}（{id}）的實景取景地共 {count} 處，含座標與場景資訊。",
-    locationTitle: "{area} 動漫取景地 | {brand}",
-    locationDescription: "{area} 的動漫取景地共 {count} 處。",
-    hubTitle: "動漫取景地與聖地巡禮 | {brand}",
+      "{anime}（{id}）的現實取景地共 {count} 處，含座標與場景資訊。",
+    locationTitle: "{area} 動畫取景地 | {brand}",
+    locationDescription: "{area} 的動畫取景地共 {count} 處。",
+    hubTitle: "動畫取景地與聖地巡禮 | {brand}",
     hubDescription:
-      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動漫取景地。",
-    animeIndexTitle: "按作品瀏覽動漫取景地 | {brand}",
-    animeIndexDescription: "已收錄取景地的動漫作品共 {animeCount} 部。",
-    locationIndexTitle: "按地區瀏覽動漫取景地 | {brand}",
-    locationIndexDescription: "已收錄動漫取景地的地區共 {locationCount} 個。",
+      "收錄 {animeCount} 部作品、{locationCount} 個地區、共 {spotCount} 處動畫取景地。",
+    animeIndexTitle: "按作品瀏覽動畫取景地 | {brand}",
+    animeIndexDescription: "已收錄取景地的動畫作品共 {animeCount} 部。",
+    locationIndexTitle: "按地區瀏覽動畫取景地 | {brand}",
+    locationIndexDescription: "已收錄動畫取景地的地區共 {locationCount} 個。",
   },
 };
 
@@ -392,6 +392,20 @@ function composeSpotDescription(
   });
 }
 
+const STREET_VIEW_SENTENCE: Record<PilgrimageLocale, string> = {
+  ja: "ストリートビューで下見して、Googleマップでナビできます。",
+  zh: "可以在街景里预览，并用 Google 地图导航。",
+  "zh-tw": "可以在街景裡預覽，並用 Google 地圖導航。",
+  en: "Preview it on Street View and get directions in Google Maps.",
+};
+
+function withoutStreetView(locale: PilgrimageLocale, text: string): string {
+  return text
+    .replace(STREET_VIEW_SENTENCE[locale], "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function fitSpotDescription(
   locale: PilgrimageLocale,
   anime: string,
@@ -409,38 +423,14 @@ function fitSpotDescription(
     episode,
     station,
   );
-  // A few characters past the target is still a sane snippet.
-  if (codePointLength(full) <= limit + 12) return full;
+  if (codePointLength(full) <= limit) return full;
 
-  const animeChars = [...anime];
-  const placeChars = [...place];
-  const render = (nextArea: string) =>
-    composeSpotDescription(
-      locale,
-      animeChars.join(""),
-      placeChars.join(""),
-      nextArea,
-      episode,
-      station,
-    );
-  while (
-    codePointLength(render(area)) > limit &&
-    (animeChars.length > 1 || placeChars.length > 1)
-  ) {
-    if (placeChars.length >= animeChars.length && placeChars.length > 1) {
-      placeChars.pop();
-    } else if (animeChars.length > 1) animeChars.pop();
-    else placeChars.pop();
-  }
-  if (animeChars.join("") !== anime && animeChars.length > 0) {
-    animeChars[animeChars.length - 1] = "…";
-  }
-  if (placeChars.join("") !== place && placeChars.length > 0) {
-    placeChars[placeChars.length - 1] = "…";
-  }
-  const fitted = render(area);
-  if (codePointLength(fitted) <= limit || station) return fitted;
-  return render("");
+  const withoutArea = station
+    ? full
+    : composeSpotDescription(locale, anime, place, "", episode, "");
+  if (codePointLength(withoutArea) <= limit) return withoutArea;
+
+  return withoutStreetView(locale, withoutArea);
 }
 
 export function buildSpotSeo(
