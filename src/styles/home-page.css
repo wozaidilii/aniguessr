@@ -1670,9 +1670,10 @@
   gap: 0;
   width: 100%;
   max-width: none;
+  height: calc(100svh - 56px);
+  min-height: 640px;
   margin: 0;
   padding: 0;
-  min-height: calc(100svh - 56px);
 }
 
 .home-mapbar {
@@ -1729,15 +1730,22 @@
 }
 
 .home-mapstage {
+  position: relative;
   flex: 1 1 auto;
   grid-column: auto;
   grid-row: auto;
   height: auto;
-  min-height: 480px;
+  min-height: 0;
   border: 0;
   border-radius: 0;
   background: #e8eef2;
   box-shadow: none;
+}
+
+.home-map {
+  position: absolute;
+  inset: 0;
+  height: auto;
 }
 
 .home-map-float {
