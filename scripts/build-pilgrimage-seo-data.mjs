@@ -16,6 +16,10 @@ import {
   localizedField,
   localizedList,
 } from "./lib/pilgrimage-group.mjs";
+import {
+  buildHomeMapLabels,
+  loadAreaNameOverrides,
+} from "./lib/home-map-labels.mjs";
 import { zhTwAnimeTitle } from "./lib/zh-tw-anime-title.mjs";
 import { reviewCsv, reviewRow } from "./lib/zh-tw-review.mjs";
 import { toZhTw } from "./lib/zh-tw.mjs";
@@ -39,6 +43,7 @@ const AREA_PATH = path.join(
 );
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/seo");
 const NAV_PATH = path.join(OUTPUT_DIR, "spots-nav.json");
+const HOME_LABELS_PATH = path.join(OUTPUT_DIR, "home-map-labels.json");
 const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
 
 const PUBLIC_ROUTES = [
@@ -845,9 +850,23 @@ async function main() {
     ]),
   };
 
+  const homeMapLabels = buildHomeMapLabels({
+    spots: visibleSpots.map((spot) => ({
+      locationSlug: spot.locationSlug,
+      lng: spot.lng,
+      lat: spot.lat,
+    })),
+    locations: locations.map((location) => ({
+      slug: location.slug,
+      name: location.name,
+    })),
+    overrides: loadAreaNameOverrides(),
+  });
+
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(path.join(OUTPUT_DIR, "index.json"), JSON.stringify(output));
   await writeFile(NAV_PATH, JSON.stringify(nav));
+  await writeFile(HOME_LABELS_PATH, JSON.stringify(homeMapLabels));
   await writeFile(
     path.join(OUTPUT_DIR, "zh-tw-review.csv"),
     reviewCsv(reviewRows),

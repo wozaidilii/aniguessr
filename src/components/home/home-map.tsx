@@ -12,10 +12,27 @@ import {
   type HomeOriginDetail,
 } from "~/components/home/home-events";
 import {
+  HOME_AREA_SOURCE,
+  HOME_CLUSTER_SOURCE,
+  HOME_DOTS_SOURCE,
+  HOME_PILL_LAYER_IDS,
+  HOME_PREF_SOURCE,
+  installHomeMapLayers,
+  labelCollection,
+  setHomeGeoJson,
+  spotCollection,
+} from "~/components/home/home-map-layers";
+import {
   KANTO_INITIAL_CENTER,
   KANTO_INITIAL_ZOOM,
   KANTO_SHONAN_BOUNDS,
 } from "~/lib/home-map-bounds";
+import { loadHomeMapLabels, type HomeMapLabels } from "~/lib/home-map-labels";
+import {
+  HOME_IDEOGRAPH_FONT,
+  HOME_MAP_STYLE,
+  tuneHomeMapStyle,
+} from "~/lib/home-map-style";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { readHomeOrigin, rememberHomeOrigin } from "~/lib/home-origin";
@@ -23,46 +40,19 @@ import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { workFocusLngLats } from "~/lib/home-work-focus";
 import {
-  PILGRIMAGE_MAP_STYLE,
-  animeTitle,
+  FAVORITES_CHANGED_EVENT,
+  readFavoriteAnimeIds,
+} from "~/lib/pilgrimage-favorites";
+import {
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   loadNavCatalog,
-  localizedSpotName,
   type NavCatalog,
-  type NavSpot,
 } from "~/lib/pilgrimage-nav";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-const SOURCE_ID = "home-spots";
-
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function spotCollection(
-  spots: readonly NavSpot[],
-  animes: NavCatalog["animes"],
-  locale: HomeLocale,
-  focusId: string | null,
-) {
-  return {
-    type: "FeatureCollection" as const,
-    features: spots.map((spot) => ({
-      type: "Feature" as const,
-      geometry: {
-        type: "Point" as const,
-        coordinates: [spot.lng, spot.lat] as [number, number],
-      },
-      properties: {
-        id: spot.id,
-        name: localizedSpotName(spot, locale),
-        anime: animeTitle(animes, spot.subjectId, locale),
-        subjectId: spot.subjectId,
-        dim: focusId && spot.subjectId !== focusId ? 1 : 0,
-      },
-    })),
-  };
 }
 
 export function HomeMap({ locale }: { locale: HomeLocale }) {
@@ -81,12 +71,13 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     let loaded = false;
     const map = new maplibregl.Map({
       container,
-      style: PILGRIMAGE_MAP_STYLE,
+      style: HOME_MAP_STYLE,
       center: KANTO_INITIAL_CENTER,
       zoom: KANTO_INITIAL_ZOOM,
       attributionControl: false,
       cooperativeGestures: false,
       maxZoom: 18,
+      localIdeographFontFamily: HOME_IDEOGRAPH_FONT,
     });
     mapRef.current = map;
     map.addControl(
@@ -99,105 +90,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     map.on("load", () => {
       loaded = true;
       window.clearTimeout(timer);
-      map.addSource(SOURCE_ID, {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] },
-        cluster: true,
-        clusterRadius: 48,
-        clusterMaxZoom: 14,
-        clusterProperties: {
-          dimSum: ["+", ["coalesce", ["get", "dim"], 0]],
-        },
-      });
-      const clusterDim: maplibregl.ExpressionSpecification = [
-        "case",
-        [
-          "all",
-          [">", ["get", "dimSum"], 0],
-          ["==", ["get", "dimSum"], ["get", "point_count"]],
-        ],
-        0.35,
-        1,
-      ];
-      map.addLayer({
-        id: "home-cluster-halo",
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": "#f9a8d4",
-          "circle-opacity": ["*", 0.25, clusterDim],
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            22,
-            25,
-            28,
-            100,
-            36,
-          ],
-        },
-      });
-      map.addLayer({
-        id: "home-clusters",
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": [
-            "case",
-            [
-              "all",
-              [">", ["get", "dimSum"], 0],
-              ["==", ["get", "dimSum"], ["get", "point_count"]],
-            ],
-            "#6d6278",
-            "#f9a8d4",
-          ],
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            16,
-            25,
-            20,
-            100,
-            26,
-          ],
-          "circle-opacity": clusterDim,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#0a0612",
-        },
-      });
-      map.addLayer({
-        id: "home-cluster-count",
-        type: "symbol",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["Noto Sans Regular"],
-          "text-size": 12,
-        },
-        paint: { "text-color": "#0a0612" },
-      });
-      map.addLayer({
-        id: "home-points",
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-color": [
-            "case",
-            ["==", ["get", "dim"], 1],
-            "#6d6278",
-            "#f9a8d4",
-          ],
-          "circle-radius": ["case", ["==", ["get", "dim"], 1], 5, 7],
-          "circle-opacity": ["case", ["==", ["get", "dim"], 1], 0.35, 1],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#0a0612",
-        },
-      });
+      tuneHomeMapStyle(map, locale);
+      installHomeMapLayers(map);
       const pointCursor = (cursor: string) => {
         map.getCanvas().style.cursor = cursor;
       };
@@ -205,12 +99,36 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       map.on("mouseleave", "home-clusters", () => pointCursor(""));
       map.on("mouseenter", "home-points", () => pointCursor("pointer"));
       map.on("mouseleave", "home-points", () => pointCursor(""));
+      for (const layerId of HOME_PILL_LAYER_IDS) {
+        map.on("mouseenter", layerId, () => pointCursor("pointer"));
+        map.on("mouseleave", layerId, () => pointCursor(""));
+        map.on("click", layerId, (event) => {
+          const props = event.features?.[0]?.properties;
+          if (!props) return;
+          const west = Number(props.west);
+          const south = Number(props.south);
+          const east = Number(props.east);
+          const north = Number(props.north);
+          if (![west, south, east, north].every(Number.isFinite)) return;
+          map.fitBounds(
+            [
+              [west, south],
+              [east, north],
+            ],
+            {
+              padding: { top: 72, right: 48, bottom: 48, left: 48 },
+              maxZoom: 14,
+              duration: prefersReducedMotion() ? 0 : 600,
+            },
+          );
+        });
+      }
       map.on("click", "home-clusters", (event) => {
         const feature = event.features?.[0];
         if (feature?.geometry.type !== "Point") return;
         const clusterId = Number(feature.properties?.cluster_id);
         if (!Number.isFinite(clusterId)) return;
-        const source = map.getSource(SOURCE_ID);
+        const source = map.getSource(HOME_CLUSTER_SOURCE);
         if (source?.type !== "geojson") return;
         const center = feature.geometry.coordinates;
         void Promise.resolve(
@@ -259,6 +177,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       if (event.originalEvent) signalHomeMapGesture();
     });
     let catalogReady: NavCatalog | null = null;
+    let labelsReady: HomeMapLabels | null = null;
+    let favoriteIds = new Set(readFavoriteAnimeIds());
     let focusedId: string | null = null;
     let savedCamera: {
       lng: number;
@@ -274,35 +194,49 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       const existing = youRef.current?.getElement();
       if (youRef.current && existing?.isConnected) {
         youRef.current.setLngLat([origin.lng, origin.lat]);
-        existing.style.zIndex = "10";
+        existing.style.zIndex = "30";
         return;
       }
       const element = document.createElement("div");
       element.className = "home-you";
-      element.style.zIndex = "10";
+      element.style.zIndex = "30";
       youRef.current = new maplibregl.Marker({ element })
         .setLngLat([origin.lng, origin.lat])
         .addTo(map);
     }
 
     function pushSpots() {
-      if (!catalogReady) return;
-      const source = map.getSource(SOURCE_ID);
-      if (source?.type !== "geojson") return;
-      (source as maplibregl.GeoJSONSource).setData(
-        spotCollection(
-          catalogReady.spots,
-          catalogReady.animes,
-          locale,
-          focusedId,
-        ),
+      if (!catalogReady || !map.getSource(HOME_CLUSTER_SOURCE)) return;
+      const data = spotCollection(
+        catalogReady.spots,
+        catalogReady.animes,
+        locale,
+        focusedId,
+        favoriteIds,
       );
+      setHomeGeoJson(map, HOME_CLUSTER_SOURCE, data);
+      setHomeGeoJson(map, HOME_DOTS_SOURCE, data);
       ensureYou();
+    }
+
+    function pushLabels() {
+      if (!labelsReady || !map.getSource(HOME_AREA_SOURCE)) return;
+      setHomeGeoJson(
+        map,
+        HOME_AREA_SOURCE,
+        labelCollection(labelsReady.areas, locale),
+      );
+      setHomeGeoJson(
+        map,
+        HOME_PREF_SOURCE,
+        labelCollection(labelsReady.prefectures, locale),
+      );
     }
 
     function showFocus() {
       pushSpots();
-      if (!focusedId || !catalogReady || !map.getSource(SOURCE_ID)) return;
+      if (!focusedId || !catalogReady || !map.getSource(HOME_CLUSTER_SOURCE))
+        return;
       const spots = catalogReady.spots.filter(
         (spot) => spot.subjectId === focusedId,
       );
@@ -370,14 +304,29 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       ensureYou();
     }
 
+    function onFavorites() {
+      favoriteIds = new Set(readFavoriteAnimeIds());
+      pushSpots();
+    }
+
     window.addEventListener(HOME_ORIGIN_EVENT, onOrigin);
     window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
+    window.addEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
+    window.addEventListener("storage", onFavorites);
     ensureYou();
 
     map.on("load", () => {
+      pushLabels();
       if (focusedId) showFocus();
       else pushSpots();
     });
+    void loadHomeMapLabels()
+      .then((labels) => {
+        if (cancelled || !labels) return;
+        labelsReady = labels;
+        pushLabels();
+      })
+      .catch(() => undefined);
     void loadNavCatalog()
       .then((catalog) => {
         if (cancelled) return;
@@ -396,6 +345,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       window.clearTimeout(timer);
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
       window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
+      window.removeEventListener("storage", onFavorites);
       observer.disconnect();
       youRef.current?.remove();
       youRef.current = null;
