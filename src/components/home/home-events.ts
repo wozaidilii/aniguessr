@@ -3,9 +3,18 @@ export const HOME_BOUNDS_EVENT = "aniguessr:home-bounds";
 export const HOME_FOCUS_WORK_EVENT = "aniguessr:home-focus-work";
 /** User drag or zoom on the homepage map. */
 export const HOME_MAP_GESTURE_EVENT = "aniguessr:home-map-gesture";
+/** True while the homepage map is on screen and should load tiles. */
+export const HOME_MAP_ACTIVE_EVENT = "aniguessr:home-map-active";
 
 export function signalHomeMapGesture(): void {
   window.dispatchEvent(new CustomEvent(HOME_MAP_GESTURE_EVENT));
+}
+
+export function setHomeMapActive(active: boolean): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(HOME_MAP_ACTIVE_EVENT, { detail: active }),
+  );
 }
 
 export interface HomeOriginDetail {

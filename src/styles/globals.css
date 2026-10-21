@@ -4,12 +4,13 @@
 
 @theme {
   --font-sans:
-    var(--font-noto), var(--font-sora), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-heading: var(--font-sora), var(--font-noto), "Hiragino Sans", "Yu Gothic UI",
-    Meiryo, sans-serif;
-  --font-body: var(--font-noto), "Hiragino Sans", "Yu Gothic UI", Meiryo, system-ui,
-    sans-serif;
+    var(--font-noto, "Hiragino Sans"), var(--font-sora, sans-serif), ui-sans-serif,
+    system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  --font-heading: var(--font-sora, sans-serif), var(--font-noto, "Hiragino Sans"),
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  --font-body: var(--font-noto, "Hiragino Sans"), "Hiragino Sans", "Yu Gothic UI",
+    Meiryo, system-ui, sans-serif;
 }
 
 html,
@@ -109,10 +110,10 @@ body {
 }
 
 :root {
-  --font-heading: var(--font-sora), var(--font-noto), "Hiragino Sans", "Yu Gothic UI",
-    Meiryo, sans-serif;
-  --font-body: var(--font-noto), "Hiragino Sans", "Yu Gothic UI", Meiryo, system-ui,
-    sans-serif;
+  --font-heading: var(--font-sora, sans-serif), var(--font-noto, "Hiragino Sans"),
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  --font-body: var(--font-noto, "Hiragino Sans"), "Hiragino Sans", "Yu Gothic UI",
+    Meiryo, system-ui, sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

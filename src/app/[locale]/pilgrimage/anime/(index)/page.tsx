@@ -8,7 +8,6 @@ import {
 } from "~/server/data/pilgrimage-seo";
 import { AnimeIndexBrowser } from "~/components/pilgrimage/anime-index-browser";
 import {
-  PilgrimageShell,
   pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
@@ -52,18 +51,8 @@ export default async function PilgrimageAnimeIndexPage({
     meta: copy.spotCountLabel(anime.spotCount),
   }));
 
-  return (
-    <PilgrimageShell
-      locale={locale}
-      kicker={copy.siteKicker}
-      title={copy.animeArchive}
-      description={copy.hubDescription}
-    >
-      {!index ? (
-        <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>
-      ) : (
-        <AnimeIndexBrowser locale={locale} items={items} />
-      )}
-    </PilgrimageShell>
-  );
+  if (!index) {
+    return <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>;
+  }
+  return <AnimeIndexBrowser locale={locale} items={items} />;
 }

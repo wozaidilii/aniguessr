@@ -396,9 +396,12 @@ export function spotCollection(
   focusId: string | null,
   favorites: ReadonlySet<string>,
 ): GeoJSON.FeatureCollection {
+  const visible = focusId
+    ? spots.filter((spot) => spot.subjectId === focusId)
+    : spots;
   return {
     type: "FeatureCollection",
-    features: spots.map((spot) => ({
+    features: visible.map((spot) => ({
       type: "Feature",
       geometry: {
         type: "Point",

@@ -2,7 +2,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 
-import { rootFontClassName } from "~/app/fonts";
+import { soraFontClassName } from "~/app/fonts";
+import { NotoFont } from "~/components/site/noto-font";
 import { RegisterServiceWorker } from "~/components/RegisterServiceWorker";
 import { CampaignAnalytics } from "~/components/CampaignAnalytics";
 import { PostHogRouteTracker } from "~/components/PostHogRouteTracker";
@@ -20,9 +21,10 @@ export function RootDocument({
     <html
       lang={locale}
       data-product="aniguessr"
-      className={`${rootFontClassName} site-light`}
+      className={`${soraFontClassName} site-light`}
     >
       <body>
+        <NotoFont />
         <PostHogScript />
         <TRPCReactProvider>
           <PostHogRouteTracker />

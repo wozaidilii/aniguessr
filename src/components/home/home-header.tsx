@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { setHomeMapActive } from "~/components/home/home-events";
 import { BrandLockup } from "~/components/brand/BrandLockup";
 import { HomeAccount } from "~/components/home/home-account";
 import { getHomePageCopy } from "~/lib/home-page-copy";
@@ -55,15 +56,6 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }, [pathname]);
 
-  useEffect(() => {
-    const model = siteNavModel(pathname, locale);
-    router.prefetch(model.home);
-    for (const link of model.links) {
-      const path = pathOnly(link.href);
-      if (path.startsWith("/")) router.prefetch(path);
-    }
-  }, [locale, pathname, router]);
-
   function active(link: SiteNavLink): boolean {
     if (pendingId) return pendingId === link.id;
     const id = hashId(link.href);
@@ -82,8 +74,11 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     setBar({ x: current.offsetLeft, width: current.offsetWidth, visible: true });
   }, [pathname, hash, pendingId, locale, open]);
 
-  function onPointerDown(id: SiteNavLink["id"]) {
+  function onPointerDown(id: SiteNavLink["id"], href: string) {
     setPendingId(id);
+    if (!href.startsWith("#") && !href.endsWith("#game") && !href.endsWith("#rank")) {
+      setHomeMapActive(false);
+    }
   }
 
   function prefetch(href: string) {
@@ -120,7 +115,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
                 href={link.href}
                 prefetch
                 aria-current={active(link) ? "page" : undefined}
-                onPointerDown={() => onPointerDown(link.id)}
+                onPointerDown={() => onPointerDown(link.id, link.href)}
                 onMouseEnter={() => prefetch(link.href)}
                 onFocus={() => prefetch(link.href)}
                 onClick={(event) => onTabClick(event, link)}
@@ -173,7 +168,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
               href={link.href}
               prefetch
               aria-current={active(link) ? "page" : undefined}
-              onPointerDown={() => onPointerDown(link.id)}
+              onPointerDown={() => onPointerDown(link.id, link.href)}
               onClick={(event) => {
                 onTabClick(event, link);
                 setOpen(false);

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { isSoftNav } from "~/components/site/soft-nav";
 import {
   matchAnimeTitles,
   type AnimeSearchRecord,
@@ -24,6 +25,21 @@ export function AnimeIndexBrowser({
 }) {
   const copy = getPilgrimageCopy(locale);
   const [query, setQuery] = useState("");
+  const [count, setCount] = useState(() =>
+    isSoftNav() ? 0 : items.length,
+  );
+  useEffect(() => {
+    if (count >= items.length) return;
+    let current = count;
+    let timer = 0;
+    const step = () => {
+      current = Math.min(items.length, current + 36);
+      setCount(current);
+      if (current < items.length) timer = window.setTimeout(step, 16);
+    };
+    timer = window.setTimeout(step, 16);
+    return () => window.clearTimeout(timer);
+  }, [count, items.length]);
   const needle = query.trim();
   const visible = useMemo(
     () => (needle ? matchAnimeTitles(items, needle) : items),
@@ -54,7 +70,7 @@ export function AnimeIndexBrowser({
         </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((anime) => (
+          {visible.slice(0, needle ? visible.length : count).map((anime) => (
             <Link
               key={anime.subjectId}
               href={anime.href}

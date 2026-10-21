@@ -1,8 +1,10 @@
 "use client";
 
+import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import { HomeHeader } from "~/components/home/home-header";
 import { PersistentHomeMap } from "~/components/home/persistent-home-map";
+import { markSoftNav } from "~/components/site/soft-nav";
 import type { HomeLocale } from "~/lib/home-locale";
 
 export function SiteShell({
@@ -14,6 +16,10 @@ export function SiteShell({
 }) {
   const pathname = usePathname() || `/${locale}`;
   const hideHeader = pathname.includes("/privacy");
+  useLayoutEffect(() => {
+    markSoftNav();
+    document.documentElement.dataset.navReady = "1";
+  }, []);
   return (
     <>
       {hideHeader ? null : <HomeHeader locale={locale} />}

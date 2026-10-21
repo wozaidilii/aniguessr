@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { setHomeMapActive } from "~/components/home/home-events";
 import { HomeMapLoader } from "~/components/home/home-map-loader";
 import type { HomeLocale } from "~/lib/home-locale";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
@@ -20,22 +21,30 @@ export function PersistentHomeMap({ locale }: { locale: HomeLocale }) {
   useLayoutEffect(() => {
     const holder = holderRef.current;
     if (!holder) return;
+    let tilesOn: boolean | null = null;
     const place = () => {
       const slot = document.getElementById("home-map-slot");
-      if (!onHome || !slot) {
-        holder.dataset.parked = "true";
-        return;
+      const rect = slot?.getBoundingClientRect();
+      const active = Boolean(
+        onHome && slot && rect && rect.width >= 2 && rect.height >= 2,
+      );
+      if (active !== tilesOn) {
+        tilesOn = active;
+        window.setTimeout(() => setHomeMapActive(active), 0);
       }
-      const rect = slot.getBoundingClientRect();
-      if (rect.width < 2 || rect.height < 2) {
+      if (!active || !rect) {
         holder.dataset.parked = "true";
         return;
       }
       holder.dataset.parked = "false";
-      holder.style.left = `${rect.left}px`;
-      holder.style.top = `${rect.top}px`;
-      holder.style.width = `${rect.width}px`;
-      holder.style.height = `${rect.height}px`;
+      const left = `${rect.left}px`;
+      const top = `${rect.top}px`;
+      const width = `${rect.width}px`;
+      const height = `${rect.height}px`;
+      if (holder.style.left !== left) holder.style.left = left;
+      if (holder.style.top !== top) holder.style.top = top;
+      if (holder.style.width !== width) holder.style.width = width;
+      if (holder.style.height !== height) holder.style.height = height;
     };
     place();
     const slot = document.getElementById("home-map-slot");

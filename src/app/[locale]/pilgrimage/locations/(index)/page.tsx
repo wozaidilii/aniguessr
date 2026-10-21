@@ -6,10 +6,10 @@ import {
   getPilgrimageSeoIndex,
   pickLocalizedText,
 } from "~/server/data/pilgrimage-seo";
+import { DeferPaint } from "~/components/site/defer-paint";
 import {
   PilgrimageCard,
   PilgrimageCardGrid,
-  PilgrimageShell,
   pilgrimageHref,
   pilgrimageLocale,
 } from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
@@ -47,30 +47,25 @@ export default async function PilgrimageLocationsIndexPage({
   const index = getPilgrimageSeoIndex();
   const locations = index?.locations ?? [];
 
+  if (!index) {
+    return <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>;
+  }
+
   return (
-    <PilgrimageShell
-      locale={locale}
-      kicker={copy.siteKicker}
-      title={copy.locationArchive}
-      description={copy.hubDescription}
-    >
-      {!index ? (
-        <p className="text-sm text-pink-100/70">{copy.emptyIndex}</p>
-      ) : (
-        <PilgrimageCardGrid>
-          {locations.map((location) => (
-            <PilgrimageCard
-              key={location.slug}
-              href={pilgrimageHref(
-                `/pilgrimage/locations/${location.slug}`,
-                locale,
-              )}
-              title={pickLocalizedText(location.name, locale)}
-              meta={copy.spotCountLabel(location.spotCount)}
-            />
-          ))}
-        </PilgrimageCardGrid>
-      )}
-    </PilgrimageShell>
+    <PilgrimageCardGrid>
+      <DeferPaint>
+        {locations.map((location) => (
+          <PilgrimageCard
+            key={location.slug}
+            href={pilgrimageHref(
+              `/pilgrimage/locations/${location.slug}`,
+              locale,
+            )}
+            title={pickLocalizedText(location.name, locale)}
+            meta={copy.spotCountLabel(location.spotCount)}
+          />
+        ))}
+      </DeferPaint>
+    </PilgrimageCardGrid>
   );
 }

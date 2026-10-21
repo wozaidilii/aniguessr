@@ -1,7 +1,7 @@
 .home {
   background: var(--color-ani-bg, #f7f6f3);
   color: var(--color-ani-text, #fff7fb);
-  font-family: var(--font-noto), var(--font-sora), sans-serif;
+  font-family: var(--font-noto, "Hiragino Sans"), var(--font-sora, sans-serif), sans-serif;
   word-break: auto-phrase;
   font-feature-settings: "palt";
 }
@@ -12,7 +12,7 @@
   margin: 0;
   letter-spacing: 0;
   text-wrap: balance;
-  font-family: var(--font-sora), var(--font-noto), sans-serif;
+  font-family: var(--font-sora, sans-serif), var(--font-noto, "Hiragino Sans"), sans-serif;
 }
 
 .home p {
@@ -941,7 +941,7 @@
   place-items: center;
   border-radius: 12px;
   color: #f7f6f3;
-  font-family: var(--font-noto), sans-serif;
+  font-family: var(--font-noto, "Hiragino Sans"), sans-serif;
   font-size: 22px;
   font-weight: 900;
 }
