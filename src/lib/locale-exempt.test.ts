@@ -144,6 +144,10 @@ describe("locale middleware exemptions", () => {
       "/zh-tw/pilgrimage",
       "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
+      "/ja/pilgrimage/spots/anitabi_1_2/opengraph-image",
+      "/zh/pilgrimage/anime/123-title/opengraph-image",
+      "/en/pilgrimage/locations/kamakura/opengraph-image",
+      "/zh-tw/pilgrimage/spots/anitabi_1_2/opengraph-image",
       "/zh-tw/pilgrimage/locations/shinjuku-tokyo",
     ]) {
       expect(isLocalePrefixedPilgrimagePath(pathname)).toBe(true);
