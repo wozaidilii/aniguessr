@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowIcon } from "~/components/brand/ArrowIcon";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { RightsContactLink } from "~/components/rights-contact-link";
 import { COMPANY_SITE_URL, HOME_COPY } from "~/lib/aniguessr-copy";
 import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
 
@@ -49,6 +50,9 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
                   <Link href={withAnimeLocale("/privacy", locale)}>
                     {copy.footerPrivacy}
                   </Link>
+                </li>
+                <li>
+                  <RightsContactLink locale={locale} />
                 </li>
               </ul>
             </div>

@@ -1,5 +1,6 @@
 import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import { RightsContactLink } from "~/components/rights-contact-link";
 import {
   CONTACT_GENERAL_EMAIL,
   CONTACT_SUPPORT_EMAIL,
@@ -77,6 +78,9 @@ export function HomeFooter({ locale }: { locale: HomeLocale }) {
                 <a href={withPilgrimageLocale("/privacy", locale)}>
                   {copy.footerPrivacy}
                 </a>
+              </li>
+              <li>
+                <RightsContactLink locale={locale} />
               </li>
             </ul>
           </div>

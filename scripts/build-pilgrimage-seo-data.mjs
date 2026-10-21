@@ -21,6 +21,7 @@ import {
   buildUrlSetXml,
   chunkSitemapPaths,
   resolveSiteOrigin,
+  rightsSitemapItem,
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 
@@ -661,6 +662,7 @@ async function main() {
     priority,
     zhTw: pilgrimageSitemapPath(route),
   }));
+  canonicalPaths.push(rightsSitemapItem());
   for (const anime of animes) {
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,

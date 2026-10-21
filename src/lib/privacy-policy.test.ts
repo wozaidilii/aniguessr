@@ -50,7 +50,7 @@ describe("privacy policy text", () => {
       expect(markdown).not.toMatch(/exif/i);
       expect(markdown).not.toMatch(/写真|投稿照片|照片投稿/);
       expect(markdown).not.toMatch(/photo submission/i);
-      expect(markdown).toContain("rights@ayiora.com");
+      expect(markdown).toContain("support@ayiora.com");
       expect(markdown).toContain(
         locale === "en" ? "October 21, 2026" : "2026年10月21日",
       );

@@ -13,6 +13,7 @@ import {
   isLocalePrefixedPilgrimagePath,
   isLocalePrefixedPrivacyPath,
 } from "~/lib/pilgrimage-cache";
+import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { pilgrimageRedirectPath } from "~/lib/pilgrimage-redirects";
 import { legacyHostRedirectUrl } from "~/lib/site-url";
@@ -158,6 +159,7 @@ export function middleware(request: NextRequest) {
   if (
     isLocalePrefixedPilgrimagePath(request.nextUrl.pathname) ||
     isLocalePrefixedPrivacyPath(request.nextUrl.pathname) ||
+    isLocalePrefixedRightsPath(request.nextUrl.pathname) ||
     isLocaleHomePath(request.nextUrl.pathname)
   ) {
     return NextResponse.next();

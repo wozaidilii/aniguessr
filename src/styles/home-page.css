@@ -881,6 +881,21 @@
   list-style: none;
 }
 
+.home-ftr li {
+  min-width: 0;
+}
+
+.home-ftr a.rights-contact-link {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.home-ftr a.rights-contact-link:hover {
+  opacity: 1;
+}
+
 .home-ftr-bottom {
   display: grid;
   gap: 6px;
