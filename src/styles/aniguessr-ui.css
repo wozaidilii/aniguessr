@@ -1399,6 +1399,7 @@ a.rights-contact-link:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: calc(100vw - 16px);
   transform: translateX(-50%);
   padding: 8px 12px;
   border: 1px solid #e5e3de;
@@ -1406,7 +1407,13 @@ a.rights-contact-link:hover {
   background: #fff;
   color: #1f2430;
   font-size: 12.5px;
+  white-space: nowrap;
   box-shadow: 0 8px 24px rgba(31, 36, 48, 0.08);
+}
+
+.ag-prog span {
+  flex: none;
+  white-space: nowrap;
 }
 
 .ag-final-pair {
@@ -1426,6 +1433,7 @@ a.rights-contact-link:hover {
 .ag-prog i {
   width: 36px;
   height: 4px;
+  flex: none;
   border-radius: 9px;
   background: #e5e3de;
 }
@@ -1742,6 +1750,12 @@ a.rights-contact-link:hover {
 
   .ag-prog {
     bottom: 16px;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .ag-prog i {
+    width: 12px;
   }
 
   .ag-scoreline b {
