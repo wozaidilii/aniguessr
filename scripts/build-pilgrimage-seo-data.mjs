@@ -21,6 +21,7 @@ import {
   buildUrlSetXml,
   chunkSitemapPaths,
   resolveSiteOrigin,
+  rightsSitemapItem,
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 
@@ -51,6 +52,7 @@ const PUBLIC_ROUTES = [
   ["/game/history-tuxun", 0.6],
   ["/character", 0.6],
   ["/login", 0.3],
+  ["/privacy", 0.4],
 ];
 
 function subjectIdFromQuestion(question) {
@@ -652,6 +654,7 @@ async function main() {
 
   const pilgrimageSitemapPath = (route) =>
     route === "/" ||
+    route === "/privacy" ||
     route === "/pilgrimage" ||
     route.startsWith("/pilgrimage/");
   const canonicalPaths = PUBLIC_ROUTES.map(([route, priority]) => ({
@@ -659,6 +662,7 @@ async function main() {
     priority,
     zhTw: pilgrimageSitemapPath(route),
   }));
+  canonicalPaths.push(rightsSitemapItem());
   for (const anime of animes) {
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,

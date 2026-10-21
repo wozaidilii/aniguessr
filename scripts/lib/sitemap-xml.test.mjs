@@ -6,6 +6,7 @@ import {
   buildUrlSetXml,
   buildZhTwOnlySitemapEntries,
   chunkSitemapPaths,
+  rightsSitemapItem,
 } from "./sitemap-xml.mjs";
 
 describe("static sitemap XML", () => {
@@ -61,6 +62,36 @@ describe("static sitemap XML", () => {
     expect(JSON.stringify(uncovered)).not.toContain("zh-Hant");
   });
 
+  it("lists the rights page in every locale, including zh-TW alternates", () => {
+    const item = rightsSitemapItem();
+    expect(item).toEqual({ path: "/rights", priority: 0.4, zhTw: true });
+    const entries = buildLocalizedSitemapEntries(
+      "https://aniguessr.ayiora.com",
+      item.path,
+      item.priority,
+      "2026-10-21",
+      { zhTw: item.zhTw },
+    );
+    expect(entries.map((entry) => entry.loc)).toEqual([
+      "https://aniguessr.ayiora.com/zh/rights",
+      "https://aniguessr.ayiora.com/ja/rights",
+      "https://aniguessr.ayiora.com/en/rights",
+      "https://aniguessr.ayiora.com/zh-tw/rights",
+    ]);
+    for (const entry of entries) {
+      expect(entry.languages.zh).toBe("https://aniguessr.ayiora.com/zh/rights");
+      expect(entry.languages.ja).toBe("https://aniguessr.ayiora.com/ja/rights");
+      expect(entry.languages.en).toBe("https://aniguessr.ayiora.com/en/rights");
+      expect(entry.languages["zh-Hant"]).toBe(
+        "https://aniguessr.ayiora.com/zh-tw/rights",
+      );
+      expect(entry.languages["zh-TW"]).toBe(entry.languages["zh-Hant"]);
+      expect(entry.languages["x-default"]).toBe(
+        "https://aniguessr.ayiora.com/en/rights",
+      );
+    }
+  });
+
   it("builds an index that points at public sitemap paths", () => {
     const xml = buildSitemapIndexXml([
       "https://aniguessr.ayiora.com/sitemap/0.xml",
@@ -80,7 +111,9 @@ describe("static sitemap XML", () => {
       "2026-10-20",
     );
     expect(entries).toHaveLength(1);
-    expect(entries[0].loc).toBe("https://aniguessr.ayiora.com/zh-tw/pilgrimage");
+    expect(entries[0].loc).toBe(
+      "https://aniguessr.ayiora.com/zh-tw/pilgrimage",
+    );
     expect(entries[0].languages.zh).toBeUndefined();
     expect(entries[0].languages["zh-TW"]).toBe(entries[0].loc);
 

@@ -86,6 +86,11 @@ export function buildLocalizedSitemapEntries(
   }));
 }
 
+/** /rights exists in zh, ja, en, and zh-tw, with zh-Hant and zh-TW alternates. */
+export function rightsSitemapItem() {
+  return { path: "/rights", priority: 0.4, zhTw: true };
+}
+
 /** A document that exists only in zh-TW. Not an alternate of the zh/ja/en page. */
 export function buildZhTwOnlySitemapEntries(
   origin,

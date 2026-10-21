@@ -10,6 +10,8 @@ describe("login-copy", () => {
     expect(getLoginCopy("zh").modeLabel.password).toBe("登录");
     expect(getLoginCopy("ja").modeLabel.register).toBe("新規登録");
     expect(getLoginCopy("en").forgotPassword).toBe("Forgot password?");
+    expect(getLoginCopy("ja").privacyPolicy).toBe("プライバシーポリシー");
+    expect(getLoginCopy("en").privacyPolicy).toBe("Privacy Policy");
   });
 
   it("translates known auth error messages", () => {

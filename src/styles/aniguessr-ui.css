@@ -804,6 +804,32 @@
   text-decoration: none;
 }
 
+/* Same size and color as the shared anitabi attribution line. */
+a.rights-contact-link {
+  color: var(--dark-text-secondary, #c9c4bd);
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 2px;
+}
+
+a.rights-contact-link:hover {
+  opacity: 0.8;
+}
+
+/* Footer nav items share the column link style. The quiet size stays on attribution. */
+.ag-ftr ul a.rights-contact-link {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+.ag-ftr ul a.rights-contact-link:hover {
+  opacity: 1;
+}
+
 .ag-ftr-copy {
   display: flex;
   justify-content: space-between;

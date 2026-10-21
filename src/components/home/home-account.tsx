@@ -49,11 +49,7 @@ export function HomeAccount({ locale }: { locale: HomeLocale }) {
       setName(user.name);
       setCountry(user.countryCode ?? "");
       setMessage(profileCopy.saved);
-      capturePostHogEvent(
-        POSTHOG_EVENTS.profileUpdated,
-        { has_country: Boolean(user.countryCode) },
-        user.id,
-      );
+      capturePostHogEvent(POSTHOG_EVENTS.profileUpdated, {}, user.id);
     },
   });
 
@@ -88,7 +84,11 @@ export function HomeAccount({ locale }: { locale: HomeLocale }) {
               onChange={(event) => setName(event.target.value)}
             />
           </label>
-          <div className="home-flags" role="radiogroup" aria-label={profileCopy.country}>
+          <div
+            className="home-flags"
+            role="radiogroup"
+            aria-label={profileCopy.country}
+          >
             <button
               type="button"
               role="radio"
@@ -126,7 +126,9 @@ export function HomeAccount({ locale }: { locale: HomeLocale }) {
                 });
               }}
             >
-              {updateProfile.isPending ? profileCopy.saving : profileCopy.saveProfile}
+              {updateProfile.isPending
+                ? profileCopy.saving
+                : profileCopy.saveProfile}
             </button>
             <button
               type="button"
