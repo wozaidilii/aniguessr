@@ -2158,3 +2158,329 @@
     bottom: calc(min(78svh, 680px) + 12px);
   }
 }
+
+/* Homepage light theme. Scoped to .home so the game shell stays dark.
+   Privacy shares the .home class and keeps its dark document below. */
+.home {
+  --color-ani-bg: #f7f6f3;
+  --color-ani-text: #1f2430;
+  --color-ani-surface: #ffffff;
+  --color-ani-pink: #c2276b;
+  --color-ani-cyan: #0e8f8a;
+  --ag-bg: #f7f6f3;
+  --ag-s1: #ffffff;
+  --ag-tx: #1f2430;
+  --ag-tx2: #3d4452;
+  --ag-tx3: #646b79;
+  --ag-tx4: #646b79;
+  --ag-line: #e5e3de;
+  --ag-line2: #e5e3de;
+  --ag-pink: #c2276b;
+  --ag-cyan: #0e8f8a;
+  min-height: 100vh;
+  background: #f7f6f3;
+  color: #1f2430;
+}
+
+.home a:focus-visible,
+.home button:focus-visible,
+.home-hdr a:focus-visible,
+.home-hdr button:focus-visible {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #1f2430;
+}
+
+.home-hdr {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid #e5e3de;
+}
+
+.home-nav {
+  color: #3d4452;
+}
+
+.home-nav a:hover,
+.home-more:hover,
+.home-ftr a:hover {
+  color: #1f2430;
+}
+
+.home-nav a[aria-current="page"],
+.home-sheet-nav > a[aria-current="page"] {
+  color: #c2276b;
+  font-weight: 700;
+}
+
+.home-lang {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+}
+
+.home-lang a {
+  color: #646b79;
+}
+
+.home-lang a[aria-current="true"] {
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.home-lang-current {
+  color: #1f2430;
+}
+
+.home-login {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-btn-primary,
+.home-popup-go,
+.home-spot-actions a:first-child {
+  background: #c2276b;
+  color: #ffffff;
+}
+
+.home-btn-secondary,
+.home-popup-alt,
+.home-spot-actions a:last-child {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-burger i {
+  background: #1f2430;
+}
+
+.home-sheet-nav {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e3de;
+}
+
+.home-sheet-nav > a {
+  color: #1f2430;
+}
+
+.home .ag-profile {
+  border-color: #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.16);
+}
+
+.home .ag-profile h2,
+.home-account label {
+  color: #1f2430;
+}
+
+.home .ag-profile input,
+.home-flags button {
+  border-color: #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-h1,
+.home-mapbar,
+.home-stats dd {
+  color: #1f2430;
+}
+
+.home-accent,
+.home-more,
+.home-play-links a,
+.home-search-icon,
+.home-popular-chip small,
+.home-glyph,
+.home-steps span,
+.home-eyebrow {
+  color: #c2276b;
+}
+
+.home-intro,
+.home-sec-h p,
+.home-steps p,
+.home-ftr-tag {
+  color: #3d4452;
+}
+
+.home-privacy,
+.home-stats dt,
+.home-kicker,
+.home-empty,
+.home-ftr h2,
+.home-credit,
+.home-copyline,
+.home-work small,
+.home-spot-top p,
+.home-spot-dist span,
+.home-nearby-head p:not(.home-nearby-label) {
+  color: #646b79;
+}
+
+.home-mapbar,
+.home-map-float {
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-search-field {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-search-field input,
+.home-search-clear,
+.home-search-results button {
+  color: #1f2430;
+}
+
+.home-nearby-panel,
+.home-nearby-sheet {
+  border-color: #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-nearby-sheet {
+  box-shadow: 0 -8px 24px rgba(31, 36, 48, 0.12);
+}
+
+.home-grab span {
+  background: rgba(31, 36, 48, 0.28);
+}
+
+.home-nearby-head .home-nearby-label,
+.home-spot-top a,
+.home-drawer-close {
+  color: #1f2430;
+}
+
+.home-spot-n {
+  background: #fdeef5;
+  color: #c2276b;
+}
+
+.home-sheet-pills a,
+.home-tags a {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-area,
+.home-work,
+.home-steps li,
+.home-play,
+.home-row {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-area small {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f7a8d0;
+  color: #1f2430;
+  font-weight: 700;
+}
+
+.home-glyph {
+  background: #fdeef5;
+}
+
+.home-game {
+  border-top: 0;
+  background: #fdeef5;
+}
+
+.home-play-art > span {
+  background: rgba(255, 255, 255, 0.88);
+  color: #1f2430;
+}
+
+.home-seg button {
+  border: 1px solid #e5e3de;
+  background: #ffffff;
+  color: #1f2430;
+}
+
+.home-seg button[aria-pressed="true"] {
+  border-color: #1f2430;
+  background: #1f2430;
+  color: #ffffff;
+}
+
+.home-row.is-me {
+  border-color: #c2276b;
+}
+
+.home-avatar {
+  background-color: #eef0ec;
+}
+
+.home-ftr {
+  background: #ffffff;
+  border-top: 1px solid #e5e3de;
+}
+
+.home-geo-note {
+  background: #ffffff;
+  color: #1f2430;
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.16);
+}
+
+.home-popup-title {
+  color: #1f2430;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.home-popup-anime {
+  color: #646b79;
+}
+
+.home-map .maplibregl-popup-content {
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1f2430;
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.16);
+}
+
+.home-map .maplibregl-popup-close-button {
+  color: #646b79;
+}
+
+.home-map .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: #ffffff;
+}
+
+.home-map .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: #ffffff;
+}
+
+.home-map .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: #ffffff;
+}
+
+.home-map .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: #ffffff;
+}
+
+.home.privacy-page {
+  --color-ani-bg: #0a0612;
+  --color-ani-text: #fff7fb;
+  --ag-bg: #0a0612;
+  --ag-tx: #fff7fb;
+  --ag-pink: #f9a8d4;
+  --ag-cyan: #67e8f9;
+  min-height: 100vh;
+  background: #0a0612;
+  color: #f6f0f8;
+}

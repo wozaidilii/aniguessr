@@ -18,6 +18,17 @@ export function isLocalePrefixedPilgrimagePath(pathname: string): boolean {
 }
 
 /**
+ * The bare hub index now lives on the locale homepage.
+ * `/{locale}/pilgrimage` → `/{locale}`, and `/pilgrimage` → `/`.
+ * Anime, area, and spot URLs are not the hub and return null.
+ */
+export function pilgrimageHubRedirectTarget(pathname: string): string | null {
+  const { locale, pathname: inner } = splitLocalePath(pathname);
+  if (inner !== "/pilgrimage") return null;
+  return locale ? `/${locale}` : "/";
+}
+
+/**
  * `/{locale}/privacy`. Same CDN rule as pilgrimage pages: no rewrite, no Set-Cookie.
  */
 export function isLocalePrefixedPrivacyPath(pathname: string): boolean {

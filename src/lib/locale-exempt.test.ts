@@ -127,12 +127,20 @@ describe("locale middleware exemptions", () => {
     expect(current.headers.get("location")).toBeNull();
   });
 
-  it("still redirects unprefixed pages to a locale", () => {
-    const response = middleware(request("/pilgrimage"));
-    expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(
-      "https://aniguessr.ayiora.com/en/pilgrimage",
-    );
+  it("308s the pilgrimage hub to the homepage and does not Set-Cookie", () => {
+    for (const [pathname, location] of [
+      ["/pilgrimage", "https://aniguessr.ayiora.com/"],
+      ["/ja/pilgrimage", "https://aniguessr.ayiora.com/ja"],
+      ["/zh/pilgrimage", "https://aniguessr.ayiora.com/zh"],
+      ["/en/pilgrimage", "https://aniguessr.ayiora.com/en"],
+      ["/zh-tw/pilgrimage", "https://aniguessr.ayiora.com/zh-tw"],
+      ["/ja/pilgrimage/", "https://aniguessr.ayiora.com/ja/"],
+    ] as const) {
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(308);
+      expect(response.headers.get("location")).toBe(location);
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
   });
 
   it("keeps the pilgrimage ISR window at one day", () => {
@@ -141,11 +149,9 @@ describe("locale middleware exemptions", () => {
 
   it("serves locale-prefixed pilgrimage URLs without rewrite or Set-Cookie", () => {
     for (const pathname of [
-      "/ja/pilgrimage",
       "/zh/pilgrimage/locations",
       "/en/pilgrimage/spots/anitabi_1_2",
       "/ja/pilgrimage/anime/123-title",
-      "/zh-tw/pilgrimage",
       "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
       "/ja/pilgrimage/spots/anitabi_1_2/opengraph-image",
@@ -171,7 +177,7 @@ describe("locale middleware exemptions", () => {
     expect(game.headers.get("set-cookie")).toBeNull();
 
     const preferred = middleware(
-      new NextRequest(new URL("https://aniguessr.ayiora.com/pilgrimage"), {
+      new NextRequest(new URL("https://aniguessr.ayiora.com/login"), {
         headers: {
           host: "aniguessr.ayiora.com",
           "accept-language": "zh-TW,zh;q=0.9",
@@ -180,7 +186,7 @@ describe("locale middleware exemptions", () => {
     );
     expect(preferred.status).toBe(307);
     expect(preferred.headers.get("location")).toBe(
-      "https://aniguessr.ayiora.com/zh/pilgrimage",
+      "https://aniguessr.ayiora.com/zh/login",
     );
   });
 

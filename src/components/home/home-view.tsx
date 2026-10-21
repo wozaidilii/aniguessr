@@ -52,7 +52,7 @@ export function HomeView({
   popularAnime: PopularAnimeChip[];
 }) {
   const copy = getHomePageCopy(locale);
-  const nearbyHref = withPilgrimageLocale("/pilgrimage#nearby", locale);
+  const nearbyHref = withPilgrimageLocale("/", locale);
   const htmlLang = locale === "zh-tw" ? "zh-Hant" : locale;
 
   return (

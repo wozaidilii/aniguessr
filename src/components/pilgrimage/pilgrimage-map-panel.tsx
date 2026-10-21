@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { PilgrimageMapLoader } from "~/components/pilgrimage/pilgrimage-map-loader";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { type PilgrimageLocale, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
+import {
+  type PilgrimageLocale,
+  withPilgrimageLocale,
+} from "~/lib/pilgrimage-locale";
 
 export function PilgrimageMapPanel({
   locale,
@@ -18,7 +21,7 @@ export function PilgrimageMapPanel({
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <h2 className="text-xl font-black text-white">{copy.mapTitle}</h2>
         <Link
-          href={withPilgrimageLocale("/pilgrimage#favorites", locale)}
+          href={withPilgrimageLocale("/", locale)}
           className="text-sm font-bold text-cyan-100/80 hover:text-cyan-50"
         >
           {copy.editFavorites}

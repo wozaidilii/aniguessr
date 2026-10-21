@@ -12,6 +12,7 @@ import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   isLocalePrefixedPilgrimagePath,
   isLocalePrefixedPrivacyPath,
+  pilgrimageHubRedirectTarget,
 } from "~/lib/pilgrimage-cache";
 import { isLocalePrefixedRightsPath } from "~/lib/rights-contact";
 import { splitLocalePath } from "~/lib/pilgrimage-locale";
@@ -106,6 +107,14 @@ export function middleware(request: NextRequest) {
   // Static XML from the data build. This does not look at User-Agent.
   const sitemapRewrite = rewriteStaticSitemap(request);
   if (sitemapRewrite) return sitemapRewrite;
+
+  // The hub index is the homepage. Subpaths stay. Do not Set-Cookie.
+  const hubTarget = pilgrimageHubRedirectTarget(request.nextUrl.pathname);
+  if (hubTarget) {
+    const url = request.nextUrl.clone();
+    url.pathname = hubTarget;
+    return NextResponse.redirect(url, 308);
+  }
 
   // /zh-tw is pilgrimage-only. Do not 307 it onto /en/zh-tw, and do not
   // Set-Cookie: partial Traditional coverage must stay CDN-cacheable.

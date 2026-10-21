@@ -90,7 +90,7 @@ export function HomeNearby({
   }, [limit, locale]);
 
   const title = copy.aroundCount(inView);
-  const nearbyHref = withPilgrimageLocale("/pilgrimage#nearby", locale);
+  const nearbyHref = withPilgrimageLocale("/", locale);
   const openClass = open ? " is-open" : "";
 
   return (
@@ -182,7 +182,7 @@ export function HomeNearby({
               <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
                 {copy.searchPill}
               </a>
-              <a href={withPilgrimageLocale("/pilgrimage#favorites", locale)}>
+              <a href={withPilgrimageLocale("/", locale)}>
                 {copy.favoritesPill}
               </a>
             </div>

@@ -1,12 +1,9 @@
 import { HOME_LANG_LINKS } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
-import {
-  splitLocalePath,
-  withPilgrimageLocale,
-} from "~/lib/pilgrimage-locale";
+import { splitLocalePath, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 export interface SiteNavLink {
-  id: "map" | "anime" | "areas" | "game" | "rank";
+  id: "anime" | "areas" | "game" | "rank";
   href: string;
 }
 
@@ -17,7 +14,10 @@ export interface SiteNavLanguage {
 }
 
 /** Shared header targets. Logo always returns to /{locale}. Game and rank stay on the homepage hash. */
-export function siteNavModel(pathname: string, locale: HomeLocale): {
+export function siteNavModel(
+  pathname: string,
+  locale: HomeLocale,
+): {
   home: string;
   links: SiteNavLink[];
   languages: SiteNavLanguage[];
@@ -28,7 +28,6 @@ export function siteNavModel(pathname: string, locale: HomeLocale): {
   return {
     home,
     links: [
-      { id: "map", href: withPilgrimageLocale("/pilgrimage", locale) },
       { id: "anime", href: withPilgrimageLocale("/pilgrimage/anime", locale) },
       {
         id: "areas",

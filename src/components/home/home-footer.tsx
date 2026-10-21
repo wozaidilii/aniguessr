@@ -29,11 +29,6 @@ export function HomeFooter({ locale }: { locale: HomeLocale }) {
             <h2>{copy.footerMap}</h2>
             <ul>
               <li>
-                <a href={withPilgrimageLocale("/pilgrimage", locale)}>
-                  {copy.navMap}
-                </a>
-              </li>
-              <li>
                 <a href={withPilgrimageLocale("/pilgrimage/anime", locale)}>
                   {copy.navAnime}
                 </a>

@@ -6,6 +6,7 @@ import {
   isZhTwCoveredLocationSlug,
   withPilgrimageLocale,
 } from "~/lib/pilgrimage-locale";
+import { dropDistrictPrefix } from "~/lib/home-area-label";
 import type { HomeLocale } from "~/lib/home-locale";
 
 const AREA_LIMIT = 8;
@@ -279,7 +280,7 @@ export function buildHomeCatalog(
       }
     }
     const location = locationBySlug.get(bestSlug);
-    return location ? homeLabel(location.name, locale) : "";
+    return location ? dropDistrictPrefix(homeLabel(location.name, locale)) : "";
   }
 
   const animeCards: HomeAnimeCard[] = shownAnime
