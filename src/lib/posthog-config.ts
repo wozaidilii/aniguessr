@@ -1,3 +1,5 @@
+import { buildPostHogBeforeSendHook } from "~/lib/posthog-privacy";
+
 const DEFAULT_POSTHOG_HOST = "https://us.i.posthog.com";
 
 function normalizeEnvValue(value: string | undefined) {
@@ -31,7 +33,8 @@ posthog.init(${JSON.stringify(projectToken)}, {
   person_profiles: "identified_only",
   autocapture: false,
   capture_pageview: false,
-  disable_session_recording: true
+  disable_session_recording: true,
+  before_send: ${buildPostHogBeforeSendHook()}
 });
 `.trim();
 }

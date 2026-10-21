@@ -107,6 +107,35 @@ describe("posthog helpers", () => {
     );
   });
 
+  it("strips display names from url properties before they are captured", async () => {
+    const posthog = posthogBrowser();
+    vi.stubGlobal("window", { posthog });
+    const { capturePostHogEvent, POSTHOG_EVENTS } =
+      await importPostHogWithKey();
+
+    capturePostHogEvent(
+      POSTHOG_EVENTS.pageViewed,
+      {
+        $current_url:
+          "https://aniguessr.ayiora.com/ja/battle/ABC?name=Sakura&userId=player-1",
+        search: "?name=Sakura&userId=player-1",
+        auth_state: "logged_in",
+      },
+      "player-1",
+    );
+
+    expect(posthog.capture).toHaveBeenCalledWith(
+      "$pageview",
+      expect.objectContaining({
+        $current_url:
+          "https://aniguessr.ayiora.com/ja/battle/ABC?userId=player-1",
+        search: "?userId=player-1",
+        auth_state: "logged_in",
+        app: "aniguessr",
+      }),
+    );
+  });
+
   it("uses the official ingestion endpoint when the SDK is not ready", async () => {
     const sendBeacon = vi.fn(() => true);
     vi.stubEnv("NEXT_PUBLIC_POSTHOG_HOST", "https://us.i.posthog.com/");
@@ -167,5 +196,7 @@ describe("posthog browser init", () => {
     expect(snippet).toContain("autocapture: false");
     expect(snippet).toContain("capture_pageview: false");
     expect(snippet).toContain("disable_session_recording: true");
+    expect(snippet).toContain("before_send:");
+    expect(snippet).not.toContain("sanitize_properties");
   });
 });

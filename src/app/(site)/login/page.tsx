@@ -115,13 +115,7 @@ export default function LoginPage() {
   ) => {
     savePlayerSession(session);
     identifyPostHogUser(session.user);
-    capturePostHogEvent(
-      eventName,
-      {
-        provider: session.user.provider ?? "password",
-      },
-      session.user.id,
-    );
+    capturePostHogEvent(eventName, {}, session.user.id);
     router.replace(getNextUrl());
   };
 

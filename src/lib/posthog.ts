@@ -3,6 +3,7 @@ import {
   buildPostHogCaptureUrl,
   POSTHOG_PROJECT_TOKEN,
 } from "~/lib/posthog-config";
+import { sanitizePostHogProperties } from "~/lib/posthog-privacy";
 import { type PlayerProfile } from "~/types/player";
 
 let lastIdentifiedUserId: string | null = null;
@@ -95,7 +96,9 @@ export function capturePostHogEvent(
 ) {
   if (!POSTHOG_PROJECT_TOKEN || typeof window === "undefined") return;
 
-  const eventProperties = withBaseProperties(properties, distinctId);
+  const eventProperties = sanitizePostHogProperties(
+    withBaseProperties(properties, distinctId),
+  );
 
   if (window.posthog?.capture) {
     try {
