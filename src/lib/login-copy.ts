@@ -1,13 +1,11 @@
-import {
-  ANIME_LOCALES,
-  type AnimeLocale,
-} from "~/lib/anime-locale";
+import { ANIME_LOCALES, type AnimeLocale } from "~/lib/anime-locale";
 
 export type AuthMode = "password" | "register" | "reset";
 
 export type LoginCopy = {
   lang: string;
   backHome: string;
+  privacyPolicy: string;
   languageLabel: string;
   accountActionsLabel: string;
   modeLabel: Record<AuthMode, string>;
@@ -54,6 +52,7 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
   zh: {
     lang: "中文",
     backHome: "返回首页",
+    privacyPolicy: "隐私政策",
     languageLabel: "语言",
     accountActionsLabel: "账号操作",
     modeLabel: {
@@ -117,6 +116,7 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
   ja: {
     lang: "日本語",
     backHome: "ホームへ戻る",
+    privacyPolicy: "プライバシーポリシー",
     languageLabel: "言語",
     accountActionsLabel: "アカウント操作",
     modeLabel: {
@@ -161,8 +161,7 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
     debugCodeLabel: "デバッグコード:",
     resetCodeSentDebug:
       "開発環境ではメール送信が未設定です。下のデバッグコードでパスワードを再設定してください。",
-    resetCodeSent:
-      "このメールが登録済みの場合、確認コードが送信されます。",
+    resetCodeSent: "このメールが登録済みの場合、確認コードが送信されます。",
     googleErrorDefault:
       "Google ログインに失敗しました。後でもう一度試すか、メールログインを使ってください。",
     googleErrors: {
@@ -185,6 +184,7 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
   en: {
     lang: "English",
     backHome: "Back home",
+    privacyPolicy: "Privacy Policy",
     languageLabel: "Language",
     accountActionsLabel: "Account actions",
     modeLabel: {
@@ -229,12 +229,12 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
     debugCodeLabel: "Debug code:",
     resetCodeSentDebug:
       "Email delivery is not configured in development. Use the debug code below to reset your password.",
-    resetCodeSent: "If this email is registered, a reset code will be sent to it.",
+    resetCodeSent:
+      "If this email is registered, a reset code will be sent to it.",
     googleErrorDefault:
       "Google login failed. Try again later or use email login.",
     googleErrors: {
-      google:
-        "Google login failed. Try again later or use email login.",
+      google: "Google login failed. Try again later or use email login.",
       google_unknown:
         "Google login failed. Try again later or use email login.",
       google_state:
@@ -251,15 +251,11 @@ const COPY: Record<AnimeLocale, LoginCopy> = {
   },
 };
 
-const AUTH_ERROR_MESSAGES: Record<
-  AnimeLocale,
-  Record<string, string>
-> = {
+const AUTH_ERROR_MESSAGES: Record<AnimeLocale, Record<string, string>> = {
   zh: {
     "Your session has expired. Please log in again.":
       "登录状态已过期，请重新登录。",
-    "The code has expired. Request a new one.":
-      "验证码已过期，请重新获取。",
+    "The code has expired. Request a new one.": "验证码已过期，请重新获取。",
     "The code is incorrect.": "验证码不正确。",
     "Too many incorrect attempts. Request a new code.":
       "错误次数过多，请重新获取验证码。",
@@ -272,8 +268,7 @@ const AUTH_ERROR_MESSAGES: Record<
     "This username is already taken. Try another one.":
       "该用户名已被占用，请换一个。",
     "Incorrect account or password.": "账号或密码不正确。",
-    "This account cannot reset a password.":
-      "该账号无法重置密码。",
+    "This account cannot reset a password.": "该账号无法重置密码。",
   },
   ja: {
     "Your session has expired. Please log in again.":

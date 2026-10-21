@@ -133,23 +133,39 @@ describe("posthog helpers", () => {
     identifyPostHogUser(player());
     identifyPostHogUser(player({ name: "Sakura Prime" }));
 
-    expect(posthog.identify).toHaveBeenLastCalledWith(
+    expect(posthog.identify).toHaveBeenCalledTimes(2);
+    expect(posthog.identify).toHaveBeenNthCalledWith(1, "player-1");
+    expect(posthog.identify).toHaveBeenNthCalledWith(2, "player-1");
+    expect(posthog.identify).not.toHaveBeenCalledWith(
       "player-1",
-      expect.objectContaining({
-        country_code: "JP",
-        email: "player@example.com",
-        name: "Sakura Prime",
-        provider: "google",
-      }),
-    );
-    expect(posthog.capture).toHaveBeenCalledWith(
-      "player_identified",
-      expect.objectContaining({
-        app: "aniguessr",
-        has_country: true,
-        provider: "google",
-      }),
+      expect.anything(),
     );
     expect(posthog.capture).toHaveBeenCalledTimes(1);
+    expect(posthog.capture).toHaveBeenCalledWith(
+      "player_identified",
+      expect.objectContaining({ app: "aniguessr" }),
+    );
+    expect(posthog.capture).toHaveBeenCalledWith("player_identified", {
+      asymmetricMatch(properties: unknown) {
+        if (typeof properties !== "object" || properties === null) return false;
+        return (
+          !Object.prototype.hasOwnProperty.call(properties, "email") &&
+          !Object.prototype.hasOwnProperty.call(properties, "name") &&
+          !Object.prototype.hasOwnProperty.call(properties, "provider") &&
+          !Object.prototype.hasOwnProperty.call(properties, "country_code") &&
+          !Object.prototype.hasOwnProperty.call(properties, "has_country")
+        );
+      },
+    });
+  });
+});
+
+describe("posthog browser init", () => {
+  it("keeps autocapture off and disables session recording", async () => {
+    const { buildPostHogSnippet } = await import("~/lib/posthog-config");
+    const snippet = buildPostHogSnippet("phc_test", "https://us.i.posthog.com");
+    expect(snippet).toContain("autocapture: false");
+    expect(snippet).toContain("capture_pageview: false");
+    expect(snippet).toContain("disable_session_recording: true");
   });
 });

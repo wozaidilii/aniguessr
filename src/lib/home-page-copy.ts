@@ -74,6 +74,7 @@ export interface HomePageCopy {
   footerMap: string;
   footerGame: string;
   footerBrand: string;
+  footerPrivacy: string;
   footerCopy: string;
   contactGeneral: string;
   contactSupport: string;
@@ -208,6 +209,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     footerMap: "MAP",
     footerGame: "GAME",
     footerBrand: "AYIORA",
+    footerPrivacy: "プライバシーポリシー",
     footerCopy: "© 2026 Ayiora",
     contactGeneral: "提携・ご提案",
     contactSupport: "不具合・バグ報告",
@@ -304,6 +306,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     footerMap: "MAP",
     footerGame: "GAME",
     footerBrand: "AYIORA",
+    footerPrivacy: "隐私政策",
     footerCopy: "© 2026 Ayiora",
     contactGeneral: "合作与提案",
     contactSupport: "问题与故障",
@@ -400,6 +403,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     footerMap: "MAP",
     footerGame: "GAME",
     footerBrand: "AYIORA",
+    footerPrivacy: "隱私權政策",
     footerCopy: "© 2026 Ayiora",
     contactGeneral: "合作與提案",
     contactSupport: "問題與故障",
@@ -497,6 +501,7 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     footerMap: "MAP",
     footerGame: "GAME",
     footerBrand: "AYIORA",
+    footerPrivacy: "Privacy Policy",
     footerCopy: "© 2026 Ayiora",
     contactGeneral: "Partnerships",
     contactSupport: "Bug reports",
@@ -511,26 +516,28 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
   },
 };
 
-export const HOME_SEO: Record<HomeLocale, { title: string; description: string }> =
-  {
-    ja: {
-      title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
-      description: HOME_PAGE_COPY.ja.intro,
-    },
-    zh: {
-      title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
-      description: HOME_PAGE_COPY.zh.intro,
-    },
-    "zh-tw": {
-      title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
-      description: HOME_PAGE_COPY["zh-tw"].intro,
-    },
-    en: {
-      title:
-        "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
-      description: HOME_PAGE_COPY.en.intro,
-    },
-  };
+export const HOME_SEO: Record<
+  HomeLocale,
+  { title: string; description: string }
+> = {
+  ja: {
+    title: "アニメ聖地巡礼マップ｜近くの聖地を探す - AniGuessr",
+    description: HOME_PAGE_COPY.ja.intro,
+  },
+  zh: {
+    title: "动漫圣地巡礼地图｜查找附近的动画取景地 - AniGuessr",
+    description: HOME_PAGE_COPY.zh.intro,
+  },
+  "zh-tw": {
+    title: "動漫聖地巡禮地圖｜尋找附近的動畫取景地 - AniGuessr",
+    description: HOME_PAGE_COPY["zh-tw"].intro,
+  },
+  en: {
+    title:
+      "Anime Pilgrimage Map: Real Life Anime Locations Near You | AniGuessr",
+    description: HOME_PAGE_COPY.en.intro,
+  },
+};
 
 export const HOME_LANG_LINKS: Array<{ locale: HomeLocale; label: string }> = [
   { locale: "ja", label: "日本語" },
@@ -551,7 +558,9 @@ export function homeDifficultyTiers(): readonly AnimeGuessrDifficultyTier[] {
 export function homePageMetadata(locale: HomeLocale): Metadata {
   const seo = HOME_SEO[locale];
   const canonical =
-    locale === "zh-tw" ? "/zh-tw" : withAnimeLocale("/", homeSiteLocale(locale));
+    locale === "zh-tw"
+      ? "/zh-tw"
+      : withAnimeLocale("/", homeSiteLocale(locale));
   const languages = localeAlternates("/");
   const zhTwUrl = absoluteUrl(withPilgrimageLocale("/", "zh-tw"));
   languages["zh-Hant"] = zhTwUrl;

@@ -13,6 +13,7 @@ import { type GoogleProfile } from "~/server/auth/google-oauth";
 import { classifyPlayerUniqueViolation } from "~/server/data/postgres-errors";
 import { hashPassword, verifyPassword } from "~/server/auth/password";
 import { sendEmailVerificationCode } from "~/server/email/verification-code";
+import { planPlayerAccountDeletion } from "~/server/data/player-account-deletion";
 import { sql } from "~/server/db/client";
 import {
   LEADERBOARD_EXCLUDED_NAMES,
@@ -1629,4 +1630,76 @@ export async function recordBattleHistory(input: {
   `;
 
   return toHistoryRecord(record!);
+}
+
+/**
+ * Deletes a player and the activity rows that still identify them.
+ *
+ * `player_activity_events.player_id` is ON DELETE SET NULL, so deleting the
+ * player alone would keep `email`. Rows are deleted by email first, then by
+ * player id. `game_sessions.user_id` is set null by the foreign key and those
+ * rows are kept because they no longer identify a person.
+ *
+ * A BEFORE DELETE trigger in db/schema.sql repeats the email and player-id
+ * cleanup, so a manual `DELETE FROM players` follows the same rule.
+ *
+ * TODO(photo-submissions): photo submissions do not exist yet. When they do,
+ * delete this player's submitted photos in this transaction before the player
+ * row is deleted.
+ *
+ * TODO(posthog-person): delete the PostHog person for this account. Feasible
+ * with the existing public project token (`POSTHOG_PROJECT_TOKEN` in
+ * src/lib/posthog-config.ts). Do not add a personal API key. Not implemented.
+ * Exact call:
+ *
+ * POST {POSTHOG_HOST}/i/v0/e/
+ * Content-Type: application/json
+ *
+ * {
+ *   "api_key": "<NEXT_PUBLIC_POSTHOG_KEY or NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN>",
+ *   "event": "$delete_person",
+ *   "distinct_id": "<player.id>"
+ * }
+ *
+ * Default host is https://us.i.posthog.com, so the URL is
+ * https://us.i.posthog.com/i/v0/e/ unless NEXT_PUBLIC_POSTHOG_HOST is set.
+ * `buildPostHogCaptureUrl()` builds that URL.
+ */
+export async function deletePlayerAccount(
+  playerId: string,
+): Promise<{ ok: true }> {
+  const [player] = await sql<{ id: string; email: string | null }[]>`
+    select id, email
+    from players
+    where id = ${playerId}
+    limit 1
+  `;
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  const plan = planPlayerAccountDeletion(player);
+
+  await sql.begin(async (tx) => {
+    if (plan.email) {
+      await tx`
+        delete from player_activity_events
+        where lower(email) = ${plan.email}
+      `;
+      await tx`
+        delete from player_email_verification_codes
+        where lower(email) = ${plan.email}
+      `;
+    }
+    await tx`
+      delete from player_activity_events
+      where player_id = ${plan.playerId}
+    `;
+    await tx`
+      delete from players
+      where id = ${plan.playerId}
+    `;
+  });
+
+  return { ok: true };
 }
