@@ -4,36 +4,36 @@
 
 .pilgrimage-map .maplibregl-popup-content {
   border-radius: 12px;
-  background: #140c1c;
-  color: #fff7fb;
+  background: #ffffff;
+  color: #1f2430;
   padding: 10px 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.16);
 }
 
 .pilgrimage-map .maplibregl-popup-close-button {
-  color: #fff;
+  color: #646b79;
   font-size: 16px;
   padding: 2px 6px;
 }
 
 .pilgrimage-map .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-  border-top-color: #140c1c;
+  border-top-color: #ffffff;
 }
 
 .pilgrimage-map .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-  border-bottom-color: #140c1c;
+  border-bottom-color: #ffffff;
 }
 
 .pilgrimage-map .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-  border-right-color: #140c1c;
+  border-right-color: #ffffff;
 }
 
 .pilgrimage-map .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-  border-left-color: #140c1c;
+  border-left-color: #ffffff;
 }
 
 .pilgrimage-map .pilgrimage-popup-link {
-  color: #cffafe;
+  color: #1f2430;
   font-weight: 800;
   text-decoration: none;
 }

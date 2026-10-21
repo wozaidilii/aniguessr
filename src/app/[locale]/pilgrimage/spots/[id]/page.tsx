@@ -33,7 +33,7 @@ import {
   pilgrimageHref,
   pilgrimageLocale,
   pilgrimageSiteHref,
-} from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+} from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;

@@ -8,11 +8,15 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
-import { HOME_FOCUS_WORK_EVENT } from "~/components/home/home-events";
+import {
+  focusHomeWork,
+  readHomeFocusWork,
+} from "~/components/home/home-events";
 import type { PopularAnimeChip } from "~/lib/popular-anime";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
+import { PILGRIMAGE_REDIRECT_MAP } from "~/lib/pilgrimage-redirects";
 import {
   matchPreparedAnimeTitles,
   prepareAnimeSearch,
@@ -27,6 +31,12 @@ import {
 interface HomeSearchHit extends AnimeSearchRecord {
   title: string;
   spotCount: number;
+}
+
+function workHref(subjectId: string, locale: HomeLocale): string {
+  const slug = PILGRIMAGE_REDIRECT_MAP.animeBySubjectId[subjectId];
+  const path = slug ? `/pilgrimage/anime/${slug}` : "/pilgrimage/anime";
+  return withPilgrimageLocale(path, locale);
 }
 
 function hitsFromCatalog(
@@ -44,14 +54,6 @@ function hitsFromCatalog(
       localizedNavText(titles, locale) || titles.ja || titles.en || titles.zh,
     spotCount: counts.get(subjectId) ?? 0,
   }));
-}
-
-function focusHomeWork(subjectId: string | null) {
-  window.dispatchEvent(
-    new CustomEvent(HOME_FOCUS_WORK_EVENT, {
-      detail: { subjectId },
-    }),
-  );
 }
 
 export function HomeWorkSearch({
@@ -73,6 +75,13 @@ export function HomeWorkSearch({
   const [ready, setReady] = useState(false);
   const [chipsOpen, setChipsOpen] = useState(true);
   const countTag = locale === "zh-tw" ? "zh-TW" : locale;
+
+  useEffect(() => {
+    const saved = readHomeFocusWork();
+    if (!saved.subjectId) return;
+    setSelectedId(saved.subjectId);
+    if (saved.title) setQuery(saved.title);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,10 +125,11 @@ export function HomeWorkSearch({
   }, [open]);
 
   function select(hit: { subjectId: string; title: string }) {
+    const href = workHref(hit.subjectId, locale);
     setQuery(hit.title);
     setSelectedId(hit.subjectId);
     setOpen(false);
-    focusHomeWork(hit.subjectId);
+    focusHomeWork(hit.subjectId, href, hit.title);
   }
 
   function clear() {
@@ -236,7 +246,19 @@ export function HomeWorkSearch({
                 <a
                   key={work.subjectId}
                   href={work.href}
-                  className="home-popular-chip"
+                  className={
+                    selectedId === work.subjectId
+                      ? "home-popular-chip is-selected"
+                      : "home-popular-chip"
+                  }
+                  aria-current={selectedId === work.subjectId ? "true" : undefined}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setQuery(work.title);
+                    setSelectedId(work.subjectId);
+                    setOpen(false);
+                    focusHomeWork(work.subjectId, work.href, work.title);
+                  }}
                 >
                   <b>{work.title}</b>
                   <small>{work.spotCount.toLocaleString(countTag)}</small>
@@ -250,8 +272,11 @@ export function HomeWorkSearch({
           <button
             type="button"
             className="home-popular-dismiss"
-            aria-label={copy.dismissPopular}
-            onClick={() => setChipsOpen(false)}
+            aria-label={selectedId ? copy.clearWorkFilter : copy.dismissPopular}
+            onClick={() => {
+              if (selectedId) clear();
+              else setChipsOpen(false);
+            }}
           >
             ×
           </button>

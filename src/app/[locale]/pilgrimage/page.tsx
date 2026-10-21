@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
-import { pilgrimageLocale } from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+import { pilgrimageLocale } from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
 import { homePageMetadata } from "~/lib/home-page-copy";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 

@@ -24,9 +24,9 @@ function asFilter(value: readonly unknown[]): FilterSpecification {
 
 export const DEFAULT_FAVORITES_ONLY = false;
 
-export const FAVORITE_COLOR = "#67e8f9";
-export const SPOT_COLOR = "#fb7185";
-export const CLUSTER_COLOR = "#f472b6";
+export const FAVORITE_COLOR = "#0e8f8a";
+export const SPOT_COLOR = "#f7a8d0";
+export const CLUSTER_COLOR = "#e86aa6";
 
 /** Sum `fav` through points and through clusters already aggregated. */
 export const FAVORITE_CLUSTER_SUM = [
@@ -75,7 +75,7 @@ export function spotClusterPaint(): CirclePaint {
     "circle-color": CLUSTER_COLOR,
     "circle-radius": CLUSTER_RADIUS,
     "circle-stroke-width": 1,
-    "circle-stroke-color": "#fff7fb",
+    "circle-stroke-color": "#e86aa6",
   };
 }
 
@@ -98,11 +98,11 @@ export function spotPointPaint(): CirclePaint {
     "circle-color": asExpr(["case", POINT_IS_FAVORITE, FAVORITE_COLOR, SPOT_COLOR]),
     "circle-radius": asExpr(["case", POINT_IS_FAVORITE, 7, 6]),
     "circle-stroke-width": asExpr(["case", POINT_IS_FAVORITE, 2.5, 1.5]),
-    "circle-stroke-color": asExpr([
+      "circle-stroke-color": asExpr([
       "case",
       POINT_IS_FAVORITE,
-      "#ecfeff",
-      "#fff7fb",
+      "#0e8f8a",
+      "#e86aa6",
     ]),
   };
 }

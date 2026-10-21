@@ -50,16 +50,16 @@
   --color-ocr-900: #0b4f4a;
   --color-ocr-action: #00776e;
   --color-ocr-action-hover: #0b4f4a;
-  --color-ani-bg: #0a0612;
-  --color-ani-surface: #0d081a;
-  --color-ani-surface-raised: #0f1020;
-  --color-ani-text: #fff7fb;
-  --color-ani-pink: #f9a8d4;
-  --color-ani-pink-soft: #f8e7ff;
-  --color-ani-cyan: #67e8f9;
-  --color-ani-cyan-soft: #cffafe;
-  --color-ani-action: #f9a8d4;
-  --color-ani-action-text: #0a0612;
+  --color-ani-bg: #f7f6f3;
+  --color-ani-surface: #ffffff;
+  --color-ani-surface-raised: #ffffff;
+  --color-ani-text: #1f2430;
+  --color-ani-pink: #c2276b;
+  --color-ani-pink-soft: #fdeef5;
+  --color-ani-cyan: #0e8f8a;
+  --color-ani-cyan-soft: #d7f3f1;
+  --color-ani-action: #c2276b;
+  --color-ani-action-text: #ffffff;
   --font-heading: "Sora", "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
   --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans Mono CJK JP", monospace;
@@ -154,12 +154,12 @@
   --color-bg: var(--color-ani-bg);
   --color-surface: var(--color-ani-surface);
   --color-text: var(--color-ani-text);
-  --color-border: rgba(255,255,255,.12);
+  --color-border: #e5e3de;
   --accent: var(--color-ani-pink);
   --accent-action: var(--color-ani-pink);
-  --accent-action-hover: var(--color-ani-pink-soft);
-  --accent-soft: rgba(249,168,212,.12);
-  --accent-border: rgba(103,232,249,.35);
+  --accent-action-hover: #a31f5b;
+  --accent-soft: #fdeef5;
+  --accent-border: #e5e3de;
 }
 @media (max-width: 767px) {
   :root {

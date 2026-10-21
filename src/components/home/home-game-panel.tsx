@@ -49,9 +49,13 @@ export function HomeGamePanel({ locale }: { locale: HomeLocale }) {
 
   return (
     <div className="home-play">
-      <div className="home-play-art" aria-hidden="true">
-        <GameArt />
-        <span>ROUND 1/5</span>
+      <div className="home-play-art">
+        <img
+          src={`/img/game-card/${locale}.svg`}
+          width={880}
+          height={500}
+          alt=""
+        />
       </div>
       <div className="home-play-body">
         <p className="home-kicker">{copy.difficultyLabel}</p>
@@ -125,33 +129,3 @@ export function HomeGamePanel({ locale }: { locale: HomeLocale }) {
   );
 }
 
-function GameArt() {
-  return (
-    <svg viewBox="0 0 480 190" className="home-play-svg">
-      <defs>
-        <linearGradient id="home-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fdeef5" />
-          <stop offset="1" stopColor="#f7f6f3" />
-        </linearGradient>
-      </defs>
-      <rect width="480" height="190" fill="url(#home-sky)" />
-      <circle cx="390" cy="48" r="18" fill="#ffffff" opacity="0.9" />
-      <path d="M0 128h480" stroke="#e5e3de" strokeWidth="2" />
-      <path d="M40 128 L120 78 L200 128" fill="#e8ebe4" />
-      <path d="M180 128 L280 64 L380 128" fill="#dce9f1" />
-      <path d="M0 150 L240 118 L480 150 L480 190 L0 190 Z" fill="#eef0ec" />
-      <path d="M220 150 L240 118 L260 150" fill="#c2276b" opacity="0.35" />
-      <text
-        x="240"
-        y="96"
-        textAnchor="middle"
-        fill="#c2276b"
-        fontSize="42"
-        fontFamily="Sora, sans-serif"
-        fontWeight="700"
-      >
-        ?
-      </text>
-    </svg>
-  );
-}

@@ -4,7 +4,7 @@ import { applySpotDisplayName } from "~/lib/spot-name-overrides";
 export const ANITABI_SITE = "https://anitabi.cn";
 export const CC_BY_NC_SA_4_URL =
   "https://creativecommons.org/licenses/by-nc-sa/4.0/";
-export const PILGRIMAGE_MAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
+export const PILGRIMAGE_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 export const SPOTS_NAV_URL = "/data/seo/spots-nav.json";
 
 export interface NavText {

@@ -18,6 +18,7 @@ import {
   withPilgrimageLocale,
 } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
+import { tuneHomeMapStyle } from "~/lib/home-map-style";
 import {
   PILGRIMAGE_MAP_STYLE,
   animeTitle,
@@ -101,6 +102,7 @@ export function PilgrimageMap({
     map.on("load", () => {
       loaded = true;
       window.clearTimeout(timer);
+      tuneHomeMapStyle(map, locale);
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -131,7 +133,7 @@ export function PilgrimageMap({
           "text-font": ["Noto Sans Regular"],
           "text-size": 12,
         },
-        paint: { "text-color": "#0a0612" },
+        paint: { "text-color": "#1f2430" },
       });
       const favoriteRing = spotFavoriteRing();
       map.addLayer({
@@ -297,12 +299,12 @@ export function PilgrimageMap({
         </div>
       ) : null}
       {visibleCount === 0 && !waiting && !error ? (
-        <p className="absolute bottom-8 left-3 z-10 max-w-[70%] rounded-lg bg-[#0a0612]/80 px-3 py-2 text-xs text-pink-50">
+        <p className="absolute bottom-8 left-3 z-10 max-w-[70%] rounded-lg border border-[#e5e3de] bg-white/95 px-3 py-2 text-xs text-[#3d4452]">
           {copy.mapEmpty}
         </p>
       ) : null}
       {waiting || error ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#0a0612]/70 p-4 text-center text-sm text-pink-100/80">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f7f6f3]/80 p-4 text-center text-sm text-[#3d4452]">
           {error ? (
             <button
               type="button"
@@ -376,8 +378,8 @@ function popupAction(href: string, label: string): HTMLAnchorElement {
   link.textContent = label;
   link.style.display = "inline-block";
   link.style.fontWeight = "800";
-  link.style.color = "#0a0612";
-  link.style.background = "#f9a8d4";
+  link.style.color = "#ffffff";
+  link.style.background = "#c2276b";
   link.style.borderRadius = "8px";
   link.style.padding = "6px 10px";
   return link;
@@ -411,7 +413,7 @@ function showSpotPopup(
     meta.textContent = spot.anime;
     meta.style.margin = "4px 0 0";
     meta.style.fontSize = "12px";
-    meta.style.color = "rgba(252, 231, 243, 0.75)";
+    meta.style.color = "#646b79";
     root.append(meta);
   }
   const actions = document.createElement("div");

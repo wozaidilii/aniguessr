@@ -26,7 +26,7 @@ import {
   PilgrimageSpotList,
   pilgrimageHref,
   pilgrimageLocale,
-} from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+} from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;

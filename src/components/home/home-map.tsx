@@ -57,14 +57,21 @@ function prefersReducedMotion(): boolean {
 /** Space labels need so they stay clear of the chip band or the search card. */
 function homeMapTopPadding(map: maplibregl.Map): number {
   if (window.matchMedia("(max-width: 1023px)").matches) return 56;
-  const stack = map
-    .getContainer()
-    .closest(".home-mapstage")
-    ?.querySelector(".home-map-searchstack");
+  const stack = document.querySelector(".home-map-searchstack");
   if (!stack) return 28;
   const mapTop = map.getContainer().getBoundingClientRect().top;
   const cardBottom = stack.getBoundingClientRect().bottom;
   return Math.max(28, Math.ceil(cardBottom - mapTop + 8));
+}
+
+/** Keep focused spots above the mobile sheet and the desktop search card. */
+function homeMapBottomPadding(map: maplibregl.Map): number {
+  if (!window.matchMedia("(max-width: 1023px)").matches) return 48;
+  const sheet = document.querySelector(".home-nearby-sheet");
+  const mapRect = map.getContainer().getBoundingClientRect();
+  if (!sheet) return 112;
+  const sheetRect = sheet.getBoundingClientRect();
+  return Math.max(112, Math.ceil(mapRect.bottom - sheetRect.top + 16));
 }
 
 export function HomeMap({ locale }: { locale: HomeLocale }) {
@@ -269,14 +276,17 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       if (coords.length === 0) return;
       const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
       for (const coord of coords) bounds.extend(coord);
-      map.fitBounds(bounds, {
-        padding: {
-          top: homeMapTopPadding(map),
-          right: 48,
-          bottom: 48,
-          left: 48,
-        },
-        maxZoom: 14,
+      const padding = {
+        top: homeMapTopPadding(map),
+        right: 48,
+        bottom: homeMapBottomPadding(map),
+        left: 48,
+      };
+      const camera = map.cameraForBounds(bounds, { padding, maxZoom: 14 });
+      if (!camera?.center || camera.zoom == null) return;
+      map.easeTo({
+        center: camera.center,
+        zoom: Math.max(5, camera.zoom),
         duration: prefersReducedMotion() ? 0 : 600,
       });
       ensureYou();

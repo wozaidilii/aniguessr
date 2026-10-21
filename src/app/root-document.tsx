@@ -17,7 +17,11 @@ export function RootDocument({
   children: React.ReactNode;
 }) {
   return (
-    <html lang={locale} data-product="aniguessr" className={rootFontClassName}>
+    <html
+      lang={locale}
+      data-product="aniguessr"
+      className={`${rootFontClassName} site-light`}
+    >
       <body>
         <PostHogScript />
         <TRPCReactProvider>

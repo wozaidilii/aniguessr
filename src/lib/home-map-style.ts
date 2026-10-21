@@ -1,7 +1,7 @@
 import type { ExpressionSpecification, Map } from "maplibre-gl";
 import type { HomeLocale } from "~/lib/home-locale";
 
-/** Light basemap for the homepage. Pilgrimage pages stay on the dark style. */
+/** Light basemap shared by the homepage and pilgrimage mini maps. */
 export const HOME_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 export const HOME_IDEOGRAPH_FONT =

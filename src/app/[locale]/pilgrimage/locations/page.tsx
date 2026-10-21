@@ -12,7 +12,7 @@ import {
   PilgrimageShell,
   pilgrimageHref,
   pilgrimageLocale,
-} from "~/app/(pilgrimage)/[locale]/pilgrimage/_components/pilgrimage-ui";
+} from "~/app/[locale]/pilgrimage/_components/pilgrimage-ui";
 
 export const revalidate = 86_400;
 

@@ -1,17 +1,22 @@
 import "~/styles/globals.css";
 import "~/styles/home-page.css";
 
-import type { Metadata, Viewport } from "next";
+import { type Metadata, type Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import { RootDocument } from "~/app/root-document";
 import { PersistAnimeLocale } from "~/components/PersistAnimeLocale";
+import { SiteShell } from "~/components/site/site-shell";
 import { isAnimeLocale } from "~/lib/anime-locale";
 import { HOME_LOCALES, isHomeLocale } from "~/lib/home-locale";
+import { htmlLangForPilgrimage } from "~/lib/pilgrimage-locale";
 import { SITE_NAME, SITE_URL } from "~/lib/seo";
+import { BRAND_NAME } from "~/lib/site-url";
+
+const HOME_TITLE = `${BRAND_NAME} | Anime Street-View Guessing Game`;
 
 export const revalidate = 86_400;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return HOME_LOCALES.map((locale) => ({ locale }));
@@ -29,8 +34,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isHomeLocale(locale)) return {};
+
   return {
     metadataBase: new URL(SITE_URL),
+    title: {
+      default: HOME_TITLE,
+      template: `%s · ${SITE_NAME}`,
+    },
     applicationName: SITE_NAME,
     robots: {
       index: true,
@@ -61,7 +71,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function HomeLocaleLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
@@ -70,11 +80,11 @@ export default async function HomeLocaleLayout({
 }) {
   const { locale } = await params;
   if (!isHomeLocale(locale)) notFound();
-  const htmlLang = locale === "zh-tw" ? "zh-Hant" : locale;
+
   return (
-    <RootDocument locale={htmlLang}>
+    <RootDocument locale={htmlLangForPilgrimage(locale)}>
       {isAnimeLocale(locale) ? <PersistAnimeLocale locale={locale} /> : null}
-      {children}
+      <SiteShell locale={locale}>{children}</SiteShell>
     </RootDocument>
   );
 }
