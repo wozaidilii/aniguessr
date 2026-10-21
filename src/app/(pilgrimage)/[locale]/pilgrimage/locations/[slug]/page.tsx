@@ -8,9 +8,11 @@ import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { withPilgrimageOg } from "~/lib/og/metadata";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
+import { loadLocationOg } from "~/server/og/load";
 import {
   listSpotsForLocation,
   pickLocalizedText,
@@ -66,12 +68,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   redirectLocationSlug(locale, resolved);
 
   const seo = locationPageSeo(locale, resolved.location);
-  return pilgrimagePageMetadata(
+  const metadata = pilgrimagePageMetadata(
     locale,
     `/pilgrimage/locations/${resolved.location.slug}`,
     seo.title,
     seo.description,
     true,
+  );
+  const og = loadLocationOg(locale, resolved.location.slug);
+  if (og.status !== "ready") return metadata;
+  return withPilgrimageOg(
+    metadata,
+    locale,
+    "locations",
+    resolved.location.slug,
+    og.card,
   );
 }
 

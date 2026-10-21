@@ -8,9 +8,11 @@ import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildAnimePageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { withPilgrimageOg } from "~/lib/og/metadata";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildAnimeFilmingListJsonLd } from "~/lib/structured-data";
 import { toFilmingLocation } from "~/server/data/filming-jsonld";
+import { loadAnimeOg } from "~/server/og/load";
 import {
   animeTitleIsAmbiguous,
   getAnimeBySlug,
@@ -75,13 +77,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!anime) return { title: "Not found" };
   redirectMergedAnime(locale, slug, anime);
   const seo = animePageSeo(locale, anime, anime.spotCount);
-  return pilgrimagePageMetadata(
+  const metadata = pilgrimagePageMetadata(
     locale,
     `/pilgrimage/anime/${anime.slug}`,
     seo.title,
     seo.description,
     true,
   );
+  const og = loadAnimeOg(locale, anime.slug);
+  if (og.status !== "ready") return metadata;
+  return withPilgrimageOg(metadata, locale, "anime", anime.slug, og.card);
 }
 
 export default async function PilgrimageAnimePage({ params }: Props) {

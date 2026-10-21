@@ -7,6 +7,11 @@ import "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
   transpilePackages: ["leaflet", "react-leaflet", "maplibre-gl"],
+  outputFileTracingIncludes: {
+    "/[locale]/pilgrimage/spots/[id]/opengraph-image": ["./assets/og-fonts/**/*"],
+    "/[locale]/pilgrimage/anime/[slug]/opengraph-image": ["./assets/og-fonts/**/*"],
+    "/[locale]/pilgrimage/locations/[slug]/opengraph-image": ["./assets/og-fonts/**/*"],
+  },
   async headers() {
     return [
       {
