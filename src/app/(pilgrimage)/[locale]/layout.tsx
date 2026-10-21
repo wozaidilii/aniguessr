@@ -87,6 +87,7 @@ export default async function PilgrimageLocaleLayout({
   return (
     <RootDocument locale={htmlLangForPilgrimage(locale)}>
       {isAnimeLocale(locale) ? <PersistAnimeLocale locale={locale} /> : null}
+      {/* Same header as the homepage, including over the map. */}
       {isHomeLocale(locale) ? <HomeHeader locale={locale} /> : null}
       {children}
     </RootDocument>
