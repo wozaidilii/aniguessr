@@ -25,6 +25,7 @@ export const PILGRIMAGE_COPY: Record<
     openMaps: string;
     relatedAnime: string;
     relatedLocation: string;
+    samePlaceAlso: (work: string) => string;
     emptyIndex: string;
     searchWorks: string;
     searchWorksEmpty: string;
@@ -93,6 +94,7 @@ export const PILGRIMAGE_COPY: Record<
     openMaps: "在 Google 地图打开",
     relatedAnime: "所属作品",
     relatedLocation: "所在地区",
+    samePlaceAlso: (work) => `同一地点也出现在《${work}》`,
     emptyIndex: "SEO 索引尚未生成，请先运行 npm run data:build-pilgrimage-seo",
     searchWorks: "搜索作品名",
     searchWorksEmpty: "没有找到相关作品",
@@ -161,6 +163,7 @@ export const PILGRIMAGE_COPY: Record<
     openMaps: "Google マップで開く",
     relatedAnime: "作品",
     relatedLocation: "地域",
+    samePlaceAlso: (work) => `同じ場所は《${work}》にも登場`,
     emptyIndex:
       "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
     searchWorks: "作品名で検索",
@@ -233,6 +236,7 @@ export const PILGRIMAGE_COPY: Record<
     openMaps: "Open in Google Maps",
     relatedAnime: "Anime",
     relatedLocation: "Region",
+    samePlaceAlso: (work) => `This place also appears in 《${work}》`,
     emptyIndex:
       "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
     searchWorks: "Search anime titles",
@@ -306,6 +310,7 @@ export const PILGRIMAGE_COPY: Record<
     openMaps: "在 Google 地圖開啟",
     relatedAnime: "所屬作品",
     relatedLocation: "所在地區",
+    samePlaceAlso: (work) => `同一地點也出現在《${work}》`,
     emptyIndex: "SEO 索引尚未生成，請先執行 npm run data:build-pilgrimage-seo",
     searchWorks: "搜尋作品名稱",
     searchWorksEmpty: "找不到相關作品",

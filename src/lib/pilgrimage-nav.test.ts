@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
+import { describe, expect, it } from "vitest";
 import {
   readFavoriteAnimeIds,
   toggleFavoriteAnimeId,
@@ -303,6 +303,7 @@ describe("pilgrimage navigation", () => {
     for (const locale of ["zh", "ja", "en", "zh-tw"] as const) {
       const copy = getPilgrimageCopy(locale);
       expect(copy.navigate.length).toBeGreaterThan(0);
+      expect(copy.samePlaceAlso("刀使ノ巫女")).toContain("刀使ノ巫女");
       expect(copy.formatDistance(0.25)).toMatch(/250/);
       expect(copy).not.toHaveProperty("openAnitabi");
       expect(copy).not.toHaveProperty("creditLead");

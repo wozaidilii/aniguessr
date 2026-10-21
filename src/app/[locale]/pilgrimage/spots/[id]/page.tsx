@@ -12,6 +12,7 @@ import {
   pickLocalizedText,
   pickMaybeLocalizedText,
 } from "~/lib/localized-text";
+import { samePlacePeerIds } from "~/lib/same-place-groups";
 import { spotPlaceName } from "~/lib/spot-name-overrides";
 import { screenshotCaption } from "~/lib/screenshot-caption";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -44,6 +45,42 @@ export const dynamicParams = true;
 
 export function generateStaticParams() {
   return [];
+}
+
+function samePlaceLinksFor(
+  spot: PilgrimageSpot,
+  locale: PilgrimageLocale,
+  labelFor: (work: string) => string,
+): { id: string; href: string; label: string }[] {
+  const peerIds = samePlacePeerIds(spot.id);
+  if (peerIds.length === 0) return [];
+  const members = [spot, ...peerIds.map((id) => getSpotById(id))].flatMap(
+    (item) => {
+      if (!item) return [];
+      const place = spotPlaceName(item, locale);
+      const work = pickLocalizedText(item.animeTitle, locale) || place;
+      return [{ id: item.id, place, work }];
+    },
+  );
+  return members
+    .filter((item) => item.id !== spot.id)
+    .map((item) => {
+      const repeated = members.filter(
+        (other) => other.work === item.work,
+      ).length;
+      const work =
+        repeated > 1 && item.place && item.place !== item.work
+          ? `${item.work} · ${item.place}`
+          : item.work;
+      return {
+        id: item.id,
+        href: pilgrimageHref(
+          `/pilgrimage/spots/${encodeSpotId(item.id)}`,
+          locale,
+        ),
+        label: labelFor(work),
+      };
+    });
 }
 
 function spotSeoFields(
@@ -124,6 +161,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
   const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
   const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
+  const samePlaceLinks = samePlaceLinksFor(spot, locale, copy.samePlaceAlso);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -170,6 +208,23 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
             {description}
           </p>
+          {samePlaceLinks.length > 0 ? (
+            <ul
+              className="mt-4 grid gap-1 text-sm leading-6"
+              data-testid="same-place-works"
+            >
+              {samePlaceLinks.map((item) => (
+                <li key={item.id}>
+                  <a
+                    href={item.href}
+                    className="text-cyan-100 hover:text-cyan-50"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
           {episode ? (
             <section className="mt-6">
@@ -254,7 +309,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               href={directionsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button whitespace-nowrap text-center text-sm"
+              className="anime-button text-center text-sm whitespace-nowrap"
             >
               {copy.navigate}
             </a>
@@ -262,7 +317,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               href={streetViewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button-secondary whitespace-nowrap text-center text-sm"
+              className="anime-button-secondary text-center text-sm whitespace-nowrap"
             >
               {copy.streetView}
             </a>
