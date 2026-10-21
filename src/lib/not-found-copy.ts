@@ -19,19 +19,19 @@ const COPY: Record<HomeLocale, NotFoundCopy> = {
     title: "找不到这个页面",
     body: "请检查地址，或从下面的页面继续。",
     home: "返回首页",
-    works: "按番剧浏览",
+    works: "按作品找",
   },
   "zh-tw": {
     title: "找不到這個頁面",
     body: "請檢查網址，或從下面的頁面繼續。",
     home: "回到首頁",
-    works: "按番劇瀏覽",
+    works: "依作品找",
   },
   en: {
     title: "Page not found",
     body: "Check the address, or continue from one of these pages.",
     home: "Back home",
-    works: "Browse by anime",
+    works: "Browse by title",
   },
 };
 
