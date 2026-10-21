@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import { pickSpotPlaceFromRecord } from "~/lib/localized-text";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { animeSlugMatches, encodeSpotId } from "~/lib/pilgrimage-slug";
@@ -133,7 +134,12 @@ export default async function PilgrimageAnimePage({ params }: Props) {
             `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
             locale,
           ),
-          title: pickSpotPlaceFromRecord(spot.answerName, spot.title, locale),
+          title: pickSpotPlaceFromRecord(
+            spot.answerName,
+            spot.title,
+            locale,
+            jaSpotPlaceOverride(spot.id),
+          ),
           subtitle: pickLocalizedText(spot.title, locale),
         }))}
       />

@@ -8,6 +8,7 @@ import {
   buildWorkCard,
 } from "~/lib/og/card";
 import { kantoBoundsContain } from "~/lib/home-map-bounds";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   haversineMeters,
   otherWorkCounts,
@@ -161,6 +162,7 @@ function spotCard(locale: PilgrimageLocale, spot: PilgrimageSpot): OgCard | null
     workTitle: animeNames(anime?.animeTitle ?? spot.animeTitle),
     derivedJa: namesOf(spot.title).ja,
     titleZh: namesOf(spot.title).zh,
+    placeOverride: jaSpotPlaceOverride(spot.id),
     workOgTitle: anime ? optionalNames(anime, "ogTitle") : undefined,
     workShortName: anime ? optionalNames(anime, "shortName") : undefined,
     areaName: namesOf(location?.name ?? spot.location),

@@ -25,6 +25,8 @@ describe("static sitemap XML", () => {
     expect(xml).toContain('hreflang="x-default"');
     expect(xml).not.toContain("zh-tw");
     expect(xml).not.toContain("zh-Hant");
+    expect(xml).not.toContain("xmlns:image");
+    expect(xml).not.toContain("image:loc");
     expect(xml.endsWith("</urlset>")).toBe(true);
   });
 

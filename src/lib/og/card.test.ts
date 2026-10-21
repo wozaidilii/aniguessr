@@ -71,6 +71,33 @@ describe("og cards", () => {
     expect(card.alt).not.toContain("Takeshita");
   });
 
+  it("paints a manual Japanese place override on the share card", () => {
+    const card = buildSpotCard({
+      requestedLocale: "ja",
+      spotName: names(
+        "",
+        "竹下口（原宿）",
+        "竹下口（原宿）",
+        "Takeshita Exit (Harajuku)",
+      ),
+      workTitle: names("アイドルマスター シンデレラガールズ"),
+      areaName: names("東京都渋谷区", "东京都涩谷区"),
+      otherWorkCount: 0,
+      art: "city",
+      origin: { lat: 35.67, lng: 139.7 },
+      nearby: [],
+      derivedJa: "竹下口アーチと商店街入口",
+      titleZh: "竹下口拱门与商店街入口",
+      placeOverride: "竹下通り入口（原宿）",
+    });
+    expect(card.titleLines.join("")).toBe("竹下通り入口（原宿）");
+    expect(card.alt).toBe(
+      "竹下通り入口（原宿）（アイドルマスター シンデレラガールズ）の聖地の地図",
+    );
+    expect(card.alt).not.toContain("Takeshita");
+    expect(card.alt).not.toContain("竹下口（原宿）");
+  });
+
   it("fills a blank Japanese place name without leaving the Japanese card", () => {
     const card = buildSpotCard({
       requestedLocale: "ja",

@@ -61,7 +61,7 @@ export interface JaPlaceSources {
   /** Scene title in Japanese, such as 竹下口アーチと商店街入口. */
   titleJa?: string;
   titleZh?: string;
-  /** Manual Japanese label. There is no place-name override map yet. */
+  /** Manual Japanese label from `jaSpotPlaceOverride`. */
   override?: string;
 }
 

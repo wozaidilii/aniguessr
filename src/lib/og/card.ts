@@ -125,6 +125,7 @@ export function displaySpotPlace(
   shortName?: OgNames,
   derivedJa?: string,
   titleZh?: string,
+  override?: string,
 ): string {
   if (locale !== "ja") return displayName(locale, base, ogTitle, shortName);
   return japanesePlaceLabel({
@@ -134,6 +135,7 @@ export function displaySpotPlace(
     tw: preferredName("zh-tw", base, ogTitle, shortName),
     titleJa: derivedJa,
     titleZh,
+    override,
   });
 }
 
@@ -216,6 +218,8 @@ export function buildSpotCard(input: {
   derivedJa?: string;
   /** Simplified scene title, used when the Japanese title is also blank or Latin. */
   titleZh?: string;
+  /** Manual Japanese place label. Wins over zh when answerName.ja is empty. */
+  placeOverride?: string;
 }): OgCard {
   const workName = (locale: OgLocale) =>
     preferredName(
@@ -245,6 +249,7 @@ export function buildSpotCard(input: {
     input.shortName,
     input.derivedJa,
     input.titleZh,
+    input.placeOverride,
   );
   const work = displayName(
     contentLocale,

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   pickLocalizedLines,
   pickLocalizedText,
+  pickSpotPlaceFromRecord,
   pickSpotPlaceName,
 } from "~/lib/localized-text";
 
@@ -94,6 +96,34 @@ describe("localized text fallback", () => {
         "竹下口",
       ),
     ).toBe("Takeshita");
+    expect(
+      pickSpotPlaceName(
+        { zh: "竹下口（原宿）", ja: "", en: "Takeshita Exit (Harajuku)" },
+        "ja",
+        "竹下口アーチと商店街入口",
+        { override: "竹下通り入口（原宿）" },
+      ),
+    ).toBe("竹下通り入口（原宿）");
+    expect(
+      pickSpotPlaceName(
+        { zh: "竹下口（原宿）", ja: "竹下口", en: "Takeshita Exit (Harajuku)" },
+        "ja",
+        "竹下口アーチと商店街入口",
+        { override: "竹下通り入口（原宿）" },
+      ),
+    ).toBe("竹下口");
+    expect(jaSpotPlaceOverride("anitabi_101399_51i525idi")).toBe(
+      "竹下通り入口（原宿）",
+    );
+    expect(
+      pickSpotPlaceFromRecord(
+        { zh: "竹下口（原宿）", ja: "", en: "Takeshita Exit (Harajuku)" },
+        { ja: "竹下口アーチと商店街入口", zh: "竹下口拱门与商店街入口", en: "" },
+        "ja",
+        jaSpotPlaceOverride("anitabi_101399_51i525idi"),
+      ),
+    ).toBe("竹下通り入口（原宿）");
+    expect(jaSpotPlaceOverride("anitabi_other")).toBeUndefined();
   });
 
   it("falls funfacts through the same order", () => {
