@@ -352,15 +352,6 @@ export const PILGRIMAGE_COPY: Record<
   },
 };
 
-/** Thin zh-TW index copy. These URLs are not hreflang twins of the full hub. */
-export const ZH_TW_AREA_COPY = {
-  title: "鎌倉與江之島動漫取景地",
-  description:
-    "目前僅提供鎌倉市與藤澤市（江之島）的繁體中文聖地頁面，含相關作品與取景地。",
-  animeTitle: "鎌倉與江之島相關作品",
-  locationTitle: "鎌倉市與藤澤市（江之島）",
-};
-
 function formatDistanceLabel(km: number, locale: PilgrimageLocale): string {
   if (!Number.isFinite(km)) return "";
   if (km < 1) {

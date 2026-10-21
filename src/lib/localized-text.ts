@@ -4,7 +4,7 @@ export interface LocalizedText {
   zh: string;
   ja: string;
   en: string;
-  /** Traditional Chinese. Present only on records that have a zh-TW page. */
+  /** Traditional Chinese for pilgrimage records. zh-TW does not fall back to zh. */
   tw?: string;
 }
 

@@ -3,10 +3,7 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { ANIME_LOCALES } from "~/lib/anime-locale";
-import {
-  isZhTwCoveredLocationSlug,
-  type PilgrimageLocale,
-} from "~/lib/pilgrimage-locale";
+import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
   assignSpotSeoVariants,
   type SpotSeoFields,
@@ -26,18 +23,6 @@ import {
 
 export type { LocalizedLines, LocalizedText };
 export { pickLocalizedText };
-
-export interface ZhTwAnimeEntry {
-  anime: PilgrimageAnimeSummary;
-  spotCount: number;
-}
-
-export interface ZhTwCatalog {
-  locations: PilgrimageLocationSummary[];
-  animes: ZhTwAnimeEntry[];
-  spotCount: number;
-  animeIds: Set<string>;
-}
 
 export interface PilgrimageAnimeSummary {
   subjectId: string;
@@ -208,7 +193,6 @@ export function listSpotsForLocation(locationSlug: string): PilgrimageSpot[] {
 
 let spotVariantCache: Map<string, SpotSeoVariant> | null = null;
 let ambiguousAnimeTitles: Set<string> | null = null;
-let zhTwCatalog: ZhTwCatalog | null = null;
 
 function spotFields(
   spot: PilgrimageSpot,
@@ -233,9 +217,6 @@ function ensureSpotVariantCache(index: PilgrimageSeoIndex) {
     const fields = index.spotIds.flatMap((id) => {
       const spot = index.spots[id];
       if (!spot) return [];
-      if (locale === "zh-tw" && !isZhTwCoveredLocationSlug(spot.locationSlug)) {
-        return [];
-      }
       return [spotFields(spot, locale)];
     });
     for (const [id, variant] of assignSpotSeoVariants(fields)) {
@@ -243,45 +224,6 @@ function ensureSpotVariantCache(index: PilgrimageSeoIndex) {
     }
   }
   spotVariantCache = cache;
-}
-
-export function getZhTwCatalog(): ZhTwCatalog | null {
-  const index = getPilgrimageSeoIndex();
-  if (!index) return null;
-  if (zhTwCatalog) return zhTwCatalog;
-  const counts = new Map<string, number>();
-  let spotCount = 0;
-  for (const id of index.spotIds) {
-    const spot = index.spots[id];
-    if (!spot || spot.redirectTo) continue;
-    if (!isZhTwCoveredLocationSlug(spot.locationSlug)) continue;
-    spotCount += 1;
-    const subjectId = spot.workSubjectId ?? spot.subjectId;
-    counts.set(subjectId, (counts.get(subjectId) ?? 0) + 1);
-  }
-  const animes = index.animes.flatMap((anime) => {
-    const count = counts.get(anime.subjectId) ?? 0;
-    return count > 0 ? [{ anime, spotCount: count }] : [];
-  });
-  zhTwCatalog = {
-    locations: index.locations.filter((location) =>
-      isZhTwCoveredLocationSlug(location.slug),
-    ),
-    animes,
-    spotCount,
-    animeIds: new Set(animes.map((entry) => entry.anime.subjectId)),
-  };
-  return zhTwCatalog;
-}
-
-export function animeHasZhTwPage(subjectId: string): boolean {
-  return getZhTwCatalog()?.animeIds.has(subjectId) ?? false;
-}
-
-export function listZhTwSpotsForAnime(subjectId: string): PilgrimageSpot[] {
-  return listSpotsForAnime(subjectId).filter((spot) =>
-    isZhTwCoveredLocationSlug(spot.locationSlug),
-  );
 }
 
 export function getSpotSeoVariant(
