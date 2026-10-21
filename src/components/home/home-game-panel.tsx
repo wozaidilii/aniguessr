@@ -50,6 +50,8 @@ export function HomeGamePanel({ locale }: { locale: HomeLocale }) {
   return (
     <div className="home-play">
       <div className="home-play-art">
+        {/* Designer SVG, one file per locale. next/image would rasterize it. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/img/game-card/${locale}.svg`}
           width={880}
