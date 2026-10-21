@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import { withAnimeLocale, type AnimeLocale } from "~/lib/anime-locale";
+import { withAnimeLocale } from "~/lib/anime-locale";
 import { type GameLocale } from "~/lib/game-locale";
 import { absoluteUrl, localeAlternates } from "~/lib/seo";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -33,7 +33,7 @@ export function gameAnimeMetadata(locale: GameLocale): Metadata {
   const canonical =
     locale === "zh-tw"
       ? withPilgrimageLocale(GAME_PATH, "zh-tw")
-      : withAnimeLocale(GAME_PATH, locale as AnimeLocale);
+      : withAnimeLocale(GAME_PATH, locale);
   const languages = localeAlternates(GAME_PATH);
   const zhTwUrl = absoluteUrl(withPilgrimageLocale(GAME_PATH, "zh-tw"));
   languages["zh-Hant"] = zhTwUrl;
