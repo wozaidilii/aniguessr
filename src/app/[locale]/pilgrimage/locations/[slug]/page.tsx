@@ -102,7 +102,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
   const location = resolved.location;
   const name = pickLocalizedText(location.name, locale);
 
-  const spots = listSpotsForLocation(location.slug).slice(0, 120);
+  const spots = listSpotsForLocation(location.slug);
   const seo = locationPageSeo(locale, location);
   const listed = spots.slice(0, 24);
   const visibleTitle = copy.spotsInLocation(name, location.spotCount);

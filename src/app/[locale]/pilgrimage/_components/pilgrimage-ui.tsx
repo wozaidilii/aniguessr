@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { RightsContactLink } from "~/components/rights-contact-link";
 import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
+import { DeferPaint } from "~/components/site/defer-paint";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import {
@@ -121,19 +122,21 @@ export function PilgrimageSpotList({
 
   return (
     <ol className="grid gap-2">
-      {spots.map((spot) => (
-        <li key={spot.id}>
-          <Link
-            href={spot.href}
-            className="block rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-cyan-200/30 hover:bg-white/10"
-          >
-            <span className="block font-bold text-white">{spot.title}</span>
-            <span className="mt-1 block text-sm text-pink-100/65">
-              {spot.subtitle}
-            </span>
-          </Link>
-        </li>
-      ))}
+      <DeferPaint>
+        {spots.map((spot) => (
+          <li key={spot.id}>
+            <Link
+              href={spot.href}
+              className="block rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-cyan-200/30 hover:bg-white/10"
+            >
+              <span className="block font-bold text-white">{spot.title}</span>
+              <span className="mt-1 block text-sm text-pink-100/65">
+                {spot.subtitle}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </DeferPaint>
     </ol>
   );
 }
