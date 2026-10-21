@@ -6,6 +6,7 @@ import {
   HOME_BOUNDS_EVENT,
   HOME_FOCUS_WORK_EVENT,
   HOME_ORIGIN_EVENT,
+  signalHomeMapGesture,
   type HomeBoundsDetail,
   type HomeFocusWorkDetail,
   type HomeOriginDetail,
@@ -253,6 +254,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       publishBounds(map);
       ensureYou();
     });
+    map.on("dragstart", signalHomeMapGesture);
+    map.on("zoomstart", (event) => {
+      if (event.originalEvent) signalHomeMapGesture();
+    });
     let catalogReady: NavCatalog | null = null;
     let focusedId: string | null = null;
     let savedCamera: {
@@ -462,7 +467,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           type="button"
           className="home-tool home-zoom"
           aria-label={copy.zoomIn}
-          onClick={() => mapRef.current?.zoomIn()}
+          onClick={() => {
+            signalHomeMapGesture();
+            mapRef.current?.zoomIn();
+          }}
         >
           +
         </button>
@@ -470,7 +478,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           type="button"
           className="home-tool home-zoom"
           aria-label={copy.zoomOut}
-          onClick={() => mapRef.current?.zoomOut()}
+          onClick={() => {
+            signalHomeMapGesture();
+            mapRef.current?.zoomOut();
+          }}
         >
           −
         </button>

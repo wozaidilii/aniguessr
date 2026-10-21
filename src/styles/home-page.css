@@ -268,10 +268,14 @@
   padding: 40px 0 56px;
 }
 
-.home-copy {
+.home-lead {
   min-width: 0;
   grid-column: 1;
   grid-row: 1;
+}
+
+.home-titleband .home-h1 {
+  margin: 0;
 }
 
 .home-chip {
@@ -484,9 +488,14 @@
   max-width: 100%;
 }
 
-.home-map-searchstack .home-pills {
+.home-work-search .home-pills {
   position: static;
   flex-wrap: wrap;
+}
+
+.home-work-search[data-collapsed="true"] .home-popular,
+.home-work-search[data-collapsed="true"] .home-pills {
+  display: none;
 }
 
 .home-sr {
@@ -629,18 +638,26 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  max-height: 72px;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 8px;
-  overflow: visible;
+  overflow: hidden;
+}
+
+.home-popular-row.is-all {
+  max-height: none;
 }
 
 .home-popular-chip {
-  display: flex;
-  flex: 0 1 auto;
+  display: inline-flex;
+  box-sizing: border-box;
+  height: 32px;
   max-width: 100%;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 12px;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
   background: rgba(13, 8, 26, 0.82);
@@ -649,10 +666,49 @@
 }
 
 .home-popular-chip b {
-  overflow-wrap: anywhere;
+  min-width: 0;
+  overflow: hidden;
   font-size: 13px;
   font-weight: 700;
-  white-space: normal;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-popular-chip small {
+  flex: none;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.home-popular-more {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #67e8f9;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-sheet-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.home-sheet-pills a {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: #f8e7ff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .home-tool-locate {
@@ -1245,8 +1301,7 @@
   .home-lang,
   .home-hdr-login,
   .home-ctas,
-  .home-privacy-desk,
-  .home-overlay {
+  .home-privacy-desk {
     display: none;
   }
 
@@ -1266,42 +1321,54 @@
   }
 
   .home-hero {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    min-height: calc(100svh - 56px);
     padding: 0;
+    gap: 0;
+  }
+
+  .home-lead {
+    display: contents;
+  }
+
+  .home-titleband {
+    order: 1;
+    padding: 12px 16px 10px;
+    background: #0a0612;
+  }
+
+  .home-titleband .home-chip {
+    margin-bottom: 6px;
+  }
+
+  .home-titleband .home-h1,
+  .home[data-locale="en"] .home-titleband .home-h1 {
+    font-size: 22px;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .home-copy-body {
+    order: 3;
+    padding: 20px 16px 8px;
   }
 
   .home-mapstage {
-    height: calc(100svh - 56px);
+    order: 2;
+    flex: 1 0 auto;
+    height: calc(100svh - 56px - 88px);
+    min-height: 320px;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
-  .home-overlay {
-    display: block;
+  .home-map {
     position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 4;
-    padding: 18px 16px 48px;
-    background: linear-gradient(rgba(10, 6, 18, 0.95), rgba(10, 6, 18, 0));
-    pointer-events: none;
-  }
-
-  .home-overlay .home-h1,
-  .home-copy .home-h1 {
-    font-size: 30px;
-    white-space: nowrap;
-  }
-
-  .home[data-locale="en"] .home-h1 {
-    font-size: 26px;
-  }
-
-  .home-pills {
-    top: 118px;
+    inset: 0;
+    height: auto;
   }
 
   .home-map-float {
@@ -1325,9 +1392,22 @@
     box-shadow: none;
   }
 
-  .home-popular-row {
+  .home-popular-label,
+  .home-popular-more,
+  .home-work-search .home-pills {
+    display: none;
+  }
+
+  .home-work-search[data-collapsed="true"] .home-popular {
+    display: block;
+  }
+
+  .home-popular-row,
+  .home-popular-row.is-all {
+    max-height: none;
     flex-wrap: nowrap;
     overflow-x: auto;
+    overflow-y: hidden;
     padding-bottom: 2px;
   }
 
@@ -1340,16 +1420,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow-wrap: normal;
-  }
-
-  .home-map-searchstack .home-pills {
-    position: static;
-    top: auto;
-  }
-
-  .home-overlay {
-    padding-top: 196px;
   }
 
   .home-map-tools {
@@ -1421,20 +1491,6 @@
 
   .home-nearby-sheet .home-spot-actions a {
     height: 44px;
-  }
-
-  .home-copy {
-    padding: 20px 16px 8px;
-  }
-
-  .home-copy .home-h1 {
-    font-size: 30px;
-  }
-
-  .home[data-locale="en"] .home-h1,
-  .home[data-locale="en"] .home-copy .home-h1,
-  .home[data-locale="en"] .home-overlay .home-h1 {
-    font-size: 26px;
   }
 
   .home-intro {
