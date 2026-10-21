@@ -45,6 +45,11 @@ export function SiteFooter({ locale }: { locale: AnimeLocale }) {
                 <li>
                   <Link href={`${homeHref}#contact`}>{copy.navContact}</Link>
                 </li>
+                <li>
+                  <Link href={withAnimeLocale("/privacy", locale)}>
+                    {copy.footerPrivacy}
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

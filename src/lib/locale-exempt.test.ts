@@ -6,6 +6,7 @@ import { shouldBypassLocale } from "~/lib/locale-exempt";
 import {
   PILGRIMAGE_REVALIDATE_SECONDS,
   isLocalePrefixedPilgrimagePath,
+  isLocalePrefixedPrivacyPath,
 } from "~/lib/pilgrimage-cache";
 import { PILGRIMAGE_REDIRECT_MAP } from "~/lib/pilgrimage-redirects";
 import { middleware } from "~/middleware";
@@ -178,6 +179,39 @@ describe("locale middleware exemptions", () => {
     expect(preferred.headers.get("location")).toBe(
       "https://aniguessr.ayiora.com/zh/pilgrimage",
     );
+  });
+
+  it("serves locale privacy pages without rewrite or Set-Cookie", () => {
+    for (const pathname of [
+      "/ja/privacy",
+      "/zh/privacy",
+      "/en/privacy",
+      "/zh-tw/privacy",
+    ]) {
+      expect(isLocalePrefixedPrivacyPath(pathname)).toBe(true);
+      const response = middleware(request(pathname));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("set-cookie")).toBeNull();
+    }
+  });
+
+  it("redirects bare /privacy to English and does not Set-Cookie", () => {
+    const response = middleware(
+      new NextRequest(new URL("https://aniguessr.ayiora.com/privacy"), {
+        headers: {
+          host: "aniguessr.ayiora.com",
+          "accept-language": "ja,en;q=0.8",
+          cookie: "aniguessr_locale=zh",
+        },
+      }),
+    );
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(
+      "https://aniguessr.ayiora.com/en/privacy",
+    );
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("serves locale homepages without rewrite or Set-Cookie", () => {

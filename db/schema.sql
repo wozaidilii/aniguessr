@@ -361,3 +361,34 @@ create table if not exists anime_tuxun_street_view_scenes (
 
 create index if not exists anime_tuxun_street_view_scenes_status_updated_idx
   on anime_tuxun_street_view_scenes(status, updated_at desc);
+
+-- player_activity_events.player_id is ON DELETE SET NULL, which would keep email.
+-- Delete those rows by email and by player id before the player row goes away.
+create or replace function delete_player_personal_rows()
+returns trigger
+language plpgsql
+as $$
+begin
+  delete from player_activity_events
+  where player_id = old.id
+     or (
+       old.email is not null
+       and btrim(old.email) <> ''
+       and email is not null
+       and lower(email) = lower(btrim(old.email))
+     );
+
+  if old.email is not null and btrim(old.email) <> '' then
+    delete from player_email_verification_codes
+    where lower(email) = lower(btrim(old.email));
+  end if;
+
+  return old;
+end;
+$$;
+
+drop trigger if exists players_delete_personal_rows on players;
+create trigger players_delete_personal_rows
+before delete on players
+for each row
+execute function delete_player_personal_rows();

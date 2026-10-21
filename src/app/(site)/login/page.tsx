@@ -115,13 +115,7 @@ export default function LoginPage() {
   ) => {
     savePlayerSession(session);
     identifyPostHogUser(session.user);
-    capturePostHogEvent(
-      eventName,
-      {
-        provider: session.user.provider ?? "password",
-      },
-      session.user.id,
-    );
+    capturePostHogEvent(eventName, {}, session.user.id);
     router.replace(getNextUrl());
   };
 
@@ -233,6 +227,12 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
+            <Link
+              href={withAnimeLocale("/privacy", locale)}
+              className="text-sm font-bold text-cyan-100/70 transition hover:text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
+            >
+              {copy.privacyPolicy}
+            </Link>
             <Link
               href={homeUrl}
               className="text-sm font-bold text-cyan-100/70 transition hover:text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
@@ -583,7 +583,9 @@ export default function LoginPage() {
                       onClick={() => setShowResetPassword((value) => !value)}
                       className="min-h-12 px-4 text-sm font-bold text-cyan-100/80 transition hover:text-cyan-50 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:outline-none"
                       aria-label={
-                        showResetPassword ? copy.hidePassword : copy.showPassword
+                        showResetPassword
+                          ? copy.hidePassword
+                          : copy.showPassword
                       }
                     >
                       {showResetPassword ? copy.hide : copy.show}
