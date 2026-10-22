@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  gameLocaleMenuLinks,
-  hrefLangForLocale,
-} from "~/components/brand/LocaleMenu";
+import { gameLocaleMenuLinks, hrefLangForLocale } from "~/lib/game-locale";
 
 describe("gameLocaleMenuLinks", () => {
   it("keeps the switcher labels and hreflang targets", () => {

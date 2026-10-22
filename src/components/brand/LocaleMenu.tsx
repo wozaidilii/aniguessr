@@ -2,35 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { HOME_LANG_LINKS } from "~/lib/home-page-copy";
-import { withGameLocale } from "~/lib/game-locale";
-import { splitLocalePath } from "~/lib/pilgrimage-locale";
+import { type GameLocaleMenuLink } from "~/lib/game-locale";
 
-export interface LocaleMenuLink {
-  locale: string;
-  label: string;
-  href: string;
-  hrefLang: string;
-}
+export type LocaleMenuLink = GameLocaleMenuLink;
 
-export function hrefLangForLocale(locale: string): string {
-  return locale === "zh-tw" ? "zh-Hant" : locale;
-}
-
-/** Locale-prefixed game URLs. The anchors navigate themselves and do not write a cookie. */
-export function gameLocaleMenuLinks(
-  pathname: string,
-  search = "",
-): LocaleMenuLink[] {
-  const inner = splitLocalePath(pathname).pathname || "/game/anime";
-  const query = search ? (search.startsWith("?") ? search : `?${search}`) : "";
-  return HOME_LANG_LINKS.map((item) => ({
-    locale: item.locale,
-    label: item.label,
-    href: withGameLocale(`${inner}${query}`, item.locale),
-    hrefLang: hrefLangForLocale(item.locale),
-  }));
-}
+export { gameLocaleMenuLinks, hrefLangForLocale } from "~/lib/game-locale";
 
 function LocaleAnchors({
   links,
