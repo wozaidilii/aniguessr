@@ -247,6 +247,48 @@ export function municipalityTouchesSea(place) {
 }
 
 /**
+ * Distance in meters from the point to the nearest ring of one municipality.
+ * @param {Municipality} place
+ */
+export function distanceToMunicipality(lng, lat, place) {
+  if (!place) return Infinity;
+  let best = Infinity;
+  if (roughBboxMeters(lng, lat, place.bbox) >= best) return best;
+  for (const ring of place.rings) {
+    const count = ring.length / 2;
+    for (let index = 0; index < count; index += 1) {
+      const next = (index + 1) % count;
+      const distance = segmentDistanceMeters(
+        lng,
+        lat,
+        ring[index * 2],
+        ring[index * 2 + 1],
+        ring[next * 2],
+        ring[next * 2 + 1],
+      );
+      if (distance < best) best = distance;
+    }
+  }
+  return best;
+}
+
+/**
+ * Meters to the nearest municipality other than `code`.
+ * A large value means the point is not on that municipality's border.
+ */
+export function distanceToOtherMunicipality(lng, lat, code) {
+  if (!index || !Number.isFinite(lng) || !Number.isFinite(lat)) return Infinity;
+  let best = Infinity;
+  for (const place of candidatesNear(lng, lat, 1)) {
+    if (place.code === code) continue;
+    if (roughBboxMeters(lng, lat, place.bbox) >= best) continue;
+    const distance = distanceToMunicipality(lng, lat, place);
+    if (distance < best) best = distance;
+  }
+  return best;
+}
+
+/**
  * Municipality containing this coordinate.
  * Points that fall just outside a simplified coastline use the nearest boundary.
  * @returns {Municipality | null}

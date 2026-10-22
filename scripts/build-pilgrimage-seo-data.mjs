@@ -37,6 +37,8 @@ import {
   indexableLocations,
   lastmodForPath,
   parseSitemapLastmods,
+  pathsForRenamedSpots,
+  SITEMAP_BASELINE_LASTMOD,
 } from "./lib/sitemap-lastmod.mjs";
 
 const SOURCE_PATH = path.join(
@@ -51,6 +53,10 @@ const OUTPUT_DIR = path.join(process.cwd(), "public/data/seo");
 const NAV_PATH = path.join(OUTPUT_DIR, "spots-nav.json");
 const HOME_LABELS_PATH = path.join(OUTPUT_DIR, "home-map-labels.json");
 const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
+const NAME_FIXES_PATH = path.join(
+  process.cwd(),
+  "scripts/data/spot-name-suffix-fixes.json",
+);
 
 const PUBLIC_ROUTES = [
   ["/", 1],
@@ -537,7 +543,8 @@ async function main() {
     anime.animeTitle.tw = chosen.text;
     anime.animeTitle.twSource = chosen.source;
     animeTitleChoice.set(anime.subjectId, chosen);
-    animeTitleSources[chosen.source] = (animeTitleSources[chosen.source] ?? 0) + 1;
+    animeTitleSources[chosen.source] =
+      (animeTitleSources[chosen.source] ?? 0) + 1;
     const simplified = anime.animeTitle?.zh?.trim() ?? "";
     if (
       chosen.source === "opencc" &&
@@ -770,7 +777,7 @@ async function main() {
       if (!previousLastmod.has(route)) previousLastmod.set(route, lastmod);
     }
   }
-  let changedOn = fallbackLastmod;
+  let changedOn = "";
   try {
     const fixes = JSON.parse(
       await readFile(
@@ -782,8 +789,25 @@ async function main() {
       changedOn = fixes.correctedOn;
     }
   } catch {
-    changedOn = fallbackLastmod;
+    changedOn = "";
   }
+  let renamedIds = [];
+  try {
+    const fixes = JSON.parse(await readFile(NAME_FIXES_PATH, "utf8"));
+    if (
+      typeof fixes.correctedOn === "string" &&
+      fixes.correctedOn &&
+      fixes.correctedOn > changedOn
+    ) {
+      changedOn = fixes.correctedOn;
+    }
+    renamedIds = Array.isArray(fixes.names?.fixes)
+      ? fixes.names.fixes.map((row) => row.id)
+      : [];
+  } catch {
+    renamedIds = [];
+  }
+  if (!changedOn) changedOn = fallbackLastmod;
   let previousRows = [];
   try {
     const nav = JSON.parse(await readFile(NAV_PATH, "utf8"));
@@ -792,6 +816,12 @@ async function main() {
     previousRows = [];
   }
   const changedPaths = changedPilgrimagePaths(previousRows, visibleSpots);
+  for (const route of pathsForRenamedSpots(renamedIds, visibleSpots)) {
+    changedPaths.add(route);
+  }
+  const unchangedFallback = previousLastmod.size
+    ? fallbackLastmod
+    : SITEMAP_BASELINE_LASTMOD;
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
   const sitemapUrls = [];
@@ -806,7 +836,7 @@ async function main() {
           previous: previousLastmod,
           changed: changedPaths,
           changedOn,
-          fallback: fallbackLastmod,
+          fallback: unchangedFallback,
         }),
         { zhTw: Boolean(item.zhTw) },
       ),

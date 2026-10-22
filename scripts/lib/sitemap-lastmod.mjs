@@ -1,5 +1,8 @@
 const LOCALE_PREFIX = /^\/(?:zh-tw|zh|ja|en)(?=\/|$)/u;
 
+/** Date already published for pilgrimage URLs. Unchanged pages keep it. */
+export const SITEMAP_BASELINE_LASTMOD = "2026-10-21";
+
 /** Pathname without the locale prefix, so sitemap locs compare to route paths. */
 export function sitemapPathname(loc) {
   const url = new URL(loc);
@@ -30,7 +33,10 @@ export function parseSitemapLastmods(xml) {
  * Changed routes take `changedOn`. Every other route keeps its previous
  * lastmod. `fallback` is only for a path that has never been in the sitemap.
  */
-export function lastmodForPath(path, { previous, changed, changedOn, fallback }) {
+export function lastmodForPath(
+  path,
+  { previous, changed, changedOn, fallback },
+) {
   if (changed.has(path)) return changedOn;
   return previous.get(path) ?? fallback;
 }
@@ -79,7 +85,10 @@ export function changedPilgrimagePaths(previousRows, nextSpots) {
 
   const subjectIds = new Set([...previousWorks.keys(), ...nextWorks.keys()]);
   for (const subjectId of subjectIds) {
-    const before = (previousWorks.get(subjectId) ?? []).slice().sort().join("\n");
+    const before = (previousWorks.get(subjectId) ?? [])
+      .slice()
+      .sort()
+      .join("\n");
     const after = (nextWorks.get(subjectId) ?? []).slice().sort().join("\n");
     if (before === after) continue;
     const slug = slugBySubject.get(subjectId);
@@ -91,4 +100,19 @@ export function changedPilgrimagePaths(previousRows, nextSpots) {
 /** Area pages with no spots are not sitemap entries. */
 export function indexableLocations(locations) {
   return locations.filter((location) => (location?.spotCount ?? 0) > 0);
+}
+
+/** Spot, area, and work pages that render a renamed spot. */
+export function pathsForRenamedSpots(ids, spots) {
+  const wanted = ids instanceof Set ? ids : new Set(ids);
+  const changed = new Set();
+  for (const spot of spots) {
+    if (!spot || spot.redirectTo || !wanted.has(spot.id)) continue;
+    changed.add(`/pilgrimage/spots/${encodeURIComponent(spot.id)}`);
+    if (spot.locationSlug) {
+      changed.add(`/pilgrimage/locations/${spot.locationSlug}`);
+    }
+    if (spot.subjectSlug) changed.add(`/pilgrimage/anime/${spot.subjectSlug}`);
+  }
+  return changed;
 }
