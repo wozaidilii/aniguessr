@@ -202,11 +202,12 @@ describe("stale place copy", () => {
     expect(cafe.locales.en.funfact[0]).toContain("Fujisawa");
     expect(cafe.locales.ja.funfact[0]).not.toContain("鎌倉市");
     const furukawa = load("anitabi_51_sww4zc3ji");
-    expect(furukawa.locales.en.answerName).toBe("Furukawa Bakery (Hamura)");
+    expect(furukawa.locales.en.answerName).toBe("Furukawa Bakery (Nishi-Tokyo)");
+    expect(furukawa.locales.ja.funfact.join("")).toContain("田無町");
     const shiranoe = load("anitabi_234_5z3hugd");
-    expect(shiranoe.locales.en.answerName).toContain("Moji-ku");
+    expect(shiranoe.locales.en.answerName).toContain("Kitakyushu");
     expect(shiranoe.locales.ja.funfact.join("")).toContain("門司区");
-    expect(shiranoe.locales.en.answerName).not.toContain("Kitakyushu");
+    expect(shiranoe.locales.en.funfact.join("")).toContain("Moji");
     const hokkaido = load("anitabi_1931_50vjonq3x");
     const story = hokkaido.locales.ja.funfact.join("");
     expect(story).toContain("北海道");

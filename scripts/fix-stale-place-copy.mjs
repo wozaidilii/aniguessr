@@ -3,7 +3,7 @@
  * for spots touched by the #28 label fixes and the #30 name fixes.
  *
  *   node scripts/fix-stale-place-copy.mjs           # print the edits
- *   node scripts/fix-stale-place-copy.mjs --apply   # patch question text
+ *   node scripts/fix-stale-place-copy.mjs --apply   # refused; use repair-place-copy.mjs
  *
  * Only the place-name token changes. Story-setting clauses (舞台 / set in)
  * are left alone. The game `location` label and tags are not rewritten.
@@ -44,7 +44,7 @@ const EDITS_PATH = path.join(
 const BORDER_METERS = 1000;
 const toSimplified = OpenCC.Converter({ from: "jp", to: "cn" });
 
-const PREFECTURES = [
+export const PREFECTURES = [
   ["01", "北海道", "Hokkaido"],
   ["02", "青森県", "Aomori"],
   ["03", "岩手県", "Iwate"],
@@ -95,7 +95,7 @@ const PREFECTURES = [
 ];
 
 /** Ward readings used when English still names only the parent city. */
-const WARD_EN = {
+export const WARD_EN = {
   門司区: "Moji-ku",
   若松区: "Wakamatsu-ku",
   戸畑区: "Tobata-ku",
@@ -686,6 +686,12 @@ function affectedIds() {
 }
 
 function main() {
+  if (process.argv.includes("--apply")) {
+    console.error(
+      "Refusing to apply the broad place rewriter. Run scripts/repair-place-copy.mjs.",
+    );
+    process.exit(1);
+  }
   const apply = process.argv.includes("--apply");
   const ids = affectedIds();
   const { places } = loadMunicipalities(AREA_PATH);

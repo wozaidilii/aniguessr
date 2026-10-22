@@ -1,0 +1,4407 @@
+{
+  "note": "Pre-#33 sentences that still name a different municipality from the spot coordinates. Story settings, landmarks, and quoted shop names are omitted. Confirm before rewriting.",
+  "questions": 364,
+  "rows": [
+    {
+      "id": "anitabi_102134_8zx1xvt",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Edogawa",
+        "Tokyo"
+      ],
+      "containing": "浦安市",
+      "excerpt": "The real location is the canoe rental facility at Kasai Rinkai Park in Edogawa, Tokyo."
+    },
+    {
+      "id": "anitabi_102134_96u0nch",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Takahama"
+      ],
+      "containing": "千葉市美浜区",
+      "excerpt": "The location is a coastal embankment in front of the Takahama North Residential Area in Inage Ward, Chiba City, a quiet seaside neighborhood."
+    },
+    {
+      "id": "anitabi_10227_kpx6ofv6a",
+      "field": "locales.en.funfact[2]",
+      "tokens": [
+        "Kunitachi"
+      ],
+      "containing": "鎌倉市",
+      "excerpt": "Although the associated city is Kunitachi, the actual location is this coast, showing the blend of fiction and reality."
+    },
+    {
+      "id": "anitabi_10227_kpx6ofvw6",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "藤沢市",
+      "excerpt": "现实地点是东京都国立市的江之島亭，动画中作为主角们常去的餐饮店原型。"
+    },
+    {
+      "id": "anitabi_110467_5q875git",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Musashino City",
+        "Musashino"
+      ],
+      "containing": "東京都杉並区",
+      "excerpt": "The intersection is located in Musashino City, Tokyo, and is a landmark near the fictional Musashino Animation studio."
+    },
+    {
+      "id": "anitabi_114735_77d66537",
+      "field": "funfact[0]",
+      "tokens": [
+        "长野县"
+      ],
+      "containing": "金沢市",
+      "excerpt": "该巡礼点原型位于长野县，是作品中遠海町市场的现实参考地点。"
+    },
+    {
+      "id": "anitabi_114735_77d66537",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "長野県"
+      ],
+      "containing": "金沢市",
+      "excerpt": "この聖地巡礼点の実在の参考地は長野県にあり、作中の遠海町市場に対応します。"
+    },
+    {
+      "id": "anitabi_114735_a65082b5",
+      "field": "answerName",
+      "tokens": [
+        "长野县",
+        "松本市"
+      ],
+      "containing": "金沢市",
+      "excerpt": "中町武家屋敷#2（长野县松本市）"
+    },
+    {
+      "id": "anitabi_114735_a65082b5",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "長野県",
+        "松本市"
+      ],
+      "containing": "金沢市",
+      "excerpt": "中町武家屋敷#2（長野県松本市）"
+    },
+    {
+      "id": "anitabi_114735_a65082b5",
+      "field": "funfact[0]",
+      "tokens": [
+        "长野县"
+      ],
+      "containing": "金沢市",
+      "excerpt": "该场景的原型是位于长野县松本市的中町武家屋敷通，保留了许多江户时代的武家建筑。"
+    },
+    {
+      "id": "anitabi_114735_a65082b5",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "長野県",
+        "松本市"
+      ],
+      "containing": "金沢市",
+      "excerpt": "このシーンのモデルは長野県松本市の中町武家屋敷で、江戸時代の武家建築が多く残されている。"
+    },
+    {
+      "id": "anitabi_114735_ae114df8",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "長野県"
+      ],
+      "containing": "金沢市",
+      "excerpt": "ゲーム中の遠海町市場は長野県の某実在市场をモデルにしており、内部のレイアウトや店のデザインが忠実に再現されています。"
+    },
+    {
+      "id": "anitabi_115732_151657a9",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Urayasu",
+        "Tokyo"
+      ],
+      "containing": "千葉市美浜区",
+      "excerpt": "The real café is located in Urayasu, Chiba, near Tokyo Disneyland."
+    },
+    {
+      "id": "anitabi_11577_3wgfbwk",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "This scene was filmed at a real taxi stand located in a ward of Tokyo."
+    },
+    {
+      "id": "anitabi_11577_3wgpx75",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Minato",
+        "Nishi"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "This location is in front of the circular walkway (Circle Walk) in the Minato Mirai area of Yokohama, Nishi Ward, a frequent route for 765 Pro members in the anime."
+    },
+    {
+      "id": "anitabi_120925_1qz5yfe",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "北九州市"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "このシーンの現実のロケ地は北九州市の魚町商店街で、地元で有名な商店街である。"
+    },
+    {
+      "id": "anitabi_120925_1qznyth",
+      "field": "funfact[0]",
+      "tokens": [
+        "福冈县"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "该场景原型位于福冈县北九州市福富町，步未家附近的住宅区街道。"
+    },
+    {
+      "id": "anitabi_120925_1qznyth",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "福岡県"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "このシーンのモデルは福岡県北九州市福富町で、歩未の家の近くの住宅街です。"
+    },
+    {
+      "id": "anitabi_120925_1r1o2by",
+      "field": "answerName",
+      "tokens": [
+        "北九州市"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "英国屋（北九州市）"
+    },
+    {
+      "id": "anitabi_120925_pikj1uym8",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kitakyushu",
+        "Fukuoka Prefecture"
+      ],
+      "containing": "長野市",
+      "excerpt": "The real shop is located in Kokura Kita-ku, Kitakyushu City, Fukuoka Prefecture, and is an actual operating soba restaurant."
+    },
+    {
+      "id": "anitabi_120925_pikpm91oo",
+      "field": "answerName",
+      "tokens": [
+        "北九州市"
+      ],
+      "containing": "横浜市神奈川区",
+      "excerpt": "スターダスト（北九州市）"
+    },
+    {
+      "id": "anitabi_12333_51i53yjmk",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Kitaibaraki"
+      ],
+      "containing": "久慈郡大子町",
+      "excerpt": "Kagoiwa Observation Deck (Kitaibaraki, Ibaraki)"
+    },
+    {
+      "id": "anitabi_12333_51i53ylcf",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "常陸太田市",
+      "excerpt": "This store is located in the Nishikawachi Naka-cho area of Tokyo, a background scene that appears multiple times in the anime."
+    },
+    {
+      "id": "anitabi_131800_51i53ghur",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kamakura City"
+      ],
+      "containing": "日光市",
+      "excerpt": "The real-life shop is located in Kamakura City and is an actual bicycle-related store."
+    },
+    {
+      "id": "anitabi_131800_51i53gm1h",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "さいたま市西区",
+      "excerpt": "This location is in Nishi Ward, Saitama, beneath the Nishioomiya Bypass of National Route 16."
+    },
+    {
+      "id": "anitabi_131800_51i53gm38",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "比企郡ときがわ町",
+      "excerpt": "该地点真实位于神奈川县镰仓市的松郷峠，是当地知名的自行车爬坡路线。"
+    },
+    {
+      "id": "anitabi_131800_51i53gmdp",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "さいたま市西区",
+      "excerpt": "该地点是位于神奈川县镰仓市的实际铁路道口，名为高木踏切，属于JR横须贺线。"
+    },
+    {
+      "id": "anitabi_131800_51i53gmdp",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kamakura",
+        "Kanagawa Prefecture",
+        "Yokosuka"
+      ],
+      "containing": "さいたま市西区",
+      "excerpt": "This is a real railroad crossing located in Kamakura, Kanagawa Prefecture, known as Takagi Crossing, part of the JR Yokosuka Line."
+    },
+    {
+      "id": "anitabi_131800_51i53gpf4",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "尾道市",
+      "excerpt": "该路标位于神奈川县镰仓市的一个路口，是动画中骑行路线的一个地标。"
+    },
+    {
+      "id": "anitabi_143128_ix92dd67h",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "由布市",
+      "excerpt": "Chuo Children's Park (Yufu)"
+    },
+    {
+      "id": "anitabi_143128_ne8h7o1xr",
+      "field": "funfact[0]",
+      "tokens": [
+        "熊本县"
+      ],
+      "containing": "長崎市",
+      "excerpt": "该场景的现实原型位于熊本县人吉市的池岛煤矿沉淀池。"
+    },
+    {
+      "id": "anitabi_143128_ne8h7o1xr",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mine",
+        "Hitoyoshi City",
+        "Kumamoto Prefecture"
+      ],
+      "containing": "長崎市",
+      "excerpt": "The real-life inspiration for this scene is the Ikeshima Coal Mine Settling Pond in Hitoyoshi City, Kumamoto Prefecture."
+    },
+    {
+      "id": "anitabi_144843_51i52vhk2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yokosuka"
+      ],
+      "containing": "江田島市",
+      "excerpt": "The real-life counterpart of this building is the Japan Maritime Self-Defense Force 1st Service School in Yokosuka. In the anime, it serves as the main building of Yokosuka Girls' "
+    },
+    {
+      "id": "anitabi_14588_9awl4f9",
+      "field": "funfact[0]",
+      "tokens": [
+        "富山县"
+      ],
+      "containing": "市原市",
+      "excerpt": "该场景的原型是富山县鱼津市的辻商店，是一家经营了数十年的老字号杂货店。"
+    },
+    {
+      "id": "anitabi_147568_51i51xy3h",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "札幌市南区",
+      "excerpt": "The park exists in reality, located in Tokyo (though actual coordinates are in Hokkaido; using given data)."
+    },
+    {
+      "id": "anitabi_14772_m7jzoa7np",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "横浜市青葉区",
+      "excerpt": "该地点位于东京都町田市藤丘1丁目的国道246号线高架桥下，是剧中通勤和办案的常用外景地。"
+    },
+    {
+      "id": "anitabi_14772_m7jzoa7np",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "横浜市青葉区",
+      "excerpt": "東京都町田市藤が丘1丁目の国道246号線ガード下で、通勤や捜査のロケ地としてよく使われた。"
+    },
+    {
+      "id": "anitabi_14772_m7k8aqxqi",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo",
+        "Setagaya"
+      ],
+      "containing": "横浜市青葉区",
+      "excerpt": "The real Tokyo Police Hospital is located in Setagaya, Tokyo, and is affiliated with the police department."
+    },
+    {
+      "id": "anitabi_14772_m7ou3l7ea",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kanazawa"
+      ],
+      "containing": "横浜市金沢区",
+      "excerpt": "This hotel in reality is the Yokohama Techno Tower Hotel, located in Kanazawa Ward, Yokohama Ward, Yokohama, featuring a distinctive twin-tower design."
+    },
+    {
+      "id": "anitabi_149993_80ff7275",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kanazawa"
+      ],
+      "containing": "横浜市金沢区",
+      "excerpt": "This location is at the entrance of Suzuran Street in Kanazawa Ward, Yokohama, a common route for the protagonists to commute to school."
+    },
+    {
+      "id": "anitabi_152091_p9ra6zd93",
+      "field": "funfact[0]",
+      "tokens": [
+        "京都府"
+      ],
+      "containing": "名古屋市熱田区",
+      "excerpt": "该场景位于京都府京都市的世纪大厅（センチュリーホール）门厅，是关西大赛决赛的实际举办地。"
+    },
+    {
+      "id": "anitabi_160209_oswv2pmim",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "The real-life prototype of this substation is the Kamisuwa Substation of Tokyo Electric Power Company, located in Suwa, Nagano Prefecture."
+    },
+    {
+      "id": "anitabi_1606_9asw87r",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "宇治市",
+      "excerpt": "该取景地位于兵库县西宫市的消防活动用空地，是漫无止境的八月的关键场景之一。"
+    },
+    {
+      "id": "anitabi_1606_9bbd5c6b",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "宇治市",
+      "excerpt": "现实中的地点位于兵库县西宫市的一条住宅区道路上，具体位置在阪急甲阳线某站附近。"
+    },
+    {
+      "id": "anitabi_1606_b98d848b",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "富田林市",
+      "excerpt": "动画中的鹤屋邸实际取景于兵库县西宫市的一处私人住宅，建筑物和庭院布局高度还原。"
+    },
+    {
+      "id": "anitabi_1671_kpx6oi66d",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "大阪市西区",
+      "excerpt": "This location is in Nishi Ward, Osaka, a junction of the Hanshin Expressway; it was used as a street background in the anime."
+    },
+    {
+      "id": "anitabi_168634_51i536ccy",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Matsubara"
+      ],
+      "containing": "南あわじ市",
+      "excerpt": "The real location is Keino Matsubara Coast in Minamiawaji City, Hyogo Prefecture, known for its pine groves and white sand."
+    },
+    {
+      "id": "anitabi_176599_51i53cjim",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "札幌市中央区",
+      "excerpt": "The real-life inspiration for this scene is a multi-story commercial building near Minami 2-jo Nishi 1-chome, Chuo-ku, Sapporo, Hokkaido."
+    },
+    {
+      "id": "anitabi_17883_kpx6oiz5z",
+      "field": "funfact[1]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "瑞穂市",
+      "excerpt": "取景地位于群马县高崎市的穂积站，站前广场与动画中基本一致。"
+    },
+    {
+      "id": "anitabi_17883_kpx6oj2k0",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "横浜市南区",
+      "excerpt": "该场景的原型是位于群马县高崎市的横浜英和女学院，但动画中改名为圣克罗尼卡女学院。"
+    },
+    {
+      "id": "anitabi_179949_4i6bvbd",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "越谷市",
+      "excerpt": "The pavilion is located in a park within Tokyo, at coordinates 35.8904, 139.7993."
+    },
+    {
+      "id": "anitabi_179949_4i7lrxk",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "越谷市",
+      "excerpt": "The real park is located within Tokyo, and the bench style and surrounding greenery closely match the anime."
+    },
+    {
+      "id": "anitabi_179949_50ef1c84",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "越谷市",
+      "excerpt": "The real-life prototype is a chain fast-food restaurant called QUEEN BURGER, located in Tokyo."
+    },
+    {
+      "id": "anitabi_179949_d171b863",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "越谷市",
+      "excerpt": "The real location is along the Motogawa River in Adachi, Tokyo, with the riverside path matching the anime almost perfectly."
+    },
+    {
+      "id": "anitabi_179949_dfbaef28",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Arakawa"
+      ],
+      "containing": "越谷市",
+      "excerpt": "The real embankment is located along the Arakawa River near Adachi Ward, a common walking spot for locals."
+    },
+    {
+      "id": "anitabi_193042_1t93mbx",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "京都市上京区"
+      ],
+      "containing": "神戸市北区",
+      "excerpt": "赤い丸ポスト（京都市上京区）"
+    },
+    {
+      "id": "anitabi_1931_50vjonpn6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Hokkaido"
+      ],
+      "containing": "仙台市宮城野区",
+      "excerpt": "The scene was filmed at the entrance of a Yodobashi Camera branch in Hokkaido."
+    },
+    {
+      "id": "anitabi_1931_50vjonq5g",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "仙台市青葉区",
+      "excerpt": "该取景地位于北海道函馆市东二番丁附近，是动画中修次和千濑常走的上学路。"
+    },
+    {
+      "id": "anitabi_1931_50vjonq5g",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "仙台市青葉区",
+      "excerpt": "ロケ地は北海道函館市東二番丁付近で、アニメの通学路と一致しています。"
+    },
+    {
+      "id": "anitabi_1931_50vjonqfn",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "東京都杉並区",
+      "excerpt": "该商店街的原型位于北海道小樽市的小樽站北口商店街，而非题目中提到的荻窪站。"
+    },
+    {
+      "id": "anitabi_207195_1dd50bf9",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Minami Alps",
+        "Iida City",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "上伊那郡中川村",
+      "excerpt": "The real-life location is in front of the Minami Alps Observatory on Mount Jinbagata in Iida City, Yamanashi Prefecture."
+    },
+    {
+      "id": "anitabi_207195_24d0e0da",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture"
+      ],
+      "containing": "諏訪郡原村",
+      "excerpt": "The intersection is located in Hokuto City, Yamanashi Prefecture, and is one of the routes leading to the campsite."
+    },
+    {
+      "id": "anitabi_207195_2f4f2f19",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "山梨県",
+        "伊那市",
+        "飯田市"
+      ],
+      "containing": "上伊那郡中川村",
+      "excerpt": "この展望台は山梨県伊那市と飯田市の境界にある陣馬形山（標高1445メートル）に位置し、作中でキャンプ地として登場する。"
+    },
+    {
+      "id": "anitabi_207195_2f4f2f19",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Iida",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "上伊那郡中川村",
+      "excerpt": "This deck is located on Mount Jinbagata (elevation 1,445 m) on the border of Ina and Iida cities in Yamanashi Prefecture, a classic camping spot in the show."
+    },
+    {
+      "id": "anitabi_207195_3dqaphf",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Ina City"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "Hayataro Statue (Ina City, Nagano)"
+    },
+    {
+      "id": "anitabi_207195_3i7vea6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "茅野市",
+      "excerpt": "The real location is the Tsuketōge Panorama Observation Deck in Yamanashi Prefecture, a famous spot for viewing Mount Fuji and the Southern Alps."
+    },
+    {
+      "id": "anitabi_207195_3i9qxck",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fuji",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "富士宮市",
+      "excerpt": "The real-life model for this building is the west side of the YMCA Mount Fuji administration building in Yamanashi Prefecture."
+    },
+    {
+      "id": "anitabi_207195_62e3072d",
+      "field": "answerName",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "便利店（山梨县）"
+    },
+    {
+      "id": "anitabi_207195_62e3072d",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "山梨県"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "コンビニ（山梨県）"
+    },
+    {
+      "id": "anitabi_207195_62e3072d",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "The real convenience store is located in Yamanashi Prefecture, near Lake Motosu and the foot of Mount Fuji, serving as a classic rest stop in the series."
+    },
+    {
+      "id": "anitabi_207195_99fb1848",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "諏訪郡富士見町"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "実際のロケ地は長野県諏訪郡富士見町の霧ヶ峰駐車場で、標高約1500メートルに位置します。"
+    },
+    {
+      "id": "anitabi_207195_99fb1848",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fujimi"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "The real location is Kirigamine Parking Lot in Fujimi Town, Suwa District, Nagano Prefecture, at an altitude of about 1500 meters."
+    },
+    {
+      "id": "anitabi_207195_u690zo068",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "富士宮市",
+      "excerpt": "This office is located at Fumotoppara Campground in Yamanashi Prefecture, a famous site with views of Mount Fuji."
+    },
+    {
+      "id": "anitabi_207195_u69s34ss3",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fuji"
+      ],
+      "containing": "富士宮市",
+      "excerpt": "The real-world location is Michi-no-Eki Asagiri Kogen in Fujinomiya, Shizuoka Prefecture, a key stop between Mount Fuji and the Fuji Five Lakes."
+    },
+    {
+      "id": "anitabi_207195_u7782edtv",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "塩尻市",
+      "excerpt": "The observatory is located in Yamanashi Prefecture, an excellent spot to view Mount Fuji and the Southern Alps."
+    },
+    {
+      "id": "anitabi_207195_u77oij68l",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "塩尻市",
+      "excerpt": "This observation deck is located in Yamanashi Prefecture, a famous spot for viewing Mount Fuji and Lake Suwa; the peak seen in the anime is indeed Mount Fuji."
+    },
+    {
+      "id": "anitabi_207573_2x8woju",
+      "field": "answerName",
+      "tokens": [
+        "川越市"
+      ],
+      "containing": "京都市東山区",
+      "excerpt": "四条大桥（川越市）"
+    },
+    {
+      "id": "anitabi_208146_1svwj1y",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "京都市右京区",
+      "excerpt": "这个鬼屋的设计原型参考了现实中的某游乐园的鬼屋，位于爱知县东海市附近。"
+    },
+    {
+      "id": "anitabi_208146_1svwj1y",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "愛知県"
+      ],
+      "containing": "京都市右京区",
+      "excerpt": "このお化け屋敷のデザインは、愛知県東海市近くの遊園地にある実際のお化け屋敷を参考にしています。"
+    },
+    {
+      "id": "anitabi_208146_1wx2ewd",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "这里的现实原型是爱知县东海市的一座大型水上乐园，入口设计独特。"
+    },
+    {
+      "id": "anitabi_208146_nwb0vilgd",
+      "field": "answerName",
+      "tokens": [
+        "东海市"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "四つ辻标牌（东海市）"
+    },
+    {
+      "id": "anitabi_208146_nwb0vilgd",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "東海市"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "四つ辻標識（東海市）"
+    },
+    {
+      "id": "anitabi_208146_nwb0vilgd",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "该标志牌位于爱知县东海市的真实十字路口，被粉丝确认为动漫取景地。"
+    },
+    {
+      "id": "anitabi_208146_nwgd8tdny",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Tokai City"
+      ],
+      "containing": "京都市右京区",
+      "excerpt": "Jidaigeki Fushou no Yakata (Tokai City, Aichi)"
+    },
+    {
+      "id": "anitabi_208146_o1yme8m1t",
+      "field": "funfact[0]",
+      "tokens": [
+        "京都市中京区"
+      ],
+      "containing": "京都市下京区",
+      "excerpt": "该广场位于京都市中京区，是室町通上的一个小广场，靠近锦市场。"
+    },
+    {
+      "id": "anitabi_208146_o1yme8m1t",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "京都市中京区"
+      ],
+      "containing": "京都市下京区",
+      "excerpt": "この広場は京都市中京区の室町通にあり、錦市場の近くに位置します。"
+    },
+    {
+      "id": "anitabi_208146_o5lxic748",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "该场景的原型是位于爱知县东海市的Free Fall Slider游乐设施。"
+    },
+    {
+      "id": "anitabi_208146_o5m1cd1vb",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "该地点实际位于爱知县东海市的一个大型设施内，水池周围有步道和长椅。"
+    },
+    {
+      "id": "anitabi_208146_tneytn",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "神戸市中央区",
+      "excerpt": "The real location is a family restaurant in Chuo Ward, Kobe, whose exterior and interior closely match the anime depiction."
+    },
+    {
+      "id": "anitabi_210272_4t2lo5n8o",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "该场景对应的现实地点位于静冈县沼津市内浦地区的一处观景坡道，是当地著名的拍照点。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5n8o",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "函館市",
+      "excerpt": "このシーンの実在のロケ地は静岡県沼津市内浦地区の見晴らしの良い坂道で、地元の有名な撮影スポットです。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5qeh",
+      "field": "funfact[1]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "现实中的原型建筑位于静冈县沼津市的内浦地区，是一所学校的走廊。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5qeh",
+      "field": "locales.ja.funfact[1]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "函館市",
+      "excerpt": "実際のモデルとなった建物は静岡県沼津市内浦地区にある学校の廊下です。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5qvt",
+      "field": "funfact[1]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "现实取景地位于静冈县沼津市舟见町7，是一处安静的住宅区坡道。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5qvt",
+      "field": "locales.ja.funfact[1]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "函館市",
+      "excerpt": "実際のロケ地は静岡県沼津市舟見町7で、閑静な住宅街の坂道。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5r9k",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "该广告牌在动画中多次出现，实际原型位于静冈县沼津市的商店街，是粉丝圣地巡礼的热门地点。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5s6z",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "此场景取景于静冈县沼津市内浦地区的某段海岸堤防，该地因动画中出现而成为粉丝巡礼的热门地点。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5s89",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Numazu",
+        "Shizuoka Prefecture"
+      ],
+      "containing": "函館市",
+      "excerpt": "This location is the old Numazu Public Hall in Numazu, Shizuoka Prefecture, built in the Meiji era, a historic building."
+    },
+    {
+      "id": "anitabi_210272_4t2lo5sd4",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "现实地点位于静冈县沼津市的内浦地区，是一个沿海步道。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5sd4",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "函館市",
+      "excerpt": "実際の場所は静岡県沼津市内浦の海岸遊歩道です。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5t21",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "函館市",
+      "excerpt": "实际取景地位于静冈县沼津市大手町附近的坡道，周边保留着昭和风格的商店街。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5t21",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "函館市",
+      "excerpt": "実際のロケ地は静岡県沼津市大手町付近の坂道で、周辺には昭和レトロな商店街が残っている。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5vda",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "東京都千代田区",
+      "excerpt": "这里的实际地点位于静冈县沼津市的内浦地区，靠近内浦湾，是Aqours成员日常通学的必经之路。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5vda",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "静岡県"
+      ],
+      "containing": "東京都千代田区",
+      "excerpt": "実際の場所は静岡県沼津市内浦地区、内浦湾に面しており、Aqoursメンバーの通学路の一つである。"
+    },
+    {
+      "id": "anitabi_210272_4t2lo5vda",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Numazu"
+      ],
+      "containing": "東京都千代田区",
+      "excerpt": "The real location is in the Uchiura area of Numazu, Shizuoka, near Uchiura Bay, a daily route for the Aqours members."
+    },
+    {
+      "id": "anitabi_210272_4t2lo5wz4",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "该场景的原型是静冈县沼津市的一条实际商店街，靠近当地车站，许多粉丝前来圣地巡礼。"
+    },
+    {
+      "id": "anitabi_212003_4ynqmynp6",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "船橋市",
+      "excerpt": "该场景的原型是东京赛马场的パドック（赛前亮相圈），位于东京都府中市。"
+    },
+    {
+      "id": "anitabi_212003_4ynqmynp6",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "船橋市",
+      "excerpt": "このシーンのモデルは東京競馬場のパドックで、東京都府中市に所在する。"
+    },
+    {
+      "id": "anitabi_212003_4ynqmynp6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "船橋市",
+      "excerpt": "The real-world location of this scene is the paddock at Tokyo Racecourse, located in Fuchu, Tokyo."
+    },
+    {
+      "id": "anitabi_212003_4ynx1ogis",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "船橋市",
+      "excerpt": "実在のロケーションは東京競馬場（東京都府中市）であり、日本中央競馬会の主要な競馬場の一つ。"
+    },
+    {
+      "id": "anitabi_212003_4ynx1ogis",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "船橋市",
+      "excerpt": "The real-life location is Tokyo Racecourse (Fuchu, Tokyo), one of the main horse racing venues of the Japan Racing Association."
+    },
+    {
+      "id": "anitabi_214265_onhx8dbpx",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "The real-life location is the Nogeyama Zoo-mae bus stop in Nishi Ward, Yokohama Ward."
+    },
+    {
+      "id": "anitabi_214265_onhx8dbpx",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Minato"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "Multiple scenes in the ED were shot in Yokohama, including this bus stop and Minato Mirai area."
+    },
+    {
+      "id": "anitabi_214265_oni2j9sf5",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "The scene was filmed at the entrance sign of Nogeyama Zoo in Tokyo."
+    },
+    {
+      "id": "anitabi_214265_onidhju6o",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "This scene was filmed at the zebra area of Noge-yama Zoo in Tokyo."
+    },
+    {
+      "id": "anitabi_216228_4ui7mhfur",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "邑楽郡大泉町",
+      "excerpt": "This restaurant is located in Tokyo, a long-standing Brazilian cuisine spot known for its grilled meats."
+    },
+    {
+      "id": "anitabi_216228_4ui7mhga5",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横浜市中区",
+      "excerpt": "This Taiwanese restaurant is actually located in Yokohama, Kanagawa Prefecture, not Tokyo, but the show sets it in Tokyo."
+    },
+    {
+      "id": "anitabi_216310_po6y8lbn0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tama"
+      ],
+      "containing": "北杜市",
+      "excerpt": "This scene was filmed at the summit of Mount Mizugaki (2230 m) on the border of Yamanashi and Nagano Prefectures, within Chichibu Tama Kai National Park."
+    },
+    {
+      "id": "anitabi_216310_qdi6zmn1p",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "前橋市",
+      "excerpt": "该场景出自第9集，实际取景地位于埼玉县饭能市的猫岩，是当地登山路线上的标志性景点。"
+    },
+    {
+      "id": "anitabi_217249_07c24821",
+      "field": "funfact[0]",
+      "tokens": [
+        "福岛县"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "该T字路口位于福岛县白河市的西片一丁目，动画中还原了街道的实景。"
+    },
+    {
+      "id": "anitabi_217249_1b1df52b",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Shirakawa"
+      ],
+      "containing": "吾妻郡高山村",
+      "excerpt": "Lockheart Castle (Shirakawa, Fukushima)"
+    },
+    {
+      "id": "anitabi_217249_1b1df52b",
+      "field": "funfact[0]",
+      "tokens": [
+        "福岛县"
+      ],
+      "containing": "吾妻郡高山村",
+      "excerpt": "这座城堡实际上是位于福岛县白河市的ロックハート城，是一座建于19世纪的仿中世纪城堡，常用于婚礼和拍摄。"
+    },
+    {
+      "id": "anitabi_217249_4a9a5d77",
+      "field": "funfact[0]",
+      "tokens": [
+        "福岛县"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "现实中的楼梯位于福岛县白河市的清和公园内，是一个长约30米的石阶。"
+    },
+    {
+      "id": "anitabi_217249_d10a2c70",
+      "field": "funfact[0]",
+      "tokens": [
+        "福岛县"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "该场景取景于福岛县白河市的西片公园，是主角们常去的休闲场所。"
+    },
+    {
+      "id": "anitabi_217249_e85ba4fd",
+      "field": "funfact[0]",
+      "tokens": [
+        "福岛县"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "该场景位于福岛县白河市西片一丁目的上坡路段，是动画中薰子前往漫画公寓的必经之路。"
+    },
+    {
+      "id": "anitabi_217249_e85ba4fd",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "福島県"
+      ],
+      "containing": "東京都文京区",
+      "excerpt": "このロケ地は福島県白河市西片一丁目の上り坂で、薫子が漫画アパートに向かう道として使用された。"
+    },
+    {
+      "id": "anitabi_219200_1jyg20",
+      "field": "funfact[0]",
+      "tokens": [
+        "香川县"
+      ],
+      "containing": "砺波市",
+      "excerpt": "该场景的原型位于日本香川县坂出市深江水与绿公园内的恐龙滑梯。该恐龙高达6米，是公园的标志性设施。"
+    },
+    {
+      "id": "anitabi_220658_85f63139",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "今治市",
+      "excerpt": "位于广岛县尾道市的龟老山展望公园，海拔约185米，可眺望濑户内海的群岛。"
+    },
+    {
+      "id": "anitabi_220658_85f63139",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Onomichi City",
+        "Hiroshima Prefecture",
+        "Seto"
+      ],
+      "containing": "今治市",
+      "excerpt": "Located in Onomichi City, Hiroshima Prefecture, Mount Kiro Observatory Park is about 185m above sea level, offering views of the Seto Inland Sea's islands."
+    },
+    {
+      "id": "anitabi_221127_5qpzrkzl",
+      "field": "funfact[0]",
+      "tokens": [
+        "京都府"
+      ],
+      "containing": "犬山市",
+      "excerpt": "该场景的现实取景地位于京都府宫津市的裁判所法庭。"
+    },
+    {
+      "id": "anitabi_221127_5qpzrkzl",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Miyazu",
+        "Kyoto Prefecture"
+      ],
+      "containing": "犬山市",
+      "excerpt": "The real-life location for this scene is the courtroom of the Miyazu District Court in Kyoto Prefecture."
+    },
+    {
+      "id": "anitabi_221127_5qpzrl2h",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kanazawa",
+        "Ishikawa Prefecture"
+      ],
+      "containing": "犬山市",
+      "excerpt": "The real Kanazawa Prison is located in Kanazawa, Ishikawa Prefecture, Japan, built in the Meiji era, and appears as a key location in the series."
+    },
+    {
+      "id": "anitabi_221127_5qpzrl93",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "名古屋市",
+        "北海道"
+      ],
+      "containing": "犬山市",
+      "excerpt": "実在の建物は愛知県名古屋市にある名古屋衛戍病院だが、作品中では北海道の第七師団陸軍病院として描かれている。"
+    },
+    {
+      "id": "anitabi_221127_5qpzrl93",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nagoya",
+        "Hokkaido"
+      ],
+      "containing": "犬山市",
+      "excerpt": "The real-life building is the Nagoya Garrison Hospital in Nagoya, Aichi Prefecture, but in the work it is depicted as the army hospital of the 7th Division in Hokkaido."
+    },
+    {
+      "id": "anitabi_221127_5qpzrlk2",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "犬山市",
+      "excerpt": "该场景的原型是位于北海道网走市的网走监狱博物馆，是日本最著名的明治时代监狱建筑之一。"
+    },
+    {
+      "id": "anitabi_221736_kpx6ojkfa",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Moriyama"
+      ],
+      "containing": "高岡市",
+      "excerpt": "This location is the Moriyama Castle ruins in the Sawara ward of Fukuoka City, a Sengoku-era mountain castle site."
+    },
+    {
+      "id": "anitabi_22431_jvuqr5hpy",
+      "field": "funfact[0]",
+      "tokens": [
+        "山形县"
+      ],
+      "containing": "由利本荘市",
+      "excerpt": "该场景的取景地是山形县酒田市附近的一片油菜花田，每年4月中旬至5月上旬可观赏，与动画中的春季氛围契合。"
+    },
+    {
+      "id": "anitabi_22431_jvuqr5hpy",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "山形県"
+      ],
+      "containing": "由利本荘市",
+      "excerpt": "このシーンのロケ地は山形県酒田市近郊の菜の花畑で、毎年4月中旬から5月上旬に見頃を迎え、作品の春の雰囲気に合致する場所である。"
+    },
+    {
+      "id": "anitabi_226956_3ea6qv8",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Chuo",
+        "Kobe"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "Teradaya (Chuo Ward, Kobe)"
+    },
+    {
+      "id": "anitabi_226956_3ea6qv8",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo",
+        "Kobe"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "The real location is Teradaya in Chuo Ward, Kobe, an old-established restaurant built in the Meiji period."
+    },
+    {
+      "id": "anitabi_226956_7gobbuw",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Awaji",
+        "Hyogo Prefecture"
+      ],
+      "containing": "度会郡南伊勢町",
+      "excerpt": "The real-life prototype of this inn is an actual inn on Awaji Island, Hyogo Prefecture."
+    },
+    {
+      "id": "anitabi_226956_82e69d44",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kobe"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "The real-life location is the Ōe Building in Chūō-ku, Kobe, built in 1925, a well-known example of Western-style architecture from the foreign settlement era."
+    },
+    {
+      "id": "anitabi_226956_px5cef6f8",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kobe"
+      ],
+      "containing": "大分市",
+      "excerpt": "This location is in Nagata Ward, Kobe, serving as a key memory scene for Sachiko in the game."
+    },
+    {
+      "id": "anitabi_22759_kpx6ojna5",
+      "field": "funfact[0]",
+      "tokens": [
+        "石川县"
+      ],
+      "containing": "小平市",
+      "excerpt": "此场景取景于石川县金泽市的ビジネルホテル一茶別館（商业酒店一茶别馆）附近。"
+    },
+    {
+      "id": "anitabi_228378_lqfm24nc0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nagano Prefecture"
+      ],
+      "containing": "京都市上京区",
+      "excerpt": "The real-life model of this school gate is located in Kyoto City, but it is set in Nagano Prefecture in the anime."
+    },
+    {
+      "id": "anitabi_231474_n4vclk99l",
+      "field": "funfact[0]",
+      "tokens": [
+        "岐阜县"
+      ],
+      "containing": "白山市",
+      "excerpt": "该收费站的现实原型是岐阜县各务原市的美川料金所（美川收费站），位于国道沿线，动画再现了其车道和建筑外观。"
+    },
+    {
+      "id": "anitabi_233_kpx6okllj",
+      "field": "answerName",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "横浜市青葉区",
+      "excerpt": "公園通路（東京都）"
+    },
+    {
+      "id": "anitabi_233_kpx6oklm8",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横浜市青葉区",
+      "excerpt": "This location is the ER emergency entrance of a general hospital in Tokyo, used as a reference for the fictional Kujou City General Hospital in the anime."
+    },
+    {
+      "id": "anitabi_234_88otyw8",
+      "field": "funfact[1]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "现实地点位于和歌山县御坊市的海岸堤坝，是粉丝圣地巡礼的热门地点。"
+    },
+    {
+      "id": "anitabi_234_88oydgf",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "该场景的取景地位于和歌山县御坊市的一个公民馆附近，现实中的火警瞭望塔与动画中形象高度一致。"
+    },
+    {
+      "id": "anitabi_234_88p1xac",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Gobo City"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "Kano's Dash Slope (Gobo City, Wakayama)"
+    },
+    {
+      "id": "anitabi_234_88p1xac",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "该场景取材于和歌山县御坊市的一处居民区斜坡，动画中佳乃的家位于此处附近。"
+    },
+    {
+      "id": "anitabi_234_88pfcr9",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "该场景的原型位于和歌山县御坊市日高川河口附近的堤防。"
+    },
+    {
+      "id": "anitabi_234_88pfcr9",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Wakayama Prefecture"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "The real-world location is the embankment near the mouth of the Hidaka River in Gobō, Wakayama Prefecture."
+    },
+    {
+      "id": "anitabi_234_88pjtm4",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "美方郡香美町",
+      "excerpt": "该场景取景于和歌山县御坊市的田间小路，靠近国道424号。"
+    },
+    {
+      "id": "anitabi_234_mjpal0fsi",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "北九州市門司区",
+      "excerpt": "现实中的取景地位于和歌山县御坊市的白野江小学，校舍已被拆除。"
+    },
+    {
+      "id": "anitabi_234_mjpvam80l",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "倉敷市",
+      "excerpt": "该场景的原型位于和歌山县御坊市的岩谷巴士站，是作品中少数完全再现的现实地点之一。"
+    },
+    {
+      "id": "anitabi_234_mjq56vioz",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Kirishima"
+      ],
+      "containing": "国立市",
+      "excerpt": "Kirishima Clinic (real-life model)"
+    },
+    {
+      "id": "anitabi_234_mk4sxzhl3",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "国立市",
+      "excerpt": "该巴士站在动画OP《鸟之诗》中作为标志性镜头出现，现实取景地位于和歌山县御坊市附近的海岸线旁。"
+    },
+    {
+      "id": "anitabi_234_mk4sxzhl3",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "和歌山県"
+      ],
+      "containing": "国立市",
+      "excerpt": "このバス停はオープニングテーマ「鳥の詩」で印象的なカットとして登場します。実在のロケ地は和歌山県御坊市近郊の海岸沿いにあります。"
+    },
+    {
+      "id": "anitabi_234_mk7d4qyug",
+      "field": "funfact[0]",
+      "tokens": [
+        "和歌山县"
+      ],
+      "containing": "山武市",
+      "excerpt": "该场景的原型是位于和歌山县御坊市的JR纪势本线御坊站，站前广场可眺望纪州滩。"
+    },
+    {
+      "id": "anitabi_248154_d2kdyhd",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Setagaya",
+        "Tokyo"
+      ],
+      "containing": "横浜市鶴見区",
+      "excerpt": "The statue is titled “Asu e Hashiru” and was created by sculptor Haruo Kakiuchi. It is located in Kinuta Park, Setagaya Ward, Tokyo."
+    },
+    {
+      "id": "anitabi_253674_51i52kuks",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "该场景位于广岛县尾道市的港口附近，是当地一条真实的坡道。"
+    },
+    {
+      "id": "anitabi_253674_51i52kv2a",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "该场景位于广岛县尾道市的港口附近，是通往主角家的必经之路。"
+    },
+    {
+      "id": "anitabi_253674_51i52kvc0",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "该场景现实原型位于广岛县尾道市因岛三庄町的岩城港，是一个小型地方渔港。"
+    },
+    {
+      "id": "anitabi_253674_51i52kvc0",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "広島県"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "実在のロケ地は広島県尾道市因島三庄町の岩城港で、小さな地方漁港である。"
+    },
+    {
+      "id": "anitabi_253674_51i52kvc0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Iwaki",
+        "Onomichi City",
+        "Hiroshima Prefecture"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "The real-world location is Iwaki Port in Innoshima Sanno-cho, Onomichi City, Hiroshima Prefecture, a small local fishing port."
+    },
+    {
+      "id": "anitabi_253674_51i52kwen",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Iwaki"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "Iwaki Port (Ochi, Ehime)"
+    },
+    {
+      "id": "anitabi_253674_51i52kwj6",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Iwaki"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "Iwaki Port (Ochi, Ehime)"
+    },
+    {
+      "id": "anitabi_253674_51i52kwj6",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "此场景原型为广岛县尾道市因岛地区的岩城港，是一个小型渔港。"
+    },
+    {
+      "id": "anitabi_253674_51i52kwj6",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "広島県"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "このシーンのモデルは広島県尾道市因島にある岩城港で、小さな漁港である。"
+    },
+    {
+      "id": "anitabi_253674_51i52kwn5",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "该小巷位于广岛县尾道市岩城港周边，是作品中少女与猫相遇的经典场景。"
+    },
+    {
+      "id": "anitabi_253674_51i52kwn5",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Iwaki",
+        "Onomichi City",
+        "Hiroshima Prefecture"
+      ],
+      "containing": "越智郡上島町",
+      "excerpt": "This alley is located around Iwaki Port in Onomichi City, Hiroshima Prefecture, and is the key scene where the girl meets the cat in the anime."
+    },
+    {
+      "id": "anitabi_253674_51i52l5dm",
+      "field": "answerName",
+      "tokens": [
+        "广岛县",
+        "尾道市"
+      ],
+      "containing": "今治市",
+      "excerpt": "上浦町井口の路地④（广岛县尾道市）"
+    },
+    {
+      "id": "anitabi_253674_51i52l5dm",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "広島県",
+        "尾道市"
+      ],
+      "containing": "今治市",
+      "excerpt": "上浦町井口の路地④（広島県尾道市）"
+    },
+    {
+      "id": "anitabi_253674_51i52l5dm",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "今治市",
+      "excerpt": "该场景的现实取景地位于广岛县尾道市上浦町井口地区的某条小巷中，是作品中猫咪常出没的路地之一。"
+    },
+    {
+      "id": "anitabi_253674_51i52l5dm",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "広島県"
+      ],
+      "containing": "今治市",
+      "excerpt": "このシーンの実在ロケ地は、広島県尾道市上浦町井口地区の路地の一つで、作中で猫がよく現れる場所のモデルとなっています。"
+    },
+    {
+      "id": "anitabi_253674_51i52l5t3",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "今治市",
+      "excerpt": "现实中的路地位于广岛县尾道市上浦町井口，是一条保留着昭和风情的石板小巷。"
+    },
+    {
+      "id": "anitabi_253674_51i52l5t3",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "広島県"
+      ],
+      "containing": "今治市",
+      "excerpt": "実際の路地は広島県尾道市上浦町井口にあり、昭和の風情を残す石畳の路地です。"
+    },
+    {
+      "id": "anitabi_253674_51i52l5x4",
+      "field": "funfact[0]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "今治市",
+      "excerpt": "该取景地位于广岛县尾道市上浦町井口的居民区，是一条安静的内部道路。"
+    },
+    {
+      "id": "anitabi_253674_51i52l5x4",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "広島県"
+      ],
+      "containing": "今治市",
+      "excerpt": "このロケ地は広島県尾道市上浦町井口の住宅街にある静かな路地です。"
+    },
+    {
+      "id": "anitabi_259_igfks2laf",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "熊本市中央区",
+      "excerpt": "The real-life location is Tsuruya Department Store in Chuo Ward, Kumamoto, a century-old shop with Showa atmosphere."
+    },
+    {
+      "id": "anitabi_259_m9p8r48au",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Hitoyoshi City",
+        "Kumamoto Prefecture",
+        "Kaizuka"
+      ],
+      "containing": "福岡市東区",
+      "excerpt": "The real location is in Hitoyoshi City, Kumamoto Prefecture, a Jomon-period shell mound called 貝塚 (Kaizuka)."
+    },
+    {
+      "id": "anitabi_260680_2ptgzcc",
+      "field": "funfact[1]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "東京都港区",
+      "excerpt": "实际取景地位于神奈川县藤泽市的商业街上，附近有江之电铁路线通过。"
+    },
+    {
+      "id": "anitabi_261591_55b1ff2a",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "東京都千代田区",
+      "excerpt": "现实地点是位于神奈川县横须贺市的一家真实咖啡厅，动画中忠实再现了其外观和内饰。"
+    },
+    {
+      "id": "anitabi_262897_2dhazi0",
+      "field": "locales.en.funfact[2]",
+      "tokens": [
+        "Fuji"
+      ],
+      "containing": "南都留郡富士河口湖町",
+      "excerpt": "In real life, this section is popular among cyclists and tourists visiting the Fuji Five Lakes area."
+    },
+    {
+      "id": "anitabi_262897_3jlyc9u",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Fujinomiya"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "Shishin-kaku (Fujinomiya, Shizuoka)"
+    },
+    {
+      "id": "anitabi_262897_3jlyc9u",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "现实地点是静冈县富士宫市的思親閣，一个可以眺望富士山的著名展望台。"
+    },
+    {
+      "id": "anitabi_262897_3jm3ahb",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Shizuoka Prefecture",
+        "Fuji"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "The observation deck is actually located in Shizuoka Prefecture, a well-known spot for viewing Mount Fuji."
+    },
+    {
+      "id": "anitabi_262897_45dqwc5",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "高山市",
+      "excerpt": "该场景的原型位于静冈县伊豆市的三町公园。"
+    },
+    {
+      "id": "anitabi_262897_45dqwc5",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "静岡県",
+        "伊豆市"
+      ],
+      "containing": "高山市",
+      "excerpt": "実際の場所は静岡県伊豆市の三町公園です。"
+    },
+    {
+      "id": "anitabi_262897_5fchw27be",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "南アルプス市"
+      ],
+      "containing": "南巨摩郡富士川町",
+      "excerpt": "実際のロケ地は山梨県南アルプス市（旧中巨摩郡）の鰍沢公民館付近です。"
+    },
+    {
+      "id": "anitabi_262897_5fchw27d6",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "该处的现实原型是静冈县富士宫市的县道404号，一条以富士山为背景的著名拍摄点。"
+    },
+    {
+      "id": "anitabi_262897_5fchw27d6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fujinomiya"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "The real location is Prefectural Road 404 in Fujinomiya, Shizuoka, a famous scenic road with a view of Mt. Fuji."
+    },
+    {
+      "id": "anitabi_262897_5fchw27fb",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县",
+        "南巨摩郡南部町"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "该地点位于静冈县南巨摩郡南部町，是动画中抚子和凛露营的河滩。"
+    },
+    {
+      "id": "anitabi_262897_5fchw27t4",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡南部町",
+      "excerpt": "该场景的实际取景地位于静冈县富士宫市南部桥东端，动画中忠实地再现了桥的结构和周边环境。"
+    },
+    {
+      "id": "anitabi_262897_5fchw282q",
+      "field": "funfact[1]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡早川町",
+      "excerpt": "指示牌位于静冈县富士宫市赤泽宿，是江户时代的驿站遗址。"
+    },
+    {
+      "id": "anitabi_262897_5fchw2883",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南都留郡山中湖村",
+      "excerpt": "本场景取景于静冈县富士宫市的みさきキャンプ場，这里位于本栖湖东岸，以正面眺望富士山的绝佳视角闻名。"
+    },
+    {
+      "id": "anitabi_262897_5fchw28ks",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡早川町",
+      "excerpt": "该场景取景于静冈县静冈市葵区的汤岛大杉，树龄约1000年，是日本著名的巨木之一。"
+    },
+    {
+      "id": "anitabi_262897_5fchw28lb",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡早川町",
+      "excerpt": "该休息所位于静冈县富士宫市的历史文化公园内，是一处真实的休憩设施。"
+    },
+    {
+      "id": "anitabi_262897_5fchw2912",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "位于静冈县富士宫市的本栖湖展望公园。"
+    },
+    {
+      "id": "anitabi_262897_f57i6zv",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "南都留郡山中湖村",
+      "excerpt": "该地点位于静冈县富士宫市的朝雾高原，是动画中多次出现的露营地之一。"
+    },
+    {
+      "id": "anitabi_262897_f5jmdz3",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Kamakura",
+        "Fujinomiya"
+      ],
+      "containing": "南都留郡山中湖村",
+      "excerpt": "Old Kamakura Road (Fujinomiya, Shizuoka)"
+    },
+    {
+      "id": "anitabi_262897_f5jmdz3",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fujinomiya City",
+        "Shizuoka Prefecture",
+        "Kamakura"
+      ],
+      "containing": "南都留郡山中湖村",
+      "excerpt": "This section is located in Fujinomiya City, Shizuoka Prefecture, part of the historic route connecting Kamakura and Kai."
+    },
+    {
+      "id": "anitabi_262897_f5r2f6b",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fujinomiya"
+      ],
+      "containing": "南巨摩郡早川町",
+      "excerpt": "This location is in Fujinomiya, Shizuoka, a real-life general store and rest area."
+    },
+    {
+      "id": "anitabi_265708_2ac3b52f",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县",
+        "东村山市"
+      ],
+      "containing": "太田市",
+      "excerpt": "该桥位于埼玉县东村山市，实际名称为世良田站陆桥，紧邻JR武藏野线世良田站。"
+    },
+    {
+      "id": "anitabi_265708_69ed0299",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東村山市"
+      ],
+      "containing": "所沢市",
+      "excerpt": "この聖地巡礼スポットは埼玉県東村山市にあるイオン所沢店で、大型総合ショッピングセンターです。"
+    },
+    {
+      "id": "anitabi_265708_915dec46",
+      "field": "funfact[0]",
+      "tokens": [
+        "东村山市"
+      ],
+      "containing": "小平市",
+      "excerpt": "该坡道位于东村山市，是主角们通学的必经之路。"
+    },
+    {
+      "id": "anitabi_265708_9bdb5f0b",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東村山市"
+      ],
+      "containing": "所沢市",
+      "excerpt": "この商店街のモデルは埼玉県東村山市のプロぺ通りで、作品中最も代表的な日常シーンの一つ。"
+    },
+    {
+      "id": "anitabi_266070_78e58fb7",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "諏訪郡富士見町",
+      "excerpt": "该地点位于山梨县笛吹市附近，是一条通向著名露营地的乡村道路。"
+    },
+    {
+      "id": "anitabi_26826_lxs0ultjc",
+      "field": "funfact[0]",
+      "tokens": [
+        "高知县"
+      ],
+      "containing": "出雲市",
+      "excerpt": "现实原型位于高知县香美市的神西湖，湖中鸟居是当地著名景观。"
+    },
+    {
+      "id": "anitabi_27364_7ek5c0so",
+      "field": "locales.ja.funfact[1]",
+      "tokens": [
+        "高山市"
+      ],
+      "containing": "掛川市",
+      "excerpt": "千反田邸は単一の実在建築をモデルにしたものではなく、高山市の伝統的な町家（木造格子窓や石灯籠など）の特徴を融合して描かれている。"
+    },
+    {
+      "id": "anitabi_274_mlirq7wbo",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "立川市",
+      "excerpt": "该场景的原型位于北海道札幌市某商业街，动画中还原了店铺屋檐与积雪路面的细节。"
+    },
+    {
+      "id": "anitabi_274_mlisf2s23",
+      "field": "funfact[1]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "立川市",
+      "excerpt": "动画中描绘的喷水池原型位于北海道札幌市的一个公园内，但具体位置未公开确认。"
+    },
+    {
+      "id": "anitabi_274_mliw8bgkt",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "立川市",
+      "excerpt": "该场景的真实取景地位于北海道札幌市中央区的某条街道附近，雪景与路灯布局与动画高度一致。"
+    },
+    {
+      "id": "anitabi_274_mliyv5lbl",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "立川市",
+      "excerpt": "该场景出自第16集约14:38处，真实取景地位于北海道札幌市中央区的狸小路商店街附近。"
+    },
+    {
+      "id": "anitabi_274_mlj1wak7t",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Sapporo"
+      ],
+      "containing": "立川市",
+      "excerpt": "The real location is the Sapporo Clock Tower in Sapporo."
+    },
+    {
+      "id": "anitabi_274_mlj7ggk3y",
+      "field": "funfact[0]",
+      "tokens": [
+        "北海道"
+      ],
+      "containing": "東大和市",
+      "excerpt": "该场景的现实原型位于北海道札幌市内的某所高中，校园布局与动画高度相似。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkv1r",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "つくば市",
+      "excerpt": "该地点位于埼玉县川越市大清水公园前交叉路口，在动画第4集约13秒处出现。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkv4h",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "つくば市",
+      "excerpt": "该路口位于埼玉县川越市并木二丁目，是动画中主角们上下学的必经之路。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkvkq",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "つくば市",
+      "excerpt": "このシーンは埼玉県川越市吾妻町にある吾妻セントラル歩道桥下で撮影されました。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkvwo",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "つくば市",
+      "excerpt": "现实原型是位于埼玉县川越市的川越市立博物馆（部分外观参考）。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkw8k",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "つくば市",
+      "excerpt": "该建筑原型是位于埼玉县川越市的川越市立博物馆（附设天文馆），其标志性穹顶在动画中多次出现。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mkya2",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "下田市",
+      "excerpt": "该场景的原型是位于千叶县南房总市的田牛沙滑雪场，是一个由沙丘构成的自然滑沙场。"
+    },
+    {
+      "id": "anitabi_276150_4sd1mleq1",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "つくば市",
+      "excerpt": "该场景原型位于日本埼玉县川越市的H2火箭实物大模型附近，该模型真实存在，为日本H2火箭的全尺寸复制品。"
+    },
+    {
+      "id": "anitabi_277518_hhm50c85h",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "町田市"
+      ],
+      "containing": "鎌倉市",
+      "excerpt": "実際のロケ地は町田市の住宅街の一角で、壁や地面がアニメと一致している。"
+    },
+    {
+      "id": "anitabi_277954_39ekvbni",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chiba Prefecture"
+      ],
+      "containing": "東京都江戸川区",
+      "excerpt": "The location is the Central Avenue of Kasai Rinkai Park in Mihama-ku, Chiba City, Chiba Prefecture, a 1 km long tree-lined avenue."
+    },
+    {
+      "id": "anitabi_282000_oxzga6ju1",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Nagoya"
+      ],
+      "containing": "東海市",
+      "excerpt": "The real-world location is Sorato Otagawa near Nagoya, Aichi Prefecture, not Kyoto."
+    },
+    {
+      "id": "anitabi_282372_il57h5eef",
+      "field": "funfact[0]",
+      "tokens": [
+        "岐阜县"
+      ],
+      "containing": "西東京市",
+      "excerpt": "该场景现实取景地为岐阜县大垣市的ASTA商业设施，是当地知名的购物中心。"
+    },
+    {
+      "id": "anitabi_282923_tvi5q3em7",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "甲斐市",
+      "excerpt": "此场景的原型位于埼玉县秩父市双叶服务区附近的鸟之池桥下，河岸旁有可供休息的平坦草地。"
+    },
+    {
+      "id": "anitabi_282923_tviu0eqi3",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "该岔口位于埼玉县秩父市郊外，实际是一条连接主要道路与山间小道的无名岔路。"
+    },
+    {
+      "id": "anitabi_282923_txm7sk5tx",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "西多摩郡奥多摩町",
+      "excerpt": "此处是埼玉县秩父市的氷川渓谷入口石阶，是作品中角色们户外饮酒的取景地。"
+    },
+    {
+      "id": "anitabi_282923_txm98zhxi",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "西多摩郡奥多摩町",
+      "excerpt": "实际地点是埼玉县秩父市的氷川溪谷，昭和桥是一座红色钢桥，是秩父地区的知名观光景点。"
+    },
+    {
+      "id": "anitabi_282923_txmdhc8pq",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Chichibu City"
+      ],
+      "containing": "西多摩郡奥多摩町",
+      "excerpt": "Hikawa Valley (Chichibu City, Saitama)"
+    },
+    {
+      "id": "anitabi_282923_txmdhc8pq",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "西多摩郡奥多摩町",
+      "excerpt": "该场景的取景地位于埼玉县秩父市的冰河溪谷，是秩父代表性的自然景点。"
+    },
+    {
+      "id": "anitabi_282923_u29y6omns",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "南魚沼市",
+      "excerpt": "该场景的原型是位于埼玉县秩父市郊外的八海山雪室，是实际存在的酒类贮藏设施。"
+    },
+    {
+      "id": "anitabi_282923_u29y6omns",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "南魚沼市",
+      "excerpt": "このシーンのモデルは埼玉県秩父市郊外にある実際の八海山雪室で、酒類の貯蔵施設です。"
+    },
+    {
+      "id": "anitabi_282923_u2bbeslj4",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "東京都目黒区",
+      "excerpt": "现实取景地为位于埼玉县秩父市的日本近代文学馆，馆藏以近代日本文学资料为主。"
+    },
+    {
+      "id": "anitabi_282923_u8l55lcly",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "该场景的原型是埼玉县秩父市的弁天堂，池塘中常有鲤鱼游动。"
+    },
+    {
+      "id": "anitabi_282923_u8l67bpx4",
+      "field": "answerName",
+      "tokens": [
+        "秩父市"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "弁天堂 時の鐘（秩父市）"
+    },
+    {
+      "id": "anitabi_282923_u8l67bpx4",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Toki",
+        "Chichibu City"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "Bentendō Toki no Kane (Chichibu City)"
+    },
+    {
+      "id": "anitabi_283643_llbiazdaq",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "宇治市"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "このシーンのロケ地は京都府宇治市の納屋町通商店街で、アーケード構造が忠実に再現されている。"
+    },
+    {
+      "id": "anitabi_283643_p9sc7x9ov",
+      "field": "answerName",
+      "tokens": [
+        "宇治市"
+      ],
+      "containing": "名古屋市熱田区",
+      "excerpt": "活动大厅（宇治市）"
+    },
+    {
+      "id": "anitabi_283643_p9sc7x9ov",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "宇治市"
+      ],
+      "containing": "名古屋市熱田区",
+      "excerpt": "イベントホール（宇治市）"
+    },
+    {
+      "id": "anitabi_28440_2dcd4de0",
+      "field": "funfact[0]",
+      "tokens": [
+        "横滨市金泽区"
+      ],
+      "containing": "横浜市栄区",
+      "excerpt": "现实中的这片森林位于横滨市金泽区，是市民自然观察公园的一部分。"
+    },
+    {
+      "id": "anitabi_28440_2dcd4de0",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "横浜市金沢区"
+      ],
+      "containing": "横浜市栄区",
+      "excerpt": "実際の森は横浜市金沢区にあり、市民自然観察公園の一部です。"
+    },
+    {
+      "id": "anitabi_28440_80b2f20a",
+      "field": "answerName",
+      "tokens": [
+        "东京都练马区"
+      ],
+      "containing": "東京都杉並区",
+      "excerpt": "丸山桥（东京都练马区）"
+    },
+    {
+      "id": "anitabi_28440_c15453a6",
+      "field": "funfact[1]",
+      "tokens": [
+        "东村山市"
+      ],
+      "containing": "国立市",
+      "excerpt": "现实中的白十字位于东京都东村山市，是当地有名的交叉路口，因附近有白十字药局而得名。"
+    },
+    {
+      "id": "anitabi_290980_460c09e6",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "前橋市",
+      "excerpt": "该山顶位于日本埼玉县饭能市郊外，是当地登山路线的一处常见终点。"
+    },
+    {
+      "id": "anitabi_290980_460c09e6",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "前橋市",
+      "excerpt": "この山頂は埼玉県飯能市郊外に位置し、地元のハイキングコースの一般的な終点である。"
+    },
+    {
+      "id": "anitabi_290980_62abe859",
+      "field": "answerName",
+      "tokens": [
+        "饭能市"
+      ],
+      "containing": "前橋市",
+      "excerpt": "青木旅馆（饭能市）"
+    },
+    {
+      "id": "anitabi_290980_62abe859",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "飯能市"
+      ],
+      "containing": "前橋市",
+      "excerpt": "青木旅館（飯能市）"
+    },
+    {
+      "id": "anitabi_290980_6w4ct5o",
+      "field": "answerName",
+      "tokens": [
+        "饭能市"
+      ],
+      "containing": "東京都港区",
+      "excerpt": "将军梅（饭能市）"
+    },
+    {
+      "id": "anitabi_290980_6w4ct5o",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "飯能市"
+      ],
+      "containing": "東京都港区",
+      "excerpt": "将軍梅（飯能市）"
+    },
+    {
+      "id": "anitabi_290980_6w4ct5o",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "東京都港区",
+      "excerpt": "现实中的将军梅是一棵位于埼玉县饭能市的古梅树，树龄超过300年，是当地的著名景观。"
+    },
+    {
+      "id": "anitabi_290980_85d7c731",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "沼田市",
+        "利根郡片品村"
+      ],
+      "containing": "前橋市",
+      "excerpt": "このシーンの現実のモデルは群馬県沼田市にある谷川岳の登山道の一部で、利根郡片品村に位置する。"
+    },
+    {
+      "id": "anitabi_290980_86de9396",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Hanno"
+      ],
+      "containing": "前橋市",
+      "excerpt": "Sai no Kawara (Hanno, Saitama)"
+    },
+    {
+      "id": "anitabi_290980_d92a4ec4",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "前橋市",
+      "excerpt": "此场景的取景地是埼玉县饭能市某大型户外停车场，常用于登山者集散。"
+    },
+    {
+      "id": "anitabi_290980_df2971e2",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "前橋市",
+      "excerpt": "此场景取景于埼玉县饭能市附近的真实登山口，该地点是当地民众常去的登山起点之一。"
+    },
+    {
+      "id": "anitabi_290980_df2971e2",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "前橋市",
+      "excerpt": "この場所は埼玉県飯能市近郊にある実際の登山口をモデルにしており、地元のハイカーによく利用されています。"
+    },
+    {
+      "id": "anitabi_290980_e37f9d63",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "桐生市",
+      "excerpt": "该场景对应的现实位置是埼玉县饭能市附近的一座山峰的山脊，登山道视野开阔。"
+    },
+    {
+      "id": "anitabi_290980_e37f9d63",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "桐生市",
+      "excerpt": "このシーンの実際の場所は、埼玉県飯能市近くの山の尾根で、展望が開けている。"
+    },
+    {
+      "id": "anitabi_290980_ef2bd688",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "前橋市",
+      "excerpt": "该场景对应的现实地点位于埼玉县饭能市内的登山道上，是通往天览山和伊豆岳的岔路口。"
+    },
+    {
+      "id": "anitabi_290980_ef2bd688",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "埼玉県"
+      ],
+      "containing": "前橋市",
+      "excerpt": "このシーンの実際の場所は埼玉県飯能市内の登山道で、天覧山と伊豆岳へ向かう分岐点です。"
+    },
+    {
+      "id": "anitabi_292902_3g2fbxc",
+      "field": "answerName",
+      "tokens": [
+        "福井市"
+      ],
+      "containing": "東京都新宿区",
+      "excerpt": "丸实商店（福井市）"
+    },
+    {
+      "id": "anitabi_292902_3g2fbxc",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "福井市"
+      ],
+      "containing": "東京都新宿区",
+      "excerpt": "丸実商店（福井市）"
+    },
+    {
+      "id": "anitabi_292902_3g2fbxc",
+      "field": "locales.en.description",
+      "tokens": [
+        "Chitose"
+      ],
+      "containing": "東京都新宿区",
+      "excerpt": "In *Bottle of Ramune*, Chitose and his friends often visit this general store located in a residential area. The entrance features red and white awnings, a glass display counter fi"
+    },
+    {
+      "id": "anitabi_292902_3g3lqip",
+      "field": "locales.en.description",
+      "tokens": [
+        "Chitose"
+      ],
+      "containing": "東京都新宿区",
+      "excerpt": "In *Chitose-kun wa Ramune-bottle no Naka*, characters visit a large chain bookstore located in a bustling urban area. The store is spacious and bright, with multiple floors; the ma"
+    },
+    {
+      "id": "anitabi_29426_kpwu5gdms",
+      "field": "answerName",
+      "tokens": [
+        "佐世保市"
+      ],
+      "containing": "東京都中央区",
+      "excerpt": "白いばら（佐世保市）"
+    },
+    {
+      "id": "anitabi_29426_kpwu5gdms",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Shiroi",
+        "Sasebo"
+      ],
+      "containing": "東京都中央区",
+      "excerpt": "Shiroi Bara (Sasebo)"
+    },
+    {
+      "id": "anitabi_29426_ukc0xbq0v",
+      "field": "funfact[0]",
+      "tokens": [
+        "长崎县"
+      ],
+      "containing": "東京都中央区",
+      "excerpt": "该十字路口位于长崎县佐世保市的银座四丁目，是作品取景地之一。"
+    },
+    {
+      "id": "anitabi_29426_ukc835hyc",
+      "field": "funfact[0]",
+      "tokens": [
+        "长崎县"
+      ],
+      "containing": "さいたま市大宮区",
+      "excerpt": "该场景的原型是位于长崎县佐世保市的佐世保铁道博物馆，馆内保存有日本最古老的电力机车之一。"
+    },
+    {
+      "id": "anitabi_294337_ngdrew2wf",
+      "field": "answerName",
+      "tokens": [
+        "笛吹市"
+      ],
+      "containing": "中郡大磯町",
+      "excerpt": "长者町（笛吹市）"
+    },
+    {
+      "id": "anitabi_294337_ngdrew2wf",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "笛吹市"
+      ],
+      "containing": "中郡大磯町",
+      "excerpt": "長者町（笛吹市）"
+    },
+    {
+      "id": "anitabi_294337_ngdrew2wf",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "中郡大磯町",
+      "excerpt": "动画第6集约13分39秒处（对应时间戳819秒）的场景取景于山梨县笛吹市的长者町。"
+    },
+    {
+      "id": "anitabi_294337_ngg24im0m",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "鎌倉市",
+      "excerpt": "The overpass is located in Minamikoma District, Yamanashi Prefecture, offering a distant view of Mount Fuji."
+    },
+    {
+      "id": "anitabi_294337_pjo44fo2d",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "大津市",
+      "excerpt": "该场景取景于山梨县北杜市的なぎさ公園市民プラザ。"
+    },
+    {
+      "id": "anitabi_294713_21ef636d",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "横須賀市",
+      "excerpt": "In reality, this parking lot is located within Tateishi Park in Tokyo, a free parking area near children's playground equipment."
+    },
+    {
+      "id": "anitabi_295308_03fa51dc",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "相模原市緑区",
+      "excerpt": "The real location is a residential area in Tokyo, surrounded by low-rise buildings and a main road."
+    },
+    {
+      "id": "anitabi_295308_3e538a2a",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "足柄上郡松田町",
+      "excerpt": "The real-world bridgehead is located in western Tokyo, with a river and walking paths, a popular recreation spot for locals."
+    },
+    {
+      "id": "anitabi_295308_4nz9ly1",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chitose",
+        "Tokyo"
+      ],
+      "containing": "亀岡市",
+      "excerpt": "This mound is actually the Chitose Kurumazuka Kofun, a circular ancient tomb located in Tokyo."
+    },
+    {
+      "id": "anitabi_295308_d6259fcd",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "秦野市",
+      "excerpt": "This location is a park plaza in western Tokyo, used in the anime as the standby point for Unit 31E operations."
+    },
+    {
+      "id": "anitabi_295308_nd6p0ow2y",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "茅野市",
+      "excerpt": "此场景的原型是位于山梨县北杜市的赤岳矿泉，是一座实际存在的山间小屋和矿泉设施。"
+    },
+    {
+      "id": "anitabi_295308_nd6p0ow2y",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture"
+      ],
+      "containing": "茅野市",
+      "excerpt": "The real-life location is Akadake Kosen, a mountain lodge and mineral spring in Hokuto City, Yamanashi Prefecture."
+    },
+    {
+      "id": "anitabi_295308_nd6s8kx93",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "茅野市",
+      "excerpt": "The real-world location is Natsuzawa Pass, located near Tokyo in Yamanashi Prefecture, a known hiking route."
+    },
+    {
+      "id": "anitabi_295308_nd7nz3b2w",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "北杜市",
+      "excerpt": "This location is the Kawamata River Valley in Tokyo, used as the backdrop for the group's outdoor training in episode 3."
+    },
+    {
+      "id": "anitabi_295308_nd9li52jr",
+      "field": "answerName",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "茅野市",
+      "excerpt": "美浓户中山（东京都）"
+    },
+    {
+      "id": "anitabi_295308_nd9li52jr",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "茅野市",
+      "excerpt": "美濃戸中山（東京都）"
+    },
+    {
+      "id": "anitabi_295350_nobf0qhuc",
+      "field": "answerName",
+      "tokens": [
+        "金泽市"
+      ],
+      "containing": "京都市東山区",
+      "excerpt": "音羽瀑布东侧（金泽市）"
+    },
+    {
+      "id": "anitabi_295350_nobf0qhuc",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "金沢市"
+      ],
+      "containing": "京都市東山区",
+      "excerpt": "音羽の滝の東側（金沢市）"
+    },
+    {
+      "id": "anitabi_295350_nobf0qhuc",
+      "field": "funfact[0]",
+      "tokens": [
+        "石川县"
+      ],
+      "containing": "京都市東山区",
+      "excerpt": "该场景对应的现实地点位于石川县金泽市的音羽瀑布东侧，是游戏中常见的约会或谈心场所。"
+    },
+    {
+      "id": "anitabi_295364_us9dd5g9g",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "宇和島市",
+      "excerpt": "该地点原型为东京都町田市的居村米穀店附近。"
+    },
+    {
+      "id": "anitabi_295364_us9dd5g9g",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都",
+        "町田市"
+      ],
+      "containing": "宇和島市",
+      "excerpt": "実際の場所は東京都町田市の居村米穀店付近である。"
+    },
+    {
+      "id": "anitabi_29648_2fq99r5",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "该便利店的原型位于滋贺县大津市美浜地区，动画中作为主角团常去的店铺出现，第8集中七宫智音在此打工。"
+    },
+    {
+      "id": "anitabi_29648_2fq99r5",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "滋賀県"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "実在のコンビニは滋賀県大津市美浜にあるファミリーマート美浜佐田店。アニメでは主要キャラクターがよく訪れる店として登場し、第8話では七宮智音がここでアルバイトしている。"
+    },
+    {
+      "id": "anitabi_29648_34kt8sc",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "该场景的现实取景地位于滋贺县大津市内某条普通住宅区道路。"
+    },
+    {
+      "id": "anitabi_29648_34kt8sc",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "滋賀県"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "このシーンのロケ地は滋賀県大津市内のある住宅街の道路です。"
+    },
+    {
+      "id": "anitabi_29648_k1e2r3rz0",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "该场景的原型位于滋贺县大津市的桃山南团地，是动画中六花居住的公寓楼所在地。"
+    },
+    {
+      "id": "anitabi_29648_ot4prc83y",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "该地点位于滋贺县大津市的若狭梅街道，是动画第12集约17分30秒（1050秒）处的取景地。"
+    },
+    {
+      "id": "anitabi_29648_p3n2htrim",
+      "field": "funfact[1]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "现实取景地位于滋贺县大津市的某公寓楼，走廊布局与动画中高度一致。"
+    },
+    {
+      "id": "anitabi_29648_p3n59s8ir",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "该场景的取景地位于大津市某普通公寓楼的室外楼梯，具体地址为滋贺县大津市松本1丁目附近。"
+    },
+    {
+      "id": "anitabi_29648_p3n59s8ir",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "大津市",
+        "滋賀県"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "このシーンのロケ地は大津市の某アパートの屋外階段で、具体的には滋賀県大津市松本1丁目付近。"
+    },
+    {
+      "id": "anitabi_29648_p3n59s8ir",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Otsu City",
+        "Matsumoto",
+        "Shiga Prefecture"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "The real location is an outdoor staircase of an apartment building in Otsu City, near Matsumoto 1-chome, Shiga Prefecture."
+    },
+    {
+      "id": "anitabi_29648_p5xicb3ci",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "该场景的原型位于滋贺县大津市的某个墓地，但并非官方认定的准确位置。"
+    },
+    {
+      "id": "anitabi_29648_p5xzbhjmj",
+      "field": "funfact[1]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "三方郡美浜町",
+      "excerpt": "这处楼梯位于滋贺县大津市的一个公共海水浴场内。"
+    },
+    {
+      "id": "anitabi_300179_5832kw4x0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kita",
+        "Tokyo",
+        "Shima"
+      ],
+      "containing": "さいたま市中央区",
+      "excerpt": "The intersection is located in Kita, Tokyo, a spot where Shima and Ibuki pass while on duty."
+    },
+    {
+      "id": "anitabi_300179_qoa2bciq4",
+      "field": "locales.en.description",
+      "tokens": [
+        "Shima"
+      ],
+      "containing": "北足立郡伊奈町",
+      "excerpt": "In *MIU404*, this location is a convenience store where the two main characters, the impulsive Shima and the calm Ibuki, briefly stop or chat. The storefront with its automatic doo"
+    },
+    {
+      "id": "anitabi_3054_5gsltvyvv",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kita"
+      ],
+      "containing": "京都市北区",
+      "excerpt": "The real-life location is Kinkaku-ji (Rokuon-ji) in Kyoto's Kita Ward, a National Treasure of Japan."
+    },
+    {
+      "id": "anitabi_30619_7ed81304",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "川崎市川崎区",
+      "excerpt": "This restaurant is real, located in Tokyo, and famous for its lamb barbecue."
+    },
+    {
+      "id": "anitabi_314638_in6tumah4",
+      "field": "answerName",
+      "tokens": [
+        "佐渡市"
+      ],
+      "containing": "所沢市",
+      "excerpt": "山中制粉工厂模型（佐渡市）"
+    },
+    {
+      "id": "anitabi_314638_in6tumah4",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "佐渡市"
+      ],
+      "containing": "所沢市",
+      "excerpt": "山中製粉モデル（佐渡市）"
+    },
+    {
+      "id": "anitabi_314638_in6tumah4",
+      "field": "funfact[0]",
+      "tokens": [
+        "新潟县"
+      ],
+      "containing": "所沢市",
+      "excerpt": "现实中的巡礼点是位于新潟县佐渡市的山中制粉工厂模型，该建筑在电影中作为背景出现。"
+    },
+    {
+      "id": "anitabi_314638_in6tumazq",
+      "field": "funfact[0]",
+      "tokens": [
+        "新潟县"
+      ],
+      "containing": "米子市",
+      "excerpt": "该场景的灵感来源于位于新潟县佐渡市的一座大型太阳能发电设施，其壮观的光伏阵列被用作动画的参考。"
+    },
+    {
+      "id": "anitabi_322535_66263ot",
+      "field": "locales.en.episodeContext",
+      "tokens": [
+        "Suzu"
+      ],
+      "containing": "吾川郡いの町",
+      "excerpt": "Scenes from Suzu's real life throughout the film"
+    },
+    {
+      "id": "anitabi_324295_oem5ctl9t",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chichibu City"
+      ],
+      "containing": "秩父郡長瀞町",
+      "excerpt": "The real shop is located in Chichibu City, Saitama Prefecture, known for its handmade pudding and vegetable sweets."
+    },
+    {
+      "id": "anitabi_328609_uqgmy0i50",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kanazawa"
+      ],
+      "containing": "横浜市金沢区",
+      "excerpt": "The real church is Pure Gospel Kanazawa Church, located in Kanazawa Ward, Yokohama, Kanagawa Prefecture."
+    },
+    {
+      "id": "anitabi_331489_p1apvxj4w",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "本场景的取景地位于爱知县春日井市的某冲浪池。"
+    },
+    {
+      "id": "anitabi_331489_p1atwg78f",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "该滑梯的原型位于爱知县春日井市某游乐园内，是真实的游乐设施。"
+    },
+    {
+      "id": "anitabi_331489_p1az9qsbs",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "桑名市",
+      "excerpt": "该游乐设施的原型位于爱知县春日井市的某游乐园内，设施名称与动画中完全一致。"
+    },
+    {
+      "id": "anitabi_331489_p1b4jlaze",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kasugai"
+      ],
+      "containing": "桑名市",
+      "excerpt": "This location is in the real-world city of Kasugai, an abandoned industrial water pipe."
+    },
+    {
+      "id": "anitabi_3375_a8c7cc56",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Nagato"
+      ],
+      "containing": "西宮市",
+      "excerpt": "Slope on the way to Nagato's apartment (Nishinomiya)"
+    },
+    {
+      "id": "anitabi_3375_a8c7cc56",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Takarazuka",
+        "Nagato"
+      ],
+      "containing": "西宮市",
+      "excerpt": "This slope is located in Takarazuka, Hyogo Prefecture, part of the residential area on the way to Nagato's apartment."
+    },
+    {
+      "id": "anitabi_338969_f93oufz",
+      "field": "funfact[0]",
+      "tokens": [
+        "岩手县"
+      ],
+      "containing": "船橋市",
+      "excerpt": "该公园位于现实中的岩手县，但动画中改名为海神町。"
+    },
+    {
+      "id": "anitabi_357961_jnv43n0l8",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "羽咋郡志賀町"
+      ],
+      "containing": "珠洲市",
+      "excerpt": "この場所は石川県羽咋郡志賀町にある高屋新保バス停で、修学旅行中の休憩地点として使用された。"
+    },
+    {
+      "id": "anitabi_362577_srgp1xz9v",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kobe"
+      ],
+      "containing": "平塚市",
+      "excerpt": "The real-world location is the abandoned Sumaura Amusement Park in Suma-ku, Kobe, featuring the Ferris wheel and carousel."
+    },
+    {
+      "id": "anitabi_36261_231d34a1",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Kagoshima Prefecture"
+      ],
+      "containing": "東京都千代田区",
+      "excerpt": "The story is mainly set in Kagoshima Prefecture, while the publishing building location is in Tokyo, reflecting a blend of reality and fiction."
+    },
+    {
+      "id": "anitabi_363957_32w6fwj",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kita"
+      ],
+      "containing": "岡山市北区",
+      "excerpt": "This location is Momotaro Street in Kita Ward, Okayama, a well-known shopping street."
+    },
+    {
+      "id": "anitabi_363957_vaxv8w89c",
+      "field": "funfact[1]",
+      "tokens": [
+        "香川县"
+      ],
+      "containing": "下田市",
+      "excerpt": "现实原型为香川县丸龟市的竜宮公園，公园内拥有相似的临海洞穴。"
+    },
+    {
+      "id": "anitabi_363957_zxxpsf",
+      "field": "funfact[0]",
+      "tokens": [
+        "香川县"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "该庭园的原型是位于香川县丸龟市的旧岩崎家宅邸庭园，被指定为国家名胜。"
+    },
+    {
+      "id": "anitabi_37137_4slhba83g",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Sawa"
+      ],
+      "containing": "藤沢市",
+      "excerpt": "Horse riding ground above Sawa's house (Fujisawa City)"
+    },
+    {
+      "id": "anitabi_37137_4slhba842",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Sawa"
+      ],
+      "containing": "藤沢市",
+      "excerpt": "Café where Konatsu and Sawa rest (Fujisawa)"
+    },
+    {
+      "id": "anitabi_378862_qjvkoyt3j",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Miyagi Prefecture"
+      ],
+      "containing": "尾花沢市",
+      "excerpt": "This parking lot is located at Ryokan Nagasawa Heihachi in Kami Town, Miyagi Prefecture, which served as the model for the hot spring ryokan in the anime."
+    },
+    {
+      "id": "anitabi_378862_qmkec963c",
+      "field": "funfact[0]",
+      "tokens": [
+        "宫城县"
+      ],
+      "containing": "尾花沢市",
+      "excerpt": "该场景的原型是宫城县加美郡加美町的白银瀑布（白银の滝），落差约20米。"
+    },
+    {
+      "id": "anitabi_378862_qmkec963c",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "宮城県",
+        "加美郡加美町"
+      ],
+      "containing": "尾花沢市",
+      "excerpt": "実際のロケ地は宮城県加美郡加美町にある白銀の滝（落差約20m）です。"
+    },
+    {
+      "id": "anitabi_378862_qmkec963c",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Miyagi Prefecture"
+      ],
+      "containing": "尾花沢市",
+      "excerpt": "The real-life location is Shirō Falls in Kami-machi, Kami District, Miyagi Prefecture, with a drop of about 20 meters."
+    },
+    {
+      "id": "anitabi_386809_feafadf2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Aso City"
+      ],
+      "containing": "阿蘇郡西原村",
+      "excerpt": "This windmill is located at Tawarayama in Aso City, Kumamoto Prefecture, serving as the filming location for Ai Hoshino's music video."
+    },
+    {
+      "id": "anitabi_387803_863cae46",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "金沢市",
+      "excerpt": "The real-life inspiration is a traditional confectionery shop near Nihonbashi, Chuo-ku, Tokyo, which also sells beaver-shaped crackers."
+    },
+    {
+      "id": "anitabi_387803_8e16af23",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Sumida",
+        "Chuo City",
+        "Tokyo"
+      ],
+      "containing": "大阪市浪速区",
+      "excerpt": "The scene is located along the Sumida River in Chuo City, Tokyo, near the famous Tsukishima Monja Street."
+    },
+    {
+      "id": "anitabi_390794_dynipod1s",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "青梅市",
+      "excerpt": "该场景的现实原型是埼玉县秩父市的旧吹上隧道南侧入口，是日本著名的灵异地点，常被动漫和影视作品取景。"
+    },
+    {
+      "id": "anitabi_390794_dynipod1s",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Saitama Prefecture"
+      ],
+      "containing": "青梅市",
+      "excerpt": "The real-world location is the south entrance of the old Fukiage Tunnel in Chichibu, Saitama Prefecture, a well-known haunted spot in Japan frequently featured in anime and films."
+    },
+    {
+      "id": "anitabi_404809_5td1uxx",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "東京都豊島区",
+      "excerpt": "该场景取景于埼玉县饭能市的明治通。"
+    },
+    {
+      "id": "anitabi_412784_uwnnkcz0w",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Suwa City"
+      ],
+      "containing": "諏訪郡下諏訪町",
+      "excerpt": "Kuriningu Momose (Suwa City)"
+    },
+    {
+      "id": "anitabi_41488_9k1238b",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "川崎市多摩区",
+      "excerpt": "该场景取景于东京都调布市的京王线某站站前广场（非札幌）。"
+    },
+    {
+      "id": "anitabi_41658_10lv8ij",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "八王子市",
+      "excerpt": "该场景取景自现实位于埼玉县饭能市天览山登山道上的东屋。"
+    },
+    {
+      "id": "anitabi_4235_potza0xpf",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Onomichi"
+      ],
+      "containing": "出雲市",
+      "excerpt": "This approach is located at Izumo Taisha in Onomichi, a real Shinto sanctuary."
+    },
+    {
+      "id": "anitabi_425909_o0fvd6wg5",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mizuho",
+        "Shibuya",
+        "Tokyo"
+      ],
+      "containing": "さいたま市大宮区",
+      "excerpt": "This scene was filmed at a Mizuho Bank ATM in Shibuya, Tokyo, near a busy commercial district."
+    },
+    {
+      "id": "anitabi_427233_p13ho3tfr",
+      "field": "funfact[0]",
+      "tokens": [
+        "三重县"
+      ],
+      "containing": "東海市",
+      "excerpt": "该场景原型为三重县桑名市的汐见丘公园。"
+    },
+    {
+      "id": "anitabi_427233_p13ho3tfr",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mie Prefecture"
+      ],
+      "containing": "東海市",
+      "excerpt": "The real location is Shiohigoka Park in Kuwana, Mie Prefecture."
+    },
+    {
+      "id": "anitabi_427233_p13n67mot",
+      "field": "funfact[0]",
+      "tokens": [
+        "三重县"
+      ],
+      "containing": "飯田市",
+      "excerpt": "现实地点位于三重县桑名市虎岩交流センター，该建筑是当地居民使用的社区交流设施。"
+    },
+    {
+      "id": "anitabi_427233_p14djswdb",
+      "field": "funfact[0]",
+      "tokens": [
+        "三重县"
+      ],
+      "containing": "神戸市中央区",
+      "excerpt": "该咖啡馆的原型是位于三重县桑名市的Cafeteria BREATH。"
+    },
+    {
+      "id": "anitabi_427233_p14djswdb",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "神戸市中央区",
+      "excerpt": "The real-life café that inspired the scene is Cafeteria BREATH in Chuo Ward, Kobe."
+    },
+    {
+      "id": "anitabi_427233_p169ylkfz",
+      "field": "locales.ja.funfact[2]",
+      "tokens": [
+        "桑名市",
+        "三重県"
+      ],
+      "containing": "京都市右京区",
+      "excerpt": "桑名市は三重県に位置し、歴史的な街並みや祭りで知られています。"
+    },
+    {
+      "id": "anitabi_427233_p16hebln2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mie Prefecture"
+      ],
+      "containing": "名古屋市昭和区",
+      "excerpt": "The real-life inspiration for this amusement park is Nagashima Spa Land in Kuwana, Mie Prefecture."
+    },
+    {
+      "id": "anitabi_428735_54m5qae",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Miura City"
+      ],
+      "containing": "三浦郡葉山町",
+      "excerpt": "Isshiki Coast is located in Miura City, Kanagawa Prefecture, and is a famous anime pilgrimage site in Japan."
+    },
+    {
+      "id": "anitabi_428735_54vnklw",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Toshima",
+        "Tokyo"
+      ],
+      "containing": "逗子市",
+      "excerpt": "In reality, it is located in Toshima Ward, Tokyo, as an ordinary junction used by locals."
+    },
+    {
+      "id": "anitabi_428735_58xzs2u",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Toshima",
+        "Tokyo"
+      ],
+      "containing": "三浦郡葉山町",
+      "excerpt": "The location is in Toshima Ward, Tokyo, and is actually named Hydrangea Park."
+    },
+    {
+      "id": "anitabi_428735_oncjh2bef",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "This intersection is located in Nishi Ward, Yokohama, a common filming location around Ikebukuro."
+    },
+    {
+      "id": "anitabi_430699_sy7qrvhri",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "京都市"
+      ],
+      "containing": "宇治市",
+      "excerpt": "このシーンは実際の木下アカデミー京都アイスアリーナ（京都市）に対応しています。"
+    },
+    {
+      "id": "anitabi_430699_t3pc5ebom",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "木津川市",
+      "excerpt": "取景地是位于爱知县名古屋市的近铁名古屋线木津站西口。"
+    },
+    {
+      "id": "anitabi_431767_n4lzkgao2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Ota City"
+      ],
+      "containing": "東京都大田区",
+      "excerpt": "This building is located in Ota City and houses a professional recording studio, a popular choice for many bands."
+    },
+    {
+      "id": "anitabi_431767_n5qwskrw1",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "東京都新宿区",
+      "excerpt": "该建筑实际是位于神奈川县川崎市的サンフラワービル，在第12集约2分08秒处出现。"
+    },
+    {
+      "id": "anitabi_431767_nchbvmpu5",
+      "field": "answerName",
+      "tokens": [
+        "川崎市"
+      ],
+      "containing": "東京都渋谷区",
+      "excerpt": "西班牙坂（川崎市）"
+    },
+    {
+      "id": "anitabi_431767_nchbvmpu5",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "川崎市"
+      ],
+      "containing": "東京都渋谷区",
+      "excerpt": "スペイン坂（川崎市）"
+    },
+    {
+      "id": "anitabi_431767_nchbvmpu5",
+      "field": "funfact[0]",
+      "tokens": [
+        "神奈川县"
+      ],
+      "containing": "東京都渋谷区",
+      "excerpt": "该场景的原型是位于神奈川县川崎市的西班牙坂，是一条长约200米的坡道，因两侧的西班牙风格建筑得名。"
+    },
+    {
+      "id": "anitabi_431767_nchbvmpu5",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kawasaki",
+        "Kanagawa Prefecture"
+      ],
+      "containing": "東京都渋谷区",
+      "excerpt": "The real-world location is the Spanish Slope (Spainzaka) in Kawasaki City, Kanagawa Prefecture, a slope about 200 meters long named for its Spanish-style architecture."
+    },
+    {
+      "id": "anitabi_431767_ndccxc7k7",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kawasaki",
+        "Kanagawa Prefecture"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "The building is actually located in Kawasaki-ku, Kawasaki City, Kanagawa Prefecture, and is one of the characters' regular hangout spots."
+    },
+    {
+      "id": "anitabi_43525_kpx6ooz6k",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "東京都渋谷区",
+      "excerpt": "动画中这条街道的现实原型是埼玉县川越市的公园通。"
+    },
+    {
+      "id": "anitabi_43557_4sm321s1k",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Suginami",
+        "Tokyo"
+      ],
+      "containing": "逗子市",
+      "excerpt": "This location is a real amusement park located in Suginami Ward, Tokyo."
+    },
+    {
+      "id": "anitabi_437532_85l0864",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "宇和島市",
+      "excerpt": "该地点原型位于东京都町田市的居村米穀店附近，现实中是一家经营多年的米店。"
+    },
+    {
+      "id": "anitabi_437532_85l0864",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都",
+        "町田市"
+      ],
+      "containing": "宇和島市",
+      "excerpt": "実在の場所は東京都町田市にある居村米穀店付近で、長年営業している米屋です。"
+    },
+    {
+      "id": "anitabi_437593_1rurbwu",
+      "field": "funfact[0]",
+      "tokens": [
+        "鸟取县"
+      ],
+      "containing": "松江市",
+      "excerpt": "该场景的原型位于日本鸟取县境港市的地藏崎，是一处面向日本海的海岸岬角。"
+    },
+    {
+      "id": "anitabi_437593_vc179ybff",
+      "field": "funfact[0]",
+      "tokens": [
+        "宫城县"
+      ],
+      "containing": "岩船郡粟島浦村",
+      "excerpt": "该牧场的现实地点位于宫城县栗原市迫地区。"
+    },
+    {
+      "id": "anitabi_437593_vc179ybff",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "宮城県"
+      ],
+      "containing": "岩船郡粟島浦村",
+      "excerpt": "この牧場の実際の場所は宮城県栗原市迫地区にあります。"
+    },
+    {
+      "id": "anitabi_443428_oi8wj2jwx",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "西臼杵郡高千穂町",
+      "excerpt": "The real-life location of this scene is a hospital in Tokyo, but the building orientation was adjusted in the anime to fit the storyboard."
+    },
+    {
+      "id": "anitabi_454684_tdh042nk6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "名古屋市昭和区",
+      "excerpt": "The real-world prototype of this scene is located in an upscale residential area in Tokyo, with architecture closely matching the Western-style mansion in the anime."
+    },
+    {
+      "id": "anitabi_454684_twde1k762",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mikasa",
+        "Tokyo"
+      ],
+      "containing": "小豆郡小豆島町",
+      "excerpt": "The location is the summit of a hill called Mikasa-yama, which is part of a large park within Tokyo."
+    },
+    {
+      "id": "anitabi_454684_twdro2uka",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "小豆郡小豆島町",
+      "excerpt": "The real Mikasayama Summit Park is located in Tokyo, offering a panoramic view of the city."
+    },
+    {
+      "id": "anitabi_467930_26ullad",
+      "field": "funfact[0]",
+      "tokens": [
+        "静冈县"
+      ],
+      "containing": "三宅支庁三宅村",
+      "excerpt": "该灯塔的现实原型是位于静冈县下田市的伊豆岬灯塔，是一座建于1908年的白色灯塔，在电影开场约4分19秒处出现。"
+    },
+    {
+      "id": "anitabi_467930_3k3cpog",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Kanazawa"
+      ],
+      "containing": "横浜市金沢区",
+      "excerpt": "The real-life location is a lecture hall in a school in Kanazawa Ward, Yokohama, which serves as the model for Lecture Hall I."
+    },
+    {
+      "id": "anitabi_46828_32kukqt",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "藤沢市",
+      "excerpt": "This location is a coastal park within Tokyo; the real spot may be near Kasai Rinkai Park's promenade."
+    },
+    {
+      "id": "anitabi_46828_kpx6op93q",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "福岡市中央区",
+      "excerpt": "The real location is Books Cubic Keyaki-dori Store in Kanda Jimbocho, Chuo Ward, Fukuoka (though coordinates indicate Fukuoka, the anime depicts Tokyo)."
+    },
+    {
+      "id": "anitabi_46874_mkbia3zt6",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "越谷市",
+      "excerpt": "There is no exact real-life counterpart, but the layout may be inspired by private clinics in Tokyo."
+    },
+    {
+      "id": "anitabi_469877_tso8ztfui",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kobe"
+      ],
+      "containing": "西宮市",
+      "excerpt": "The real-life inspiration is the Music Hall of Kobe College in Hyogo Prefecture, built in 1933, designated as an Important Cultural Property."
+    },
+    {
+      "id": "anitabi_469877_tsqwe8x6x",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tomi",
+        "Tateyama City"
+      ],
+      "containing": "南房総市",
+      "excerpt": "This location is located at the summit of Mount Tomi (Tomiyama) in Tateyama City, Chiba Prefecture. It is a free observatory offering views of Tokyo Bay and the Izu Islands."
+    },
+    {
+      "id": "anitabi_469877_tsxwwnbs3",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "该场景取景于千叶县馆山市的雷门通り，是一条保留昭和风情的商店街。"
+    },
+    {
+      "id": "anitabi_478079_f10oyg0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Mikasa"
+      ],
+      "containing": "北佐久郡軽井沢町",
+      "excerpt": "This location is actually Mikasa-dori in Sakyo Ward, Kyoto City, known for its ginkgo trees and the distant Mount Daimonji."
+    },
+    {
+      "id": "anitabi_47889_282uok1",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kumano City",
+        "Mie Prefecture",
+        "Kumano"
+      ],
+      "containing": "東牟婁郡那智勝浦町",
+      "excerpt": "The real tunnel entrance is located in Kumano City, Mie Prefecture, a narrow tunnel about 50 meters long, offering a view of the Kumano Sea from one side."
+    },
+    {
+      "id": "anitabi_484761_mhh9t2xh6",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "石巻市",
+      "excerpt": "该场景对应动画第3集约10分钟处，现实原型位于东京都日野市的某公园，园内保留有相似的缓坡与长椅布局。"
+    },
+    {
+      "id": "anitabi_484761_mhh9t2xh6",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "石巻市",
+      "excerpt": "This scene corresponds to around 10 minutes into episode 3. The real-life inspiration is a park in Hino, Tokyo, which features a similar gentle slope and bench layout."
+    },
+    {
+      "id": "anitabi_484761_noayh4i8i",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "日光市",
+      "excerpt": "该场景的原型是东京都日野市的汤ノ湖（Yunoko），一个真实的湖泊。"
+    },
+    {
+      "id": "anitabi_485936_13evk89",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture"
+      ],
+      "containing": "松本市",
+      "excerpt": "This location corresponds to the real Konashidaira Campground (Hokuto City, Yamanashi Prefecture), a well-known camping spot surrounded by the Southern Alps."
+    },
+    {
+      "id": "anitabi_485936_13fiizk",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Fuji",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "松本市",
+      "excerpt": "The restaurant is located at the foot of Mount Fuji in Yamanashi Prefecture in reality."
+    },
+    {
+      "id": "anitabi_485936_ithug3",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Kofu City"
+      ],
+      "containing": "南巨摩郡身延町",
+      "excerpt": "The real-life store is Yamanashi Crystal Main Shop in Kofu City, Yamanashi Prefecture, known for selling a wide range of crystals and minerals."
+    },
+    {
+      "id": "anitabi_485936_t04cyn",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "南佐久郡南相木村",
+      "excerpt": "该场景取景于现实中的南相木村水坝（Minami-Aiki Dam），位于山梨县。"
+    },
+    {
+      "id": "anitabi_485936_t04cyn",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "山梨県"
+      ],
+      "containing": "南佐久郡南相木村",
+      "excerpt": "このシーンのモデルは山梨県にある南相木村ダム（Minami-Aiki Dam）です。"
+    },
+    {
+      "id": "anitabi_485936_utfln0nb6",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Yamanashi Prefecture"
+      ],
+      "containing": "茅野市",
+      "excerpt": "Paul's Restaurant (Hokuto City, Yamanashi Prefecture)"
+    },
+    {
+      "id": "anitabi_485936_v14wr10fq",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "山梨県",
+        "伊那市",
+        "飯田市"
+      ],
+      "containing": "上伊那郡中川村",
+      "excerpt": "実際の場所は山梨県伊那市と飯田市の境にある陣馬形山キャンプ場で、標高約1,400メートル、眺望が素晴らしい。"
+    },
+    {
+      "id": "anitabi_485936_v14wr10fq",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Iida",
+        "Yamanashi Prefecture"
+      ],
+      "containing": "上伊那郡中川村",
+      "excerpt": "The real location is the Harumigatayama Campground located on the border of Ina and Iida cities in Yamanashi Prefecture, at an altitude of about 1,400 meters, offering excellent vi"
+    },
+    {
+      "id": "anitabi_485936_v153wvs6f",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "岡谷市",
+      "excerpt": "The real location is Hachibuseyama Observation Deck in Yamanashi Prefecture, at an altitude of about 1200 meters, offering views of the Southern Alps and Mount Fuji."
+    },
+    {
+      "id": "anitabi_485936_v17ntmtjm",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chino City",
+        "Yamanashi Prefecture",
+        "Fuji"
+      ],
+      "containing": "塩尻市",
+      "excerpt": "The location is Takabocchi Pasture in Chino City, Yamanashi Prefecture, known for its views of Mount Fuji and the Southern Alps."
+    },
+    {
+      "id": "anitabi_485936_v17tsxamc",
+      "field": "funfact[0]",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "该场景的原型位于山梨县北杜市小淵沢町，是JR小海線上的甲斐小泉站前。"
+    },
+    {
+      "id": "anitabi_485936_v1cwr5vrg",
+      "field": "answerName",
+      "tokens": [
+        "山梨县"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "軽食喫茶ガロ (山梨县)"
+    },
+    {
+      "id": "anitabi_485936_v1cwr5vrg",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "山梨県"
+      ],
+      "containing": "駒ヶ根市",
+      "excerpt": "軽食喫茶ガロ（山梨県）"
+    },
+    {
+      "id": "anitabi_485_b46a0263",
+      "field": "answerName",
+      "tokens": [
+        "西宫市",
+        "兵库县"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "西宫市（兵库县）"
+    },
+    {
+      "id": "anitabi_485_b46a0263",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "西宮市",
+        "兵庫県"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "西宮市（兵庫県）"
+    },
+    {
+      "id": "anitabi_485_b46a0263",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Nishinomiya City",
+        "Hyogo Prefecture"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "Nishinomiya City (Hyogo Prefecture)"
+    },
+    {
+      "id": "anitabi_485_b46a0263",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "该场景的现实取景地位于日本兵库县西宫市的西宫北口站附近，但动画中仅作为参考，并非完全再现。"
+    },
+    {
+      "id": "anitabi_485_b46a0263",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishinomiya",
+        "Hyogo Prefecture"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "The real-life inspiration for this scene is located in the Nishinomiya area of Hyogo Prefecture, though the anime takes creative liberties. The view near Nishinomiya-Kitaguchi Stat"
+    },
+    {
+      "id": "anitabi_485_b8c144a9",
+      "field": "funfact[1]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "大阪市北区",
+      "excerpt": "天台的原型位于兵库县西宫市某学校的屋顶，该学校是动画中县立北高的主要取景参考之一。"
+    },
+    {
+      "id": "anitabi_488177_s7qhbrvt0",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Yokosuka"
+      ],
+      "containing": "横浜市金沢区",
+      "excerpt": "This location is the Asahina Toll Gate exit on the Yokohama-Yokosuka Road."
+    },
+    {
+      "id": "anitabi_490141_lrip2pilw",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Shinjo"
+      ],
+      "containing": "壱岐市",
+      "excerpt": "Shinjo Ancient Battlefield (Iki City)"
+    },
+    {
+      "id": "anitabi_490141_lrip2pilw",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Shinjo"
+      ],
+      "containing": "壱岐市",
+      "excerpt": "The real Shinjo Ancient Battlefield is located in Tsushima City, Nagasaki Prefecture, and was one of the landing sites of the Mongol invasions in 1281 (the Battle of Kōan)."
+    },
+    {
+      "id": "anitabi_505776_8lmlgdt",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "熊本市中央区",
+      "excerpt": "The electronics store is a real chain store located in the Chuo ward of Kumamoto City."
+    },
+    {
+      "id": "anitabi_509297_ackj3xj",
+      "field": "answerName",
+      "tokens": [
+        "多治见市"
+      ],
+      "containing": "宝塚市",
+      "excerpt": "サンライトウォーク（多治见市）"
+    },
+    {
+      "id": "anitabi_509297_ackj3xj",
+      "field": "locales.ja.answerName",
+      "tokens": [
+        "多治見市"
+      ],
+      "containing": "宝塚市",
+      "excerpt": "サンライトウォーク（多治見市）"
+    },
+    {
+      "id": "anitabi_511207_5coy285",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "東京都豊島区",
+      "excerpt": "该场景的现实取景地位于群马县前桥市的一家优衣库（UNIQLO）门店。"
+    },
+    {
+      "id": "anitabi_513345_311c6nh",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "浜松市中区",
+      "excerpt": "The cafe's real-life prototype is located somewhere in Tokyo, Japan, closely matching the anime exterior."
+    },
+    {
+      "id": "anitabi_518278_5faorc9",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "京都市東山区",
+      "excerpt": "此场景的现实取景地位于兵库县丰冈市的音羽瀑布东侧。"
+    },
+    {
+      "id": "anitabi_518278_5fawr98",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "京都市右京区",
+      "excerpt": "现实取景地位于兵库县丰冈市的竹林游步道。"
+    },
+    {
+      "id": "anitabi_531159_fk2zoo",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "下田市",
+      "excerpt": "该场景的现实取景地位于东京都八王子市的柳桥，是一座跨溪的小桥。"
+    },
+    {
+      "id": "anitabi_531159_isgivd",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "熱海市",
+      "excerpt": "该电车型号为京急2000型，实际运行于东京都八王子市的京王线。"
+    },
+    {
+      "id": "anitabi_531159_iskvzq",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "下田市",
+      "excerpt": "该取景地位于东京都八王子市下田町的东急超市前，是一处住宅区内的日常购物场所。"
+    },
+    {
+      "id": "anitabi_531159_iskvzq",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "下田市",
+      "excerpt": "このロケ地は東京都八王子市下田町にある東急スーパーの前で、住宅街の中の日常的な買い物スポットです。"
+    },
+    {
+      "id": "anitabi_531159_iskvzq",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Hachioji City"
+      ],
+      "containing": "下田市",
+      "excerpt": "The location is in front of the Tokyu supermarket in Shimoda, Hachioji City, Shizuoka, a common shopping area in a residential neighborhood."
+    },
+    {
+      "id": "anitabi_531159_jpwc7r",
+      "field": "funfact[0]",
+      "tokens": [
+        "东京都"
+      ],
+      "containing": "熱海市",
+      "excerpt": "此场景的现实原型位于东京都八王子市多贺町，是一家当地知名的定食屋。"
+    },
+    {
+      "id": "anitabi_531159_jpwc7r",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "東京都"
+      ],
+      "containing": "熱海市",
+      "excerpt": "このシーンの実在ロケ地は東京都八王子市多賀町にある地元で人気の定食屋である。"
+    },
+    {
+      "id": "anitabi_5436_kpx6oqavj",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "東京都江東区",
+      "excerpt": "该地点位于千叶县千叶市中央区千叶公园内的日本庭园，是动画中多处散步场景的取景地。"
+    },
+    {
+      "id": "anitabi_54433_165bc98a",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该地点是动画第7集中林间学校活动的入口场景，现实位于千叶县南房总市的高原千叶村。"
+    },
+    {
+      "id": "anitabi_54433_165bc98a",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "千葉県",
+        "南房総市"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "この場所はアニメ第7話の林間学校活動の入り口シーンであり、実際の場所は千葉県南房総市の高原千葉村です。"
+    },
+    {
+      "id": "anitabi_54433_165bc98a",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Minamiboso City",
+        "Chiba Prefecture"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "This location serves as the entrance for the forest school activity in episode 7 of the anime. In reality, it is located at Kogen Chiba Village in Minamiboso City, Chiba Prefecture"
+    },
+    {
+      "id": "anitabi_54433_4216b5f9",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "千葉県"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "現実のロケ地は千葉県の高原千葉村林間キャンプ場で、2017年に閉鎖された。"
+    },
+    {
+      "id": "anitabi_54433_4216b5f9",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chiba Prefecture"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "The real-life location is the Kōgen Chiba Village Forest Camp in Chiba Prefecture, which closed down in 2017."
+    },
+    {
+      "id": "anitabi_54433_4a6ce6d2",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该场景取景于千叶县南房总市的高原千叶村つどいの広場。"
+    },
+    {
+      "id": "anitabi_54433_c5c765a5",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该场景取景于千叶县君津市的高原千叶村青少年自然之家。"
+    },
+    {
+      "id": "anitabi_57978_mcp2igsb7",
+      "field": "funfact[0]",
+      "tokens": [
+        "千叶市"
+      ],
+      "containing": "京都市下京区",
+      "excerpt": "现实中，这条坡道位于千叶市，是动画中通学路的原型，也是粉丝们喜爱的圣地之一。"
+    },
+    {
+      "id": "anitabi_605_pp944fee2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "黒部市",
+      "excerpt": "The real-life inspiration for this location is an observatory in Tokyo, offering a panoramic view of the city."
+    },
+    {
+      "id": "anitabi_62214_nyeqbpd16",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "浦安市",
+      "excerpt": "The filming location is in a residential area of Tokyo; the actual building matches the on-screen appearance and is a popular pilgrimage spot for fans."
+    },
+    {
+      "id": "anitabi_67403_50ux6a1vb",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Hokkaido"
+      ],
+      "containing": "犬上郡豊郷町",
+      "excerpt": "The physical sign corresponding to this pilgrimage point is located in Shiga Prefecture (coordinates 35.2004, 136.2296), but appears in the anime as part of a Hokkaido-based scene."
+    },
+    {
+      "id": "anitabi_7157_5az1x2c",
+      "field": "funfact[0]",
+      "tokens": [
+        "栃木县"
+      ],
+      "containing": "東京都台東区",
+      "excerpt": "现实地点位于栃木县足利市的新仲見世商店街入口。"
+    },
+    {
+      "id": "anitabi_72942_k04hee895",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "鹿児島市",
+      "excerpt": "该步道桥位于滋贺县大津市的中央公园附近，是作品中出现多次的巡礼点。"
+    },
+    {
+      "id": "anitabi_72942_k1dtahd83",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "该公寓原型位于滋贺县大津市的桃山南团地。"
+    },
+    {
+      "id": "anitabi_72942_pomnx6z9d",
+      "field": "funfact[1]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "京都市伏見区",
+      "excerpt": "取景地位于滋贺县大津市的某栋公寓，楼梯间结构忠实还原了动画中的细节。"
+    },
+    {
+      "id": "anitabi_72942_pqt1qfymp",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "鹿児島市",
+      "excerpt": "现实中的展望台位于滋贺县大津市的城山公园，可眺望琵琶湖。"
+    },
+    {
+      "id": "anitabi_72942_ptbc76tqb",
+      "field": "funfact[0]",
+      "tokens": [
+        "滋贺县"
+      ],
+      "containing": "鹿児島市",
+      "excerpt": "场景取材于滋贺县大津市的城山公园，位于第7集约3分47秒处。"
+    },
+    {
+      "id": "anitabi_78544_lvy35q63k",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Ibusuki"
+      ],
+      "containing": "札幌市中央区",
+      "excerpt": "The actual filming location is not the fictional city of Ibusuki but an elementary school in Sapporo, Hokkaido."
+    },
+    {
+      "id": "anitabi_78544_lvy79jsay",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Chuo"
+      ],
+      "containing": "札幌市中央区",
+      "excerpt": "The real-world location is Ōdōri Park in Chuo Ward, Sapporo, whose clock tower closely resembles the one in the work."
+    },
+    {
+      "id": "anitabi_8452_56ztmv5jr",
+      "field": "funfact[1]",
+      "tokens": [
+        "广岛县"
+      ],
+      "containing": "横須賀市",
+      "excerpt": "现实地点是广岛县竹原市的绪明山公园。"
+    },
+    {
+      "id": "anitabi_86670_680663f7",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "佐久市"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "この小屋のモデルは長野県佐久市と長和町の境にある奥霧小屋で、標高約1800メートルにある。"
+    },
+    {
+      "id": "anitabi_86670_bdd64175",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "諏訪市",
+      "excerpt": "该场景原型位于埼玉县饭能市的物見岩，是登山的常见中途点。"
+    },
+    {
+      "id": "anitabi_86670_qipesrtil",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该场景的原型是位于埼玉县饭能市的土合站，其站内楼梯共有462级，是日本最深的车站楼梯之一。"
+    },
+    {
+      "id": "anitabi_86670_qipuqfnzh",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该巡礼点位于埼玉县饭能市的一条实际登山道上，是当地知名的徒步路线。"
+    },
+    {
+      "id": "anitabi_86670_qipx30yyu",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该场景的取景地原型位于埼玉县饭能市的缆车站前，是登山者常用的起点。"
+    },
+    {
+      "id": "anitabi_86670_qiqdy9ka6",
+      "field": "funfact[0]",
+      "tokens": [
+        "埼玉县"
+      ],
+      "containing": "利根郡みなかみ町",
+      "excerpt": "该场景取景于现实中的熊穴沢避难小屋，位于埼玉县饭能市的山林中，是登山路线上常见的无人小屋。"
+    },
+    {
+      "id": "anitabi_876_9ot26go",
+      "field": "funfact[0]",
+      "tokens": [
+        "东村山市"
+      ],
+      "containing": "西多摩郡瑞穂町",
+      "excerpt": "该地点位于东京都东村山市，是作品中冈崎父女旅行经过的公园入口。"
+    },
+    {
+      "id": "anitabi_876_9ot26go",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Okazaki"
+      ],
+      "containing": "西多摩郡瑞穂町",
+      "excerpt": "This location is in Higashimurayama, Tokyo, the park entrance where the Okazaki father and daughter pass during their trip."
+    },
+    {
+      "id": "anitabi_876_s351vrj9d",
+      "field": "answerName",
+      "tokens": [
+        "京都府",
+        "京都市左京区"
+      ],
+      "containing": "吹田市",
+      "excerpt": "山手町（京都府京都市左京区）"
+    },
+    {
+      "id": "anitabi_876_s351vrj9d",
+      "field": "funfact[0]",
+      "tokens": [
+        "京都府"
+      ],
+      "containing": "吹田市",
+      "excerpt": "该坡道的现实原型位于京都府京都市左京区山手町，附近有叡山电铁的出町柳站。"
+    },
+    {
+      "id": "anitabi_89511_51i52ap5b",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Tokyo",
+        "Edogawa"
+      ],
+      "containing": "習志野市",
+      "excerpt": "The scene is located on a curved slope in a Tokyo residential area, specifically a street in Edogawa Ward."
+    },
+    {
+      "id": "anitabi_89511_51i52ap5h",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Tokyo"
+      ],
+      "containing": "習志野市",
+      "excerpt": "The real park is located in a residential area of Tokyo, and the slide is still there today."
+    },
+    {
+      "id": "anitabi_89511_51i52ap7h",
+      "field": "answerName",
+      "tokens": [
+        "船桥市"
+      ],
+      "containing": "習志野市",
+      "excerpt": "小高商店（千叶县船桥市）"
+    },
+    {
+      "id": "anitabi_89511_51i52ap7h",
+      "field": "locales.en.answerName",
+      "tokens": [
+        "Funabashi"
+      ],
+      "containing": "習志野市",
+      "excerpt": "Kotaka Store (Funabashi, Chiba)"
+    },
+    {
+      "id": "anitabi_89511_51i52ap7h",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Funabashi",
+        "Tokyo"
+      ],
+      "containing": "習志野市",
+      "excerpt": "The actual shop is located in Funabashi, Chiba Prefecture, not in Tokyo as depicted in the anime."
+    },
+    {
+      "id": "anitabi_90599_jeyht01dy",
+      "field": "funfact[0]",
+      "tokens": [
+        "爱知县"
+      ],
+      "containing": "岐阜市",
+      "excerpt": "该雕像位于爱知县名古屋市的名古屋城正门前，是织田信长的黄金像，高约10米。"
+    },
+    {
+      "id": "anitabi_90599_jeyht01dy",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nagoya",
+        "Aichi Prefecture"
+      ],
+      "containing": "岐阜市",
+      "excerpt": "The statue is located in front of Nagoya Castle in Nagoya, Aichi Prefecture, a golden statue of Oda Nobunaga about 10 meters tall."
+    },
+    {
+      "id": "anitabi_90815_51i52dzhf",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "長野市",
+      "excerpt": "该灯笼位于兵库县西宫市的ショッピングプラザ・アゲイン前，是动画中反复出现的背景元素。"
+    },
+    {
+      "id": "anitabi_90815_51i52dzsz",
+      "field": "locales.en.funfact[1]",
+      "tokens": [
+        "Nishinomiya",
+        "Hyogo Prefecture"
+      ],
+      "containing": "長野市",
+      "excerpt": "Although the story mainly takes place in Nishinomiya, Hyogo Prefecture, this square scene was actually filmed in Nagano, a typical example of location mixing in anime."
+    },
+    {
+      "id": "anitabi_90815_51i52e01t",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "長野市",
+      "excerpt": "该巡礼点原型位于兵库县西宫市的仲见世通（元善町），是一条历史悠久的商店街，在作品中出现于日常逛街的片段。"
+    },
+    {
+      "id": "anitabi_90815_51i52e01t",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "兵庫県",
+        "西宮市"
+      ],
+      "containing": "長野市",
+      "excerpt": "この聖地のモデルは兵庫県西宮市の仲見世通り（元善町）で、歴史ある商店街。アニメでは日常の買い物シーンに登場する。"
+    },
+    {
+      "id": "anitabi_90815_51i52e036",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "長野市",
+      "excerpt": "该地点位于兵库县西宫市新田町交差点。"
+    },
+    {
+      "id": "anitabi_90815_51i52e0tc",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "長野市",
+      "excerpt": "该店铺原型是位于兵库县西宫市的一家名为‘滝屋本店’的烤饼店，专营‘おやき’等日式点心。"
+    },
+    {
+      "id": "anitabi_90815_51i52e17c",
+      "field": "funfact[0]",
+      "tokens": [
+        "兵库县"
+      ],
+      "containing": "長野市",
+      "excerpt": "该公交站位于兵库县西宫市的茶臼山恐龙公园入口附近。"
+    },
+    {
+      "id": "anitabi_95225_51i528yxu",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Meguro",
+        "Tokyo"
+      ],
+      "containing": "名古屋市東区",
+      "excerpt": "The real-life building is the former Toyota Sasuke residence in Meguro, Tokyo, built in 1925 in Western style."
+    },
+    {
+      "id": "anitabi_95225_llf37vsa2",
+      "field": "locales.en.funfact[0]",
+      "tokens": [
+        "Nishi"
+      ],
+      "containing": "横浜市西区",
+      "excerpt": "The real-world filming location is Rinkō Park in Nishi Ward, Yokohama, which offers a view of the Cosmo Clock ferris wheel."
+    },
+    {
+      "id": "anitabi_9912_59hyvpm",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "八王子市",
+      "excerpt": "该场景位于群马县伊势崎市的尾形商店前，自动贩卖机至今仍在营业。"
+    },
+    {
+      "id": "anitabi_9912_5i3skeump",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "八王子市",
+      "excerpt": "该场景的原型是位于群马县伊势崎市的舶来茶屋天正庵，一家真实营业的日式茶屋。"
+    },
+    {
+      "id": "anitabi_9912_5i3wwtwvf",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "八王子市",
+      "excerpt": "该场景的原型是位于日本群马县伊势崎市的尾形商店。"
+    },
+    {
+      "id": "anitabi_9912_5i4jawqrj",
+      "field": "funfact[0]",
+      "tokens": [
+        "群马县"
+      ],
+      "containing": "八王子市",
+      "excerpt": "该地点位于群马县伊势崎市小門町，是作品中出现的主要公园之一。"
+    },
+    {
+      "id": "anitabi_9912_5i4jawqrj",
+      "field": "locales.ja.funfact[0]",
+      "tokens": [
+        "群馬県"
+      ],
+      "containing": "八王子市",
+      "excerpt": "この場所は群馬県伊勢崎市小門町にある児童公園で、作品に登場する主要な公園の一つです。"
+    }
+  ]
+}
