@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowIcon } from "~/components/brand/ArrowIcon";
 import { BrandLockup } from "~/components/brand/BrandLockup";
-import { LangSwitch } from "~/components/brand/LangSwitch";
+import { gameLocaleMenuLinks, LocaleMenu } from "~/components/brand/LocaleMenu";
 import { useAnimeLocale } from "~/hooks/use-anime-locale";
 import {
   gameLocaleFromPathname,
   withGameLocale,
   type GameLocale,
 } from "~/lib/game-locale";
-import { splitLocalePath } from "~/lib/pilgrimage-locale";
 import { GAME_UI_COPY } from "~/lib/aniguessr-copy";
+import { getHomePageCopy } from "~/lib/home-page-copy";
 import {
   difficultyHint,
   difficultyLabel,
@@ -45,10 +45,7 @@ import {
   type AnimeGuessrQuestionText,
   type AnimeGuessrRoundCount,
 } from "~/lib/anime-guessr";
-import {
-  DEFAULT_ANIME_LOCALE,
-  saveAnimeLocale,
-} from "~/lib/anime-locale";
+import { DEFAULT_ANIME_LOCALE } from "~/lib/anime-locale";
 import {
   clearPendingAnimeFinalResult,
   formatAnimeGameCountdown,
@@ -730,8 +727,8 @@ function AnimeCluePanel({
 
 export default function AnimeGuessrPage() {
   const { ready, session } = useEmailSession();
-  const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const storedLocale = useAnimeLocale();
   const pathGameLocale = gameLocaleFromPathname(pathname);
   const locale: GameLocale = pathGameLocale ?? storedLocale;
@@ -776,6 +773,12 @@ export default function AnimeGuessrPage() {
       withGameLocale(`/login?next=${encodeURIComponent(gameNextUrl)}`, locale),
     [gameNextUrl, locale],
   );
+  const localeLinks = useMemo(
+    () =>
+      gameLocaleMenuLinks(pathname || "/game/anime", searchParams.toString()),
+    [pathname, searchParams],
+  );
+  const langLabel = getHomePageCopy(locale).langLabel;
 
   const current = questions[round];
   const currentText = useMemo(
@@ -1250,14 +1253,7 @@ export default function AnimeGuessrPage() {
     setLoadMessage(copy.skippedStreetView);
   }, [copy, current, questions, results.length, round]);
 
-  function selectLocale(nextLocale: GameLocale) {
-    if (nextLocale !== "zh-tw") saveAnimeLocale(nextLocale);
-    const innerPath = splitLocalePath(pathname).pathname;
-    const search = window.location.search;
-    router.push(withGameLocale(`${innerPath}${search}`, nextLocale));
-  }
-
-    if (!ready) return <AuthLoading />;
+  if (!ready) return <AuthLoading />;
 
   if (guestBlocked) {
     return (
@@ -1367,7 +1363,12 @@ export default function AnimeGuessrPage() {
         )}
         <header className="ag-page-bar">
           <BrandLockup href={homeUrl} />
-          <LangSwitch locale={locale} onSelect={selectLocale} />
+          <LocaleMenu
+            locale={locale}
+            label={langLabel}
+            links={localeLinks}
+            rowClassName="ag-lang"
+          />
         </header>
 
         <div className="mx-auto w-full max-w-3xl px-6 py-8">
@@ -1597,7 +1598,12 @@ export default function AnimeGuessrPage() {
         <>
           <div className="ag-result-top">
             <BrandLockup href={homeUrl} />
-            <LangSwitch locale={locale} onSelect={selectLocale} />
+            <LocaleMenu
+              locale={locale}
+              label={langLabel}
+              links={localeLinks}
+              rowClassName="ag-lang"
+            />
           </div>
           <aside className="ag-result-side">
             <div className="ag-result-body">

@@ -2791,7 +2791,9 @@
 }
 
 .home-lang-menu .home-lang-current {
+  display: inline-flex;
   align-items: center;
+  gap: 4px;
   height: 28px;
   margin: 0;
   padding: 0 8px;
@@ -2805,6 +2807,13 @@
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.home-lang-chevron {
+  display: block;
+  width: 10px;
+  height: 10px;
+  flex: none;
 }
 
 .home-lang-popover {
