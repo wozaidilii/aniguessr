@@ -176,6 +176,21 @@ function sameDisplay(rows: PlaceRecord[]): boolean {
   );
 }
 
+/** Kana label plus its kanji Chinese spelling are one city, not a prefecture. */
+function sameCitySpelling(rows: PlaceRecord[]): PlaceRecord | null {
+  const first = rows[0];
+  if (!first) return null;
+  if (
+    !rows.every(
+      (row) =>
+        row.ja === first.ja && row.en === first.en && row.pref === first.pref,
+    )
+  ) {
+    return null;
+  }
+  return rows.find((row) => row.zh !== row.ja) ?? first;
+}
+
 function resolvePlaces(
   rows: PlaceRecord[],
   point?: { lat: number; lng: number },
@@ -187,6 +202,8 @@ function resolvePlaces(
     if (inside.length > 0) pool = inside;
   }
   if (pool.length === 1 || sameDisplay(pool)) return pool[0] ?? null;
+  const spelling = sameCitySpelling(pool);
+  if (spelling) return spelling;
   const prefs = new Set(pool.map((row) => row.pref).filter(Boolean));
   if (prefs.size === 1) return { pref: [...prefs][0] ?? "" };
   return null;

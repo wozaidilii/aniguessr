@@ -37,6 +37,12 @@ describe("place names", () => {
     expect(localizePlaceName("北海道伊达市", "en")).toBe("Date");
     expect(localizePlaceName("京丹波町", "ja")).toBe("京丹波町");
     expect(localizePlaceName("京丹波町", "en")).toBe("京丹波町");
+    expect(localizePlaceName("つくば市", "en", { lat: 36.0922, lng: 140.1015 })).toBe(
+      "Tsukuba",
+    );
+    expect(localizePlaceName("丰乡町", "ja", { lat: 35.2034, lng: 136.2328 })).toBe(
+      "豊郷町",
+    );
     expect(localizePlaceName("京都市", "ja", { lat: 35.6442, lng: 140.0457 })).toBe(
       "京都市",
     );
@@ -77,12 +83,12 @@ describe("place names", () => {
       readFileSync("public/data/anime-guessr-questions.json", "utf8"),
     ) as { questions: Array<{ location: string; lat: number; lng: number }> };
     const coverage = summarizePlaceCoverage(bank.questions);
-    expect(coverage.uniqueLabels).toBe(209);
+    expect(coverage.uniqueLabels).toBe(514);
     expect(coverage.questions).toBe(24750);
     expect(coverage.byKind).toEqual({
       country: { labels: 1, questions: 2941 },
-      prefecture: { labels: 31, questions: 7453 },
-      municipality: { labels: 167, questions: 14161 },
+      prefecture: { labels: 31, questions: 6027 },
+      municipality: { labels: 472, questions: 15587 },
       "prefecture-fallback": { labels: 0, questions: 0 },
       outside: { labels: 10, questions: 195 },
       unmatched: { labels: 0, questions: 0 },
