@@ -275,13 +275,25 @@ describe("pilgrimage navigation", () => {
     expect(shown).not.toContain("『");
     expect(shown).not.toContain("中津宮階段");
 
+    const musubi = [
+      "ピンポン THE ANIMATION",
+      "青春ブタ野郎はバニーガール先輩の夢を見ない",
+    ];
+    const musubiJoined = musubi.join(" · ");
+    expect(formatPlaceWorkSubtitle(musubi, "ja")).toBe(musubiJoined);
+    expect(formatPlaceWorkSubtitle(musubi, "ja", 60)).toBe(musubiJoined);
+    expect(formatPlaceWorkSubtitle(musubi, "en")).not.toContain("more");
+
     const titles = ["Alpha", "Beta", "Gamma", "Delta"];
     expect(formatPlaceWorkSubtitle(titles, "ja", 20)).toBe(
+      "Alpha · Beta · Gamma · Delta",
+    );
+    expect(formatPlaceWorkSubtitle(titles, "ja", 12)).toBe(
       "Alpha · ほか 3 作品",
     );
-    expect(formatPlaceWorkSubtitle(titles, "en", 20)).toBe("Alpha · +3 more");
-    expect(formatPlaceWorkSubtitle(titles, "zh", 20)).toBe("Alpha · 等 3 部");
-    expect(formatPlaceWorkSubtitle(titles, "zh-tw", 20)).toBe(
+    expect(formatPlaceWorkSubtitle(titles, "en", 12)).toBe("Alpha · +3 more");
+    expect(formatPlaceWorkSubtitle(titles, "zh", 12)).toBe("Alpha · 等 3 部");
+    expect(formatPlaceWorkSubtitle(titles, "zh-tw", 12)).toBe(
       "Alpha · 等 3 部",
     );
     const css = readFileSync("src/styles/home-page.css", "utf8");

@@ -1,3 +1,4 @@
+import { isKnownSpotId } from "~/lib/known-spot-id";
 import knownSlugs from "~/lib/pilgrimage-known-slugs.json";
 import {
   splitLocalePath,
@@ -56,12 +57,31 @@ export function missingPilgrimageShell(pathname: string): string | null {
       ? null
       : notFoundShellPath(locale);
   }
+  const spot = /^\/pilgrimage\/spots\/([^/]+)\/?$/u.exec(inner);
+  const spotId = spot?.[1];
+  if (spotId) {
+    return isKnownSpotId(decodeSegment(spotId))
+      ? null
+      : notFoundShellPath(locale);
+  }
   return null;
 }
 
-/** Drop the client runtime so a 404 document cannot hydrate into the empty error shell. */
+const ROBOTS_META =
+  /<meta\b[^>]*\bname=["'](?:robots|googlebot)["'][^>]*>/gi;
+
+/**
+ * Drop the client runtime so a 404 document cannot hydrate into the empty
+ * error shell, and leave exactly one robots meta: noindex.
+ */
 export function freezeNotFoundDocument(html: string): string {
-  return html
+  const stripped = html
     .replace(/<link\b[^>]*rel="preload"[^>]*as="script"[^>]*>/gi, "")
-    .replace(/<script\b[\s\S]*?<\/script>/gi, "");
+    .replace(/<script\b[\s\S]*?<\/script>/gi, "")
+    .replace(ROBOTS_META, "");
+  const meta = '<meta name="robots" content="noindex"/>';
+  if (stripped.includes("</head>")) {
+    return stripped.replace("</head>", `${meta}</head>`);
+  }
+  return `${meta}${stripped}`;
 }

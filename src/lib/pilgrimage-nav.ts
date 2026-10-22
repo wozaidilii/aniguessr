@@ -376,10 +376,11 @@ export function formatWorkTitle(
 export const PLACE_WORK_SUBTITLE_SEPARATOR = " · ";
 
 /**
- * Two lines of the 12px nearby subtitle. A CJK character counts as 2.
- * Kept under the card width so the overflow label is not clipped.
+ * Two lines of the 12px nearby subtitle at a 390px sheet.
+ * A CJK character counts as 2. The text column is about 270px, so two
+ * lines hold about 90 units before the line clamp.
  */
-export const PLACE_WORK_SUBTITLE_BUDGET = 64;
+export const PLACE_WORK_SUBTITLE_BUDGET = 90;
 
 export function workSubtitleOverflow(
   locale: PilgrimageLocale,
@@ -413,8 +414,9 @@ export function dedupedWorkTitles(titles: readonly string[]): string[] {
 }
 
 /**
- * One subtitle for a same-place card. Titles that do not fit the character
- * budget are dropped and counted in the locale overflow label.
+ * One subtitle for a same-place card. Titles that do not fit two lines are
+ * counted in the locale overflow label. A single leftover title is shown,
+ * because collapsing one title is never shorter than showing it.
  */
 export function formatPlaceWorkSubtitle(
   titles: readonly string[],
@@ -424,9 +426,14 @@ export function formatPlaceWorkSubtitle(
   const unique = dedupedWorkTitles(titles);
   if (unique.length === 0) return "";
   const joined = unique.join(PLACE_WORK_SUBTITLE_SEPARATOR);
-  if (subtitleWidth(joined) <= budget) return joined;
+  if (subtitleWidth(joined) <= budget || unique.length < 3) return joined;
 
-  for (let count = unique.length - 1; count >= 1; count -= 1) {
+  const withoutLast = unique
+    .slice(0, -1)
+    .join(PLACE_WORK_SUBTITLE_SEPARATOR);
+  if (subtitleWidth(withoutLast) <= budget) return joined;
+
+  for (let count = unique.length - 2; count >= 1; count -= 1) {
     const hidden = unique.length - count;
     const label = workSubtitleOverflow(locale, hidden);
     const head = unique
@@ -436,9 +443,8 @@ export function formatPlaceWorkSubtitle(
     if (subtitleWidth(text) <= budget) return text;
   }
 
-  const label = workSubtitleOverflow(locale, Math.max(unique.length - 1, 0));
+  const label = workSubtitleOverflow(locale, unique.length - 1);
   const first = unique[0] ?? "";
-  if (unique.length === 1) return first;
   return `${first}${PLACE_WORK_SUBTITLE_SEPARATOR}${label}`;
 }
 

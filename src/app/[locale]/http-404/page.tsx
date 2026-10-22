@@ -15,7 +15,7 @@ export async function generateMetadata({
   if (!isHomeLocale(locale)) return {};
   return {
     title: notFoundCopy(locale).title,
-    robots: { index: false, follow: false },
+    robots: "noindex",
   };
 }
 

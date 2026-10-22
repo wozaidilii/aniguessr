@@ -66,6 +66,18 @@ describe("rewritten question labels and pilgrimage pages", () => {
     const renamed = new Set(
       (fixes.names?.fixes ?? []).map((row) => String(row.id)),
     );
+    let copyIds = new Set();
+    try {
+      const edits = JSON.parse(
+        readFileSync(
+          path.join(process.cwd(), "scripts/data/spot-copy-edits.json"),
+          "utf8",
+        ),
+      );
+      copyIds = new Set((edits.ids ?? []).map((id) => String(id)));
+    } catch {
+      copyIds = new Set();
+    }
     const files = readdirSync(path.join(process.cwd(), "public/sitemaps")).filter(
       (file) => /^\d+\.xml$/u.test(file),
     );
@@ -88,7 +100,7 @@ describe("rewritten question labels and pilgrimage pages", () => {
         const spotId = pathname.startsWith("/pilgrimage/spots/")
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
           : "";
-        if (renamed.has(spotId)) {
+        if (renamed.has(spotId) || copyIds.has(spotId)) {
           expect(lastmod).toBe("2026-10-23");
           bumped.add(spotId);
         } else {
