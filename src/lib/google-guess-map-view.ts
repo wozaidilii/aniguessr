@@ -6,9 +6,14 @@ import type {
   GoogleMapsApi,
 } from "~/lib/google-street-view";
 
-/** Inset for the round-result map so pins sit clear of the legend and controls. */
+/**
+ * Inset for the round-result fit. Right, bottom, and left keep the pins off
+ * the fullscreen control, the camera control, and the Google attribution.
+ * Top has to clear the legend (it ends about 52px down) and the marker drawn
+ * above that coordinate. The taller answer pin is 54px, plus an 8px gap.
+ */
 export const ROUND_RESULT_FIT_BOUNDS_PADDING: GoogleMapPadding = {
-  top: 64,
+  top: 114,
   right: 64,
   bottom: 40,
   left: 24,

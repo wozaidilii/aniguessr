@@ -117,7 +117,7 @@ describe("google guess map viewport sync", () => {
       points: [guess, answer],
     });
     expect(fitBounds.mock.calls[0]?.[1]).toEqual({
-      top: 64,
+      top: 114,
       right: 64,
       bottom: 40,
       left: 24,
