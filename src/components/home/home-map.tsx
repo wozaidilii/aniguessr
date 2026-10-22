@@ -37,6 +37,11 @@ import {
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { readHomeOrigin, rememberHomeOrigin } from "~/lib/home-origin";
+import {
+  HOME_USER_FLY_ZOOM,
+  homeStartupCamera,
+  homeUserLocateDetail,
+} from "~/lib/home-user-camera";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { workFocusLngLats } from "~/lib/home-work-focus";
@@ -130,9 +135,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const flyToUserRef = useRef<
-    ((lat: number, lng: number, keepZoom: boolean) => void) | null
-  >(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const youRef = useRef<maplibregl.Marker | null>(null);
   const [error, setError] = useState(false);
@@ -143,6 +145,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     if (!container) return;
     let cancelled = false;
     let loaded = false;
+    let originPinned = false;
+    let lastBottom = -1;
     const map = new maplibregl.Map({
       container,
       style: HOME_MAP_STYLE,
@@ -238,7 +242,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           lat: lat ?? 0,
         });
       });
-      if (!focusedId) {
+      const startup = homeStartupCamera(Boolean(focusedId), readHomeOrigin());
+      if (startup.kind === "user") {
+        flyToUser(startup.lat, startup.lng, false);
+      } else if (startup.kind === "kanto") {
         map.fitBounds(KANTO_SHONAN_BOUNDS, {
           padding: {
             top: homeMapTopPadding(map),
@@ -259,7 +266,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       publishBounds(map);
       ensureYou();
     });
-    let originPinned = false;
     map.on("dragstart", () => {
       originPinned = false;
       signalHomeMapGesture();
@@ -377,13 +383,11 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       lastBottom = padding.bottom;
       map.flyTo({
         center: [lng, lat],
-        zoom: keepZoom ? map.getZoom() : 13,
+        zoom: keepZoom ? map.getZoom() : HOME_USER_FLY_ZOOM,
         padding,
         duration: prefersReducedMotion() ? 0 : 700,
       });
     }
-    flyToUserRef.current = flyToUser;
-
     function onOrigin(event: Event) {
       const detail = (event as CustomEvent<HomeOriginDetail>).detail;
       if (
@@ -475,7 +479,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
 
     let resizeTimer = 0;
     let padTimer = 0;
-    let lastBottom = -1;
     const observer = new ResizeObserver(() => {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => map.resize(), 0);
@@ -513,7 +516,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       window.clearTimeout(timer);
       window.clearTimeout(resizeTimer);
       window.clearTimeout(padTimer);
-      flyToUserRef.current = null;
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
       window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
       window.removeEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
@@ -546,10 +548,16 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           data-testid="home-my-location"
           aria-label={copy.myLocation}
           onClick={() => {
+            const publish = (lat: number, lng: number) => {
+              const detail = homeUserLocateDetail(lat, lng);
+              rememberHomeOrigin(detail);
+              window.dispatchEvent(
+                new CustomEvent(HOME_ORIGIN_EVENT, { detail }),
+              );
+            };
             const origin = readHomeOrigin();
-            const current = mapRef.current;
-            if (origin && current && flyToUserRef.current) {
-              flyToUserRef.current(origin.lat, origin.lng, true);
+            if (origin) {
+              publish(origin.lat, origin.lng);
               return;
             }
             if (!navigator.geolocation) {
@@ -558,15 +566,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
             }
             navigator.geolocation.getCurrentPosition(
               (position) => {
-                const detail: HomeOriginDetail = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                  keepZoom: true,
-                };
-                rememberHomeOrigin(detail);
-                window.dispatchEvent(
-                  new CustomEvent(HOME_ORIGIN_EVENT, { detail }),
-                );
+                publish(position.coords.latitude, position.coords.longitude);
               },
               () => {
                 window.location.assign(withPilgrimageLocale("/", locale));
