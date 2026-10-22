@@ -8,10 +8,38 @@ import { BrandLockup } from "~/components/brand/BrandLockup";
 import { HomeAccount } from "~/components/home/home-account";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
-import { siteNavIsCurrent, siteNavModel, type SiteNavLink } from "~/lib/site-nav";
+import {
+  siteNavIsCurrent,
+  siteNavModel,
+  type SiteNavLanguage,
+  type SiteNavLink,
+} from "~/lib/site-nav";
 
 function hashId(href: string): string {
   return href.split("#")[1] ?? "";
+}
+
+function hrefLang(locale: HomeLocale): string {
+  return locale === "zh-tw" ? "zh-Hant" : locale;
+}
+
+function LanguageAnchors({
+  languages,
+  locale,
+}: {
+  languages: SiteNavLanguage[];
+  locale: HomeLocale;
+}) {
+  return languages.map((item) => (
+    <a
+      key={item.locale}
+      href={item.href}
+      aria-current={item.locale === locale ? "true" : undefined}
+      hrefLang={hrefLang(item.locale)}
+    >
+      {item.label}
+    </a>
+  ));
 }
 
 function pathOnly(href: string): string {
@@ -27,6 +55,9 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const [pendingId, setPendingId] = useState<SiteNavLink["id"] | null>(null);
   const [hash, setHash] = useState("");
   const navRef = useRef<HTMLElement | null>(null);
+  const langRef = useRef<HTMLDivElement | null>(null);
+  const langButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [langOpen, setLangOpen] = useState(false);
   const [bar, setBar] = useState({ x: 0, width: 0, visible: false });
   const labels = {
     anime: copy.navAnime,
@@ -45,15 +76,41 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
 
   useEffect(() => {
     setPendingId(null);
+    setLangOpen(false);
   }, [pathname, hash]);
+
+  useEffect(() => {
+    if (!langOpen) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setLangOpen(false);
+      langButtonRef.current?.focus();
+    }
+    function onPointer(event: PointerEvent) {
+      const target = event.target;
+      if (target instanceof Node && langRef.current?.contains(target)) return;
+      setLangOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [langOpen]);
 
   useEffect(() => {
     const id = window.location.hash.replace(/^#/, "");
     if (!id) return;
     const target = document.getElementById(id);
     if (!target) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    target.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+      block: "start",
+    });
   }, [pathname]);
 
   function active(link: SiteNavLink): boolean {
@@ -71,12 +128,20 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
       setBar((prev) => ({ ...prev, visible: false }));
       return;
     }
-    setBar({ x: current.offsetLeft, width: current.offsetWidth, visible: true });
+    setBar({
+      x: current.offsetLeft,
+      width: current.offsetWidth,
+      visible: true,
+    });
   }, [pathname, hash, pendingId, locale, open]);
 
   function onPointerDown(id: SiteNavLink["id"], href: string) {
     setPendingId(id);
-    if (!href.startsWith("#") && !href.endsWith("#game") && !href.endsWith("#rank")) {
+    if (
+      !href.startsWith("#") &&
+      !href.endsWith("#game") &&
+      !href.endsWith("#rank")
+    ) {
       setHomeMapActive(false);
     }
   }
@@ -96,8 +161,13 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    target.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+      block: "start",
+    });
     const next = `${pathname}#${id}`;
     window.history.pushState(null, "", next);
     setHash(`#${id}`);
@@ -132,18 +202,42 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
         </div>
         <div className="home-hdr-right">
           <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {nav.languages.map((item) => (
-              <a
-                key={item.locale}
-                href={item.href}
-                aria-current={item.locale === locale ? "true" : undefined}
-                hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
-              >
-                {item.label}
-              </a>
-            ))}
+            <LanguageAnchors languages={nav.languages} locale={locale} />
           </div>
-          <span className="home-lang-current">{currentLang?.label}</span>
+          <div
+            className="home-lang-menu"
+            ref={langRef}
+            onBlur={(event) => {
+              const next = event.relatedTarget;
+              if (next instanceof Node && event.currentTarget.contains(next))
+                return;
+              setLangOpen(false);
+            }}
+          >
+            <button
+              ref={langButtonRef}
+              type="button"
+              className="home-lang-current"
+              aria-expanded={langOpen}
+              aria-controls="home-lang-popover"
+              onClick={() => {
+                setLangOpen((value) => !value);
+                setOpen(false);
+              }}
+            >
+              <span className="home-lang-name">{copy.langLabel}</span>
+              {currentLang?.label}
+            </button>
+            <div
+              id="home-lang-popover"
+              className="home-lang-popover"
+              role="group"
+              aria-label={copy.langLabel}
+              hidden={!langOpen}
+            >
+              <LanguageAnchors languages={nav.languages} locale={locale} />
+            </div>
+          </div>
           <div className="home-hdr-login">
             <HomeAccount locale={locale} />
           </div>
@@ -152,7 +246,10 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
             className="home-burger"
             aria-expanded={open}
             aria-label={open ? copy.closeMenu : copy.menu}
-            onClick={() => setOpen((value) => !value)}
+            onClick={() => {
+              setOpen((value) => !value);
+              setLangOpen(false);
+            }}
           >
             <i />
             <i />
@@ -178,16 +275,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
             </Link>
           ))}
           <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {nav.languages.map((item) => (
-              <a
-                key={item.locale}
-                href={item.href}
-                aria-current={item.locale === locale ? "true" : undefined}
-                hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
-              >
-                {item.label}
-              </a>
-            ))}
+            <LanguageAnchors languages={nav.languages} locale={locale} />
           </div>
           <HomeAccount locale={locale} />
         </div>
