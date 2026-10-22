@@ -11,6 +11,7 @@ import {
   getGoogleMapsApi,
   googleBoundsForCountry,
   loadGoogleMapsScript,
+  type GoogleMapPadding,
   type GoogleMapsLanguage,
   type GoogleMapInstance,
   type GoogleMarkerInstance,
@@ -36,6 +37,7 @@ interface Props {
   restrictToCountry?: boolean;
   formatDistance?: (distanceKm: number) => string;
   onGuess: (point: { lat: number; lng: number }) => void;
+  boundsPadding?: GoogleMapPadding;
   showLegend?: boolean;
   guessColor?: string;
   answerColor?: string;
@@ -82,6 +84,7 @@ export function GoogleGuessMap({
   restrictToCountry = true,
   formatDistance = formatDistanceZh,
   onGuess,
+  boundsPadding,
   showLegend = true,
   guessColor = "#f59e0b",
   answerColor = "#22c55e",
@@ -173,10 +176,12 @@ export function GoogleGuessMap({
       restrictToCountry,
       guess,
       answer,
+      boundsPadding,
     });
   }, [
     answer,
     answerLabel,
+    boundsPadding,
     clearOverlays,
     country,
     guess,

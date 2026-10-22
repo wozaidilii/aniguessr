@@ -23,12 +23,22 @@ interface GoogleMapsListener {
   remove: () => void;
 }
 
+export interface GoogleMapPadding {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
 export interface GoogleMapInstance {
   addListener: (
     type: "click",
     handler: (event: GoogleMapMouseEvent) => void,
   ) => GoogleMapsListener;
-  fitBounds: (bounds: GoogleLatLngBoundsInstance) => void;
+  fitBounds: (
+    bounds: GoogleLatLngBoundsInstance,
+    padding?: number | GoogleMapPadding,
+  ) => void;
   panTo?: (point: LatLng) => void;
   setCenter?: (point: LatLng) => void;
   setZoom?: (zoom: number) => void;

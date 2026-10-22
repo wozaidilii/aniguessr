@@ -20,6 +20,7 @@ import {
   difficultyStars,
 } from "~/lib/difficulty-labels";
 import { GoogleGuessMap } from "~/app/(site)/game/foreign/_components/GoogleGuessMap";
+import { ROUND_RESULT_FIT_BOUNDS_PADDING } from "~/lib/google-guess-map-view";
 import { GoogleStreetView } from "~/app/(site)/game/foreign/_components/GoogleStreetView";
 import { redactAnswerTerms } from "~/lib/anime-clue-redaction";
 import { AnimeDifficultySelector } from "~/components/AnimeDifficultySelector";
@@ -1691,6 +1692,9 @@ export default function AnimeGuessrPage() {
             formatDistance={(distanceKm) => formatDistance(distanceKm, locale)}
             minHeightClass="min-h-0 h-full"
             showLegend={false}
+            boundsPadding={
+              roundResult ? ROUND_RESULT_FIT_BOUNDS_PADDING : undefined
+            }
             guessColor="#f9a8d4"
             answerColor="#67e8f9"
             lineColor="#fff7fb"
