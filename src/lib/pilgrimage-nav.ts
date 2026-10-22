@@ -373,6 +373,75 @@ export function formatWorkTitle(
   return `《${name}》`;
 }
 
+export const PLACE_WORK_SUBTITLE_SEPARATOR = " · ";
+
+/**
+ * Two lines of the 12px nearby subtitle. A CJK character counts as 2.
+ * Kept under the card width so the overflow label is not clipped.
+ */
+export const PLACE_WORK_SUBTITLE_BUDGET = 64;
+
+export function workSubtitleOverflow(
+  locale: PilgrimageLocale,
+  hidden: number,
+): string {
+  if (locale === "ja") return `ほか ${hidden} 作品`;
+  if (locale === "en") return `+${hidden} more`;
+  return `等 ${hidden} 部`;
+}
+
+function subtitleWidth(text: string): number {
+  let width = 0;
+  for (const char of text) {
+    const code = char.codePointAt(0) ?? 0;
+    width += code > 0xff ? 2 : 1;
+  }
+  return width;
+}
+
+/** Work titles only, first occurrence wins. Stored brackets are not shown. */
+export function dedupedWorkTitles(titles: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const raw of titles) {
+    const title = stripStoredTitleBrackets(raw);
+    if (!title || seen.has(title)) continue;
+    seen.add(title);
+    unique.push(title);
+  }
+  return unique;
+}
+
+/**
+ * One subtitle for a same-place card. Titles that do not fit the character
+ * budget are dropped and counted in the locale overflow label.
+ */
+export function formatPlaceWorkSubtitle(
+  titles: readonly string[],
+  locale: PilgrimageLocale,
+  budget = PLACE_WORK_SUBTITLE_BUDGET,
+): string {
+  const unique = dedupedWorkTitles(titles);
+  if (unique.length === 0) return "";
+  const joined = unique.join(PLACE_WORK_SUBTITLE_SEPARATOR);
+  if (subtitleWidth(joined) <= budget) return joined;
+
+  for (let count = unique.length - 1; count >= 1; count -= 1) {
+    const hidden = unique.length - count;
+    const label = workSubtitleOverflow(locale, hidden);
+    const head = unique
+      .slice(0, count)
+      .join(PLACE_WORK_SUBTITLE_SEPARATOR);
+    const text = `${head}${PLACE_WORK_SUBTITLE_SEPARATOR}${label}`;
+    if (subtitleWidth(text) <= budget) return text;
+  }
+
+  const label = workSubtitleOverflow(locale, Math.max(unique.length - 1, 0));
+  const first = unique[0] ?? "";
+  if (unique.length === 1) return first;
+  return `${first}${PLACE_WORK_SUBTITLE_SEPARATOR}${label}`;
+}
+
 export function workSpotCountLabel(
   locale: PilgrimageLocale,
   count: number,

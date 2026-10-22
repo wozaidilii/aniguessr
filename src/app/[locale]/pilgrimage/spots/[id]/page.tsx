@@ -3,10 +3,9 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import {
-  formatWorkTitle,
+  formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
-  workSpotCountLabel,
 } from "~/lib/pilgrimage-nav";
 import { buildAnimeGuessrImageUrl } from "~/lib/anime-guessr";
 import {
@@ -58,21 +57,17 @@ interface SamePlaceLink {
 function samePlaceSections(
   spot: PilgrimageSpot,
   locale: PilgrimageLocale,
-): { works: SamePlaceLink[]; siblings: SamePlaceLink[] } {
+): { works: string; siblings: SamePlaceLink[] } {
   const currentWork = spot.workSubjectId ?? spot.subjectId;
   const peers = samePlacePeerIds(spot.id).flatMap((id) => {
     const other = getSpotById(id);
     if (!other || other.id === spot.id) return [];
-    const place = spotPlaceName(other, locale);
-    const title =
-      formatWorkTitle(locale, pickLocalizedText(other.animeTitle, locale)) ||
-      place;
     return [
       {
         id: other.id,
         workId: other.workSubjectId ?? other.subjectId,
-        place,
-        title,
+        place: spotPlaceName(other, locale),
+        title: pickLocalizedText(other.animeTitle, locale),
         href: pilgrimageHref(
           `/pilgrimage/spots/${encodeSpotId(other.id)}`,
           locale,
@@ -83,30 +78,12 @@ function samePlaceSections(
   const siblings = peers
     .filter((item) => item.workId === currentWork)
     .map((item) => ({ id: item.id, href: item.href, text: item.place }));
-  const works: SamePlaceLink[] = [];
-  const others = new Map<string, typeof peers>();
-  for (const item of peers) {
-    if (item.workId === currentWork) continue;
-    const list = others.get(item.workId);
-    if (list) list.push(item);
-    else others.set(item.workId, [item]);
-  }
-  for (const group of others.values()) {
-    const first = group[0];
-    if (!first) continue;
-    if (group.length === 1) {
-      works.push({ id: first.id, href: first.href, text: first.title });
-      continue;
-    }
-    works.push({
-      id: `${first.workId}-count`,
-      href: "",
-      text: `${first.title}${workSpotCountLabel(locale, group.length)}`,
-    });
-    for (const item of group) {
-      works.push({ id: item.id, href: item.href, text: item.place });
-    }
-  }
+  const works = formatPlaceWorkSubtitle(
+    peers
+      .filter((item) => item.workId !== currentWork)
+      .map((item) => item.title),
+    locale,
+  );
   return { works, siblings };
 }
 
@@ -241,25 +218,11 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               data-testid="same-place-works"
             >
               {samePlace.works.length > 0 ? (
-                <p>
+                <p className="place-work-sub line-clamp-2">
                   <span className="whitespace-nowrap">
                     {copy.samePlaceWorks}
-                  </span>
-                  {samePlace.works.map((item) =>
-                    item.href ? (
-                      <a
-                        key={item.id}
-                        href={item.href}
-                        className="ml-1 whitespace-nowrap text-cyan-100 hover:text-cyan-50"
-                      >
-                        {item.text}
-                      </a>
-                    ) : (
-                      <span key={item.id} className="ml-1 whitespace-nowrap">
-                        {item.text}
-                      </span>
-                    ),
-                  )}
+                  </span>{" "}
+                  {samePlace.works}
                 </p>
               ) : null}
               {samePlace.siblings.length > 0 ? (

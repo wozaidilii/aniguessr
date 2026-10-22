@@ -56,12 +56,21 @@ describe("rewritten question labels and pilgrimage pages", () => {
     expect(block).not.toContain('"locationSlug"');
   });
 
-  it("keeps every published area URL in the sitemap with the existing lastmod", () => {
+  it("bumps lastmod only on renamed spot pages and keeps every area URL", () => {
+    const fixes = JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "scripts/data/spot-name-suffix-fixes.json"),
+        "utf8",
+      ),
+    );
+    const renamed = new Set(
+      (fixes.names?.fixes ?? []).map((row) => String(row.id)),
+    );
     const files = readdirSync(path.join(process.cwd(), "public/sitemaps")).filter(
       (file) => /^\d+\.xml$/u.test(file),
     );
     const paths = new Set();
-    const lastmods = new Set();
+    const bumped = new Set();
     for (const file of files) {
       const xml = readFileSync(
         path.join(process.cwd(), "public/sitemaps", file),
@@ -70,19 +79,29 @@ describe("rewritten question labels and pilgrimage pages", () => {
       for (const match of xml.matchAll(
         /<loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod>/gu,
       )) {
-        lastmods.add(match[2]);
-        const pathname = new URL(match[1]).pathname.replace(
-          /^\/(?:zh-tw|zh|ja|en)(?=\/|$)/u,
-          "",
-        );
-        paths.add(pathname || "/");
+        const loc = match[1];
+        const lastmod = match[2];
+        const pathname =
+          new URL(loc).pathname.replace(/^\/(?:zh-tw|zh|ja|en)(?=\/|$)/u, "") ||
+          "/";
+        paths.add(pathname);
+        const spotId = pathname.startsWith("/pilgrimage/spots/")
+          ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
+          : "";
+        if (renamed.has(spotId)) {
+          expect(lastmod).toBe("2026-10-23");
+          bumped.add(spotId);
+        } else {
+          expect(lastmod).toBe("2026-10-21");
+        }
       }
     }
-    expect([...lastmods]).toEqual(["2026-10-21"]);
+    expect(bumped.size).toBeGreaterThan(0);
     for (const slug of knownSlugs.location) {
       expect(paths.has(`/pilgrimage/locations/${slug}`)).toBe(true);
     }
     expect(paths.has("/pilgrimage/locations/chiba-chiba-12106")).toBe(true);
+    expect(paths.has("/")).toBe(true);
   });
 
   it("keeps ISR, canonical, and hreflang on area pages", () => {

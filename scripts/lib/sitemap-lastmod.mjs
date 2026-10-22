@@ -3,6 +3,13 @@ const LOCALE_PREFIX = /^\/(?:zh-tw|zh|ja|en)(?=\/|$)/u;
 /** Date already published for pilgrimage URLs. Unchanged pages keep it. */
 export const SITEMAP_BASELINE_LASTMOD = "2026-10-21";
 
+/**
+ * Date for pages whose visible name or area membership changed.
+ * The fix files record correctedOn as 2026-10-21, which is the baseline,
+ * so using that value left every sitemap URL unchanged.
+ */
+export const SITEMAP_CONTENT_LASTMOD = "2026-10-23";
+
 /** Pathname without the locale prefix, so sitemap locs compare to route paths. */
 export function sitemapPathname(loc) {
   const url = new URL(loc);
@@ -100,6 +107,34 @@ export function changedPilgrimagePaths(previousRows, nextSpots) {
 /** Area pages with no spots are not sitemap entries. */
 export function indexableLocations(locations) {
   return locations.filter((location) => (location?.spotCount ?? 0) > 0);
+}
+
+/**
+ * Spot pages whose display name changed, plus an explicit membership list.
+ * Area and work URLs are not inferred from the spot. A clean deploy has no
+ * previous nav file, and diffing against an empty one would mark every
+ * area and work URL.
+ * @param {Iterable<string>} ids
+ * @param {Array<{ id: string, redirectTo?: string | null }>} spots
+ * @param {Iterable<string>} [membershipPaths]
+ */
+export function contentChangedSitemapPaths(ids, spots, membershipPaths = []) {
+  const changed = renamedSpotPaths(ids, spots);
+  for (const route of membershipPaths) {
+    if (typeof route === "string" && route.startsWith("/")) changed.add(route);
+  }
+  return changed;
+}
+
+/** Spot pages whose display name changed. Area and work URLs are not included. */
+export function renamedSpotPaths(ids, spots) {
+  const wanted = ids instanceof Set ? ids : new Set(ids);
+  const changed = new Set();
+  for (const spot of spots) {
+    if (!spot || spot.redirectTo || !wanted.has(spot.id)) continue;
+    changed.add(`/pilgrimage/spots/${encodeURIComponent(spot.id)}`);
+  }
+  return changed;
 }
 
 /** Spot, area, and work pages that render a renamed spot. */

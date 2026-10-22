@@ -788,6 +788,14 @@
   -webkit-box-orient: vertical;
 }
 
+.home-spot-sub,
+.place-work-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 .home-spot-works {
   margin: 2px 0 0;
   padding: 0;

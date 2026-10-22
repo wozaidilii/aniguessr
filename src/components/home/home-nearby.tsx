@@ -15,13 +15,13 @@ import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import {
   clusterSamePlaces,
+  formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
   groupPlaceWorks,
   haversineKm,
   loadNavCatalog,
   localizedSpotName,
-  type GroupedPlaceWork,
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
@@ -29,8 +29,8 @@ import {
 interface ListedSpot {
   id: string;
   name: string;
-  works: GroupedPlaceWork[];
-  singleWork: string;
+  href: string;
+  subtitle: string;
   lat: number;
   lng: number;
   distanceKm?: number;
@@ -186,39 +186,9 @@ export function HomeNearby({
               <div className="home-spot-top">
                 <span className="home-spot-n">{index + 1}</span>
                 <div>
-                  {spot.works.length === 1 &&
-                  spot.works[0]?.spots.length === 1 &&
-                  spot.works[0].spots[0] ? (
-                    <a href={spot.works[0].spots[0].href}>{spot.name}</a>
-                  ) : (
-                    <span className="home-spot-place">{spot.name}</span>
-                  )}
-                  {spot.singleWork ? (
-                    <p>{spot.singleWork}</p>
-                  ) : spot.works.length > 0 ? (
-                    <ul className="home-spot-works">
-                      {spot.works.map((work) => (
-                        <li key={work.key}>
-                          {work.spots.length === 1 && work.spots[0] ? (
-                            <a href={work.spots[0].href}>{work.title}</a>
-                          ) : (
-                            <>
-                              <span className="home-spot-work">
-                                {work.title}
-                                {work.countLabel}
-                              </span>
-                              <ul className="home-spot-spotnames">
-                                {work.spots.map((item) => (
-                                  <li key={item.id}>
-                                    <a href={item.href}>{item.place}</a>
-                                  </li>
-                                ))}
-                              </ul>
-                            </>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                  <a href={spot.href}>{spot.name}</a>
+                  {spot.subtitle ? (
+                    <p className="home-spot-sub">{spot.subtitle}</p>
                   ) : null}
                 </div>
                 {spot.distanceKm != null ? (
@@ -294,17 +264,22 @@ function toListed(
 ): ListedSpot {
   const spot = group[0];
   if (!spot) {
-    return { id: "", name: "", works: [], singleWork: "", lat: 0, lng: 0 };
+    return { id: "", name: "", href: "", subtitle: "", lat: 0, lng: 0 };
   }
   const works = groupPlaceWorks(group, catalog.animes, locale, (id) =>
     withPilgrimageLocale(`/pilgrimage/spots/${encodeSpotId(id)}`, locale),
   );
-  const only = works.length === 1 ? works[0] : undefined;
   return {
     id: spot.id,
     name: localizedSpotName(spot, locale),
-    works,
-    singleWork: only?.spots.length === 1 ? (only?.title ?? "") : "",
+    href: withPilgrimageLocale(
+      `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
+      locale,
+    ),
+    subtitle: formatPlaceWorkSubtitle(
+      works.map((work) => work.title),
+      locale,
+    ),
     lat: spot.lat,
     lng: spot.lng,
     distanceKm: spot.distanceKm,

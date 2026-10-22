@@ -18,6 +18,8 @@ import {
   googleStreetViewUrl,
   haversineKm,
   localizedNavText,
+  dedupedWorkTitles,
+  formatPlaceWorkSubtitle,
   formatWorkTitle,
   groupPlaceWorks,
   parseNavCatalog,
@@ -256,6 +258,38 @@ describe("pilgrimage navigation", () => {
     );
   });
 
+  it("lists each work once, without brackets, and labels the overflow", () => {
+    expect(
+      dedupedWorkTitles([
+        "『刀使ノ巫女』",
+        "刀使ノ巫女",
+        "『Just Because!』",
+        "  ",
+      ]),
+    ).toEqual(["刀使ノ巫女", "Just Because!"]);
+    const shown = formatPlaceWorkSubtitle(
+      ["『Just Because!』", "『刀使ノ巫女』", "刀使ノ巫女", "『チェンソーマン』"],
+      "ja",
+    );
+    expect(shown).toBe("Just Because! · 刀使ノ巫女 · チェンソーマン");
+    expect(shown).not.toContain("『");
+    expect(shown).not.toContain("中津宮階段");
+
+    const titles = ["Alpha", "Beta", "Gamma", "Delta"];
+    expect(formatPlaceWorkSubtitle(titles, "ja", 20)).toBe(
+      "Alpha · ほか 3 作品",
+    );
+    expect(formatPlaceWorkSubtitle(titles, "en", 20)).toBe("Alpha · +3 more");
+    expect(formatPlaceWorkSubtitle(titles, "zh", 20)).toBe("Alpha · 等 3 部");
+    expect(formatPlaceWorkSubtitle(titles, "zh-tw", 20)).toBe(
+      "Alpha · 等 3 部",
+    );
+    const css = readFileSync("src/styles/home-page.css", "utf8");
+    expect(css).toMatch(
+      /\.home-spot-sub,\s*\.place-work-sub \{[^}]*-webkit-line-clamp: 2;/s,
+    );
+  });
+
   it("keeps the open nearby sheet from stretching the card list", () => {
     const css = readFileSync("src/styles/home-page.css", "utf8");
     expect(css).toMatch(
@@ -275,10 +309,12 @@ describe("pilgrimage navigation", () => {
     );
     expect(home).toContain("clusterSamePlaces");
     expect(home).toContain("/pilgrimage/spots/${encodeSpotId(id)}");
-    expect(home).toContain("<a href={item.href}>{item.place}</a>");
+    expect(home).toContain("formatPlaceWorkSubtitle");
+    expect(home).not.toContain("{item.place}");
     expect(near).toContain("clusterSamePlaces");
     expect(near).toContain("/pilgrimage/spots/${encodeSpotId(id)}");
-    expect(near).toContain("href={item.href}");
+    expect(near).toContain("formatPlaceWorkSubtitle");
+    expect(near).not.toContain("{item.place}");
     expect(spotPage).not.toContain("NearbySpots");
     expect(spotPage).not.toContain("clusterSamePlaces");
   });

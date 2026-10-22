@@ -33,12 +33,12 @@ import {
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 import {
-  changedPilgrimagePaths,
+  contentChangedSitemapPaths,
   indexableLocations,
   lastmodForPath,
   parseSitemapLastmods,
-  pathsForRenamedSpots,
   SITEMAP_BASELINE_LASTMOD,
+  SITEMAP_CONTENT_LASTMOD,
 } from "./lib/sitemap-lastmod.mjs";
 
 const SOURCE_PATH = path.join(
@@ -767,7 +767,6 @@ async function main() {
   }
 
   const origin = resolveSiteOrigin();
-  const fallbackLastmod = generatedAt.slice(0, 10);
   const previousLastmod = new Map();
   const sitemapFiles = await readdir(SITEMAP_DIR).catch(() => []);
   for (const file of sitemapFiles) {
@@ -777,56 +776,34 @@ async function main() {
       if (!previousLastmod.has(route)) previousLastmod.set(route, lastmod);
     }
   }
-  // One production sitemap date covers both data fixes: question labels
-  // that moved prefecture, and spot names whose municipality suffix changed.
-  // The later correctedOn wins. A sitemap with no previous file uses that
-  // date instead of the build day, so a fresh deploy does not restamp
-  // every URL.
-  let changedOn = "";
-  try {
-    const fixes = JSON.parse(
-      await readFile(
-        path.join(process.cwd(), "scripts/data/question-location-fixes.json"),
-        "utf8",
-      ),
-    );
-    if (typeof fixes.correctedOn === "string" && fixes.correctedOn) {
-      changedOn = fixes.correctedOn;
-    }
-  } catch {
-    changedOn = "";
-  }
+  // Both fix files set correctedOn to 2026-10-21, the baseline already on
+  // every URL, so that stamp changed nothing. Name edits bump only the spot
+  // page. Membership changes come from the recorded area-page list (#28 and
+  // #30 both left it empty). Do not diff spots-nav.json: it is generated,
+  // missing on a clean deploy, and an empty previous set would mark every
+  // area and work URL. The date is fixed: the build clock must not restamp
+  // the rest of the sitemap.
+  const changedOn = SITEMAP_CONTENT_LASTMOD;
   let renamedIds = [];
+  let membershipPaths = [];
   try {
     const fixes = JSON.parse(await readFile(NAME_FIXES_PATH, "utf8"));
-    if (
-      typeof fixes.correctedOn === "string" &&
-      fixes.correctedOn &&
-      fixes.correctedOn > changedOn
-    ) {
-      changedOn = fixes.correctedOn;
-    }
     renamedIds = Array.isArray(fixes.names?.fixes)
       ? fixes.names.fixes.map((row) => row.id)
       : [];
+    membershipPaths = Array.isArray(fixes.areas?.affectedAreaPages)
+      ? fixes.areas.affectedAreaPages
+      : [];
   } catch {
     renamedIds = [];
+    membershipPaths = [];
   }
-  if (!changedOn) changedOn = fallbackLastmod;
-  let previousRows = [];
-  try {
-    const nav = JSON.parse(await readFile(NAV_PATH, "utf8"));
-    previousRows = Array.isArray(nav.spots) ? nav.spots : [];
-  } catch {
-    previousRows = [];
-  }
-  const changedPaths = changedPilgrimagePaths(previousRows, visibleSpots);
-  for (const route of pathsForRenamedSpots(renamedIds, visibleSpots)) {
-    changedPaths.add(route);
-  }
-  const unchangedFallback = previousLastmod.size
-    ? fallbackLastmod
-    : SITEMAP_BASELINE_LASTMOD;
+  const changedPaths = contentChangedSitemapPaths(
+    renamedIds,
+    visibleSpots,
+    membershipPaths,
+  );
+  const unchangedFallback = SITEMAP_BASELINE_LASTMOD;
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
   const sitemapUrls = [];
