@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_FOREIGN_COUNTRY, type LatLng } from "./foreign-map";
 import {
+  MIN_RESULT_BOUNDS_SPAN_DEG,
   resetGoogleGuessMapView,
+  ROUND_RESULT_FIT_BOUNDS_PADDING,
   syncGoogleGuessMapViewport,
 } from "./google-guess-map-view";
 import type {
@@ -93,6 +95,89 @@ describe("google guess map viewport sync", () => {
     expect(panTo).not.toHaveBeenCalled();
     expect(setCenter).not.toHaveBeenCalled();
     expect(setZoom).not.toHaveBeenCalled();
+  });
+
+  it("insets a round-result fit so pins clear the legend and controls", () => {
+    const { fitBounds, map, setZoom } = makeMap();
+    const guess = { lat: 35.7, lng: 139.7 };
+    const answer = { lat: 35.6, lng: 139.8 };
+
+    syncGoogleGuessMapViewport({
+      map,
+      api,
+      country: DEFAULT_FOREIGN_COUNTRY,
+      restrictToCountry: true,
+      guess,
+      answer,
+      boundsPadding: ROUND_RESULT_FIT_BOUNDS_PADDING,
+    });
+
+    expect(fitBounds).toHaveBeenCalledTimes(1);
+    expect(fitBounds.mock.calls[0]?.[0]).toMatchObject({
+      points: [guess, answer],
+    });
+    expect(fitBounds.mock.calls[0]?.[1]).toEqual({
+      top: 64,
+      right: 64,
+      bottom: 40,
+      left: 24,
+    });
+    expect(setZoom).not.toHaveBeenCalled();
+  });
+
+  it("expands a single-point result so zoom stays off the maximum", () => {
+    const { fitBounds, map, setZoom } = makeMap();
+    const point = { lat: 35.681, lng: 139.767 };
+
+    syncGoogleGuessMapViewport({
+      map,
+      api,
+      country: DEFAULT_FOREIGN_COUNTRY,
+      restrictToCountry: true,
+      guess: point,
+      answer: point,
+      boundsPadding: ROUND_RESULT_FIT_BOUNDS_PADDING,
+    });
+
+    const bounds = fitBounds.mock.calls[0]?.[0] as MockLatLngBounds;
+    const lats = bounds.points.map((item) => item.lat);
+    const lngs = bounds.points.map((item) => item.lng);
+    expect(Math.max(...lats) - Math.min(...lats)).toBeCloseTo(
+      MIN_RESULT_BOUNDS_SPAN_DEG,
+    );
+    expect(Math.max(...lngs) - Math.min(...lngs)).toBeCloseTo(
+      MIN_RESULT_BOUNDS_SPAN_DEG,
+    );
+    expect((Math.max(...lats) + Math.min(...lats)) / 2).toBeCloseTo(point.lat);
+    expect((Math.max(...lngs) + Math.min(...lngs)) / 2).toBeCloseTo(point.lng);
+    expect(lats.some((lat) => lat < point.lat)).toBe(true);
+    expect(lats.some((lat) => lat > point.lat)).toBe(true);
+    expect(setZoom).not.toHaveBeenCalled();
+    expect(fitBounds.mock.calls[0]?.[1]).toEqual(ROUND_RESULT_FIT_BOUNDS_PADDING);
+  });
+
+  it("keeps a wide separation and only widens a collapsed axis", () => {
+    const { fitBounds, map } = makeMap();
+    const guess = { lat: 35, lng: 139 };
+    const answer = { lat: 36, lng: 139 };
+
+    syncGoogleGuessMapViewport({
+      map,
+      api,
+      country: DEFAULT_FOREIGN_COUNTRY,
+      restrictToCountry: true,
+      guess,
+      answer,
+    });
+
+    const bounds = fitBounds.mock.calls[0]?.[0] as MockLatLngBounds;
+    const lats = bounds.points.map((item) => item.lat);
+    const lngs = bounds.points.map((item) => item.lng);
+    expect(Math.max(...lats) - Math.min(...lats)).toBeCloseTo(1);
+    expect(Math.max(...lngs) - Math.min(...lngs)).toBeCloseTo(
+      MIN_RESULT_BOUNDS_SPAN_DEG,
+    );
+    expect(fitBounds.mock.calls[0]?.[1]).toBeUndefined();
   });
 
   it("falls back to panTo when the map wrapper lacks setCenter", () => {
