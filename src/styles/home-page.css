@@ -777,7 +777,8 @@
   font-weight: 800;
 }
 
-.home-spot-top a {
+.home-spot-top a,
+.home-spot-place {
   display: -webkit-box;
   overflow: hidden;
   color: #fff7fb;
@@ -785,6 +786,50 @@
   text-decoration: none;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.home-spot-sub,
+.place-work-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.home-spot-works {
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-spot-works li + li {
+  margin-top: 2px;
+}
+
+.home-spot-works a,
+.home-spot-work {
+  display: block;
+  overflow: hidden;
+  color: #8f86a0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+}
+
+.home-spot-spotnames {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-spot-spotnames a {
+  padding-left: 8px;
+  font-size: 11px;
 }
 
 .home-spot-dist {
@@ -1453,7 +1498,12 @@
   }
 
   .home-nearby-sheet.is-open {
-    height: min(78svh, 680px);
+    height: auto;
+    max-height: min(78svh, 680px);
+  }
+
+  .home-nearby-sheet.is-open .home-spot-list {
+    flex: 0 0 auto;
   }
 
   .home-nearby-sheet:not(.is-open) .home-spot-list {
@@ -2115,8 +2165,13 @@
   }
 
   .home-nearby-sheet.is-open {
-    height: min(78svh, 680px);
+    height: auto;
+    max-height: min(78svh, 680px);
     overflow: auto;
+  }
+
+  .home-nearby-sheet.is-open .home-spot-list {
+    flex: 0 0 auto;
   }
 
   .home-nearby-sheet .home-grab {
@@ -2124,6 +2179,7 @@
   }
 
   .home-nearby-sheet:not(.is-open) .home-spot-top p,
+  .home-nearby-sheet:not(.is-open) .home-spot-works,
   .home-nearby-sheet:not(.is-open) .home-spot-dist,
   .home-nearby-sheet:not(.is-open) .home-spot-actions,
   .home-nearby-sheet:not(.is-open) .home-sheet-extra {
@@ -2151,11 +2207,7 @@
 
   .home-map-tools {
     right: 12px;
-    bottom: calc(96px + 12px);
-  }
-
-  .home-hero:has(.home-nearby-sheet.is-open) .home-map-tools {
-    bottom: calc(min(78svh, 680px) + 12px);
+    bottom: calc(var(--home-sheet-height, 96px) + 12px);
   }
 }
 
@@ -2354,8 +2406,14 @@
 
 .home-nearby-head .home-nearby-label,
 .home-spot-top a,
+.home-spot-place,
 .home-drawer-close {
   color: #1f2430;
+}
+
+.home .home-spot-works a,
+.home .home-spot-work {
+  color: #646b79;
 }
 
 .home-spot-n {

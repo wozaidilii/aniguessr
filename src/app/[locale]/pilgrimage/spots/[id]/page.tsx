@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import {
+  formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
 } from "~/lib/pilgrimage-nav";
@@ -12,6 +13,7 @@ import {
   pickLocalizedText,
   pickMaybeLocalizedText,
 } from "~/lib/localized-text";
+import { samePlacePeerIds } from "~/lib/same-place-groups";
 import { spotPlaceName } from "~/lib/spot-name-overrides";
 import { screenshotCaption } from "~/lib/screenshot-caption";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
@@ -44,6 +46,45 @@ export const dynamicParams = true;
 
 export function generateStaticParams() {
   return [];
+}
+
+interface SamePlaceLink {
+  id: string;
+  href: string;
+  text: string;
+}
+
+function samePlaceSections(
+  spot: PilgrimageSpot,
+  locale: PilgrimageLocale,
+): { works: string; siblings: SamePlaceLink[] } {
+  const currentWork = spot.workSubjectId ?? spot.subjectId;
+  const peers = samePlacePeerIds(spot.id).flatMap((id) => {
+    const other = getSpotById(id);
+    if (!other || other.id === spot.id) return [];
+    return [
+      {
+        id: other.id,
+        workId: other.workSubjectId ?? other.subjectId,
+        place: spotPlaceName(other, locale),
+        title: pickLocalizedText(other.animeTitle, locale),
+        href: pilgrimageHref(
+          `/pilgrimage/spots/${encodeSpotId(other.id)}`,
+          locale,
+        ),
+      },
+    ];
+  });
+  const siblings = peers
+    .filter((item) => item.workId === currentWork)
+    .map((item) => ({ id: item.id, href: item.href, text: item.place }));
+  const works = formatPlaceWorkSubtitle(
+    peers
+      .filter((item) => item.workId !== currentWork)
+      .map((item) => item.title),
+    locale,
+  );
+  return { works, siblings };
 }
 
 function spotSeoFields(
@@ -124,6 +165,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const mapsUrl = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
   const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
   const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
+  const samePlace = samePlaceSections(spot, locale);
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -170,6 +212,37 @@ export default async function PilgrimageSpotPage({ params }: Props) {
           <p className="mt-3 text-sm leading-7 text-pink-50/80">
             {description}
           </p>
+          {samePlace.works.length + samePlace.siblings.length > 0 ? (
+            <div
+              className="mt-4 grid gap-2 text-sm leading-6 text-pink-100/80"
+              data-testid="same-place-works"
+            >
+              {samePlace.works.length > 0 ? (
+                <p className="place-work-sub line-clamp-2">
+                  <span className="whitespace-nowrap">
+                    {copy.samePlaceWorks}
+                  </span>{" "}
+                  {samePlace.works}
+                </p>
+              ) : null}
+              {samePlace.siblings.length > 0 ? (
+                <p>
+                  <span className="whitespace-nowrap">
+                    {copy.samePlaceSiblings}
+                  </span>
+                  {samePlace.siblings.map((item) => (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      className="ml-1 whitespace-nowrap text-cyan-100 hover:text-cyan-50"
+                    >
+                      {item.text}
+                    </a>
+                  ))}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
           {episode ? (
             <section className="mt-6">
@@ -254,7 +327,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               href={directionsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button whitespace-nowrap text-center text-sm"
+              className="anime-button text-center text-sm whitespace-nowrap"
             >
               {copy.navigate}
             </a>
@@ -262,7 +335,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               href={streetViewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="anime-button-secondary whitespace-nowrap text-center text-sm"
+              className="anime-button-secondary text-center text-sm whitespace-nowrap"
             >
               {copy.streetView}
             </a>

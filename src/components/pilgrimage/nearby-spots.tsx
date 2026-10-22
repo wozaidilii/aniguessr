@@ -10,13 +10,16 @@ import {
 } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import {
-  animeTitle,
+  clusterSamePlaces,
+  formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
+  groupPlaceWorks,
+  haversineKm,
   loadNavCatalog,
   localizedSpotName,
-  rankNearbySpots,
   type NavCatalog,
+  type NavSpot,
   type NearbySpot,
 } from "~/lib/pilgrimage-nav";
 
@@ -62,12 +65,13 @@ export function NearbySpots({ locale }: { locale: PilgrimageLocale }) {
     );
   }
 
-  const spots: NearbySpot[] =
-    origin && catalog ? rankNearbySpots(catalog.spots, origin, ids) : [];
+  const groups =
+    origin && catalog
+      ? nearbyPlaceGroups(catalog.spots, origin, ids)
+      : emptyGroups;
   const animes = catalog?.animes ?? {};
-  const favoriteIds = new Set(ids);
-  const favorites = spots.filter((spot) => favoriteIds.has(spot.subjectId));
-  const others = spots.filter((spot) => !favoriteIds.has(spot.subjectId));
+  const favorites = groups.favorites;
+  const others = groups.others;
 
   return (
     <section className="mb-10" id="near-me" data-testid="near-me">
@@ -91,7 +95,7 @@ export function NearbySpots({ locale }: { locale: PilgrimageLocale }) {
           {status === "error" ? copy.mapUnavailable : copy.nearMeUnavailable}
         </p>
       ) : null}
-      {status === "ready" && spots.length === 0 ? (
+      {status === "ready" && favorites.length + others.length === 0 ? (
         <p className="mb-3 text-sm text-pink-100/75">{copy.nearMeEmpty}</p>
       ) : null}
       {favorites.length > 0 ? (
@@ -114,6 +118,36 @@ export function NearbySpots({ locale }: { locale: PilgrimageLocale }) {
   );
 }
 
+const emptyGroups = { favorites: [], others: [] } as {
+  favorites: NearbySpot[][];
+  others: NearbySpot[][];
+};
+
+function nearbyPlaceGroups(
+  spots: readonly NavSpot[],
+  origin: { lat: number; lng: number },
+  favoriteIds: readonly string[],
+): { favorites: NearbySpot[][]; others: NearbySpot[][] } {
+  const favorite = new Set(favoriteIds);
+  const ranked: NearbySpot[] = spots
+    .map((spot) => ({
+      ...spot,
+      distanceKm: haversineKm(origin.lat, origin.lng, spot.lat, spot.lng),
+    }))
+    .sort((left, right) => left.distanceKm - right.distanceKm);
+  const favorites: NearbySpot[][] = [];
+  const others: NearbySpot[][] = [];
+  for (const group of clusterSamePlaces(ranked)) {
+    const favored = group.some((spot) => favorite.has(spot.subjectId));
+    if (favored) {
+      if (favorites.length < 20) favorites.push(group);
+    } else if (others.length < 20) {
+      others.push(group);
+    }
+  }
+  return { favorites, others };
+}
+
 function SpotGroup({
   locale,
   heading,
@@ -122,8 +156,8 @@ function SpotGroup({
 }: {
   locale: PilgrimageLocale;
   heading?: string;
-  spots: NearbySpot[];
-  animes: Parameters<typeof animeTitle>[0];
+  spots: NearbySpot[][];
+  animes: NavCatalog["animes"];
 }) {
   const copy = getPilgrimageCopy(locale);
   return (
@@ -134,11 +168,9 @@ function SpotGroup({
         </h3>
       ) : null}
       <ol className="grid gap-2" data-testid="near-me-list">
-        {spots.map((spot) => {
-          const href = withPilgrimageLocale(
-            `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
-            locale,
-          );
+        {spots.map((group) => {
+          const spot = group[0];
+          if (!spot) return null;
           const title = localizedSpotName(spot, locale);
           return (
             <li
@@ -147,7 +179,10 @@ function SpotGroup({
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <Link
-                  href={href}
+                  href={withPilgrimageLocale(
+                    `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
+                    locale,
+                  )}
                   className="font-bold text-white hover:text-cyan-50"
                 >
                   {title}
@@ -156,8 +191,16 @@ function SpotGroup({
                   {copy.formatDistance(spot.distanceKm)}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-pink-100/65">
-                {animeTitle(animes, spot.subjectId, locale)}
+              <p className="place-work-sub mt-1 line-clamp-2 text-sm text-pink-100/65">
+                {formatPlaceWorkSubtitle(
+                  groupPlaceWorks(group, animes, locale, (id) =>
+                    withPilgrimageLocale(
+                      `/pilgrimage/spots/${encodeSpotId(id)}`,
+                      locale,
+                    ),
+                  ).map((work) => work.title),
+                  locale,
+                )}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a

@@ -4,7 +4,8 @@ import { applySpotDisplayName } from "~/lib/spot-name-overrides";
 export const ANITABI_SITE = "https://anitabi.cn";
 export const CC_BY_NC_SA_4_URL =
   "https://creativecommons.org/licenses/by-nc-sa/4.0/";
-export const PILGRIMAGE_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
+export const PILGRIMAGE_MAP_STYLE =
+  "https://tiles.openfreemap.org/styles/positron";
 export const SPOTS_NAV_URL = "/data/seo/spots-nav.json";
 
 export interface NavText {
@@ -187,6 +188,118 @@ export function filterNavSpots(
   });
 }
 
+/** Spots this close, with similar names, are one place in nearby lists. */
+export const SAME_PLACE_METERS = 30;
+
+function normalizePlaceName(value: string): string {
+  return value
+    .normalize("NFKC")
+    .replace(/[（(][^）)]*[）)]/gu, "")
+    .replace(/[\s・･、,，。．.ー\-－]/gu, "")
+    .replace(/の/gu, "")
+    .toLowerCase();
+}
+
+function placeNameForms(name: NavText): string[] {
+  return [name.ja, name.zh, name.tw ?? ""]
+    .map((value) => normalizePlaceName(value))
+    .filter((value) => value.length >= 3);
+}
+
+/** True when one stored name contains the other after light normalization. */
+export function placeNamesSimilar(left: NavText, right: NavText): boolean {
+  const formsA = placeNameForms(left);
+  const formsB = placeNameForms(right);
+  for (const a of formsA) {
+    for (const b of formsB) {
+      if (a === b) return true;
+      const shorter = a.length <= b.length ? a : b;
+      const longer = a.length <= b.length ? b : a;
+      if (shorter.length >= 3 && longer.includes(shorter)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Cluster a distance-sorted list. The first member of each group stays first,
+ * so a nearest-first list keeps the closest spot as the card.
+ */
+export function clusterSamePlaces<
+  T extends { lat: number; lng: number; name: NavText },
+>(spots: readonly T[], meters = SAME_PLACE_METERS): T[][] {
+  const count = spots.length;
+  const parent = Array.from({ length: count }, (_, index) => index);
+  const find = (index: number): number => {
+    let root = index;
+    while (parent[root] !== root) root = parent[root] ?? root;
+    let cursor = index;
+    while (cursor !== root) {
+      const next = parent[cursor] ?? root;
+      parent[cursor] = root;
+      cursor = next;
+    }
+    return root;
+  };
+  const union = (left: number, right: number) => {
+    let a = find(left);
+    let b = find(right);
+    if (a === b) return;
+    if (a > b) [a, b] = [b, a];
+    parent[b] = a;
+  };
+
+  const cell = 0.0004;
+  const buckets = new Map<string, number[]>();
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const key = `${Math.floor(spot.lat / cell)}:${Math.floor(spot.lng / cell)}`;
+    const list = buckets.get(key);
+    if (list) list.push(index);
+    else buckets.set(key, [index]);
+  }
+
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const latCell = Math.floor(spot.lat / cell);
+    const lngCell = Math.floor(spot.lng / cell);
+    for (let dLat = -1; dLat <= 1; dLat += 1) {
+      for (let dLng = -1; dLng <= 1; dLng += 1) {
+        const list = buckets.get(`${latCell + dLat}:${lngCell + dLng}`);
+        if (!list) continue;
+        for (const other of list) {
+          if (other <= index) continue;
+          const candidate = spots[other];
+          if (!candidate) continue;
+          const distance =
+            haversineKm(spot.lat, spot.lng, candidate.lat, candidate.lng) *
+            1000;
+          if (distance > meters) continue;
+          if (!placeNamesSimilar(spot.name, candidate.name)) continue;
+          union(index, other);
+        }
+      }
+    }
+  }
+
+  const groups = new Map<number, T[]>();
+  const order: number[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const spot = spots[index];
+    if (!spot) continue;
+    const root = find(index);
+    const list = groups.get(root);
+    if (list) list.push(spot);
+    else {
+      groups.set(root, [spot]);
+      order.push(root);
+    }
+  }
+  return order.map((root) => groups.get(root) ?? []);
+}
+
 export function rankNearbySpots(
   spots: readonly NavSpot[],
   origin: { lat: number; lng: number },
@@ -218,6 +331,179 @@ export function animeTitle(
   locale: PilgrimageLocale,
 ): string {
   return localizedNavText(animes[subjectId] ?? EMPTY_TEXT, locale);
+}
+
+const TITLE_BRACKETS: ReadonlyArray<readonly [string, string]> = [
+  ["『", "』"],
+  ["「", "」"],
+  ["《", "》"],
+  ["“", "”"],
+  ['"', '"'],
+];
+
+/** Drop brackets that were stored as part of a title, once per matched pair. */
+export function stripStoredTitleBrackets(value: string): string {
+  let text = value.trim();
+  let changed = true;
+  while (changed && text.length > 0) {
+    changed = false;
+    for (const [open, close] of TITLE_BRACKETS) {
+      if (
+        text.startsWith(open) &&
+        text.endsWith(close) &&
+        text.length > open.length + close.length
+      ) {
+        text = text.slice(open.length, text.length - close.length).trim();
+        changed = true;
+      }
+    }
+  }
+  return text;
+}
+
+/** ja 『』, zh/zh-tw 《》, en quotes. Stored brackets are not kept. */
+export function formatWorkTitle(
+  locale: PilgrimageLocale,
+  title: string,
+): string {
+  const name = stripStoredTitleBrackets(title);
+  if (!name) return "";
+  if (locale === "ja") return `『${name}』`;
+  if (locale === "en") return `"${name}"`;
+  return `《${name}》`;
+}
+
+export const PLACE_WORK_SUBTITLE_SEPARATOR = " · ";
+
+/**
+ * Two lines of the 12px nearby subtitle. A CJK character counts as 2.
+ * Kept under the card width so the overflow label is not clipped.
+ */
+export const PLACE_WORK_SUBTITLE_BUDGET = 64;
+
+export function workSubtitleOverflow(
+  locale: PilgrimageLocale,
+  hidden: number,
+): string {
+  if (locale === "ja") return `ほか ${hidden} 作品`;
+  if (locale === "en") return `+${hidden} more`;
+  return `等 ${hidden} 部`;
+}
+
+function subtitleWidth(text: string): number {
+  let width = 0;
+  for (const char of text) {
+    const code = char.codePointAt(0) ?? 0;
+    width += code > 0xff ? 2 : 1;
+  }
+  return width;
+}
+
+/** Work titles only, first occurrence wins. Stored brackets are not shown. */
+export function dedupedWorkTitles(titles: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const raw of titles) {
+    const title = stripStoredTitleBrackets(raw);
+    if (!title || seen.has(title)) continue;
+    seen.add(title);
+    unique.push(title);
+  }
+  return unique;
+}
+
+/**
+ * One subtitle for a same-place card. Titles that do not fit the character
+ * budget are dropped and counted in the locale overflow label.
+ */
+export function formatPlaceWorkSubtitle(
+  titles: readonly string[],
+  locale: PilgrimageLocale,
+  budget = PLACE_WORK_SUBTITLE_BUDGET,
+): string {
+  const unique = dedupedWorkTitles(titles);
+  if (unique.length === 0) return "";
+  const joined = unique.join(PLACE_WORK_SUBTITLE_SEPARATOR);
+  if (subtitleWidth(joined) <= budget) return joined;
+
+  for (let count = unique.length - 1; count >= 1; count -= 1) {
+    const hidden = unique.length - count;
+    const label = workSubtitleOverflow(locale, hidden);
+    const head = unique
+      .slice(0, count)
+      .join(PLACE_WORK_SUBTITLE_SEPARATOR);
+    const text = `${head}${PLACE_WORK_SUBTITLE_SEPARATOR}${label}`;
+    if (subtitleWidth(text) <= budget) return text;
+  }
+
+  const label = workSubtitleOverflow(locale, Math.max(unique.length - 1, 0));
+  const first = unique[0] ?? "";
+  if (unique.length === 1) return first;
+  return `${first}${PLACE_WORK_SUBTITLE_SEPARATOR}${label}`;
+}
+
+export function workSpotCountLabel(
+  locale: PilgrimageLocale,
+  count: number,
+): string {
+  if (locale === "ja") return `（${count}か所）`;
+  if (locale === "zh") return `（${count}处）`;
+  if (locale === "zh-tw") return `（${count}處）`;
+  return ` (${count} spots)`;
+}
+
+export interface GroupedPlaceSpot {
+  id: string;
+  href: string;
+  place: string;
+}
+
+export interface GroupedPlaceWork {
+  key: string;
+  title: string;
+  countLabel: string;
+  spots: GroupedPlaceSpot[];
+}
+
+/** One entry per work. Several spots of that work stay on the entry. */
+export function groupPlaceWorks(
+  spots: readonly NavSpot[],
+  animes: Record<string, NavText>,
+  locale: PilgrimageLocale,
+  hrefFor: (id: string) => string,
+): GroupedPlaceWork[] {
+  const order: string[] = [];
+  const buckets = new Map<string, NavSpot[]>();
+  for (const spot of spots) {
+    const key = spot.subjectId || spot.id;
+    const list = buckets.get(key);
+    if (list) list.push(spot);
+    else {
+      buckets.set(key, [spot]);
+      order.push(key);
+    }
+  }
+  return order.flatMap((key) => {
+    const members = buckets.get(key);
+    const first = members?.[0];
+    if (!members || !first) return [];
+    const raw = animeTitle(animes, first.subjectId, locale);
+    const title =
+      formatWorkTitle(locale, raw) || localizedSpotName(first, locale);
+    return [
+      {
+        key,
+        title,
+        countLabel:
+          members.length > 1 ? workSpotCountLabel(locale, members.length) : "",
+        spots: members.map((item) => ({
+          id: item.id,
+          href: hrefFor(item.id),
+          place: localizedSpotName(item, locale),
+        })),
+      },
+    ];
+  });
 }
 
 let catalogRequest: Promise<NavCatalog> | null = null;

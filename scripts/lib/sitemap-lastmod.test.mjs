@@ -5,6 +5,9 @@ import {
   lastmodForPath,
   parseSitemapLastmods,
   pathsForRenamedSpots,
+  contentChangedSitemapPaths,
+  renamedSpotPaths,
+  SITEMAP_CONTENT_LASTMOD,
 } from "./sitemap-lastmod.mjs";
 
 describe("sitemap lastmod", () => {
@@ -127,6 +130,72 @@ describe("sitemap lastmod", () => {
     expect(locations.map((location) => location.slug)).toEqual([
       "chiba-chiba-12106",
     ]);
+  });
+
+  it("adds recorded membership paths and does not infer area pages", () => {
+    const spots = [
+      {
+        id: "anitabi_37137_4slhba842",
+        locationSlug: "fujisawa-kanagawa",
+        subjectSlug: "37137-tari-tari",
+      },
+    ];
+    expect(
+      contentChangedSitemapPaths(["anitabi_37137_4slhba842"], spots, []),
+    ).toEqual(new Set(["/pilgrimage/spots/anitabi_37137_4slhba842"]));
+    expect(
+      contentChangedSitemapPaths(
+        ["anitabi_37137_4slhba842"],
+        spots,
+        ["/pilgrimage/locations/chiba-chiba-12106"],
+      ),
+    ).toEqual(
+      new Set([
+        "/pilgrimage/spots/anitabi_37137_4slhba842",
+        "/pilgrimage/locations/chiba-chiba-12106",
+      ]),
+    );
+  });
+
+  it("bumps renamed spot pages only, on the fixed content date", () => {
+    const spots = [
+      {
+        id: "anitabi_37137_4slhba842",
+        locationSlug: "fujisawa-kanagawa",
+        subjectSlug: "37137-tari-tari",
+      },
+      {
+        id: "untouched",
+        locationSlug: "kamakura-kanagawa",
+        subjectSlug: "51-clannad",
+      },
+    ];
+    const changed = renamedSpotPaths(["anitabi_37137_4slhba842"], spots);
+    expect(changed).toEqual(
+      new Set(["/pilgrimage/spots/anitabi_37137_4slhba842"]),
+    );
+    expect(SITEMAP_CONTENT_LASTMOD).toBe("2026-10-23");
+    expect(
+      lastmodForPath("/pilgrimage/spots/anitabi_37137_4slhba842", {
+        previous: new Map([
+          ["/pilgrimage/spots/anitabi_37137_4slhba842", "2026-10-21"],
+          ["/pilgrimage/locations/fujisawa-kanagawa", "2026-10-21"],
+        ]),
+        changed,
+        changedOn: SITEMAP_CONTENT_LASTMOD,
+        fallback: "2026-10-21",
+      }),
+    ).toBe("2026-10-23");
+    expect(
+      lastmodForPath("/pilgrimage/locations/fujisawa-kanagawa", {
+        previous: new Map([
+          ["/pilgrimage/locations/fujisawa-kanagawa", "2026-10-21"],
+        ]),
+        changed,
+        changedOn: SITEMAP_CONTENT_LASTMOD,
+        fallback: "2026-10-21",
+      }),
+    ).toBe("2026-10-21");
   });
 
   it("marks the spot, its area page, and its work page", () => {

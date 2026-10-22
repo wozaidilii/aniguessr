@@ -39,7 +39,8 @@ describe("spot name municipality suffixes", () => {
     const build = readFileSync("scripts/build-pilgrimage-seo-data.mjs", "utf8");
     expect(build).toContain("/pilgrimage/spots/${encodeURIComponent(spot.id)}");
     expect(build).toContain("locationSlug: item.area.slug");
-    expect(build).toContain("pathsForRenamedSpots");
+    expect(build).toContain("contentChangedSitemapPaths");
+    expect(build).toContain("renamedIds");
     expect(build).not.toContain("slugifyLocation(");
   });
 

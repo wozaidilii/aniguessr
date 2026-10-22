@@ -14,9 +14,11 @@ import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import {
-  animeTitle,
+  clusterSamePlaces,
+  formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
   googleStreetViewUrl,
+  groupPlaceWorks,
   haversineKm,
   loadNavCatalog,
   localizedSpotName,
@@ -27,10 +29,10 @@ import {
 interface ListedSpot {
   id: string;
   name: string;
-  anime: string;
+  href: string;
+  subtitle: string;
   lat: number;
   lng: number;
-  href: string;
   distanceKm?: number;
 }
 
@@ -49,6 +51,7 @@ export function HomeNearby({
   const [spots, setSpots] = useState<ListedSpot[]>([]);
   const [workHref, setWorkHref] = useState<string | null>(null);
   const focusRef = useRef<HomeFocusWorkDetail>(readHomeFocusWork());
+  const sheetRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let alive = true;
@@ -69,17 +72,16 @@ export function HomeNearby({
           );
       const ranked = focused
         .map((spot) => ({
-          spot,
+          ...spot,
           distanceKm: haversineKm(detail.lat, detail.lng, spot.lat, spot.lng),
         }))
         .sort((a, b) => a.distanceKm - b.distanceKm);
-      setInView(ranked.length);
+      const groups = clusterSamePlaces(ranked);
+      setInView(groups.length);
       setSpots(
-        ranked
-          .slice(0, limit)
-          .map((item) => toListed(item.spot, locale, catalog, item.distanceKm)),
+        groups.slice(0, limit).map((group) => toListed(group, locale, catalog)),
       );
-      setWorkHref(focus.subjectId ? focus.href ?? null : null);
+      setWorkHref(focus.subjectId ? (focus.href ?? null) : null);
     };
     let latest: HomeBoundsDetail | null = null;
     void loadNavCatalog()
@@ -95,7 +97,7 @@ export function HomeNearby({
           const detail = (event as CustomEvent<HomeFocusWorkDetail>).detail;
           focusRef.current = detail ?? { subjectId: null };
           if (latest) paint(catalog, latest);
-          else setWorkHref(detail?.subjectId ? detail.href ?? null : null);
+          else setWorkHref(detail?.subjectId ? (detail.href ?? null) : null);
         };
         window.addEventListener(HOME_BOUNDS_EVENT, bag.bounds);
         window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocus);
@@ -105,9 +107,26 @@ export function HomeNearby({
     return () => {
       alive = false;
       if (bag.bounds) window.removeEventListener(HOME_BOUNDS_EVENT, bag.bounds);
-      if (bag.focus) window.removeEventListener(HOME_FOCUS_WORK_EVENT, bag.focus);
+      if (bag.focus)
+        window.removeEventListener(HOME_FOCUS_WORK_EVENT, bag.focus);
     };
   }, [limit, locale]);
+
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    if (!sheet || variant !== "sheet") return;
+    const root = document.documentElement;
+    const apply = () => {
+      root.style.setProperty("--home-sheet-height", `${sheet.offsetHeight}px`);
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(sheet);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--home-sheet-height");
+    };
+  }, [variant, open, spots]);
 
   const title = copy.aroundCount(inView);
   const nearbyHref = withPilgrimageLocale("/", locale);
@@ -127,6 +146,7 @@ export function HomeNearby({
         </button>
       ) : null}
       <aside
+        ref={sheetRef}
         className={"home-nearby home-nearby-" + variant + openClass}
         aria-label={title}
         aria-hidden={variant === "panel" ? !open : undefined}
@@ -167,7 +187,9 @@ export function HomeNearby({
                 <span className="home-spot-n">{index + 1}</span>
                 <div>
                   <a href={spot.href}>{spot.name}</a>
-                  {spot.anime ? <p>{spot.anime}</p> : null}
+                  {spot.subtitle ? (
+                    <p className="home-spot-sub">{spot.subtitle}</p>
+                  ) : null}
                 </div>
                 {spot.distanceKm != null ? (
                   <span className="home-spot-dist">
@@ -236,22 +258,31 @@ export function HomeNearby({
 }
 
 function toListed(
-  spot: NavSpot,
+  group: Array<NavSpot & { distanceKm: number }>,
   locale: HomeLocale,
   catalog: NavCatalog,
-  distanceKm?: number,
 ): ListedSpot {
+  const spot = group[0];
+  if (!spot) {
+    return { id: "", name: "", href: "", subtitle: "", lat: 0, lng: 0 };
+  }
+  const works = groupPlaceWorks(group, catalog.animes, locale, (id) =>
+    withPilgrimageLocale(`/pilgrimage/spots/${encodeSpotId(id)}`, locale),
+  );
   return {
     id: spot.id,
     name: localizedSpotName(spot, locale),
-    anime: animeTitle(catalog.animes, spot.subjectId, locale),
-    lat: spot.lat,
-    lng: spot.lng,
     href: withPilgrimageLocale(
       `/pilgrimage/spots/${encodeSpotId(spot.id)}`,
       locale,
     ),
-    distanceKm,
+    subtitle: formatPlaceWorkSubtitle(
+      works.map((work) => work.title),
+      locale,
+    ),
+    lat: spot.lat,
+    lng: spot.lng,
+    distanceKm: spot.distanceKm,
   };
 }
 
