@@ -777,6 +777,11 @@ async function main() {
       if (!previousLastmod.has(route)) previousLastmod.set(route, lastmod);
     }
   }
+  // One production sitemap date covers both data fixes: question labels
+  // that moved prefecture, and spot names whose municipality suffix changed.
+  // The later correctedOn wins. A sitemap with no previous file uses that
+  // date instead of the build day, so a fresh deploy does not restamp
+  // every URL.
   let changedOn = "";
   try {
     const fixes = JSON.parse(
