@@ -256,6 +256,29 @@ places.forEach((place, index) => {
   for (const form of forms) addAlias(form, index);
 });
 
+// Subprefecture villages whose question labels use the village name alone.
+const SHORT_VILLAGES = ["三宅支庁三宅村", "小笠原支庁小笠原村"];
+for (const full of SHORT_VILLAGES) {
+  const sourcePlace = source.find((place) => place.ja === full);
+  if (!sourcePlace) continue;
+  const ja = full.replace(/^.*庁/u, "");
+  const zh = mainland(ja);
+  places.push({
+    ja,
+    zh,
+    tw: toTw(zh),
+    en: "",
+    pref: prefIdOf(sourcePlace),
+    box: Array.isArray(sourcePlace.bbox)
+      ? sourcePlace.bbox.slice(0, 4)
+      : [0, 0, 0, 0],
+  });
+  const index = places.length - 1;
+  addAlias(ja, index);
+  addAlias(zh, index);
+  addAlias(toTw(zh), index);
+}
+
 // Kanji spelling of the hiragana city name. Romaji still comes from the dataset.
 const saitama = places.find(
   (place) => place.ja === "さいたま市" && place.pref === "saitama" && place.en,
@@ -286,6 +309,17 @@ for (const [kanji, kana] of KANJI_FOR_KANA) {
   addAlias(zh, index);
   addAlias(toTw(zh), index);
   addAlias(kana, index);
+}
+
+// Question labels use a simplified spelling that OpenCC does not emit.
+const SPELLING_ALIASES = [
+  ["丰乡町", "豊郷町"],
+  ["吉野之里町", "吉野ヶ里町"],
+  ["外之滨町", "外ヶ浜町"],
+];
+for (const [label, ja] of SPELLING_ALIASES) {
+  const index = places.findIndex((place) => place.ja === ja);
+  if (index >= 0) addAlias(label, index);
 }
 
 const out = { places, alias };

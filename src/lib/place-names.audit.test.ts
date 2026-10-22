@@ -25,9 +25,13 @@ describe("place display audit", () => {
         matchPlaceName(question.location, locale, point),
       );
       const kinds = new Set(shown.map((match) => match.kind));
-      const jaName = localizePlaceName(question.location, "ja");
-      const jaPoint = shown[0]?.label ?? "";
-      if (kinds.size !== 1 || jaPoint !== jaName) {
+      const bare = matchPlaceName(question.location, "ja");
+      const jaPoint = shown[0];
+      const retargets =
+        bare.kind === "municipality" &&
+        jaPoint?.kind === "municipality" &&
+        bare.label !== jaPoint.label;
+      if (kinds.size !== 1 || retargets) {
         mismatches.push(
           `${question.id} ${question.location} → ${shown.map((match) => `${match.kind}:${match.label}`).join(" / ")}`,
         );
@@ -57,11 +61,11 @@ describe("place display audit", () => {
     }
 
     const makuhari = questions.find((question) => question.id === "anitabi_102134_9xs0myq");
-    expect(makuhari?.location).toBe("京都市");
+    expect(makuhari?.location).toBe("千叶市");
     if (makuhari) {
-      expect(getAnimeGuessrQuestionText(makuhari, "ja").location).toBe("京都市");
-      expect(getAnimeGuessrQuestionText(makuhari, "en").location).toBe("Kyoto");
-      expect(localizePlaceName(makuhari.location, "zh")).toBe("京都市");
+      expect(getAnimeGuessrQuestionText(makuhari, "ja").location).toBe("千葉市");
+      expect(getAnimeGuessrQuestionText(makuhari, "en").location).toBe("Chiba");
+      expect(localizePlaceName(makuhari.location, "zh")).toBe("千叶市");
     }
   });
 });

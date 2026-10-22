@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   loadMunicipalities,
@@ -32,6 +32,12 @@ import {
   rightsSitemapItem,
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
+import {
+  changedPilgrimagePaths,
+  indexableLocations,
+  lastmodForPath,
+  parseSitemapLastmods,
+} from "./lib/sitemap-lastmod.mjs";
 
 const SOURCE_PATH = path.join(
   process.cwd(),
@@ -738,7 +744,7 @@ async function main() {
       zhTw: true,
     });
   }
-  for (const location of locations) {
+  for (const location of indexableLocations(locations)) {
     canonicalPaths.push({
       path: `/pilgrimage/locations/${location.slug}`,
       priority: 0.7,
@@ -754,7 +760,38 @@ async function main() {
   }
 
   const origin = resolveSiteOrigin();
-  const lastModified = generatedAt.slice(0, 10);
+  const fallbackLastmod = generatedAt.slice(0, 10);
+  const previousLastmod = new Map();
+  const sitemapFiles = await readdir(SITEMAP_DIR).catch(() => []);
+  for (const file of sitemapFiles) {
+    if (!/^\d+\.xml$/u.test(file)) continue;
+    const xml = await readFile(path.join(SITEMAP_DIR, file), "utf8");
+    for (const [route, lastmod] of parseSitemapLastmods(xml)) {
+      if (!previousLastmod.has(route)) previousLastmod.set(route, lastmod);
+    }
+  }
+  let changedOn = fallbackLastmod;
+  try {
+    const fixes = JSON.parse(
+      await readFile(
+        path.join(process.cwd(), "scripts/data/question-location-fixes.json"),
+        "utf8",
+      ),
+    );
+    if (typeof fixes.correctedOn === "string" && fixes.correctedOn) {
+      changedOn = fixes.correctedOn;
+    }
+  } catch {
+    changedOn = fallbackLastmod;
+  }
+  let previousRows = [];
+  try {
+    const nav = JSON.parse(await readFile(NAV_PATH, "utf8"));
+    previousRows = Array.isArray(nav.spots) ? nav.spots : [];
+  } catch {
+    previousRows = [];
+  }
+  const changedPaths = changedPilgrimagePaths(previousRows, visibleSpots);
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
   const sitemapUrls = [];
@@ -765,7 +802,12 @@ async function main() {
         origin,
         item.path,
         item.priority,
-        lastModified,
+        lastmodForPath(item.path, {
+          previous: previousLastmod,
+          changed: changedPaths,
+          changedOn,
+          fallback: fallbackLastmod,
+        }),
         { zhTw: Boolean(item.zhTw) },
       ),
     );
