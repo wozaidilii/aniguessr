@@ -37,9 +37,15 @@ export function ensureNotFoundShellPlaceholders(cwd = process.cwd()) {
  * @param {string} html
  */
 export function freezeNotFoundDocument(html) {
-  return html
+  const stripped = html
     .replace(/<link\b[^>]*rel="preload"[^>]*as="script"[^>]*>/gi, "")
-    .replace(/<script\b[\s\S]*?<\/script>/gi, "");
+    .replace(/<script\b[\s\S]*?<\/script>/gi, "")
+    .replace(/<meta\b[^>]*\bname=["'](?:robots|googlebot)["'][^>]*>/gi, "");
+  const meta = '<meta name="robots" content="noindex"/>';
+  if (stripped.includes("</head>")) {
+    return stripped.replace("</head>", `${meta}</head>`);
+  }
+  return `${meta}${stripped}`;
 }
 
 /** @param {string} [cwd] */

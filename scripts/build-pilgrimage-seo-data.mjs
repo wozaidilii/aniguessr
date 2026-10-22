@@ -23,6 +23,7 @@ import {
 import { zhTwAnimeTitle } from "./lib/zh-tw-anime-title.mjs";
 import { reviewCsv, reviewRow } from "./lib/zh-tw-review.mjs";
 import { toZhTw } from "./lib/zh-tw.mjs";
+import { packKnownSpotIds } from "./lib/known-spot-id.mjs";
 import {
   buildLocalizedSitemapEntries,
   buildSitemapIndexXml,
@@ -56,6 +57,10 @@ const SITEMAP_DIR = path.join(process.cwd(), "public/sitemaps");
 const NAME_FIXES_PATH = path.join(
   process.cwd(),
   "scripts/data/spot-name-suffix-fixes.json",
+);
+const COPY_EDITS_PATH = path.join(
+  process.cwd(),
+  "scripts/data/spot-copy-edits.json",
 );
 
 const PUBLIC_ROUTES = [
@@ -798,8 +803,15 @@ async function main() {
     renamedIds = [];
     membershipPaths = [];
   }
+  let copyIds = [];
+  try {
+    const edits = JSON.parse(await readFile(COPY_EDITS_PATH, "utf8"));
+    copyIds = Array.isArray(edits.ids) ? edits.ids : [];
+  } catch {
+    copyIds = [];
+  }
   const changedPaths = contentChangedSitemapPaths(
-    renamedIds,
+    [...renamedIds, ...copyIds],
     visibleSpots,
     membershipPaths,
   );
@@ -924,6 +936,10 @@ async function main() {
       anime: animes.map((anime) => anime.slug),
       location: locations.map((location) => location.slug),
     }),
+  );
+  await writeFile(
+    path.join(process.cwd(), "src/lib/pilgrimage-known-spot-ids.json"),
+    JSON.stringify(packKnownSpotIds(Object.keys(spots))),
   );
   await writeFile(NAV_PATH, JSON.stringify(nav));
   await writeFile(HOME_LABELS_PATH, JSON.stringify(homeMapLabels));

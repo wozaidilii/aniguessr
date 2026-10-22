@@ -110,10 +110,29 @@ function homeMapBottomPadding(map: maplibregl.Map): number {
   return Math.max(112, Math.ceil(mapRect.bottom - sheetRect.top + 16));
 }
 
+/** Shift the user pin into the map that stays visible above the sheet. */
+function homeMapPadding(map: maplibregl.Map): {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+} {
+  const wide = !window.matchMedia("(max-width: 1023px)").matches;
+  return {
+    top: homeMapTopPadding(map),
+    right: wide ? 48 : 24,
+    bottom: homeMapBottomPadding(map),
+    left: wide ? 48 : 24,
+  };
+}
+
 export function HomeMap({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const flyToUserRef = useRef<
+    ((lat: number, lng: number, keepZoom: boolean) => void) | null
+  >(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const youRef = useRef<maplibregl.Marker | null>(null);
   const [error, setError] = useState(false);
@@ -240,9 +259,15 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       publishBounds(map);
       ensureYou();
     });
-    map.on("dragstart", signalHomeMapGesture);
+    let originPinned = false;
+    map.on("dragstart", () => {
+      originPinned = false;
+      signalHomeMapGesture();
+    });
     map.on("zoomstart", (event) => {
-      if (event.originalEvent) signalHomeMapGesture();
+      if (!event.originalEvent) return;
+      originPinned = false;
+      signalHomeMapGesture();
     });
     let catalogReady: NavCatalog | null = null;
     let labelsReady: HomeMapLabels | null = null;
@@ -346,6 +371,19 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       ensureYou();
     }
 
+    function flyToUser(lat: number, lng: number, keepZoom: boolean) {
+      originPinned = true;
+      const padding = homeMapPadding(map);
+      lastBottom = padding.bottom;
+      map.flyTo({
+        center: [lng, lat],
+        zoom: keepZoom ? map.getZoom() : 13,
+        padding,
+        duration: prefersReducedMotion() ? 0 : 700,
+      });
+    }
+    flyToUserRef.current = flyToUser;
+
     function onOrigin(event: Event) {
       const detail = (event as CustomEvent<HomeOriginDetail>).detail;
       if (
@@ -357,11 +395,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       }
       rememberHomeOrigin(detail);
       ensureYou();
-      map.flyTo({
-        center: [detail.lng, detail.lat],
-        zoom: detail.keepZoom ? map.getZoom() : 13,
-        duration: prefersReducedMotion() ? 0 : 700,
-      });
+      flyToUser(detail.lat, detail.lng, detail.keepZoom === true);
     }
 
     function onFocusWork(event: Event) {
@@ -440,21 +474,54 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       });
 
     let resizeTimer = 0;
+    let padTimer = 0;
+    let lastBottom = -1;
     const observer = new ResizeObserver(() => {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => map.resize(), 0);
     });
     observer.observe(container);
+    let watchedSheet: Element | null = null;
+    const sheetObserver = new ResizeObserver(() => {
+      window.clearTimeout(padTimer);
+      padTimer = window.setTimeout(() => {
+        if (!originPinned) return;
+        const origin = readHomeOrigin();
+        if (!origin) return;
+        const padding = homeMapPadding(map);
+        if (padding.bottom === lastBottom) return;
+        lastBottom = padding.bottom;
+        map.easeTo({
+          center: [origin.lng, origin.lat],
+          padding,
+          duration: prefersReducedMotion() ? 0 : 450,
+        });
+      }, 60);
+    });
+    const attachSheet = () => {
+      const node = document.querySelector(".home-nearby-sheet");
+      if (!node || node === watchedSheet) return;
+      if (watchedSheet) sheetObserver.unobserve(watchedSheet);
+      watchedSheet = node;
+      sheetObserver.observe(node);
+    };
+    attachSheet();
+    const mountObserver = new MutationObserver(attachSheet);
+    mountObserver.observe(document.body, { childList: true, subtree: true });
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
       window.clearTimeout(resizeTimer);
+      window.clearTimeout(padTimer);
+      flyToUserRef.current = null;
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
       window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
       window.removeEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
       window.removeEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
       window.removeEventListener("storage", onFavorites);
       observer.disconnect();
+      sheetObserver.disconnect();
+      mountObserver.disconnect();
       youRef.current?.remove();
       youRef.current = null;
       map.remove();
@@ -481,12 +548,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           onClick={() => {
             const origin = readHomeOrigin();
             const current = mapRef.current;
-            if (origin && current) {
-              current.flyTo({
-                center: [origin.lng, origin.lat],
-                zoom: current.getZoom(),
-                duration: prefersReducedMotion() ? 0 : 700,
-              });
+            if (origin && current && flyToUserRef.current) {
+              flyToUserRef.current(origin.lat, origin.lng, true);
               return;
             }
             if (!navigator.geolocation) {

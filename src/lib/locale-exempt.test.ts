@@ -195,7 +195,7 @@ describe("locale middleware exemptions", () => {
   it("serves locale-prefixed pilgrimage URLs without rewrite or Set-Cookie", () => {
     for (const pathname of [
       "/zh/pilgrimage/locations",
-      "/en/pilgrimage/spots/anitabi_1_2",
+      "/en/pilgrimage/spots/anitabi_37137_4slhba842",
       "/ja/pilgrimage/anime/294993-%E5%92%92%E6%9C%AF%E5%9B%9E%E6%88%98",
       "/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       "/zh-tw/pilgrimage/locations/kamakura-kanagawa",
@@ -212,6 +212,15 @@ describe("locale middleware exemptions", () => {
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("set-cookie")).toBeNull();
     }
+
+    const bogus = middleware(
+      request("/ja/pilgrimage/spots/not-a-real-spot-404"),
+    );
+    expect(bogus.status).toBe(200);
+    expect(bogus.headers.get("x-middleware-rewrite")).toBe(
+      "https://aniguessr.ayiora.com/not-found-shell/ja",
+    );
+    expect(bogus.headers.get("set-cookie")).toBeNull();
   });
 
   it("does not locale-redirect /zh-tw outside pilgrimage or onto simplified", () => {

@@ -128,7 +128,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: localeParam, id } = await params;
   const locale = pilgrimageLocale(localeParam);
   const spot = getSpotById(id);
-  if (!spot) return { title: "Not found" };
+  if (!spot) notFound();
   redirectDuplicateSpot(locale, spot);
 
   const fields = spotSeoFields(spot, locale);

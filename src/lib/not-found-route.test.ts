@@ -18,6 +18,18 @@ describe("missingPilgrimageShell", () => {
     expect(missingPilgrimageShell("/ja/pilgrimage/anime")).toBeNull();
   });
 
+  it("keeps a real spot page and sends a bogus id to the shell", () => {
+    expect(
+      missingPilgrimageShell("/ja/pilgrimage/spots/anitabi_37137_4slhba842"),
+    ).toBeNull();
+    expect(
+      missingPilgrimageShell("/en/pilgrimage/spots/not-a-real-spot-404"),
+    ).toBe("/not-found-shell/en");
+    expect(
+      missingPilgrimageShell("/zh-tw/pilgrimage/spots/not-a-real-spot-404"),
+    ).toBe("/not-found-shell/zh-tw");
+  });
+
   it("sends unknown work and area slugs to the styled shell", () => {
     expect(missingPilgrimageShell("/ja/pilgrimage/anime/does-not-exist")).toBe(
       "/not-found-shell/ja",
@@ -57,5 +69,14 @@ describe("freezeNotFoundDocument", () => {
     expect(frozen).toContain("anime-button");
     expect(frozen).not.toContain("<script");
     expect(frozen).not.toContain('as="script"');
+  });
+
+  it("leaves exactly one noindex robots meta", () => {
+    const html = `<head><meta name="robots" content="index, follow"/><meta name="googlebot" content="index, follow"/><meta name="robots" content="noindex, nofollow"/></head>`;
+    const frozen = freezeNotFoundDocument(html);
+    const robots = frozen.match(/<meta\b[^>]*name="robots"[^>]*>/gi) ?? [];
+    expect(robots).toEqual(['<meta name="robots" content="noindex"/>']);
+    expect(frozen).not.toContain("googlebot");
+    expect(frozen).not.toContain("index, follow");
   });
 });
