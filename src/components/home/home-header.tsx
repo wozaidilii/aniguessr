@@ -5,10 +5,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { setHomeMapActive } from "~/components/home/home-events";
 import { BrandLockup } from "~/components/brand/BrandLockup";
+import {
+  hrefLangForLocale,
+  LocaleLinkGroup,
+  LocaleMenu,
+  type LocaleMenuLink,
+} from "~/components/brand/LocaleMenu";
 import { HomeAccount } from "~/components/home/home-account";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
-import { siteNavIsCurrent, siteNavModel, type SiteNavLink } from "~/lib/site-nav";
+import {
+  siteNavIsCurrent,
+  siteNavModel,
+  type SiteNavLink,
+} from "~/lib/site-nav";
 
 function hashId(href: string): string {
   return href.split("#")[1] ?? "";
@@ -34,7 +44,12 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     game: copy.navGame,
     rank: copy.navRank,
   } as const;
-  const currentLang = nav.languages.find((item) => item.locale === locale);
+  const localeLinks: LocaleMenuLink[] = nav.languages.map((item) => ({
+    locale: item.locale,
+    label: item.label,
+    href: item.href,
+    hrefLang: hrefLangForLocale(item.locale),
+  }));
 
   useEffect(() => {
     const sync = () => setHash(window.location.hash);
@@ -52,8 +67,13 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     if (!id) return;
     const target = document.getElementById(id);
     if (!target) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    target.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+      block: "start",
+    });
   }, [pathname]);
 
   function active(link: SiteNavLink): boolean {
@@ -71,12 +91,20 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
       setBar((prev) => ({ ...prev, visible: false }));
       return;
     }
-    setBar({ x: current.offsetLeft, width: current.offsetWidth, visible: true });
+    setBar({
+      x: current.offsetLeft,
+      width: current.offsetWidth,
+      visible: true,
+    });
   }, [pathname, hash, pendingId, locale, open]);
 
   function onPointerDown(id: SiteNavLink["id"], href: string) {
     setPendingId(id);
-    if (!href.startsWith("#") && !href.endsWith("#game") && !href.endsWith("#rank")) {
+    if (
+      !href.startsWith("#") &&
+      !href.endsWith("#game") &&
+      !href.endsWith("#rank")
+    ) {
       setHomeMapActive(false);
     }
   }
@@ -96,8 +124,13 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    target.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+      block: "start",
+    });
     const next = `${pathname}#${id}`;
     window.history.pushState(null, "", next);
     setHash(`#${id}`);
@@ -131,19 +164,14 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
           </nav>
         </div>
         <div className="home-hdr-right">
-          <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {nav.languages.map((item) => (
-              <a
-                key={item.locale}
-                href={item.href}
-                aria-current={item.locale === locale ? "true" : undefined}
-                hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-          <span className="home-lang-current">{currentLang?.label}</span>
+          <LocaleMenu
+            locale={locale}
+            label={copy.langLabel}
+            links={localeLinks}
+            rowClassName="home-lang"
+            onOpen={() => setOpen(false)}
+            dismissSignal={open}
+          />
           <div className="home-hdr-login">
             <HomeAccount locale={locale} />
           </div>
@@ -177,18 +205,12 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
               {labels[link.id]}
             </Link>
           ))}
-          <div className="home-lang" role="group" aria-label={copy.langLabel}>
-            {nav.languages.map((item) => (
-              <a
-                key={item.locale}
-                href={item.href}
-                aria-current={item.locale === locale ? "true" : undefined}
-                hrefLang={item.locale === "zh-tw" ? "zh-Hant" : item.locale}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
+          <LocaleLinkGroup
+            className="home-lang"
+            label={copy.langLabel}
+            locale={locale}
+            links={localeLinks}
+          />
           <HomeAccount locale={locale} />
         </div>
       ) : null}
