@@ -1448,8 +1448,8 @@ a.rights-contact-link:hover {
 
 .ag-legend {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   z-index: 2;
   display: flex;
   gap: 10px;
@@ -1905,11 +1905,6 @@ a.rights-contact-link:hover {
 
   .ag-scoreline b {
     font-size: 48px;
-  }
-
-  .ag-legend {
-    left: 8px;
-    bottom: 8px;
   }
 }
 
