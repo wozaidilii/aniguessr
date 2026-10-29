@@ -5,10 +5,25 @@ import {
   tripDate,
   tripFromHash,
   tripShareUrl,
+  tripStateSchema,
 } from "./state";
 import { formatTripTime } from "./export";
 
 describe("trip draft boundaries", () => {
+  it("rejects oversized encoded links and safely round-trips escaped unicode", () => {
+    const tooLarge = {
+      ...emptyTrip(),
+      spotIds: Array.from({ length: 60 }, (_, i) => `${i}${"界".repeat(170)}`),
+      placeIds: Array.from({ length: 60 }, (_, i) => `${i}${"界".repeat(170)}`),
+    };
+    expect(tripStateSchema.safeParse(tooLarge).success).toBe(false);
+    const unicode = { ...emptyTrip(), spotIds: ["\ud800"] };
+    expect(
+      tripFromHash(
+        new URL(tripShareUrl("https://example.org", "en", unicode)).hash,
+      ),
+    ).toEqual(unicode);
+  });
   it("round trips all inputs including unicode and manual order", () => {
     const state = {
       ...emptyTrip(),

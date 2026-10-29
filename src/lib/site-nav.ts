@@ -13,6 +13,22 @@ export interface SiteNavLanguage {
   href: string;
 }
 
+/** Keep a planner preview when changing language; other pages keep their normal locale links. */
+export function plannerLocaleSuffix(
+  pathname: string,
+  search: string,
+  hash: string,
+): string {
+  if (splitLocalePath(pathname).pathname !== "/pilgrimage/planner") return "";
+  const source = new URLSearchParams(search);
+  const params = new URLSearchParams();
+  for (const key of ["anime", "spot", "area"]) {
+    const value = source.get(key);
+    if (value) params.set(key, value);
+  }
+  return `${params.size ? `?${params.toString()}` : ""}${hash.startsWith("#trip=") ? hash : ""}`;
+}
+
 /** Shared header targets. Logo always returns to /{locale}. Game and rank stay on the homepage hash. */
 export function siteNavModel(
   pathname: string,
@@ -33,7 +49,10 @@ export function siteNavModel(
         id: "areas",
         href: withPilgrimageLocale("/pilgrimage/locations", locale),
       },
-      { id: "planner", href: withPilgrimageLocale("/pilgrimage/planner", locale) },
+      {
+        id: "planner",
+        href: withPilgrimageLocale("/pilgrimage/planner", locale),
+      },
       { id: "game", href: onHome ? "#game" : `${home}#game` },
       { id: "rank", href: onHome ? "#rank" : `${home}#rank` },
     ],

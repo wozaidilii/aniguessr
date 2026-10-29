@@ -1,7 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { siteNavIsCurrent, siteNavModel } from "~/lib/site-nav";
+import {
+  siteNavIsCurrent,
+  siteNavModel,
+  plannerLocaleSuffix,
+} from "~/lib/site-nav";
 
 describe("site nav", () => {
+  it("preserves planner previews across locales without carrying unrelated query data", () => {
+    expect(
+      plannerLocaleSuffix(
+        "/zh/pilgrimage/planner",
+        "?spot=s&tracking=secret",
+        "#trip=x",
+      ),
+    ).toBe("?spot=s#trip=x");
+    expect(plannerLocaleSuffix("/en/pilgrimage/planner", "", "#trip=x")).toBe(
+      "#trip=x",
+    );
+    expect(plannerLocaleSuffix("/en/pilgrimage/planner", "", "#other")).toBe(
+      "",
+    );
+    expect(plannerLocaleSuffix("/en", "?spot=s", "#trip=x")).toBe("");
+  });
   it("keeps homepage hashes local and points the logo at /{locale}", () => {
     const nav = siteNavModel("/zh", "zh");
     expect(nav.home).toBe("/zh");

@@ -9,18 +9,26 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 - `getTravelKlookLinks(locale): KlookLinks` is server-only and serializes only final URLs and sponsored flags.
 - Draft key: `aniguessr_travel_draft_v1`. Share fragment: `#trip=<percent-encoded JSON>`.
 - Contextual entry query: `?anime=<canonical subject ID>`, `?spot=<spot ID>`, or `?area=<location slug>`.
+- `resolveTripEntry(catalog, search, hash, savedRaw): TripEntry` separates previewing from persistence; `useTripDraft` owns lifecycle, undo and storage.
+- `recommendGuides(plan, state, locale): GuideRecommendation[]` ranks the curated `TravelGuide` catalog. `exportGuideText` and `buildCommunityQuestion` are pure text builders; no outbound requests.
 
 ## 3. Contracts
 - Reuse `loadNavCatalog`, multilingual search folding, `localizedSpotName`, favorite IDs, geodesic distance and the existing map style. Never send the raw SEO index to the client.
 - Pages remain daily ISR, cookie-independent and localized in zh/zh-tw/ja/en. User selections load after hydration.
 - A draft permits 8 anime, 60 explicit spots, 60 curated places, 12 ordered route anchors, 1–14 days, 1–50 km corridor radius, and 0–720 minutes per visit. Arrays and string sizes are bounded; normalized IDs are unique.
-- Anime mode suggests at most 6 spatially distinct visits per work. Explicit selected stops are not silently dropped or merged. Extra automatic frames, disappeared IDs and unscheduled stops are reported.
+- Anime mode suggests at most 6 spatially distinct visits per work within 50km of its local starting cluster. Deduplicate automatic frames against explicit same-work spots and anchors too. Explicit selected stops are not silently dropped or merged. Extra automatic frames, disappeared IDs and unscheduled stops are reported.
 - Route mode preserves anchor order. Great-circle corridor proximity is geographic discovery, NOT a road/rail route or detour estimate. Label this in the UI.
-- Daily budgets include 60 minutes for meals/rest. Carry transfers across day boundaries. A single impossible transfer must show over-budget status; never claim it fits.
+- Daily budgets include 60 minutes for meals/rest. Carry transfers across day boundaries. A single impossible transfer must show over-budget status; never claim it fits. Transport estimates must be non-decreasing with distance; use cumulative urban/intercity segments rather than changing the entire leg's speed at a threshold.
 - No hidden truncation of Google Maps waypoints: use per-leg direction URLs with origin/destination/travelmode.
-- Preserve drafts on invalid shared input and show retryable catalog errors. Catch storage and clipboard errors. Clear stale context queries/shared fragments after edits.
+- Shared/contextual trips are previews until edited or explicitly saved. Valid and invalid previews preserve the stored draft; invalid entries display the saved trip when available. Offer restore and 20-step in-session undo. Hash changes, Back and locale changes preserve these semantics. Attach hash listeners independently of one-time hydration guards.
+- JSON is bounded to 32,000 characters and the encoded hash to 100,000; the schema must reject a state that cannot round-trip through both decoders. Removing a stop deletes its duration override and retains at most the latest 180 exclusions. Discovery additions use the same per-kind limits as the schema.
+- Show retryable catalog errors. Catch storage and clipboard errors. Clear stale clipboard fallbacks after any trip/locale change. Clear stale entry URLs after edits/saves while retaining framework history metadata, and notify hash listeners. Planner language links preserve only the anime/spot/area query and trip fragment.
+- Storage denial must not crash shared root components before the planner mounts. Keep both `window.localStorage` access and `getItem` inside the session reader's error boundary; test blocked getters as well as quota/write failures.
 - Use `AFFILIATE_ENABLED=true` and a nonempty `KLOOK_AFFILIATE_ID` for tracked URLs. Otherwise use plain Klook destinations. The planner's curated destination map is separate from the legacy page allowlist; don't change that allowlist to enable planner links. Mark paid links sponsored and show disclosure.
 - Curated places require localized names/descriptions, coordinates, approximate visit duration and a verified official source. No live price, opening-hours or availability claims without a live provider.
+- Guide entries require canonical HTTPS URL, identifiable publisher, actual article language, source kind, region/topic coverage and `checkedAt`. Match scheduled destinations (not unscheduled visits), cover distinct regions before extra guides, return at most 8. Do not use commission in ranking. Print/download/copy preserve attribution. A checked link is not a guarantee of current prices/hours.
+- Guide and Klook destination matching use explicit trusted coverage; never infer Japan from a rectangular latitude/longitude range. Uncovered destinations use global Klook and an honest no-guide state.
+- Community handoff is an editable English draft plus a verified forum link. Do not automatically post or claim an authenticated content/API partnership. Omit exact dates, coordinates and private/promotional links from generated questions; edits remain local.
 
 ## 4. Validation & Error Matrix
 | Input/state | Behavior |
@@ -31,6 +39,8 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 | Too many visits for days | Explicit unscheduled list |
 | Map WebGL/style failure | Itinerary and navigation remain usable |
 | Storage/clipboard unavailable | Visible message; downloadable trip / selectable share link |
+| Valid shared/contextual trip | Preview; saved draft unchanged until edit/save |
+| No regional guide coverage | Explicit empty state; no unrelated Japan recommendations |
 
 ## 5. Good / Base / Bad Cases
 - Good: select two works, adjust visit durations, review overflow, open individual transport legs, save/share the exact selections.
@@ -42,6 +52,9 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 - Day budget, carry-over transfer, impossible day warning, edited visit duration and unscheduled retention.
 - Draft/share round trips, invalid dates/version/oversize; Klook enabled/disabled/missing-ID behavior.
 - Browser: both modes, desktop/mobile overflow, save/share/download/print, invalid share protection and failed catalog retry.
+- Monotonic estimate thresholds, explicit-frame proximity, remote automatic outliers, encoding expansion, removal at limits, guide region/interest filtering, foreign-country fallback and exported attribution.
+- Browser: preview across locale changes; restore/undo/Back; editable community draft; clipboard failure; guide print/download parity.
+- Shared session reader: SSR, denied storage getter/read, malformed session and valid legacy session. Browser: blocked storage still allows itinerary editing and reports persistence failure.
 
 ## 7. Wrong vs Correct
 Wrong: reuse a React `ready` flag to add a source immediately after recreating a MapLibre map.
@@ -52,3 +65,6 @@ Correct: report invalid shared state and keep persistence disabled until a valid
 
 Wrong: split a checked-in CSV on `\n` and compare the header without accounting for Windows CRLF.
 Correct: accept `\r?\n` in the same-place parser and test both line endings. The planner links to spot details, so smoke-test these links as well as the planner itself; a successful static build does not exercise every on-demand spot page.
+
+Wrong: enable auto-save as soon as a valid shared trip is loaded, or switch the whole trip leg to a faster speed after 80km.
+Correct: treat inbound data as a preview until user action; estimate time as the sum of nonnegative distance segments so longer travel cannot become shorter.

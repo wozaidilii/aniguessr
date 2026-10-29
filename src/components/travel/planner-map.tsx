@@ -59,6 +59,9 @@ export function PlannerMap({
     instance.on("error", () => {
       if (!instance.isStyleLoaded()) setFailed(true);
     });
+    instance.on("idle", () => {
+      if (instance.isStyleLoaded()) setFailed(false);
+    });
     const resize = new ResizeObserver(() => instance.resize());
     resize.observe(container.current);
     const timeout = window.setTimeout(() => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { type NavCatalog, type NavSpot } from "~/lib/pilgrimage-nav";
 import {
   buildTripPlan,
+  distanceKm,
   distanceToSegment,
   estimateTravelMinutes,
   legDirectionsUrl,
@@ -78,6 +79,55 @@ describe("travel corridor geometry", () => {
 });
 
 describe("itinerary selection and ordering", () => {
+  it("removes a crossing introduced by nearest-neighbor ordering without moving the start", () => {
+    const points = [
+      spot("start", 0, 0),
+      spot("middle", 0.02, 0.02),
+      spot("east", 0, 0.03),
+      spot("north", 0.03, 0),
+    ];
+    const plan = buildTripPlan(catalog(points), {
+      ...emptyTrip(),
+      spotIds: points.map((point) => point.id),
+    });
+    expect(plan.ordered[0]?.spotId).toBe("start");
+    expect(new Set(plan.ordered.map((stop) => stop.spotId))).toEqual(
+      new Set(points.map((point) => point.id)),
+    );
+    const total = plan.ordered.reduce(
+      (km, stop, index) =>
+        km + (index ? distanceKm(plan.ordered[index - 1]!, stop) : 0),
+      0,
+    );
+    // A non-crossing route for this four-stop layout is about 8.3 km;
+    // the greedy crossing is over 10 km.
+    expect(total).toBeLessThan(8.5);
+  });
+  it("does not add automatic frames beside explicit visits or in a remote region", () => {
+    const data = catalog([
+      spot("chosen", 35, 139),
+      spot("frame", 35.0001, 139),
+      spot("local", 35.02, 139),
+      spot("remote", 36, 136),
+    ]);
+    const plan = buildTripPlan(data, {
+      ...emptyTrip(),
+      animeIds: ["a"],
+      spotIds: ["chosen"],
+    });
+    expect(plan.ordered.map((stop) => stop.spotId)).toEqual([
+      "chosen",
+      "local",
+    ]);
+    const explicitRemote = buildTripPlan(data, {
+      ...emptyTrip(),
+      animeIds: ["a"],
+      spotIds: ["chosen", "remote"],
+    });
+    expect(
+      explicitRemote.ordered.some((stop) => stop.spotId === "remote"),
+    ).toBe(true);
+  });
   it("retains explicit choices, caps auto selection, ignores invalid coordinates", () => {
     const points = Array.from({ length: 20 }, (_, i) =>
       spot(String(i), 35 + i * 0.01, 139),
@@ -191,6 +241,17 @@ describe("itinerary selection and ordering", () => {
 });
 
 describe("daily budgets", () => {
+  it.each(["walking", "driving", "transit"] as const)(
+    "keeps %s estimates non-decreasing across distance thresholds",
+    (mode) => {
+      let previous = 0;
+      for (let km = 0; km <= 250; km += 0.1) {
+        const minutes = estimateTravelMinutes(km, mode);
+        expect(minutes).toBeGreaterThanOrEqual(previous);
+        previous = minutes;
+      }
+    },
+  );
   it("respects edited visit duration and persists overflow without dropping stops", () => {
     const state = {
       ...emptyTrip(),

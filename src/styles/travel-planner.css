@@ -1186,6 +1186,117 @@
   }
 }
 
+.trip-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.trip-guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--trip-line);
+  border-radius: 12px;
+  background: #fafbf8;
+  overflow-wrap: anywhere;
+  break-inside: avoid;
+}
+.trip-guide-card p,
+.trip-guide-card h3 {
+  margin: 0;
+}
+.trip-guide-card h3 {
+  font-size: 17px;
+  line-height: 1.65;
+}
+.trip-guide-publisher {
+  color: #4d653d;
+  font-size: 12px;
+  font-weight: 700;
+}
+.trip-guide-publisher span {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+  color: var(--trip-muted);
+}
+.trip-guide-match,
+.trip-guide-card small,
+.trip-guide-caveat {
+  color: var(--trip-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.trip-guide-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.trip-guide-topics span {
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  color: #4d653d;
+  background: #eaf0e4;
+}
+.trip-guide-read {
+  margin-top: auto;
+  color: var(--trip-pink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.trip-guide-caveat {
+  margin: 16px 0 0;
+}
+.trip-community {
+  border-top: 1px solid var(--trip-line);
+  margin-top: 24px;
+  padding-top: 22px;
+}
+.trip-community label {
+  display: block;
+  margin-top: 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.trip-community textarea {
+  display: block;
+  width: 100%;
+  min-height: 150px;
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid #b8c4af;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.65;
+  resize: vertical;
+}
+@media (max-width: 760px) {
+  .trip-guide-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .trip-guides .trip-section-heading {
+    flex-wrap: wrap;
+  }
+}
+@media print {
+  .trip-guide-grid {
+    display: block;
+  }
+  .trip-guide-card {
+    margin: 12px 0;
+  }
+  .trip-guide-read {
+    display: none;
+  }
+  .trip-guide-card .trip-print-only {
+    font-size: 10px;
+  }
+}
+
 .trip-mobile-jump {
   display: none;
 }

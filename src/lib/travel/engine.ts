@@ -23,6 +23,7 @@ export const DAY_BUDGET: Record<TravelPace, number> = {
   full: 540,
 };
 export const MAX_AUTO_PER_ANIME = 6;
+export const AUTO_CLUSTER_KM = 50;
 const EARTH_KM = 6371;
 const rad = (value: number) => (value * Math.PI) / 180;
 export const distanceKm = (a: Coordinate, b: Coordinate) =>
@@ -116,10 +117,10 @@ export function estimateTravelMinutes(km: number, mode: TravelMode): number {
     mode === "walking"
       ? ((km * 1.3) / 4) * 60
       : mode === "driving"
-        ? ((km * 1.35) / (km > 50 ? 60 : 25)) * 60 + 10
+        ? (Math.min(km, 10) / 25 + Math.max(0, km - 10) / 60) * 1.35 * 60 + 10
         : km < 1
           ? ((km * 1.3) / 4) * 60
-          : ((km * 1.3) / (km > 80 ? 65 : 22)) * 60 + 20;
+          : (Math.min(km, 20) / 22 + Math.max(0, km - 20) / 65) * 1.3 * 60 + 20;
   return Math.ceil(minutes / 5) * 5;
 }
 
@@ -136,6 +137,25 @@ function nearestOrder(stops: TripStop[]): TripStop[] {
         index = i;
     }
     result.push(remaining.splice(index, 1)[0]!);
+  }
+  // Bounded 2-opt removes avoidable backtracking while preserving the start.
+  for (let pass = 0; pass < 3; pass++) {
+    let improved = false;
+    for (let i = 1; i < result.length - 1; i++) {
+      for (let j = i + 1; j < result.length; j++) {
+        const before =
+          distanceKm(result[i - 1]!, result[i]!) +
+          (result[j + 1] ? distanceKm(result[j]!, result[j + 1]!) : 0);
+        const after =
+          distanceKm(result[i - 1]!, result[j]!) +
+          (result[j + 1] ? distanceKm(result[i]!, result[j + 1]!) : 0);
+        if (after + 0.001 < before) {
+          result.splice(i, j - i + 1, ...result.slice(i, j + 1).reverse());
+          improved = true;
+        }
+      }
+    }
+    if (!improved) break;
   }
   return result;
 }
@@ -277,11 +297,24 @@ export function buildTripPlan(catalog: NavCatalog, state: TripState): TripPlan {
             (counts.get(a.locationSlug) ?? 0) || a.id.localeCompare(b.id),
     );
     const selected: NavSpot[] = [];
+    const clusterOrigin = candidates[0];
+    const existing = [...chosen.values(), ...anchors].filter(
+      (stop) => stop.subjectId === id,
+    );
     for (const candidate of candidates) {
       if (selected.length >= MAX_AUTO_PER_ANIME) break;
       if (chosen.has(`spot:${candidate.id}`)) continue;
+      if (
+        clusterOrigin &&
+        distanceKm(clusterOrigin, candidate) > AUTO_CLUSTER_KM
+      )
+        continue;
       // Nearby frames of one anime are one optional visit; explicit choices are never collapsed.
-      if (selected.some((other) => distanceKm(other, candidate) < 0.15))
+      if (
+        [...existing, ...selected].some(
+          (other) => distanceKm(other, candidate) < 0.15,
+        )
+      )
         continue;
       selected.push(candidate);
       const stop = spotStop(candidate);

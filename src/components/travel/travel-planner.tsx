@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   loadNavCatalog,
   localizedNavText,
@@ -14,15 +14,7 @@ import { TRAVEL_HUBS, TRAVEL_PLACES, TRIP_PRESETS } from "~/lib/travel/catalog";
 import { getTravelCopy } from "~/lib/travel/copy";
 import { buildTripPlan } from "~/lib/travel/engine";
 import { exportTripText } from "~/lib/travel/export";
-import {
-  emptyTrip,
-  MAX_TRIP_STOPS,
-  parseTrip,
-  tripFromHash,
-  tripShareUrl,
-  tripStateSchema,
-  TRIP_STORAGE_KEY,
-} from "~/lib/travel/state";
+import { emptyTrip, MAX_TRIP_STOPS, tripShareUrl } from "~/lib/travel/state";
 import type {
   KlookLinks,
   TripState,
@@ -34,6 +26,9 @@ import type {
 import { PlannerSearch } from "./planner-search";
 import { PlannerItinerary } from "./planner-itinerary";
 import { PlannerRecommendations } from "./planner-recommendations";
+import { PlannerGuides } from "./planner-guides";
+import { useTripDraft } from "./use-trip-draft";
+import { removeTripStop } from "~/lib/travel/entry";
 
 const PlannerMap = dynamic(
   () => import("./planner-map").then((module) => module.PlannerMap),
@@ -56,14 +51,22 @@ export function TravelPlanner({
 }) {
   const copy = getTravelCopy(locale);
   const [catalog, setCatalog] = useState<NavCatalog | null>(null);
-  const [state, setState] = useState<TripState>(emptyTrip);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [status, setStatus] = useState("");
   const [shareFallback, setShareFallback] = useState("");
-  const [initialized, setInitialized] = useState(false);
-  const canPersist = useRef(false);
-  const initializedRef = useRef(false);
+  const {
+    state,
+    initialized,
+    update: updateDraft,
+    save,
+    restore,
+    undo,
+    canUndo,
+    hasSavedDraft,
+  } = useTripDraft(catalog, locale, setStatus);
+
+  useEffect(() => setShareFallback(""), [state, locale]);
 
   useEffect(() => {
     let active = true;
@@ -80,99 +83,8 @@ export function TravelPlanner({
     };
   }, [attempt]);
 
-  useEffect(() => {
-    if (!catalog || initializedRef.current) return;
-    initializedRef.current = true;
-    const hydrate = () => {
-      if (window.location.hash.startsWith("#trip=")) {
-        const shared = tripFromHash(window.location.hash);
-        if (shared) {
-          setState(shared);
-          canPersist.current = true;
-        } else {
-          setStatus(copy.invalid);
-          canPersist.current = false;
-        }
-        return;
-      }
-      const params = new URLSearchParams(window.location.search);
-      const anime = params.get("anime");
-      const spot = params.get("spot");
-      const area = params.get("area");
-      if (anime || spot || area) {
-        const next = emptyTrip();
-        if (anime) next.animeIds = [anime];
-        if (spot) next.spotIds = [spot];
-        if (area) {
-          const first = catalog.spots.find(
-            (item) => item.locationSlug === area,
-          );
-          if (first) {
-            next.mode = "route";
-            next.routeIds = [`spot:${first.id}`];
-          } else setStatus(copy.unknown);
-        }
-        const parsed = tripStateSchema.safeParse(next);
-        if (parsed.success) {
-          setState(parsed.data);
-          canPersist.current = true;
-        } else setStatus(copy.invalid);
-        return;
-      }
-      try {
-        const raw = window.localStorage.getItem(TRIP_STORAGE_KEY);
-        if (raw) {
-          const saved = parseTrip(raw);
-          if (saved) {
-            setState(saved);
-            setStatus(copy.restored);
-            canPersist.current = true;
-          } else setStatus(copy.invalid);
-        } else canPersist.current = true;
-      } catch {
-        setStatus(copy.storageError);
-      }
-    };
-    hydrate();
-    setInitialized(true);
-    const onHashChange = () => {
-      if (!window.location.hash.startsWith("#trip=")) return;
-      const shared = tripFromHash(window.location.hash);
-      if (shared) {
-        canPersist.current = true;
-        setState(shared);
-        setStatus("");
-      } else {
-        canPersist.current = false;
-        setStatus(copy.invalid);
-      }
-    };
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, [catalog, copy]);
-
-  useEffect(() => {
-    if (!initialized || !canPersist.current) return;
-    try {
-      window.localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      setStatus(copy.storageError);
-    }
-  }, [state, initialized, copy]);
-
   function update(next: TripState) {
-    const checked = tripStateSchema.safeParse(next);
-    if (!checked.success) {
-      setStatus(copy.limit);
-      return;
-    }
-    canPersist.current = true;
-    setState(checked.data);
-    setStatus("");
-    setShareFallback("");
-    // A stale shared fragment must not override a newly edited draft on reload.
-    if (window.location.hash.startsWith("#trip=") || window.location.search)
-      window.history.replaceState(null, "", window.location.pathname);
+    if (updateDraft(next)) setShareFallback("");
   }
   function patch(value: Partial<TripState>) {
     update({ ...state, ...value });
@@ -230,7 +142,10 @@ export function TravelPlanner({
       });
   }
   function addDiscovery(stop: TripStop) {
-    if (state.spotIds.length + state.placeIds.length >= MAX_TRIP_STOPS) {
+    if (
+      (stop.spotId ? state.spotIds.length : state.placeIds.length) >=
+      MAX_TRIP_STOPS
+    ) {
       setStatus(copy.limit);
       return;
     }
@@ -246,13 +161,7 @@ export function TravelPlanner({
     });
   }
   function remove(id: string) {
-    patch({
-      routeIds: state.routeIds.filter((item) => item !== id),
-      spotIds: state.spotIds.filter((item) => `spot:${item}` !== id),
-      placeIds: state.placeIds.filter((item) => `place:${item}` !== id),
-      excludedIds: [...new Set([...state.excludedIds, id])],
-      stopOrder: state.stopOrder.filter((item) => item !== id),
-    });
+    update(removeTripStop(state, id));
   }
   function move(id: string, delta: number, anchors = false) {
     const ids = anchors
@@ -274,15 +183,6 @@ export function TravelPlanner({
     const ids = [...new Set([...state.animeIds, ...favorites])];
     patch({ animeIds: ids.slice(0, 8), stopOrder: [] });
     if (ids.length > 8) setStatus(copy.limit);
-  }
-  function save() {
-    try {
-      window.localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(state));
-      canPersist.current = true;
-      setStatus(copy.saved);
-    } catch {
-      setStatus(copy.storageError);
-    }
   }
   async function share() {
     const url = tripShareUrl(window.location.origin, locale, state);
@@ -348,6 +248,7 @@ export function TravelPlanner({
               <button
                 type="button"
                 aria-pressed={state.mode === "anime"}
+                disabled={!initialized}
                 onClick={() => patch({ mode: "anime", stopOrder: [] })}
               >
                 {copy.animeMode}
@@ -355,6 +256,7 @@ export function TravelPlanner({
               <button
                 type="button"
                 aria-pressed={state.mode === "route"}
+                disabled={!initialized}
                 onClick={() => patch({ mode: "route", stopOrder: [] })}
               >
                 {copy.routeMode}
@@ -485,6 +387,7 @@ export function TravelPlanner({
               <label>
                 {copy.days}
                 <select
+                  disabled={!initialized}
                   value={state.days}
                   onChange={(event) =>
                     patch({ days: Number(event.target.value) })
@@ -500,6 +403,7 @@ export function TravelPlanner({
               <label>
                 {copy.pace}
                 <select
+                  disabled={!initialized}
                   value={state.pace}
                   onChange={(event) =>
                     patch({ pace: event.target.value as TravelPace })
@@ -515,6 +419,7 @@ export function TravelPlanner({
               <label>
                 {copy.transport}
                 <select
+                  disabled={!initialized}
                   value={state.transport}
                   onChange={(event) =>
                     patch({ transport: event.target.value as TravelMode })
@@ -530,6 +435,7 @@ export function TravelPlanner({
               <label>
                 {copy.date}
                 <input
+                  disabled={!initialized}
                   type="date"
                   min="2000-01-01"
                   max="2099-12-31"
@@ -542,6 +448,7 @@ export function TravelPlanner({
               {copy.radius}
               <strong>{state.radiusKm} km</strong>
               <input
+                disabled={!initialized}
                 type="range"
                 min="1"
                 max="50"
@@ -558,6 +465,7 @@ export function TravelPlanner({
                 (interest) => (
                   <label key={interest}>
                     <input
+                      disabled={!initialized}
                       type="checkbox"
                       checked={state.interests.includes(interest)}
                       onChange={() =>
@@ -579,6 +487,15 @@ export function TravelPlanner({
               <button
                 type="button"
                 className="trip-text-button"
+                disabled={!canUndo}
+                onClick={undo}
+              >
+                {copy.undo}
+              </button>
+              <button
+                type="button"
+                className="trip-text-button"
+                disabled={!initialized}
                 onClick={() => update(emptyTrip())}
               >
                 {copy.clear}
@@ -599,6 +516,15 @@ export function TravelPlanner({
         <div className="trip-results" id="trip-results">
           <div className="trip-status" role="status" aria-live="polite">
             {status}
+            {hasSavedDraft && (
+              <button
+                type="button"
+                className="trip-text-button"
+                onClick={restore}
+              >
+                {copy.restoreDraft}
+              </button>
+            )}
           </div>
           {shareFallback && (
             <textarea
@@ -689,6 +615,12 @@ export function TravelPlanner({
                   })
                 }
               />
+              <PlannerGuides
+                plan={plan}
+                state={state}
+                catalog={catalog}
+                locale={locale}
+              />
               <PlannerRecommendations
                 plan={plan}
                 catalog={catalog}
@@ -750,15 +682,13 @@ export function TravelPlanner({
           type="button"
           className="trip-mobile-jump trip-no-print"
           onClick={() =>
-            document
-              .getElementById("trip-results")
-              ?.scrollIntoView({
-                behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
-                  .matches
-                  ? "auto"
-                  : "smooth",
-                block: "start",
-              })
+            document.getElementById("trip-results")?.scrollIntoView({
+              behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+                .matches
+                ? "auto"
+                : "smooth",
+              block: "start",
+            })
           }
         >
           {copy.itinerary} · {plan.ordered.length} {copy.stops} ↑

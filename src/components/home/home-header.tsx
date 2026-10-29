@@ -18,6 +18,7 @@ import type { HomeLocale } from "~/lib/home-locale";
 import {
   siteNavIsCurrent,
   siteNavModel,
+  plannerLocaleSuffix,
   type SiteNavLink,
 } from "~/lib/site-nav";
 
@@ -39,6 +40,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const [localeDismiss, setLocaleDismiss] = useState(0);
   const [pendingId, setPendingId] = useState<SiteNavLink["id"] | null>(null);
   const [hash, setHash] = useState("");
+  const [plannerEntry, setPlannerEntry] = useState("");
   const navRef = useRef<HTMLElement | null>(null);
   const [bar, setBar] = useState({ x: 0, width: 0, visible: false });
   const labels = {
@@ -51,13 +53,23 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const localeLinks: LocaleMenuLink[] = nav.languages.map((item) => ({
     locale: item.locale,
     label: item.label,
-    href: item.href,
+    href: `${item.href}${plannerEntry}`,
     hrefLang: hrefLangForLocale(item.locale),
   }));
-  const rankHref = nav.links.find((link) => link.id === "rank")?.href ?? "#rank";
+  const rankHref =
+    nav.links.find((link) => link.id === "rank")?.href ?? "#rank";
 
   useEffect(() => {
-    const sync = () => setHash(window.location.hash);
+    const sync = () => {
+      setHash(window.location.hash);
+      setPlannerEntry(
+        plannerLocaleSuffix(
+          pathname,
+          window.location.search,
+          window.location.hash,
+        ),
+      );
+    };
     sync();
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);

@@ -4,6 +4,7 @@ import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { dayLabel, getTravelCopy } from "./copy";
 import { legDirectionsUrl } from "./engine";
 import { tripDate } from "./state";
+import { exportGuideText } from "./guide-export";
 import type { TripPlan, TripState } from "./types";
 
 export function formatTripTime(minutes: number): string {
@@ -52,5 +53,7 @@ export function exportTripText(
       copy.overflowHelp,
       ...plan.unscheduled.map((stop) => `- ${tripStopName(stop, locale)}`),
     );
+  const guides = exportGuideText(plan, state, locale);
+  if (guides) lines.push("", guides);
   return lines.join("\n");
 }

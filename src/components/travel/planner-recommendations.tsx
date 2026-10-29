@@ -5,21 +5,10 @@ import { localizedNavText, type NavCatalog } from "~/lib/pilgrimage-nav";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { getTravelCopy } from "~/lib/travel/copy";
 import { distanceKm, nearbySearchUrl } from "~/lib/travel/engine";
-import { TRAVEL_HUBS } from "~/lib/travel/catalog";
+import { klookRegionFor, klookRegionLabel } from "~/lib/travel/regions";
 import type { KlookLinks, TripPlan, TripStop } from "~/lib/travel/types";
 import { StopLinks } from "./planner-itinerary";
 import { capturePostHogEvent, POSTHOG_EVENTS } from "~/lib/posthog";
-
-function regionFor(stop: TripStop): string {
-  if (stop.klookRegion) return stop.klookRegion;
-  const closest = TRAVEL_HUBS.filter((hub) => distanceKm(hub, stop) < 40).sort(
-    (a, b) => distanceKm(a, stop) - distanceKm(b, stop),
-  )[0];
-  if (closest) return closest.klookRegion;
-  return stop.lat >= 24 && stop.lat <= 46 && stop.lng >= 122 && stop.lng <= 146
-    ? "japan"
-    : "global";
-}
 
 export function PlannerRecommendations({
   plan,
@@ -42,7 +31,13 @@ export function PlannerRecommendations({
       localStops.push(stop);
     if (localStops.length === 6) break;
   }
-  const regions = [...new Set(plan.ordered.map(regionFor))];
+  const regions = [
+    ...new Set(
+      plan.days.flatMap((day) =>
+        day.stops.map(({ stop }) => klookRegionFor(stop)),
+      ),
+    ),
+  ];
   const hasSponsored = regions.some((region) => klookLinks[region]?.sponsored);
   return (
     <div className="trip-recommendations trip-no-print">
@@ -160,14 +155,7 @@ export function PlannerRecommendations({
           {regions.map((region) => {
             const offer = klookLinks[region];
             if (!offer) return null;
-            const hub = TRAVEL_HUBS.find((item) => item.id === region);
-            const label = hub
-              ? localizedNavText(hub.name, locale)
-              : region === "japan"
-                ? { zh: "日本", "zh-tw": "日本", ja: "日本", en: "Japan" }[
-                    locale
-                  ]
-                : "Klook";
+            const label = klookRegionLabel(region, locale);
             return (
               <a
                 key={region}

@@ -25,10 +25,9 @@ const DEMO_PLAYER_SESSION: PlayerSession = {
 export function getStoredPlayerSession(): PlayerSession | null {
   if (typeof window === "undefined") return null;
 
-  const raw = window.localStorage.getItem(PLAYER_SESSION_KEY);
-  if (!raw) return null;
-
   try {
+    const raw = window.localStorage.getItem(PLAYER_SESSION_KEY);
+    if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (!isPlayerSession(parsed)) return null;
     return {

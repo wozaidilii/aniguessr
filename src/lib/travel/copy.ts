@@ -9,7 +9,7 @@ const en = {
   animeMode: "Start with anime & places",
   routeMode: "Discover along my route",
   animeHelp:
-    "Choose up to 8 anime or individual places. We suggest up to 6 distinct visits per anime; add more places yourself or remove any you do not need.",
+    "Choose up to 8 anime or individual places. We suggest up to 6 distinct visits in one local area per anime; add more distant places explicitly if you want to include them.",
   routeHelp:
     "Add cities or places in your travel order. Discover anime stops around the lines connecting them, then add the detours you like.",
   settings: "Make it your trip",
@@ -126,6 +126,11 @@ const en = {
   disclaimer:
     "This is a planning draft. Travel times use straight-line distance, an allowance for detours and typical speeds—not live transit or road data. Ferries, mountains and service gaps may take much longer. Check each leg, opening hours and access before departure. Respect residents and private property.",
   autoSave: "Draft stays in this browser. No account needed.",
+  preview:
+    "Previewing a new trip. Your saved draft stays intact until you edit or save this trip.",
+  restoreDraft: "Return to my saved trip",
+  undo: "Undo last edit",
+  undone: "Last edit undone.",
 };
 type Copy = typeof en;
 const zh: Copy = {
@@ -137,7 +142,7 @@ const zh: Copy = {
   animeMode: "从动漫与圣地出发",
   routeMode: "沿我的路线找圣地",
   animeHelp:
-    "最多选择 8 部动漫，也可直接添加地点。每部先推荐最多 6 处不同的取景地，你可以继续增删。",
+    "最多选择 8 部动漫，也可直接添加地点。每部优先推荐同一地区最多 6 处不同取景地，更远的地点可自行添加。",
   routeHelp:
     "按旅行顺序添加城市或地点，再从连线周边的动漫圣地中挑选想去的地方。",
   settings: "安排你的旅行",
@@ -243,6 +248,10 @@ const zh: Copy = {
   disclaimer:
     "这是行程草案。交通时间由直线距离、绕行系数和参考速度估算，不是实时路况或列车时刻。山地、渡轮与班次不足可能大幅增加耗时。出发前逐段确认交通、营业和参观权限，并尊重居民与私人空间。",
   autoSave: "草稿保存在此浏览器，无需登录。",
+  preview: "正在预览新行程。编辑或保存后才会替换原草稿。",
+  restoreDraft: "返回我保存的行程",
+  undo: "撤销上一步",
+  undone: "已撤销上一步修改。",
 };
 const tw: Copy = {
   nav: "旅行規劃",
@@ -253,7 +262,7 @@ const tw: Copy = {
   animeMode: "從動畫與聖地出發",
   routeMode: "沿我的路線找聖地",
   animeHelp:
-    "最多選擇 8 部動畫，也可直接加入地點。每部先推薦最多 6 處不同取景地，你可以繼續增刪。",
+    "最多選擇 8 部動畫，也可直接加入地點。每部優先推薦同一地區最多 6 處不同取景地，較遠的地點可自行加入。",
   routeHelp:
     "按旅行順序加入城市或地點，再從連線周邊的動畫聖地中挑選想去的地方。",
   settings: "安排你的旅行",
@@ -359,6 +368,10 @@ const tw: Copy = {
   disclaimer:
     "這是行程草案。交通時間由直線距離、繞行係數和參考速度估算，不是即時路況或列車時刻。山地、渡輪與班次不足可能大幅增加耗時。出發前逐段確認交通、營業和參觀權限，並尊重居民與私人空間。",
   autoSave: "草稿儲存在此瀏覽器，無需登入。",
+  preview: "正在預覽新行程。編輯或儲存後才會取代原草稿。",
+  restoreDraft: "返回我儲存的行程",
+  undo: "復原上一步",
+  undone: "已復原上一步修改。",
 };
 const ja: Copy = {
   nav: "旅のプラン",
@@ -369,7 +382,7 @@ const ja: Copy = {
   animeMode: "作品・聖地から計画",
   routeMode: "ルート沿いの聖地を探す",
   animeHelp:
-    "最大8作品、または個別の場所を選択。各作品から最大6か所を提案します。場所の追加や削除もできます。",
+    "最大8作品、または個別の場所を選択。各作品につき同じ地域から最大6か所を提案します。遠方の場所は個別に追加できます。",
   routeHelp:
     "訪問順に都市や場所を追加し、その地点を結ぶ線の周辺から寄り道したい聖地を選びましょう。",
   settings: "旅の条件",
@@ -485,6 +498,11 @@ const ja: Copy = {
   disclaimer:
     "これは旅の下書きです。移動時間は直線距離・迂回係数・参考速度による概算で、道路状況や時刻表ではありません。山道、フェリー、運行本数などで大きく変わります。各区間の交通、営業時間、立入可否を確認し、住民や私有地に配慮してください。",
   autoSave: "下書きはこのブラウザに保存。ログイン不要。",
+  preview:
+    "新しい旅程をプレビュー中です。編集または保存するまで元の下書きは保持されます。",
+  restoreDraft: "保存した旅程に戻る",
+  undo: "前の編集を元に戻す",
+  undone: "前の編集を元に戻しました。",
 };
 export function getTravelCopy(locale: PilgrimageLocale): Copy {
   return locale === "zh"
