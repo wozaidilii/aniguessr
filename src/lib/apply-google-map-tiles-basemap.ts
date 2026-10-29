@@ -1,6 +1,11 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { mountGoogleMapTilesAttribution } from "~/components/map/google-map-tiles-attribution-control";
+import {
+  fadeInGoogleMapBasemapCanvas,
+  googleMapBasemapFadeMs,
+} from "~/lib/google-map-basemap-placeholder";
 import type { HomeMapBasemapKind } from "~/lib/home-map-basemap";
+import { homeMapInitialStyleUrl } from "~/lib/home-map-basemap";
 import {
   attachGoogleMapTilesQuotaMonitor,
 } from "~/lib/google-map-tiles-quota-monitor";
@@ -9,6 +14,7 @@ import {
   createGoogleMapTilesSession,
   type GoogleMapTilesLocale,
   type GoogleMapTilesSessionFailure,
+  type GoogleMapTilesSessionResponse,
 } from "~/lib/google-map-tiles-basemap";
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
 import type { GoogleMapTilesAttributionSurface } from "~/components/map/google-map-tiles-attribution-control";
@@ -40,10 +46,30 @@ export interface ApplyGoogleMapTilesBasemapResult {
 export interface ApplyGoogleMapTilesBasemapOptions {
   restoreOpenFreeMapAttribution?: () => void;
   onRevertedToOpenFreemap?: () => void;
+  /** When set, skips an extra createSession round-trip (started before map init). */
+  sessionPromise?: Promise<GoogleMapTilesSessionResponse>;
+  onGoogleBasemapVisible?: () => void;
+  onFallbackToOpenFreemap?: () => void;
+}
+
+function applyPositronFallback(
+  map: MapLibreMap,
+  onStyleReady: () => void,
+  options?: ApplyGoogleMapTilesBasemapOptions,
+): Promise<ApplyGoogleMapTilesBasemapResult> {
+  return new Promise((resolve) => {
+    const finish = (): void => {
+      options?.onFallbackToOpenFreemap?.();
+      onStyleReady();
+      resolve({ applied: false, activeBasemap: "openfreemap" });
+    };
+    void map.once("style.load", finish);
+    void map.setStyle(homeMapInitialStyleUrl());
+  });
 }
 
 /**
- * Swaps the MapLibre style to Google roadmap raster when a session succeeds.
+ * Loads Google roadmap raster when a session succeeds.
  * Caller must re-install overlay layers on `onStyleReady`.
  */
 export async function applyGoogleMapTilesBasemap(
@@ -55,15 +81,15 @@ export async function applyGoogleMapTilesBasemap(
 ): Promise<ApplyGoogleMapTilesBasemapResult & { detachQuotaMonitor?: () => void }> {
   const apiKey = resolveGoogleMapTilesApiKey();
   if (!apiKey) {
-    return { applied: false, activeBasemap: "openfreemap" };
+    return applyPositronFallback(map, onStyleReady, options);
   }
 
-  const sessionResult = await createGoogleMapTilesSession(locale, apiKey);
+  const sessionResult = await (options?.sessionPromise ??
+    createGoogleMapTilesSession(locale, apiKey));
   if (!sessionResult.ok) {
     warnCreateSessionFailureOnce(sessionResult);
     return {
-      applied: false,
-      activeBasemap: "openfreemap",
+      ...(await applyPositronFallback(map, onStyleReady, options)),
       sessionFailure: sessionResult,
     };
   }
@@ -71,13 +97,14 @@ export async function applyGoogleMapTilesBasemap(
   const style = buildGoogleMapTilesMapStyle(sessionResult.session, apiKey);
 
   return await new Promise((resolve) => {
-    const finish = (): void => {
+    const finishAfterTiles = (): void => {
       mountGoogleMapTilesAttribution(
         map,
         sessionResult.session,
         apiKey,
         surface,
       );
+      options?.onGoogleBasemapVisible?.();
       onStyleReady();
       let detachQuotaMonitor: (() => void) | undefined;
       if (options?.restoreOpenFreeMapAttribution && options.onRevertedToOpenFreemap) {
@@ -93,7 +120,10 @@ export async function applyGoogleMapTilesBasemap(
       });
     };
 
-    void map.once("style.load", finish);
+    void map.once("style.load", () => {
+      fadeInGoogleMapBasemapCanvas(map, googleMapBasemapFadeMs());
+      void map.once("idle", finishAfterTiles);
+    });
     void map.setStyle(style);
   });
 }

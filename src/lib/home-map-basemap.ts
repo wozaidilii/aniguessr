@@ -1,3 +1,5 @@
+import type { StyleSpecification } from "maplibre-gl";
+import { buildGoogleMapBasemapPlaceholderStyle } from "~/lib/google-map-basemap-placeholder";
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
 import { isGoogleMapTilesQuotaFallbackActive } from "~/lib/google-map-tiles-quota-fallback";
 import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
@@ -13,6 +15,14 @@ export function homeMapBasemapMode(): HomeMapBasemapKind {
 
 export function homeMapInitialStyleUrl(): string {
   return OPENFREEMAP_POSITRON_STYLE;
+}
+
+/** MapLibre style for first paint: placeholder when Google will load, else Positron. */
+export function resolveHomeMapInitialStyle(): StyleSpecification | string {
+  if (shouldAttemptGoogleMapTilesBasemap()) {
+    return buildGoogleMapBasemapPlaceholderStyle();
+  }
+  return homeMapInitialStyleUrl();
 }
 
 /** True when we should try Map Tiles API (still falls back to Positron on failure). */

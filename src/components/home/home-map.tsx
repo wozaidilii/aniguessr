@@ -34,8 +34,14 @@ import {
   tuneHomeMapStyle,
 } from "~/lib/home-map-style";
 import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
+import { buildHomeBoundsDetail } from "~/lib/home-map-bounds-publish";
 import {
-  homeMapInitialStyleUrl,
+  injectGoogleMapTilesPreconnect,
+} from "~/lib/google-map-basemap-placeholder";
+import { createGoogleMapTilesSession } from "~/lib/google-map-tiles-basemap";
+import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
+import {
+  resolveHomeMapInitialStyle,
   shouldAttemptGoogleMapTilesBasemap,
   shouldTuneOpenFreemapPlaceLabels,
   type HomeMapBasemapKind,
@@ -157,9 +163,17 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     let mapInteractionsBound = false;
     let googleUpgradeStarted = false;
     let detachQuotaMonitor: (() => void) | undefined;
+    const attemptGoogleBasemap = shouldAttemptGoogleMapTilesBasemap();
+    if (attemptGoogleBasemap) {
+      container.classList.add("home-map-canvas--google-loading");
+      injectGoogleMapTilesPreconnect();
+    }
+    const googleSessionPromise = attemptGoogleBasemap
+      ? createGoogleMapTilesSession(locale, resolveGoogleMapTilesApiKey())
+      : undefined;
     const map = new maplibregl.Map({
       container,
-      style: homeMapInitialStyleUrl(),
+      style: resolveHomeMapInitialStyle(),
       center: KANTO_INITIAL_CENTER,
       zoom: KANTO_INITIAL_ZOOM,
       attributionControl: false,
@@ -168,10 +182,27 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       localIdeographFontFamily: HOME_IDEOGRAPH_FONT,
     });
     mapRef.current = map;
-    const openFreeMapAttribution = new maplibregl.AttributionControl({
-      compact: true,
-    });
-    map.addControl(openFreeMapAttribution, "bottom-left");
+    let openFreeMapAttribution: maplibregl.AttributionControl | undefined;
+    if (!attemptGoogleBasemap) {
+      openFreeMapAttribution = new maplibregl.AttributionControl({
+        compact: true,
+      });
+      map.addControl(openFreeMapAttribution, "bottom-left");
+    }
+    const ensureOpenFreeMapAttribution = (): void => {
+      if (openFreeMapAttribution) return;
+      openFreeMapAttribution = new maplibregl.AttributionControl({
+        compact: true,
+      });
+      try {
+        map.addControl(openFreeMapAttribution, "bottom-left");
+      } catch {
+        // ignore duplicate add after style swap
+      }
+    };
+    const clearGoogleLoadingChrome = (): void => {
+      container.classList.remove("home-map-canvas--google-loading");
+    };
     const timer = window.setTimeout(() => {
       if (!loaded) setError(true);
     }, 15_000);
@@ -287,7 +318,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       mapRef.current = map;
       ensureYou();
 
-      if (shouldAttemptGoogleMapTilesBasemap() && !googleUpgradeStarted) {
+      if (attemptGoogleBasemap && !googleUpgradeStarted) {
         googleUpgradeStarted = true;
         void applyGoogleMapTilesBasemap(
           map,
@@ -295,7 +326,9 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           () => {
             activeBasemap = "google";
             try {
-              map.removeControl(openFreeMapAttribution);
+              if (openFreeMapAttribution) {
+                map.removeControl(openFreeMapAttribution);
+              }
             } catch {
               // Already removed after a style swap.
             }
@@ -303,15 +336,16 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           },
           "home",
           {
-            restoreOpenFreeMapAttribution: () => {
-              try {
-                map.addControl(openFreeMapAttribution, "bottom-left");
-              } catch {
-                // Control may already be present after a partial revert.
-              }
+            sessionPromise: googleSessionPromise,
+            onGoogleBasemapVisible: clearGoogleLoadingChrome,
+            onFallbackToOpenFreemap: () => {
+              clearGoogleLoadingChrome();
+              ensureOpenFreeMapAttribution();
             },
+            restoreOpenFreeMapAttribution: ensureOpenFreeMapAttribution,
             onRevertedToOpenFreemap: () => {
               activeBasemap = "openfreemap";
+              clearGoogleLoadingChrome();
               refreshOverlayLayers();
             },
           },
@@ -320,6 +354,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           if (result.detachQuotaMonitor) {
             detachQuotaMonitor?.();
             detachQuotaMonitor = result.detachQuotaMonitor;
+          }
+          if (!result.applied && result.sessionFailure) {
+            activeBasemap = "openfreemap";
+            refreshOverlayLayers();
           }
         });
       }
@@ -679,16 +717,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
 }
 
 function publishBounds(map: maplibregl.Map) {
-  const bounds = map.getBounds();
-  const center = map.getCenter();
-  const detail: HomeBoundsDetail = {
-    west: bounds.getWest(),
-    south: bounds.getSouth(),
-    east: bounds.getEast(),
-    north: bounds.getNorth(),
-    lat: center.lat,
-    lng: center.lng,
-  };
+  const detail = buildHomeBoundsDetail(map);
   window.dispatchEvent(new CustomEvent(HOME_BOUNDS_EVENT, { detail }));
 }
 

@@ -22,6 +22,12 @@ import { workFocusFrame } from "~/lib/home-map-focus";
 import { tuneHomeMapStyle } from "~/lib/home-map-style";
 import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
 import {
+  injectGoogleMapTilesPreconnect,
+} from "~/lib/google-map-basemap-placeholder";
+import { createGoogleMapTilesSession } from "~/lib/google-map-tiles-basemap";
+import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
+import {
+  resolveHomeMapInitialStyle,
   shouldAttemptGoogleMapTilesBasemap,
   shouldTuneOpenFreemapPlaceLabels,
   type HomeMapBasemapKind,
@@ -34,7 +40,6 @@ import {
   pilgrimageSpotBounds,
 } from "~/lib/pilgrimage-map-frame";
 import {
-  PILGRIMAGE_MAP_STYLE,
   animeTitle,
   filterNavSpots,
   googleMapsDirectionsUrl,
@@ -94,9 +99,17 @@ export function PilgrimageMap({
     let mapInteractionsBound = false;
     let googleUpgradeStarted = false;
     let detachQuotaMonitor: (() => void) | undefined;
+    const attemptGoogleBasemap = shouldAttemptGoogleMapTilesBasemap();
+    if (attemptGoogleBasemap) {
+      container.classList.add("pilgrimage-map-canvas--google-loading");
+      injectGoogleMapTilesPreconnect();
+    }
+    const googleSessionPromise = attemptGoogleBasemap
+      ? createGoogleMapTilesSession(locale, resolveGoogleMapTilesApiKey())
+      : undefined;
     const map = new maplibregl.Map({
       container,
-      style: PILGRIMAGE_MAP_STYLE,
+      style: resolveHomeMapInitialStyle(),
       bounds: PILGRIMAGE_JAPAN_BOUNDS,
       fitBoundsOptions: { padding: 24 },
       attributionControl: false,
@@ -104,10 +117,27 @@ export function PilgrimageMap({
       maxZoom: 18,
       maxBounds: PILGRIMAGE_JAPAN_BOUNDS,
     });
-    const openFreeMapAttribution = new maplibregl.AttributionControl({
-      compact: true,
-    });
-    map.addControl(openFreeMapAttribution, "bottom-right");
+    let openFreeMapAttribution: maplibregl.AttributionControl | undefined;
+    if (!attemptGoogleBasemap) {
+      openFreeMapAttribution = new maplibregl.AttributionControl({
+        compact: true,
+      });
+      map.addControl(openFreeMapAttribution, "bottom-right");
+    }
+    const ensureOpenFreeMapAttribution = (): void => {
+      if (openFreeMapAttribution) return;
+      openFreeMapAttribution = new maplibregl.AttributionControl({
+        compact: true,
+      });
+      try {
+        map.addControl(openFreeMapAttribution, "bottom-right");
+      } catch {
+        // ignore
+      }
+    };
+    const clearGoogleLoadingChrome = (): void => {
+      container.classList.remove("pilgrimage-map-canvas--google-loading");
+    };
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
       "top-right",
@@ -240,7 +270,7 @@ export function PilgrimageMap({
       setLayerEpoch((value) => value + 1);
       map.resize();
 
-      if (shouldAttemptGoogleMapTilesBasemap() && !googleUpgradeStarted) {
+      if (attemptGoogleBasemap && !googleUpgradeStarted) {
         googleUpgradeStarted = true;
         void applyGoogleMapTilesBasemap(
           map,
@@ -248,7 +278,9 @@ export function PilgrimageMap({
           () => {
             activeBasemap = "google";
             try {
-              map.removeControl(openFreeMapAttribution);
+              if (openFreeMapAttribution) {
+                map.removeControl(openFreeMapAttribution);
+              }
             } catch {
               // ignore
             }
@@ -257,15 +289,16 @@ export function PilgrimageMap({
           },
           "pilgrimage",
           {
-            restoreOpenFreeMapAttribution: () => {
-              try {
-                map.addControl(openFreeMapAttribution, "bottom-right");
-              } catch {
-                // ignore duplicate add
-              }
+            sessionPromise: googleSessionPromise,
+            onGoogleBasemapVisible: clearGoogleLoadingChrome,
+            onFallbackToOpenFreemap: () => {
+              clearGoogleLoadingChrome();
+              ensureOpenFreeMapAttribution();
             },
+            restoreOpenFreeMapAttribution: ensureOpenFreeMapAttribution,
             onRevertedToOpenFreemap: () => {
               activeBasemap = "openfreemap";
+              clearGoogleLoadingChrome();
               installSpotLayers();
               setLayerEpoch((value) => value + 1);
             },
@@ -275,6 +308,11 @@ export function PilgrimageMap({
           if (result.detachQuotaMonitor) {
             detachQuotaMonitor?.();
             detachQuotaMonitor = result.detachQuotaMonitor;
+          }
+          if (!result.applied && result.sessionFailure) {
+            activeBasemap = "openfreemap";
+            installSpotLayers();
+            setLayerEpoch((value) => value + 1);
           }
         });
       }

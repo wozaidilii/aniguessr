@@ -47,7 +47,7 @@ export function HomeNearby({
   const distanceLabel = getPilgrimageCopy(locale).formatDistance;
   const limit = variant === "sheet" ? 3 : 12;
   const [open, setOpen] = useState(false);
-  const [inView, setInView] = useState(0);
+  const [inView, setInView] = useState<number | null>(null);
   const [spots, setSpots] = useState<ListedSpot[]>([]);
   const [workHref, setWorkHref] = useState<string | null>(null);
   const focusRef = useRef<HomeFocusWorkDetail>(readHomeFocusWork());

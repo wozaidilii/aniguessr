@@ -394,6 +394,33 @@
   height: 100%;
 }
 
+.home-map-canvas--google-loading {
+  background-color: #f5f3ef;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-map-canvas--google-loading {
+    background-image: linear-gradient(
+      110deg,
+      #f5f3ef 8%,
+      #faf8f4 18%,
+      #f5f3ef 33%
+    );
+    background-size: 200% 100%;
+    animation: home-map-google-loading-shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes home-map-google-loading-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
 .home-map {
   position: relative;
 }
