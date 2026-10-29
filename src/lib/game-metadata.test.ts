@@ -7,11 +7,15 @@ describe("game anime metadata", () => {
     expect(metadata.alternates?.canonical).toBe("/zh-tw/game/anime");
     expect(metadata.alternates?.languages).toMatchObject({
       ja: "https://aniguessr.ayiora.com/ja/game/anime",
-      zh: "https://aniguessr.ayiora.com/zh/game/anime",
+      "zh-Hans": "https://aniguessr.ayiora.com/zh/game/anime",
+      "zh-CN": "https://aniguessr.ayiora.com/zh/game/anime",
+      "zh-SG": "https://aniguessr.ayiora.com/zh/game/anime",
       en: "https://aniguessr.ayiora.com/en/game/anime",
       "x-default": "https://aniguessr.ayiora.com/en/game/anime",
       "zh-Hant": "https://aniguessr.ayiora.com/zh-tw/game/anime",
       "zh-TW": "https://aniguessr.ayiora.com/zh-tw/game/anime",
+      "zh-HK": "https://aniguessr.ayiora.com/zh-tw/game/anime",
+      "zh-MO": "https://aniguessr.ayiora.com/zh-tw/game/anime",
     });
     expect(metadata.title).toEqual({ absolute: "猜動漫模式 - AniGuessr" });
   });

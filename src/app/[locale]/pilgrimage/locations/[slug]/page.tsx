@@ -186,11 +186,6 @@ export default async function PilgrimageLocationPage({ params }: Props) {
           subtitle: pickLocalizedText(spot.animeTitle, locale),
         }))}
       />
-      {location.spotCount > spots.length ? (
-        <p className="mt-4 text-xs text-pink-100/50">
-          + {location.spotCount - spots.length} more spots indexed
-        </p>
-      ) : null}
     </PilgrimageShell>
   );
 }

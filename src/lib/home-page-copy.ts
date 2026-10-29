@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { type HomeLocale, homeSiteLocale } from "~/lib/home-locale";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
-import { absoluteUrl, localeAlternates } from "~/lib/seo";
+import {
+  absoluteUrl,
+  localeAlternates,
+  traditionalChineseAlternates,
+} from "~/lib/seo";
 import {
   ANIME_GUESSR_DIFFICULTY_TIERS,
   type AnimeGuessrDifficultyTier,
@@ -640,9 +644,10 @@ export function homePageMetadata(locale: HomeLocale): Metadata {
       ? "/zh-tw"
       : withAnimeLocale("/", homeSiteLocale(locale));
   const languages = localeAlternates("/");
-  const zhTwUrl = absoluteUrl(withPilgrimageLocale("/", "zh-tw"));
-  languages["zh-Hant"] = zhTwUrl;
-  languages["zh-TW"] = zhTwUrl;
+  Object.assign(
+    languages,
+    traditionalChineseAlternates(absoluteUrl(withPilgrimageLocale("/", "zh-tw"))),
+  );
   return {
     title: { absolute: seo.title },
     description: seo.description,

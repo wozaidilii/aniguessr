@@ -65,11 +65,15 @@ describe("homepage copy", () => {
     expect(english.alternates?.canonical).toBe("/en");
     expect(english.alternates?.languages).toMatchObject({
       ja: "https://aniguessr.ayiora.com/ja",
-      zh: "https://aniguessr.ayiora.com/zh",
+      "zh-Hans": "https://aniguessr.ayiora.com/zh",
+      "zh-CN": "https://aniguessr.ayiora.com/zh",
+      "zh-SG": "https://aniguessr.ayiora.com/zh",
       en: "https://aniguessr.ayiora.com/en",
       "x-default": "https://aniguessr.ayiora.com/en",
       "zh-Hant": "https://aniguessr.ayiora.com/zh-tw",
       "zh-TW": "https://aniguessr.ayiora.com/zh-tw",
+      "zh-HK": "https://aniguessr.ayiora.com/zh-tw",
+      "zh-MO": "https://aniguessr.ayiora.com/zh-tw",
     });
     expect(homePageMetadata("zh-tw").alternates?.canonical).toBe("/zh-tw");
   });

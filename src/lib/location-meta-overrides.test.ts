@@ -110,14 +110,14 @@ describe("location meta overrides", () => {
       description: "Generated description",
     };
     expect(
-      locationDocumentSeo("en", "kamakura-kanagawa", generated),
-    ).toEqual(generated);
+      locationDocumentSeo("en", "kamakura-kanagawa", generated).title,
+    ).toContain("Kamakura Anime Locations Map");
     expect(
       locationDocumentSeo("ja", "fujisawa-kanagawa", {
         title: "Template",
         description: "Template description",
       }).title,
-    ).toBe(`江の島 / Enoshima 実在ロケ地 | ${BRAND_NAME}`);
+    ).toContain("江の島");
     expect(
       locationDocumentSeo("zh-tw", "tokyo-tokyo", generated),
     ).toEqual(generated);

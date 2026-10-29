@@ -218,7 +218,8 @@ describe("spot display-name overrides", () => {
       });
       expect(metadata.alternates?.canonical).toBe(`/${locale}${path}`);
       const languages = metadata.alternates?.languages ?? {};
-      expect(languages.zh).toBe(absoluteUrl(`/zh${path}`));
+      expect(languages["zh-Hans"]).toBe(absoluteUrl(`/zh${path}`));
+      expect(languages["zh-CN"]).toBe(languages["zh-Hans"]);
       expect(languages.ja).toBe(absoluteUrl(`/ja${path}`));
       expect(languages.en).toBe(absoluteUrl(`/en${path}`));
       expect(languages["x-default"]).toBe(absoluteUrl(`/en${path}`));

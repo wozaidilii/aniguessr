@@ -8,5 +8,249 @@
       "title": "江之島 動漫聖地巡禮地圖｜青春豬頭少年・孤獨搖滾 | AniGuessr",
       "description": "江之島（藤澤市）動漫聖地巡禮：青春豬頭少年、孤獨搖滾取景地，附座標與 Google 地圖導航。"
     }
+  },
+  "en": {
+    "shibuya-tokyo": {
+      "title": "Shibuya, Tokyo Anime Locations Map: Yoyogi · CHAOS;HEAD & More | AniGuessr",
+      "description": "Shibuya, Tokyo anime pilgrimage: Yoyogi, Jujutsu Kaisen Season 2, CHAOS;HEAD, Love Live! Superstar!!, and more with coordinates and Google Maps directions."
+    },
+    "kumano-mie": {
+      "title": "Kumano, Mie Anime Locations Map: Onigajo · Nagi & More | AniGuessr",
+      "description": "Kumano, Mie anime pilgrimage: Onigajo, Tsurezure Biyori, Nagi no Asukara, Wasteful Days of High School Girl, and more with coordinates and Google Maps directions."
+    },
+    "furano-hokkaido": {
+      "title": "Furano, Hokkaido Anime Locations Map: Furano Cheese Workshop & More | AniGuessr",
+      "description": "Furano, Hokkaido anime pilgrimage: Furano Cheese Workshop, Tokimeki Memorial Only Love, and more with coordinates and Google Maps directions."
+    },
+    "imizu-toyama": {
+      "title": "Imizu, Toyama Anime Locations Map: Shinminato Bridge · I & More | AniGuessr",
+      "description": "Imizu, Toyama anime pilgrimage: Shinminato Bridge, Hisone & Masotan, I Want to Eat Your Pancreas, and more with coordinates and Google Maps directions."
+    },
+    "kanazawa-ishikawa": {
+      "title": "Kanazawa, Ishikawa Anime Locations Map: Korinbo · Hanasaku & More | AniGuessr",
+      "description": "Kanazawa, Ishikawa anime pilgrimage: Korinbo, Link! Like! LoveLive! Hasunosora Girls' Academy School Idol Club, Hanasaku Iroha: Blossoms for Tomorrow, Amakano 2, and more with coordinates and Google Maps directions."
+    },
+    "kamakura-kanagawa": {
+      "title": "Kamakura Anime Locations Map: Slam Dunk Crossing & More | AniGuessr",
+      "description": "Kamakura anime pilgrimage: Slam Dunk railroad crossing (Kamakura-Kōkōmae Station), Rascal Does Not Dream of Bunny Girl Senpai at Shichirigahama, and more with coordinates and Google Maps directions."
+    },
+    "nishitokyo-tokyo": {
+      "title": "Nishitokyo, Tokyo Anime Locations Map: Stairs 3 · Fantasista & More | AniGuessr",
+      "description": "Nishitokyo, Tokyo anime pilgrimage: Stairs 3, Sorairo Utility, Fantasista Doll, Adachi and Shimamura, and more with coordinates and Google Maps directions."
+    },
+    "chiyoda-tokyo": {
+      "title": "Chiyoda, Tokyo Anime Locations Map: Sankōen · Joshiraku & More | AniGuessr",
+      "description": "Chiyoda, Tokyo anime pilgrimage: Sankōen, Steins;Gate, Joshiraku, Suzume, and more with coordinates and Google Maps directions."
+    },
+    "wakayama-wakayama": {
+      "title": "Wakayama, Wakayama Anime Locations Map: Kobamart · Summer & More | AniGuessr",
+      "description": "Wakayama, Wakayama anime pilgrimage: Kobamart, Summertime Render, Summer Time Rendering, Dark Gathering, and more with coordinates and Google Maps directions."
+    },
+    "yonezawa-yamagata": {
+      "title": "Yonezawa, Yamagata Anime Locations Map: Suminoe Bridge · PriPara & More | AniGuessr",
+      "description": "Yonezawa, Yamagata anime pilgrimage: Suminoe Bridge, 好きでも嫌いなあまのじゃく, PriPara, and more with coordinates and Google Maps directions."
+    },
+    "shinjuku-tokyo": {
+      "title": "Shinjuku, Tokyo Anime Locations Map: Uotani · Your & More | AniGuessr",
+      "description": "Shinjuku, Tokyo anime pilgrimage: Uotani, 5 Centimeters per Second, Your Name., The Garden of Words, and more with coordinates and Google Maps directions."
+    },
+    "minato-tokyo": {
+      "title": "Minato, Tokyo Anime Locations Map: Jules A · Sailor & More | AniGuessr",
+      "description": "Minato, Tokyo anime pilgrimage: Jules A, Love Live! Nijigasaki High School Idol Club, Sailor Moon, Tokyo Magnitude 8.0, and more with coordinates and Google Maps directions."
+    },
+    "toshima-tokyo": {
+      "title": "Toshima, Tokyo Anime Locations Map: Meikidou · My & More | AniGuessr",
+      "description": "Toshima, Tokyo anime pilgrimage: Meikidou, Durarara!!, My Dress-Up Darling, Taiso Samurai, and more with coordinates and Google Maps directions."
+    },
+    "fujisawa-kanagawa": {
+      "title": "Enoshima Anime Locations Map: Rascal Does Not Dream & Bocchi the Rock | AniGuessr",
+      "description": "Enoshima (Fujisawa) anime pilgrimage: Rascal Does Not Dream of Bunny Girl Senpai and Bocchi the Rock! spots with coordinates and Google Maps directions."
+    },
+    "koto-tokyo": {
+      "title": "Koto, Tokyo Anime Locations Map: Bridge · Odoru & More | AniGuessr",
+      "description": "Koto, Tokyo anime pilgrimage: Bridge, Love Live! Nijigasaki High School Idol Club, Odoru Daisousasen, Love, Election & Chocolate, and more with coordinates and Google Maps directions."
+    },
+    "uji-kyoto": {
+      "title": "Uji, Kyoto Anime Locations Map: Byōdō-in · Sound! & More | AniGuessr",
+      "description": "Uji, Kyoto anime pilgrimage: Byōdō-in, Sound! Euphonium, Sound! Euphonium 2, Sound! Euphonium 3, and more with coordinates and Google Maps directions."
+    },
+    "gifu-gifu": {
+      "title": "Gifu, Gifu Anime Locations Map: Zeniya · Shōshimin & More | AniGuessr",
+      "description": "Gifu, Gifu anime pilgrimage: Zeniya, Shoshimin Series Season 2, Shōshimin Series, Adachi and Shimamura, and more with coordinates and Google Maps directions."
+    },
+    "kyoto-kyoto-26103": {
+      "title": "Kyoto, Kyoto Anime Locations Map: Daigenkyo · K-ON! & More | AniGuessr",
+      "description": "Kyoto, Kyoto anime pilgrimage: Daigenkyo, K-ON!!, K-ON!, Deaimon, and more with coordinates and Google Maps directions."
+    },
+    "suginami-tokyo": {
+      "title": "Suginami, Tokyo Anime Locations Map: Wall · Mawaru & More | AniGuessr",
+      "description": "Suginami, Tokyo anime pilgrimage: Wall, SSSS.GRIDMAN, Mawaru Penguindrum, Accel World, and more with coordinates and Google Maps directions."
+    },
+    "chuo-tokyo": {
+      "title": "Chuo, Tokyo Anime Locations Map: Meijiza · Apocalypse & More | AniGuessr",
+      "description": "Chuo, Tokyo anime pilgrimage: Meijiza, Edogawa Elf, Apocalypse Hotel, Negative Positive Angler, and more with coordinates and Google Maps directions."
+    },
+    "nishinomiya-hyogo": {
+      "title": "Nishinomiya, Hyogo Anime Locations Map: Shin'ike · The & More | AniGuessr",
+      "description": "Nishinomiya, Hyogo anime pilgrimage: Shin'ike, The Melancholy of Haruhi Suzumiya (2009), The Disappearance of Haruhi Suzumiya, The Disappearance of Nagato Yuki-chan, and more with coordinates and Google Maps directions."
+    },
+    "hachioji-tokyo": {
+      "title": "Hachioji, Tokyo Anime Locations Map: Yumiko · Re:Stage! & More | AniGuessr",
+      "description": "Hachioji, Tokyo anime pilgrimage: Yumiko, Time Passes, Yet the Meal is Delicious (Hibi wa Sugiredo Meshi Umashi), Re:Stage! Dream Days♪, Encouragement of Climb, and more with coordinates and Google Maps directions."
+    },
+    "setagaya-tokyo": {
+      "title": "Setagaya, Tokyo Anime Locations Map: Chanoko · Bocchi & More | AniGuessr",
+      "description": "Setagaya, Tokyo anime pilgrimage: Chanoko, Sing \"Yesterday\" for Me, Bocchi the Rock!, Dead Dead Demon's Dededede Destruction, and more with coordinates and Google Maps directions."
+    },
+    "taito-tokyo": {
+      "title": "Taito, Tokyo Anime Locations Map: Hōzōmon · Sarazanmai & More | AniGuessr",
+      "description": "Taito, Tokyo anime pilgrimage: Hōzōmon, The Quintessential Quintuplets ~The Five Promises with Her~, Sarazanmai, Shōwa Genroku Rakugo Shinjū, and more with coordinates and Google Maps directions."
+    },
+    "yokohama-kanagawa-14104": {
+      "title": "Yokohama, Kanagawa Anime Locations Map: Funamae · The & More | AniGuessr",
+      "description": "Yokohama, Kanagawa anime pilgrimage: Funamae, Rascal Does Not Dream of a Santa Claus, The Quintessential Quintuplets, Bungo Stray Dogs, and more with coordinates and Google Maps directions."
+    },
+    "numazu-shizuoka": {
+      "title": "Numazu, Shizuoka Anime Locations Map: Kamiike · Love & More | AniGuessr",
+      "description": "Numazu, Shizuoka anime pilgrimage: Kamiike, Love Live! Sunshine!! Season 2, Love Live! Sunshine!!, Love Live! Sunshine!! The School Idol Movie Over the Rainbow, and more with coordinates and Google Maps directions."
+    },
+    "musashino-tokyo": {
+      "title": "Musashino, Tokyo Anime Locations Map: Matsutei · Maria-sama & More | AniGuessr",
+      "description": "Musashino, Tokyo anime pilgrimage: Matsutei, Joshiraku, Maria-sama ga Miteru, SHIROBAKO, and more with coordinates and Google Maps directions."
+    },
+    "atami-shizuoka": {
+      "title": "Atami, Shizuoka Anime Locations Map: Ōnoya · Upotte!! & More | AniGuessr",
+      "description": "Atami, Shizuoka anime pilgrimage: Ōnoya, Kirei ni Shite Moraemasu ka., Upotte!!, Amanchu!, and more with coordinates and Google Maps directions."
+    },
+    "kyoto-kyoto-26105": {
+      "title": "Kyoto, Kyoto Anime Locations Map: Gion · The & More | AniGuessr",
+      "description": "Kyoto, Kyoto anime pilgrimage: Gion, The Eccentric Family 2, The Eccentric Family, Mitsuwano, and more with coordinates and Google Maps directions."
+    },
+    "kyoto-kyoto-26106": {
+      "title": "Kyoto, Kyoto Anime Locations Map: Bukko-ji · The & More | AniGuessr",
+      "description": "Kyoto, Kyoto anime pilgrimage: Bukko-ji, The Eccentric Family, The Quintessential Quintuplets, Deaimon: Recipe for Happiness, and more with coordinates and Google Maps directions."
+    }
+  },
+  "ja": {
+    "shibuya-tokyo": {
+      "title": "東京都渋谷区 アニメ聖地巡礼マップ｜呪術廻戦 第2期・CHAOS;HEAD（水車ほか） | AniGuessr",
+      "description": "東京都渋谷区のアニメ聖地巡礼：水車、呪術廻戦 第2期、CHAOS;HEAD、『ラブライブ！スーパースター!!』 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kumano-mie": {
+      "title": "熊野市 アニメ聖地巡礼マップ｜徒然日和・凪のあすから（亀齢橋ほか） | AniGuessr",
+      "description": "熊野市のアニメ聖地巡礼：亀齢橋、徒然日和、凪のあすから、女子高生の無駄づかい などの撮影地。座標と Google マップナビ付き。"
+    },
+    "furano-hokkaido": {
+      "title": "富良野市 アニメ聖地巡礼マップ｜ときめきメモリアル Only Love（富良野チーズ工房ほか） | AniGuessr",
+      "description": "富良野市のアニメ聖地巡礼：富良野チーズ工房、ときめきメモリアル Only Love などの撮影地。座標と Google マップナビ付き。"
+    },
+    "imizu-toyama": {
+      "title": "射水市 アニメ聖地巡礼マップ｜ひそねとまそたん・君の膵臓をたべたい（新湊大橋（富山県）ほか） | AniGuessr",
+      "description": "射水市のアニメ聖地巡礼：新湊大橋（富山県）、ひそねとまそたん、君の膵臓をたべたい などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kanazawa-ishikawa": {
+      "title": "金沢市 アニメ聖地巡礼マップ｜『Link！Like！ラブライブ！蓮ノ空スクールアイドルクラブ』・花咲くいろは（兼六園ほか） | AniGuessr",
+      "description": "金沢市のアニメ聖地巡礼：兼六園、『Link！Like！ラブライブ！蓮ノ空スクールアイドルクラブ』、花咲くいろは、アマカノ2 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kamakura-kanagawa": {
+      "title": "鎌倉 アニメ聖地巡礼マップ｜スラムダンク踏切・青春ブタ野郎ほか | AniGuessr",
+      "description": "鎌倉のアニメ聖地巡礼：スラムダンクの踏切（鎌倉高校前駅）、青春ブタ野郎はバニーガール先輩の夢を見ないの七里ヶ浜ほか。座標と Google マップナビ付き。"
+    },
+    "nishitokyo-tokyo": {
+      "title": "西東京市 アニメ聖地巡礼マップ｜空色ユーティリティ・ファンタジスタドール（住宅街ほか） | AniGuessr",
+      "description": "西東京市のアニメ聖地巡礼：住宅街、空色ユーティリティ、ファンタジスタドール、安達としまむら などの撮影地。座標と Google マップナビ付き。"
+    },
+    "chiyoda-tokyo": {
+      "title": "東京都千代田区 アニメ聖地巡礼マップ｜シュタインズ・ゲート・じょしらく（聖橋ほか） | AniGuessr",
+      "description": "東京都千代田区のアニメ聖地巡礼：聖橋、シュタインズ・ゲート、じょしらく、すずめの戸締まり などの撮影地。座標と Google マップナビ付き。"
+    },
+    "wakayama-wakayama": {
+      "title": "和歌山市 アニメ聖地巡礼マップ｜サマータイムレンダ・サマータイムレンダ（虎島ほか） | AniGuessr",
+      "description": "和歌山市のアニメ聖地巡礼：虎島、サマータイムレンダ、サマータイムレンダ、ダークギャザリング などの撮影地。座標と Google マップナビ付き。"
+    },
+    "yonezawa-yamagata": {
+      "title": "米沢市 アニメ聖地巡礼マップ｜好きでも嫌いなあまのじゃく・『プリパラ』（米沢駅ほか） | AniGuessr",
+      "description": "米沢市のアニメ聖地巡礼：米沢駅、好きでも嫌いなあまのじゃく、『プリパラ』 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "shinjuku-tokyo": {
+      "title": "東京都新宿区 アニメ聖地巡礼マップ｜秒速5センチメートル・君の名は。（曙橋ほか） | AniGuessr",
+      "description": "東京都新宿区のアニメ聖地巡礼：曙橋、秒速5センチメートル、君の名は。、言の葉の庭 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "minato-tokyo": {
+      "title": "東京都港区 アニメ聖地巡礼マップ｜ラブライブ！虹ヶ咲学園スクールアイドル同好会・美少女戦士セーラームーン（橋ほか） | AniGuessr",
+      "description": "東京都港区のアニメ聖地巡礼：橋、ラブライブ！虹ヶ咲学園スクールアイドル同好会、美少女戦士セーラームーン、東京マグニチュード8.0 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "toshima-tokyo": {
+      "title": "東京都豊島区 アニメ聖地巡礼マップ｜デュラララ!!・その着せ替え人形は恋をする（曙橋ほか） | AniGuessr",
+      "description": "東京都豊島区のアニメ聖地巡礼：曙橋、デュラララ!!、その着せ替え人形は恋をする、体操ザムライ などの撮影地。座標と Google マップナビ付き。"
+    },
+    "fujisawa-kanagawa": {
+      "title": "江の島 アニメ聖地巡礼マップ｜青春ブタ野郎・ぼっち・ざ・ろっく！ | AniGuessr",
+      "description": "藤沢市・江の島のアニメ聖地巡礼：青春ブタ野郎はバニーガール先輩の夢を見ない、ぼっち・ざ・ろっく！ などの撮影地。座標と Google マップナビ付き。"
+    },
+    "koto-tokyo": {
+      "title": "東京都江東区 アニメ聖地巡礼マップ｜ラブライブ！虹ヶ咲学園スクールアイドル同好会・踊る大捜査線（橋ほか） | AniGuessr",
+      "description": "東京都江東区のアニメ聖地巡礼：橋、ラブライブ！虹ヶ咲学園スクールアイドル同好会、踊る大捜査線、『恋と選挙とチョコレート』 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "uji-kyoto": {
+      "title": "宇治市 アニメ聖地巡礼マップ｜響け！ユーフォニアム・響け！ユーフォニアム2（橘橋ほか） | AniGuessr",
+      "description": "宇治市のアニメ聖地巡礼：橘橋、響け！ユーフォニアム、響け！ユーフォニアム2、響け！ユーフォニアム 3 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "gifu-gifu": {
+      "title": "岐阜市 アニメ聖地巡礼マップ｜小市民シリーズ 第2期・小市民シリーズ（交差点ほか） | AniGuessr",
+      "description": "岐阜市のアニメ聖地巡礼：交差点、小市民シリーズ 第2期、小市民シリーズ、安達としまむら などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kyoto-kyoto-26103": {
+      "title": "京都市左京区 アニメ聖地巡礼マップ｜けいおん!!・けいおん！（石垣ほか） | AniGuessr",
+      "description": "京都市左京区のアニメ聖地巡礼：石垣、けいおん!!、けいおん！、であいもん などの撮影地。座標と Google マップナビ付き。"
+    },
+    "suginami-tokyo": {
+      "title": "東京都杉並区 アニメ聖地巡礼マップ｜SSSS.GRIDMAN・輪るピングドラム（壁ほか） | AniGuessr",
+      "description": "東京都杉並区のアニメ聖地巡礼：壁、SSSS.GRIDMAN、輪るピングドラム、アクセル・ワールド などの撮影地。座標と Google マップナビ付き。"
+    },
+    "chuo-tokyo": {
+      "title": "東京都中央区 アニメ聖地巡礼マップ｜江戸前エルフ・アポカリプスホテル（月島ほか） | AniGuessr",
+      "description": "東京都中央区のアニメ聖地巡礼：月島、江戸前エルフ、アポカリプスホテル、ネガポジアングラー などの撮影地。座標と Google マップナビ付き。"
+    },
+    "nishinomiya-hyogo": {
+      "title": "西宮市 アニメ聖地巡礼マップ｜涼宮ハルヒの憂鬱（2009年版）・涼宮ハルヒの消失（踏切ほか） | AniGuessr",
+      "description": "西宮市のアニメ聖地巡礼：踏切、涼宮ハルヒの憂鬱（2009年版）、涼宮ハルヒの消失、長門有希ちゃんの消失 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "hachioji-tokyo": {
+      "title": "八王子市 アニメ聖地巡礼マップ｜日々は過ぎれど飯うまし・Re:ステージ! ドリームデイズ♪（水門ほか） | AniGuessr",
+      "description": "八王子市のアニメ聖地巡礼：水門、日々は過ぎれど飯うまし、Re:ステージ! ドリームデイズ♪、ヤマノススメ などの撮影地。座標と Google マップナビ付き。"
+    },
+    "setagaya-tokyo": {
+      "title": "東京都世田谷区 アニメ聖地巡礼マップ｜イエスタデイをうたって・ぼっち・ざ・ろっく！（五差路ほか） | AniGuessr",
+      "description": "東京都世田谷区のアニメ聖地巡礼：五差路、イエスタデイをうたって、ぼっち・ざ・ろっく！、デッドデッドデーモンズデデデデデストラクション などの撮影地。座標と Google マップナビ付き。"
+    },
+    "taito-tokyo": {
+      "title": "東京都台東区 アニメ聖地巡礼マップ｜五等分の花嫁 ～彼女と交わす五つの約束～・さらざんまい（交番ほか） | AniGuessr",
+      "description": "東京都台東区のアニメ聖地巡礼：交番、五等分の花嫁 ～彼女と交わす五つの約束～、さらざんまい、昭和元禄落語心中 などの撮影地。座標と Google マップナビ付き。"
+    },
+    "yokohama-kanagawa-14104": {
+      "title": "横浜市中区 アニメ聖地巡礼マップ｜青春ブタ野郎はサンタクロースの夢を見ない・五等分の花嫁（新港橋ほか） | AniGuessr",
+      "description": "横浜市中区のアニメ聖地巡礼：新港橋、青春ブタ野郎はサンタクロースの夢を見ない、五等分の花嫁、文豪ストレイドッグス などの撮影地。座標と Google マップナビ付き。"
+    },
+    "numazu-shizuoka": {
+      "title": "沼津市 アニメ聖地巡礼マップ｜ラブライブ! サンシャイン!! 2期・ラブライブ! サンシャイン!!（商店街ほか） | AniGuessr",
+      "description": "沼津市のアニメ聖地巡礼：商店街、ラブライブ! サンシャイン!! 2期、ラブライブ! サンシャイン!!、ラブライブ!サンシャイン!! The School Idol Movie Over the Rainbow などの撮影地。座標と Google マップナビ付き。"
+    },
+    "musashino-tokyo": {
+      "title": "武蔵野市 アニメ聖地巡礼マップ｜じょしらく・マリア様がみてる（松亭ほか） | AniGuessr",
+      "description": "武蔵野市のアニメ聖地巡礼：松亭、じょしらく、マリア様がみてる、SHIROBAKO などの撮影地。座標と Google マップナビ付き。"
+    },
+    "atami-shizuoka": {
+      "title": "熱海市 アニメ聖地巡礼マップ｜綺麗にしてもらえますか。・うぽって!!（交差点ほか） | AniGuessr",
+      "description": "熱海市のアニメ聖地巡礼：交差点、綺麗にしてもらえますか。、うぽって!!、あまんちゅ！ などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kyoto-kyoto-26105": {
+      "title": "京都市東山区 アニメ聖地巡礼マップ｜有頂天家族2・有頂天家族（祇園ほか） | AniGuessr",
+      "description": "京都市東山区のアニメ聖地巡礼：祇園、有頂天家族2、有頂天家族、みツわの などの撮影地。座標と Google マップナビ付き。"
+    },
+    "kyoto-kyoto-26106": {
+      "title": "京都市下京区 アニメ聖地巡礼マップ｜有頂天家族・五等分の花嫁（鴨川ほか） | AniGuessr",
+      "description": "京都市下京区のアニメ聖地巡礼：鴨川、有頂天家族、五等分の花嫁、であいもん などの撮影地。座標と Google マップナビ付き。"
+    }
   }
 }

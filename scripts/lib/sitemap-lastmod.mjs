@@ -42,9 +42,10 @@ export function parseSitemapLastmods(xml) {
  */
 export function lastmodForPath(
   path,
-  { previous, changed, changedOn, fallback },
+  { previous, changed, changedOn, contentChanged, contentChangedOn, fallback },
 ) {
   if (changed.has(path)) return changedOn;
+  if (contentChanged?.has(path)) return contentChangedOn ?? changedOn;
   return previous.get(path) ?? fallback;
 }
 

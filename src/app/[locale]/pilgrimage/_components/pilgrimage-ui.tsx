@@ -95,9 +95,13 @@ export function PilgrimageCard({
   );
 }
 
+/** First N spots use the rich list card; the rest stay crawlable as compact links. */
+export const LOCATION_SPOT_LIST_FEATURED = 48;
+
 export function PilgrimageSpotList({
   locale,
   spots,
+  featuredCount = LOCATION_SPOT_LIST_FEATURED,
 }: {
   locale: PilgrimageLocale;
   spots: Array<{
@@ -106,6 +110,7 @@ export function PilgrimageSpotList({
     title: string;
     subtitle: string;
   }>;
+  featuredCount?: number;
 }) {
   const copy = getPilgrimageCopy(locale);
   if (spots.length === 0) {
@@ -116,23 +121,50 @@ export function PilgrimageSpotList({
     );
   }
 
+  const featured = spots.slice(0, featuredCount);
+  const rest = spots.slice(featuredCount);
+
   return (
-    <ol className="grid gap-2">
-      <DeferPaint>
-        {spots.map((spot) => (
-          <li key={spot.id}>
-            <Link
-              href={spot.href}
-              className="block rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-cyan-200/30 hover:bg-white/10"
-            >
-              <span className="block font-bold text-white">{spot.title}</span>
-              <span className="mt-1 block text-sm text-pink-100/65">
-                {spot.subtitle}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </DeferPaint>
-    </ol>
+    <>
+      <ol className="grid gap-2">
+        <DeferPaint>
+          {featured.map((spot) => (
+            <li key={spot.id}>
+              <Link
+                href={spot.href}
+                className="block rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-cyan-200/30 hover:bg-white/10"
+              >
+                <span className="block font-bold text-white">{spot.title}</span>
+                <span className="mt-1 block text-sm text-pink-100/65">
+                  {spot.subtitle}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </DeferPaint>
+      </ol>
+      {rest.length > 0 ? (
+        <nav
+          className="mt-6 border-t border-white/10 pt-4"
+          aria-label={copy.locationSpotIndex}
+        >
+          <p className="mb-3 text-xs font-bold tracking-wide text-pink-100/55 uppercase">
+            {copy.locationSpotIndexMore(rest.length)}
+          </p>
+          <ul className="columns-1 gap-x-6 sm:columns-2 lg:columns-3">
+            {rest.map((spot) => (
+              <li key={spot.id} className="mb-1.5 break-inside-avoid">
+                <Link
+                  href={spot.href}
+                  className="text-sm text-cyan-100/85 hover:text-cyan-50"
+                >
+                  {spot.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </>
   );
 }

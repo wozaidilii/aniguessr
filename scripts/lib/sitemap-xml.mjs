@@ -63,18 +63,22 @@ export function buildLocalizedSitemapEntries(
   lastModified,
   options = {},
 ) {
-  const languages = Object.fromEntries(
-    ANIME_LOCALES.map((locale) => [
-      locale,
-      `${origin}${withLocale(path, locale)}`,
-    ]),
-  );
-  languages["x-default"] = `${origin}${withLocale(path, DEFAULT_LOCALE)}`;
+  const zhUrl = `${origin}${withLocale(path, "zh")}`;
+  const languages = {
+    "zh-Hans": zhUrl,
+    "zh-CN": zhUrl,
+    "zh-SG": zhUrl,
+    ja: `${origin}${withLocale(path, "ja")}`,
+    en: `${origin}${withLocale(path, "en")}`,
+    "x-default": `${origin}${withLocale(path, DEFAULT_LOCALE)}`,
+  };
   const locales = [...ANIME_LOCALES];
   if (options.zhTw) {
     const zhTwUrl = `${origin}${withLocale(path, "zh-tw")}`;
     languages["zh-Hant"] = zhTwUrl;
     languages["zh-TW"] = zhTwUrl;
+    languages["zh-HK"] = zhTwUrl;
+    languages["zh-MO"] = zhTwUrl;
     locales.push("zh-tw");
   }
   return locales.map((locale) => ({
@@ -108,6 +112,8 @@ export function buildZhTwOnlySitemapEntries(
       languages: {
         "zh-Hant": loc,
         "zh-TW": loc,
+        "zh-HK": loc,
+        "zh-MO": loc,
       },
     },
   ];

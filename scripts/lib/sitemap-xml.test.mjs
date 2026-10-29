@@ -48,9 +48,13 @@ describe("static sitemap XML", () => {
         "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
       );
       expect(entry.languages["zh-TW"]).toBe(entry.languages["zh-Hant"]);
-      expect(entry.languages.zh).toBe(
+      expect(entry.languages["zh-HK"]).toBe(entry.languages["zh-Hant"]);
+      expect(entry.languages["zh-MO"]).toBe(entry.languages["zh-Hant"]);
+      expect(entry.languages["zh-Hans"]).toBe(
         "https://aniguessr.ayiora.com/zh/pilgrimage/locations/fujisawa-kanagawa",
       );
+      expect(entry.languages["zh-CN"]).toBe(entry.languages["zh-Hans"]);
+      expect(entry.languages["zh-SG"]).toBe(entry.languages["zh-Hans"]);
     }
 
     const uncovered = buildLocalizedSitemapEntries(
@@ -81,13 +85,15 @@ describe("static sitemap XML", () => {
       "https://aniguessr.ayiora.com/zh-tw/rights",
     ]);
     for (const entry of entries) {
-      expect(entry.languages.zh).toBe("https://aniguessr.ayiora.com/zh/rights");
+      expect(entry.languages["zh-Hans"]).toBe("https://aniguessr.ayiora.com/zh/rights");
+      expect(entry.languages["zh-CN"]).toBe(entry.languages["zh-Hans"]);
       expect(entry.languages.ja).toBe("https://aniguessr.ayiora.com/ja/rights");
       expect(entry.languages.en).toBe("https://aniguessr.ayiora.com/en/rights");
       expect(entry.languages["zh-Hant"]).toBe(
         "https://aniguessr.ayiora.com/zh-tw/rights",
       );
       expect(entry.languages["zh-TW"]).toBe(entry.languages["zh-Hant"]);
+      expect(entry.languages["zh-HK"]).toBe(entry.languages["zh-Hant"]);
       expect(entry.languages["x-default"]).toBe(
         "https://aniguessr.ayiora.com/en/rights",
       );
