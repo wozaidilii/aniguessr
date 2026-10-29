@@ -6,6 +6,7 @@ import {
   HOME_FOCUS_WORK_EVENT,
   HOME_MAP_ACTIVE_EVENT,
   HOME_ORIGIN_EVENT,
+  HOME_REPUBLISH_BOUNDS_EVENT,
   signalHomeMapGesture,
   type HomeFocusWorkDetail,
   type HomeOriginDetail,
@@ -32,8 +33,7 @@ import {
   tuneHomeMapStyle,
 } from "~/lib/home-map-style";
 import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
-import { buildHomeBoundsDetail } from "~/lib/home-map-bounds-publish";
-import { publishHomeBoundsDetail } from "~/lib/home-bounds-store";
+import { publishHomeMapBounds } from "~/lib/home-map-bounds-publish";
 import {
   injectGoogleMapTilesPreconnect,
 } from "~/lib/google-map-basemap-placeholder";
@@ -142,6 +142,13 @@ function homeMapPadding(map: maplibregl.Map): {
   };
 }
 
+function openFreeMapAttributionOptions(): maplibregl.AttributionControlOptions {
+  const compact =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 1023px)").matches;
+  return { compact };
+}
+
 export function HomeMap({ locale }: { locale: HomeLocale }) {
   const copy = getHomePageCopy(locale);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -184,16 +191,16 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     mapRef.current = map;
     let openFreeMapAttribution: maplibregl.AttributionControl | undefined;
     if (!attemptGoogleBasemap) {
-      openFreeMapAttribution = new maplibregl.AttributionControl({
-        compact: true,
-      });
+      openFreeMapAttribution = new maplibregl.AttributionControl(
+        openFreeMapAttributionOptions(),
+      );
       map.addControl(openFreeMapAttribution, "bottom-left");
     }
     const ensureOpenFreeMapAttribution = (): void => {
       if (openFreeMapAttribution) return;
-      openFreeMapAttribution = new maplibregl.AttributionControl({
-        compact: true,
-      });
+      openFreeMapAttribution = new maplibregl.AttributionControl(
+        openFreeMapAttributionOptions(),
+      );
       try {
         map.addControl(openFreeMapAttribution, "bottom-left");
       } catch {
@@ -314,7 +321,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           animate: false,
         });
       }
-      publishBounds(map);
+      publishHomeMapBounds(map);
       mapRef.current = map;
       ensureYou();
 
@@ -365,7 +372,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       }
     });
     map.on("moveend", () => {
-      publishBounds(map);
+      publishHomeMapBounds(map);
       ensureYou();
     });
     map.on("dragstart", () => {
@@ -549,9 +556,14 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       setHomeTileLoading(map, active);
     }
 
+    function onRepublishBounds() {
+      publishHomeMapBounds(map);
+    }
+
     window.addEventListener(HOME_ORIGIN_EVENT, onOrigin);
     window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
     window.addEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
+    window.addEventListener(HOME_REPUBLISH_BOUNDS_EVENT, onRepublishBounds);
     window.addEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
     window.addEventListener("storage", onFavorites);
     ensureYou();
@@ -593,6 +605,9 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         lastBottom = padding.bottom;
         map.easeTo({
           center: [origin.lng, origin.lat],
+          zoom: map.getZoom(),
+          bearing: map.getBearing(),
+          pitch: map.getPitch(),
           padding,
           duration: prefersReducedMotion() ? 0 : 450,
         });
@@ -617,6 +632,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       window.removeEventListener(HOME_ORIGIN_EVENT, onOrigin);
       window.removeEventListener(HOME_FOCUS_WORK_EVENT, onFocusWork);
       window.removeEventListener(HOME_MAP_ACTIVE_EVENT, onMapActive);
+      window.removeEventListener(HOME_REPUBLISH_BOUNDS_EVENT, onRepublishBounds);
       window.removeEventListener(FAVORITES_CHANGED_EVENT, onFavorites);
       window.removeEventListener("storage", onFavorites);
       observer.disconnect();
@@ -716,10 +732,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       ) : null}
     </div>
   );
-}
-
-function publishBounds(map: maplibregl.Map) {
-  publishHomeBoundsDetail(buildHomeBoundsDetail(map));
 }
 
 function showPopup(

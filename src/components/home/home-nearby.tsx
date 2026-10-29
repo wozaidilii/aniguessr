@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   HOME_BOUNDS_EVENT,
   HOME_FOCUS_WORK_EVENT,
+  HOME_REPUBLISH_BOUNDS_EVENT,
   readHomeFocusWork,
   type HomeBoundsDetail,
   type HomeFocusWorkDetail,
@@ -132,6 +133,11 @@ export function HomeNearby({
       root.style.removeProperty("--home-sheet-height");
     };
   }, [variant, open, spots]);
+
+  useEffect(() => {
+    if (variant !== "sheet") return;
+    window.dispatchEvent(new CustomEvent(HOME_REPUBLISH_BOUNDS_EVENT));
+  }, [open, variant]);
 
   const title = copy.aroundCount(inView);
   const nearbyHref = withPilgrimageLocale("/", locale);
