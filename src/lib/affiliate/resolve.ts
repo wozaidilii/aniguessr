@@ -1,3 +1,5 @@
+import "server-only";
+
 import { shouldRenderAffiliateBlock } from "~/lib/affiliate/config";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import {
