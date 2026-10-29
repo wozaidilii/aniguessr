@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
+import { resolveAffiliatePage } from "~/lib/affiliate/resolve";
 import {
   formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
@@ -168,6 +169,16 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
   const samePlace = samePlaceSections(spot, locale);
 
+  const affiliateInput = {
+    pageType: "spot" as const,
+    locale,
+    spotId: spot.id,
+    areaLabel: location,
+    lat: spot.lat,
+    lng: spot.lng,
+  };
+  const affiliatePage = resolveAffiliatePage(affiliateInput);
+
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
   const jsonLd = buildTouristAttractionJsonLd({
@@ -189,11 +200,14 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       locale={locale}
       kicker={copy.spotDetail}
       title={copy.seoSpotTitle(anime, place)}
+      affiliateDisclosure={
+        affiliatePage ? copy.affiliateDisclosure : undefined
+      }
     >
       <JsonLd data={jsonLd} />
 
-      <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="anime-panel p-5 sm:p-6">
+      <article className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
+        <div className="anime-panel order-1 p-5 sm:p-6 lg:col-start-1 lg:row-start-1">
           {imageUrl ? (
             <figure className="mb-5">
               {/* Decorative: the scene title and caption name the work. */}
@@ -271,18 +285,9 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               </ul>
             </section>
           ) : null}
-
-          <AffiliateBlock
-            pageType="spot"
-            locale={locale}
-            spotId={spot.id}
-            areaLabel={location}
-            lat={spot.lat}
-            lng={spot.lng}
-          />
         </div>
 
-        <aside className="anime-panel h-fit p-5">
+        <aside className="anime-panel order-2 h-fit p-5 lg:col-start-2 lg:row-start-1">
           <dl className="grid gap-4 text-sm">
             <div>
               <dt className="text-xs font-bold text-pink-100/60">
@@ -365,6 +370,12 @@ export default async function PilgrimageSpotPage({ params }: Props) {
             </Link>
           </div>
         </aside>
+
+        {affiliatePage ? (
+          <div className="order-3 lg:col-start-1 lg:row-start-2">
+            <AffiliateBlock {...affiliateInput} />
+          </div>
+        ) : null}
       </article>
     </PilgrimageShell>
   );

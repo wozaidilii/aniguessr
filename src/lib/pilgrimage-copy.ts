@@ -74,6 +74,7 @@ export const PILGRIMAGE_COPY: Record<
     affiliatePrLabel: string;
     affiliateDisclosure: string;
     affiliateTitle: string;
+    affiliateTitleLocation: string;
     affiliateHotelLink: string;
     affiliateTourLink: string;
   }
@@ -150,10 +151,12 @@ export const PILGRIMAGE_COPY: Record<
     favoriteBadge: "想去",
     formatDistance: (km) => formatDistanceLabel(km, "zh"),
     affiliatePrLabel: "PR",
-    affiliateDisclosure: "TODO(Marketing): 本页含广告（联盟链接）。",
-    affiliateTitle: "TODO(Marketing): 附近住宿与行程",
-    affiliateHotelLink: "TODO(Marketing): 搜索附近住宿",
-    affiliateTourLink: "TODO(Marketing): 搜索附近行程与门票",
+    affiliateDisclosure:
+      "本页含联盟链接，通过链接预订时本站可能获得佣金。",
+    affiliateTitle: "附近住宿／行程",
+    affiliateTitleLocation: "这一带的住宿／行程",
+    affiliateHotelLink: "查看附近住宿",
+    affiliateTourLink: "查看附近行程",
   },
   ja: {
     siteKicker: "聖地巡礼アーカイブ",
@@ -231,10 +234,11 @@ export const PILGRIMAGE_COPY: Record<
     formatDistance: (km) => formatDistanceLabel(km, "ja"),
     affiliatePrLabel: "PR",
     affiliateDisclosure:
-      "TODO(Marketing): 本ページはプロモーションが含まれています。",
-    affiliateTitle: "TODO(Marketing): 近くの宿泊・行程",
-    affiliateHotelLink: "TODO(Marketing): 近くの宿を探す",
-    affiliateTourLink: "TODO(Marketing): 近くの体験・チケット",
+      "このページにはアフィリエイトリンクが含まれます。予約により当サイトが報酬を受け取ることがあります。",
+    affiliateTitle: "周辺の宿・ツアー",
+    affiliateTitleLocation: "このエリアの宿・ツアー",
+    affiliateHotelLink: "周辺の宿を見る",
+    affiliateTourLink: "周辺のツアーを見る",
   },
   en: {
     siteKicker: "Pilgrimage Archive",
@@ -313,10 +317,12 @@ export const PILGRIMAGE_COPY: Record<
     favoriteBadge: "Favorite",
     formatDistance: (km) => formatDistanceLabel(km, "en"),
     affiliatePrLabel: "PR",
-    affiliateDisclosure: "TODO(Marketing): Ad · We may earn a commission.",
-    affiliateTitle: "TODO(Marketing): Stays and activities nearby",
-    affiliateHotelLink: "TODO(Marketing): Find nearby stays",
-    affiliateTourLink: "TODO(Marketing): Browse tours and tickets",
+    affiliateDisclosure:
+      "This page contains affiliate links. We may earn a commission if you book through them.",
+    affiliateTitle: "Stays & tours nearby",
+    affiliateTitleLocation: "Stays & tours in this area",
+    affiliateHotelLink: "See stays nearby",
+    affiliateTourLink: "See tours nearby",
   },
   // OpenCC s2twp of the zh block, plus scripts/data/zh-tw-overrides.json.
   // Committed so the client bundle does not import opencc.
@@ -392,10 +398,12 @@ export const PILGRIMAGE_COPY: Record<
     favoriteBadge: "想去",
     formatDistance: (km) => formatDistanceLabel(km, "zh-tw"),
     affiliatePrLabel: "PR",
-    affiliateDisclosure: "TODO(Marketing): 本頁含廣告（聯盟連結）。",
-    affiliateTitle: "TODO(Marketing): 附近住宿與行程",
-    affiliateHotelLink: "TODO(Marketing): 搜尋附近住宿",
-    affiliateTourLink: "TODO(Marketing): 搜尋附近行程與門票",
+    affiliateDisclosure:
+      "本頁含聯盟連結，透過連結預訂時本站可能獲得佣金。",
+    affiliateTitle: "附近住宿／行程",
+    affiliateTitleLocation: "這一帶的住宿／行程",
+    affiliateHotelLink: "查看附近住宿",
+    affiliateTourLink: "查看附近行程",
   },
 };
 
