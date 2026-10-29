@@ -3,7 +3,6 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
 import { resolveAffiliatePage } from "~/lib/affiliate/resolve";
-import { shouldSuppressAffiliatePilotScreenshots } from "~/lib/affiliate/pilot-media";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { spotPlaceName } from "~/lib/spot-name-overrides";
@@ -13,7 +12,7 @@ import { locationDocumentSeo } from "~/lib/location-meta-overrides";
 import { buildLocationPageSeo } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { withPilgrimageOg, withHomeOg } from "~/lib/og/metadata";
+import { withPilgrimageOg } from "~/lib/og/metadata";
 import { emptyAreaOutcome } from "~/lib/empty-area";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildPlaceCollectionJsonLd } from "~/lib/structured-data";
@@ -106,12 +105,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     seo.description,
     true,
   );
-  const suppressScreenshots = shouldSuppressAffiliatePilotScreenshots({
-    locationSlug: resolved.location.slug,
-  });
-  if (suppressScreenshots) {
-    return withHomeOg(metadata, locale, { staticArt: true });
-  }
   const og = loadLocationOg(locale, resolved.location.slug);
   if (og.status !== "ready") return metadata;
   return withPilgrimageOg(
