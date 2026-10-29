@@ -10,6 +10,9 @@ export const SITEMAP_BASELINE_LASTMOD = "2026-10-21";
  */
 export const SITEMAP_CONTENT_LASTMOD = "2026-10-23";
 
+/** Affiliate pilot go-live: allowlisted pilgrimage URLs and /privacy. */
+export const SITEMAP_AFFILIATE_PILOT_LASTMOD = "2026-10-29";
+
 /** Pathname without the locale prefix, so sitemap locs compare to route paths. */
 export function sitemapPathname(loc) {
   const url = new URL(loc);
@@ -42,8 +45,18 @@ export function parseSitemapLastmods(xml) {
  */
 export function lastmodForPath(
   path,
-  { previous, changed, changedOn, contentChanged, contentChangedOn, fallback },
+  {
+    previous,
+    changed,
+    changedOn,
+    contentChanged,
+    contentChangedOn,
+    affiliatePilot,
+    affiliatePilotOn,
+    fallback,
+  },
 ) {
+  if (affiliatePilot?.has(path)) return affiliatePilotOn ?? changedOn;
   if (changed.has(path)) return changedOn;
   if (contentChanged?.has(path)) return contentChangedOn ?? changedOn;
   return previous.get(path) ?? fallback;
@@ -123,6 +136,25 @@ export function contentChangedSitemapPaths(ids, spots, membershipPaths = []) {
   const changed = renamedSpotPaths(ids, spots);
   for (const route of membershipPaths) {
     if (typeof route === "string" && route.startsWith("/")) changed.add(route);
+  }
+  return changed;
+}
+
+/**
+ * Spot, area, and pilgrimage URLs in the affiliate pilot allowlist, plus /privacy.
+ * @param {{ spots?: string[], locations?: string[] }} allowlist
+ */
+export function affiliatePilotSitemapPaths(allowlist) {
+  const changed = new Set(["/privacy"]);
+  for (const slug of allowlist?.locations ?? []) {
+    if (typeof slug === "string" && slug) {
+      changed.add(`/pilgrimage/locations/${slug}`);
+    }
+  }
+  for (const id of allowlist?.spots ?? []) {
+    if (typeof id === "string" && id) {
+      changed.add(`/pilgrimage/spots/${encodeURIComponent(id)}`);
+    }
   }
   return changed;
 }

@@ -8,7 +8,7 @@ import {
   PRIVACY_POLICY_TITLES,
 } from "~/lib/privacy-policy-content";
 
-export const PRIVACY_EFFECTIVE_DATE_LABEL = "2026-10-21";
+export const PRIVACY_EFFECTIVE_DATE_LABEL = "2026-10-29";
 
 /** zh-TW keeps its own text. If that text is missing, simplified Chinese, then English. */
 export function privacyLocaleChain(

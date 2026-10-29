@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadMunicipalities, locateMunicipality } from "./japan-area.mjs";
 import { pilgrimagePageMetadata } from "../../src/lib/seo.ts";
-import { pathsForRenamedSpots } from "./sitemap-lastmod.mjs";
+import { pathsForRenamedSpots, affiliatePilotSitemapPaths } from "./sitemap-lastmod.mjs";
 import knownSlugs from "../../src/lib/pilgrimage-known-slugs.json" with { type: "json" };
 
 loadMunicipalities(
@@ -108,6 +108,18 @@ describe("rewritten question labels and pilgrimage pages", () => {
     for (const route of pathsForRenamedSpots([...zhTwPlaceIds], navSpots)) {
       bumpedPaths.add(route);
     }
+    let affiliatePilotPaths = new Set();
+    try {
+      const allowlist = JSON.parse(
+        readFileSync(
+          path.join(process.cwd(), "data/affiliate-allowlist.json"),
+          "utf8",
+        ),
+      );
+      affiliatePilotPaths = affiliatePilotSitemapPaths(allowlist);
+    } catch {
+      affiliatePilotPaths = new Set();
+    }
     const renamed = new Set(
       (fixes.names?.fixes ?? []).map((row) => String(row.id)),
     );
@@ -146,7 +158,9 @@ describe("rewritten question labels and pilgrimage pages", () => {
         const spotId = pathname.startsWith("/pilgrimage/spots/")
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
           : "";
-        if (renamed.has(spotId) || copyIds.has(spotId)) {
+        if (affiliatePilotPaths.has(pathname)) {
+          expect(lastmod).toBe("2026-10-29");
+        } else if (renamed.has(spotId) || copyIds.has(spotId)) {
           expect(lastmod).toBe("2026-10-23");
           bumped.add(spotId);
         } else if (bumpedPaths.has(pathname)) {

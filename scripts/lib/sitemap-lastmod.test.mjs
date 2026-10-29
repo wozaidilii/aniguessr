@@ -5,8 +5,10 @@ import {
   lastmodForPath,
   parseSitemapLastmods,
   pathsForRenamedSpots,
+  affiliatePilotSitemapPaths,
   contentChangedSitemapPaths,
   renamedSpotPaths,
+  SITEMAP_AFFILIATE_PILOT_LASTMOD,
   SITEMAP_CONTENT_LASTMOD,
 } from "./sitemap-lastmod.mjs";
 
@@ -196,6 +198,44 @@ describe("sitemap lastmod", () => {
         fallback: "2026-10-21",
       }),
     ).toBe("2026-10-21");
+  });
+
+  it("bumps affiliate pilot routes ahead of copy-edit lastmod", () => {
+    const pilot = affiliatePilotSitemapPaths({
+      locations: ["kamakura-kanagawa"],
+      spots: ["anitabi_100444_51i51yooo"],
+    });
+    const changed = new Set(["/pilgrimage/spots/anitabi_100444_51i51yooo"]);
+    expect(
+      lastmodForPath("/pilgrimage/spots/anitabi_100444_51i51yooo", {
+        previous: new Map(),
+        changed,
+        changedOn: SITEMAP_CONTENT_LASTMOD,
+        affiliatePilot: pilot,
+        affiliatePilotOn: SITEMAP_AFFILIATE_PILOT_LASTMOD,
+        fallback: "2026-10-21",
+      }),
+    ).toBe("2026-10-29");
+    expect(
+      lastmodForPath("/pilgrimage/spots/not-in-pilot", {
+        previous: new Map(),
+        changed,
+        changedOn: SITEMAP_CONTENT_LASTMOD,
+        affiliatePilot: pilot,
+        affiliatePilotOn: SITEMAP_AFFILIATE_PILOT_LASTMOD,
+        fallback: "2026-10-21",
+      }),
+    ).toBe("2026-10-21");
+    expect(
+      lastmodForPath("/privacy", {
+        previous: new Map([["/privacy", "2026-10-21"]]),
+        changed: new Set(),
+        changedOn: SITEMAP_CONTENT_LASTMOD,
+        affiliatePilot: pilot,
+        affiliatePilotOn: SITEMAP_AFFILIATE_PILOT_LASTMOD,
+        fallback: "2026-10-21",
+      }),
+    ).toBe("2026-10-29");
   });
 
   it("marks the spot, its area page, and its work page", () => {

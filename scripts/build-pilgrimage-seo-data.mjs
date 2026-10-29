@@ -34,11 +34,13 @@ import {
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 import {
+  affiliatePilotSitemapPaths,
   contentChangedSitemapPaths,
   indexableLocations,
   lastmodForPath,
   parseSitemapLastmods,
   pathsForRenamedSpots,
+  SITEMAP_AFFILIATE_PILOT_LASTMOD,
   SITEMAP_BASELINE_LASTMOD,
   SITEMAP_CONTENT_LASTMOD,
 } from "./lib/sitemap-lastmod.mjs";
@@ -861,6 +863,18 @@ async function main() {
   } catch {
     // optional zh-TW display-name overrides
   }
+  let affiliatePilotPaths = new Set();
+  try {
+    const allowlist = JSON.parse(
+      await readFile(
+        path.join(process.cwd(), "data/affiliate-allowlist.json"),
+        "utf8",
+      ),
+    );
+    affiliatePilotPaths = affiliatePilotSitemapPaths(allowlist);
+  } catch {
+    affiliatePilotPaths = new Set();
+  }
   const unchangedFallback = SITEMAP_BASELINE_LASTMOD;
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
@@ -878,6 +892,8 @@ async function main() {
           changedOn,
           contentChanged: contentChangedPaths,
           contentChangedOn: step1LastmodOn,
+          affiliatePilot: affiliatePilotPaths,
+          affiliatePilotOn: SITEMAP_AFFILIATE_PILOT_LASTMOD,
           fallback: unchangedFallback,
         }),
         { zhTw: Boolean(item.zhTw) },
