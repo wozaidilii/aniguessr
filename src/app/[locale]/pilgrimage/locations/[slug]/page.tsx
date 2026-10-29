@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { PlannerLink } from "~/components/travel/planner-link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
@@ -179,6 +180,7 @@ export default async function PilgrimageLocationPage({ params }: Props) {
       }
     >
       <JsonLd data={jsonLd} />
+      <PlannerLink locale={locale} area={location.slug} />
       <PilgrimageMapPanel locale={locale} locationSlug={location.slug} />
       <NearbySpots locale={locale} />
       {affiliatePage ? <AffiliateBlock {...affiliateInput} /> : null}

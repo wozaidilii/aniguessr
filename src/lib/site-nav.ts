@@ -3,7 +3,7 @@ import type { HomeLocale } from "~/lib/home-locale";
 import { splitLocalePath, withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 export interface SiteNavLink {
-  id: "anime" | "areas" | "game" | "rank";
+  id: "anime" | "areas" | "planner" | "game" | "rank";
   href: string;
 }
 
@@ -33,6 +33,7 @@ export function siteNavModel(
         id: "areas",
         href: withPilgrimageLocale("/pilgrimage/locations", locale),
       },
+      { id: "planner", href: withPilgrimageLocale("/pilgrimage/planner", locale) },
       { id: "game", href: onHome ? "#game" : `${home}#game` },
       { id: "rank", href: onHome ? "#rank" : `${home}#rank` },
     ],

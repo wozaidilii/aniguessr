@@ -128,7 +128,7 @@ function parseCsvLine(line: string): string[] {
 }
 
 export function parseSamePlaceGroupsCsv(csv: string): SamePlaceGroupRow[] {
-  const lines = csv.trim().split(/\n/u);
+  const lines = csv.trim().split(/\r?\n/u);
   const header = lines[0];
   if (header !== "group_id,spot_ids,names,works,max_distance_m") {
     throw new Error("Unexpected same-place CSV header");

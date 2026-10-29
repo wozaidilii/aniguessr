@@ -17,13 +17,27 @@ const ENOSHIMA_IDS = [
 ];
 
 describe("same-place group export", () => {
+  it.each(["\n", "\r\n"])("reads CSV with %j line endings", (newline) => {
+    const rows = [
+      {
+        groupId: "spot-a",
+        spotIds: ["spot-a", "spot-b"],
+        names: ['A, "station"', "B"],
+        works: ["Work A", "Work B"],
+        maxDistanceM: 12.3,
+      },
+    ];
+    const csv = formatSamePlaceGroupsCsv(rows).replaceAll("\n", newline);
+    expect(parseSamePlaceGroupsCsv(csv)).toEqual(rows);
+  });
+
   it("matches the committed CSV and keeps existing spot ids", () => {
     const catalog = parseNavCatalog(
       JSON.parse(readFileSync("public/data/seo/spots-nav.json", "utf8")),
     );
     const rows = buildSamePlaceGroupRows(catalog);
     const csv = readFileSync(SAME_PLACE_GROUPS_CSV, "utf8");
-    expect(csv).toBe(formatSamePlaceGroupsCsv(rows));
+    expect(csv.replaceAll("\r\n", "\n")).toBe(formatSamePlaceGroupsCsv(rows));
     expect(rows).toHaveLength(1662);
     const enoshima = rows.find((row) =>
       row.spotIds.includes("anitabi_215158_51i53xo8n"),

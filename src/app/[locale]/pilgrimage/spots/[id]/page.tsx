@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { PlannerLink } from "~/components/travel/planner-link";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
@@ -206,6 +207,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
       }
     >
       <JsonLd data={jsonLd} />
+      <PlannerLink locale={locale} spotId={spot.id} />
 
       <article className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
         <div className="anime-panel order-1 p-5 sm:p-6 lg:col-start-1 lg:row-start-1">

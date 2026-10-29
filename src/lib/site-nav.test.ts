@@ -8,6 +8,7 @@ describe("site nav", () => {
     expect(nav.links.map((link) => link.href)).toEqual([
       "/zh/pilgrimage/anime",
       "/zh/pilgrimage/locations",
+      "/zh/pilgrimage/planner",
       "#game",
       "#rank",
     ]);

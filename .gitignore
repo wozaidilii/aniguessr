@@ -9,6 +9,10 @@
 # testing
 /coverage
 
+# Local browser verification artifacts
+/.playwright-cli/
+/output/playwright/
+
 # database
 /prisma/db.sqlite
 /prisma/db.sqlite-journal

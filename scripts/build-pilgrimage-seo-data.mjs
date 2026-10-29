@@ -78,6 +78,7 @@ const PUBLIC_ROUTES = [
   ["/", 1],
   ["/pilgrimage/anime", 0.9],
   ["/pilgrimage/locations", 0.9],
+  ["/pilgrimage/planner", 0.8],
   ["/game", 0.85],
   ["/game/anime", 0.85],
   ["/game/anime-tuxun", 0.8],

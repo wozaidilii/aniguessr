@@ -13,6 +13,7 @@ import {
 } from "~/components/brand/LocaleMenu";
 import { HomeAccount } from "~/components/home/home-account";
 import { getHomePageCopy } from "~/lib/home-page-copy";
+import { getTravelCopy } from "~/lib/travel/copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import {
   siteNavIsCurrent,
@@ -43,6 +44,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const labels = {
     anime: copy.navAnime,
     areas: copy.navAreas,
+    planner: getTravelCopy(locale).nav,
     game: copy.navGame,
     rank: copy.navRank,
   } as const;

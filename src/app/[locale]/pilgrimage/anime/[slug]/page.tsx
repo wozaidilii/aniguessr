@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+import { PlannerLink } from "~/components/travel/planner-link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
@@ -125,6 +126,7 @@ export default async function PilgrimageAnimePage({ params }: Props) {
       description={visibleDescription}
     >
       <JsonLd data={jsonLd} />
+      <PlannerLink locale={locale} animeId={anime.subjectId} />
       {aliases.length > 0 ? (
         <p className="mb-6 text-sm leading-6 text-pink-100/75">
           {copy.alsoKnownAs}
