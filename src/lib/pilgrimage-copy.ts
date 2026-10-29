@@ -69,6 +69,11 @@ export const PILGRIMAGE_COPY: Record<
     streetView: string;
     favoriteBadge: string;
     formatDistance: (km: number) => string;
+    affiliatePrLabel: string;
+    affiliateDisclosure: string;
+    affiliateTitle: string;
+    affiliateHotelLink: string;
+    affiliateTourLink: string;
   }
 > = {
   zh: {
@@ -140,6 +145,11 @@ export const PILGRIMAGE_COPY: Record<
     streetView: "街景",
     favoriteBadge: "想去",
     formatDistance: (km) => formatDistanceLabel(km, "zh"),
+    affiliatePrLabel: "PR",
+    affiliateDisclosure: "TODO(Marketing): 本页含广告（联盟链接）。",
+    affiliateTitle: "TODO(Marketing): 附近住宿与行程",
+    affiliateHotelLink: "TODO(Marketing): 搜索附近住宿",
+    affiliateTourLink: "TODO(Marketing): 搜索附近行程与门票",
   },
   ja: {
     siteKicker: "聖地巡礼アーカイブ",
@@ -213,6 +223,12 @@ export const PILGRIMAGE_COPY: Record<
     streetView: "ストリートビュー",
     favoriteBadge: "行きたい",
     formatDistance: (km) => formatDistanceLabel(km, "ja"),
+    affiliatePrLabel: "PR",
+    affiliateDisclosure:
+      "TODO(Marketing): 本ページはプロモーションが含まれています。",
+    affiliateTitle: "TODO(Marketing): 近くの宿泊・行程",
+    affiliateHotelLink: "TODO(Marketing): 近くの宿を探す",
+    affiliateTourLink: "TODO(Marketing): 近くの体験・チケット",
   },
   en: {
     siteKicker: "Pilgrimage Archive",
@@ -287,6 +303,11 @@ export const PILGRIMAGE_COPY: Record<
     streetView: "Street View",
     favoriteBadge: "Favorite",
     formatDistance: (km) => formatDistanceLabel(km, "en"),
+    affiliatePrLabel: "PR",
+    affiliateDisclosure: "TODO(Marketing): Ad · We may earn a commission.",
+    affiliateTitle: "TODO(Marketing): Stays and activities nearby",
+    affiliateHotelLink: "TODO(Marketing): Find nearby stays",
+    affiliateTourLink: "TODO(Marketing): Browse tours and tickets",
   },
   // OpenCC s2twp of the zh block, plus scripts/data/zh-tw-overrides.json.
   // Committed so the client bundle does not import opencc.
@@ -359,6 +380,11 @@ export const PILGRIMAGE_COPY: Record<
     streetView: "街景服務",
     favoriteBadge: "想去",
     formatDistance: (km) => formatDistanceLabel(km, "zh-tw"),
+    affiliatePrLabel: "PR",
+    affiliateDisclosure: "TODO(Marketing): 本頁含廣告（聯盟連結）。",
+    affiliateTitle: "TODO(Marketing): 附近住宿與行程",
+    affiliateHotelLink: "TODO(Marketing): 搜尋附近住宿",
+    affiliateTourLink: "TODO(Marketing): 搜尋附近行程與門票",
   },
 };
 

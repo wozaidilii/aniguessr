@@ -28,6 +28,7 @@ export const POSTHOG_EVENTS = {
   animeScoreShared: "anime_score_shared",
   animeGameCompleted: "anime_game_completed",
   animeGameTimedOut: "anime_game_timed_out",
+  affiliateLinkClicked: "affiliate_link_clicked",
 } as const;
 
 export type PostHogEventName =
