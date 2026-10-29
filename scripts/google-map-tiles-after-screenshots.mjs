@@ -85,10 +85,35 @@ function waitForServer(url, timeoutMs = 120_000) {
   });
 }
 
+function startNextServer() {
+  const child = spawn("npm", ["run", "start", "--", "-p", String(PORT)], {
+    cwd: ROOT,
+    env: sharedEnv(),
+    stdio: "ignore",
+    detached: true,
+  });
+  child.unref();
+  return child;
+}
+
+function stopNextServer(child) {
+  if (!child?.pid) return;
+  try {
+    process.kill(-child.pid, "SIGTERM");
+  } catch {
+    try {
+      child.kill("SIGTERM");
+    } catch {
+      /* already dead */
+    }
+  }
+}
+
 function createTileMetrics() {
   return {
     createSessionCalls: 0,
     tiles2dRequests: 0,
+    viewportRequests: 0,
     sessionIds: new Set(),
   };
 }
@@ -97,6 +122,10 @@ function trackRequest(metrics, url, method) {
   if (!url.includes("tile.googleapis.com")) return;
   if (method === "POST" && url.includes("/createSession")) {
     metrics.createSessionCalls += 1;
+    return;
+  }
+  if (url.includes("/tile/v1/viewport")) {
+    metrics.viewportRequests += 1;
     return;
   }
   if (url.includes("/v1/2dtiles/")) {
@@ -114,8 +143,15 @@ function metricsSnapshot(metrics) {
   return {
     createSessionCalls: metrics.createSessionCalls,
     tiles2dRequests: metrics.tiles2dRequests,
+    viewportRequests: metrics.viewportRequests,
     distinctSessionPrefixes: [...metrics.sessionIds],
   };
+}
+
+function bindMetrics(context, metrics) {
+  context.on("request", (req) => {
+    trackRequest(metrics, req.url(), req.method());
+  });
 }
 
 async function attachGoogleTileRouting(context) {
@@ -136,6 +172,15 @@ async function waitForHomeMap(page) {
     .waitFor({ state: "visible", timeout: 45_000 })
     .catch(() => undefined);
   await page.waitForTimeout(2500);
+}
+
+async function waitForGoogleAttribution(page) {
+  await page
+    .locator(".google-map-tiles-attribution-text")
+    .first()
+    .waitFor({ state: "attached", timeout: 20_000 })
+    .catch(() => undefined);
+  await page.waitForTimeout(800);
 }
 
 async function screenshotPage(page, fileName, fullPage = false) {
@@ -183,11 +228,7 @@ async function main() {
     await runBuild();
   }
 
-  const server = spawn("npm", ["run", "start", "--", "-p", String(PORT)], {
-    cwd: ROOT,
-    env: sharedEnv(),
-    stdio: "pipe",
-  });
+  const server = startNextServer();
 
   try {
     await waitForServer(`${BASE}/ja`);
@@ -226,9 +267,7 @@ async function main() {
         viewport: { width, height },
       });
       const metrics = createTileMetrics();
-      context.on("request", (req) => {
-        trackRequest(metrics, req.url(), req.method());
-      });
+      bindMetrics(context, metrics);
       await attachGoogleTileRouting(context);
       const page = await context.newPage();
       await page.goto(`${BASE}${pathname}`, {
@@ -240,6 +279,7 @@ async function main() {
       } else {
         await page.waitForTimeout(2500);
       }
+      await waitForGoogleAttribution(page);
       await screenshotPage(
         page,
         file,
@@ -265,59 +305,67 @@ async function main() {
       await context.close();
     }
 
-    const interactContext = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-    });
-    const interactMetrics = createTileMetrics();
-    interactContext.on("request", (req) => {
-      trackRequest(interactMetrics, req.url(), req.method());
-    });
-    await attachGoogleTileRouting(interactContext);
-    const interactPage = await interactContext.newPage();
-    await interactPage.goto(`${BASE}/ja`, {
-      waitUntil: "networkidle",
-      timeout: 120_000,
-    });
-    await waitForHomeMap(interactPage);
-    await panAndZoomHome(interactPage);
-    usage.scenarios.homeInteraction1440Pan5Zoom3 =
-      metricsSnapshot(interactMetrics);
+    {
+      const context = await browser.newContext({
+        viewport: { width: 1440, height: 900 },
+      });
+      const metrics = createTileMetrics();
+      bindMetrics(context, metrics);
+      await attachGoogleTileRouting(context);
+      const page = await context.newPage();
+      await page.goto(`${BASE}/ja`, {
+        waitUntil: "networkidle",
+        timeout: 120_000,
+      });
+      await waitForHomeMap(page);
+      await panAndZoomHome(page);
+      await waitForGoogleAttribution(page);
+      usage.scenarios.homeInteraction1440Pan5Zoom3 =
+        metricsSnapshot(metrics);
+      await context.close();
+    }
 
-    const navMetrics = createTileMetrics();
-    interactContext.on("request", (req) => {
-      trackRequest(navMetrics, req.url(), req.method());
-    });
-    await interactPage.goto(`${BASE}${LOCATION_PATH}`, {
-      waitUntil: "networkidle",
-      timeout: 120_000,
-    });
-    await interactPage.waitForTimeout(2500);
-    await interactPage.goto(`${BASE}${SPOT_PATH}`, {
-      waitUntil: "networkidle",
-      timeout: 120_000,
-    });
-    await interactPage.waitForTimeout(2000);
+    {
+      const context = await browser.newContext({
+        viewport: { width: 1440, height: 900 },
+      });
+      const homeMetrics = createTileMetrics();
+      const navMetrics = createTileMetrics();
+      let phase = "home";
+      context.on("request", (req) => {
+        const target = phase === "home" ? homeMetrics : navMetrics;
+        trackRequest(target, req.url(), req.method());
+      });
+      await attachGoogleTileRouting(context);
+      const page = await context.newPage();
+      await page.goto(`${BASE}/ja`, {
+        waitUntil: "networkidle",
+        timeout: 120_000,
+      });
+      await waitForHomeMap(page);
 
-    const combinedCreateSession =
-      interactMetrics.createSessionCalls + navMetrics.createSessionCalls;
-    const combinedSessions = new Set([
-      ...interactMetrics.sessionIds,
-      ...navMetrics.sessionIds,
-    ]);
-    usage.sessionReuseAcrossNavigations = {
-      createSessionCallsAfterHomeInteraction:
-        interactMetrics.createSessionCalls,
-      createSessionCallsOnPilgrimageNavigation: navMetrics.createSessionCalls,
-      createSessionCallsTotalInSameContext: combinedCreateSession,
-      distinctSessionPrefixesInContext: [...combinedSessions],
-      sessionLikelyReused:
-        navMetrics.createSessionCalls === 0 &&
-        interactMetrics.createSessionCalls <= 1,
-    };
-    usage.scenarios.pilgrimageAndSpotSameContext =
-      metricsSnapshot(navMetrics);
+      phase = "nav";
+      await page.goto(`${BASE}${LOCATION_PATH}`, {
+        waitUntil: "networkidle",
+        timeout: 120_000,
+      });
+      await page.waitForTimeout(2500);
+      await page.goto(`${BASE}${SPOT_PATH}`, {
+        waitUntil: "networkidle",
+        timeout: 120_000,
+      });
+      await page.waitForTimeout(2000);
 
-    await interactContext.close();
+      usage.sessionReuseAcrossNavigations = {
+        homeLoad: metricsSnapshot(homeMetrics),
+        pilgrimageNavigationOnly: metricsSnapshot(navMetrics),
+        sessionLikelyReused:
+          navMetrics.createSessionCalls === 0 &&
+          homeMetrics.createSessionCalls <= 1,
+      };
+      await context.close();
+    }
+
     await browser.close();
 
     await writeFile(
@@ -338,7 +386,7 @@ async function main() {
       ),
     );
   } finally {
-    server.kill("SIGTERM");
+    stopNextServer(server);
   }
 }
 

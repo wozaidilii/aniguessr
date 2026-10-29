@@ -13,11 +13,16 @@ export interface GoogleMapTilesLanguageRegion {
 const SESSION_CACHE_KEY = "aniguessr.googleMapTilesSession.v1";
 const CREATE_SESSION_URL = "https://tile.googleapis.com/v1/createSession";
 const TILE_PATH = "https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}";
-const VIEWPORT_URL = "https://tile.googleapis.com/v1/viewport";
+/** Viewport metadata (copyright) — must use `/tile/v1/viewport`, not `/v1/viewport`. */
+export const GOOGLE_MAP_TILES_VIEWPORT_URL =
+  "https://tile.googleapis.com/tile/v1/viewport";
 
-/** Official logo for third-party renderers (Map Tiles API policies). */
-export const GOOGLE_MAP_TILES_LOGO_URL =
-  "https://developers.google.com/static/maps/documentation/images/google_on_white.png";
+/** Self-hosted Google logo (Map Tiles API attribution policies). */
+export const GOOGLE_MAP_TILES_LOGO_PATH =
+  "/images/maps/google-powered-by-on-white.png";
+
+/** @deprecated Use GOOGLE_MAP_TILES_LOGO_PATH */
+export const GOOGLE_MAP_TILES_LOGO_URL = GOOGLE_MAP_TILES_LOGO_PATH;
 
 interface CachedGoogleMapTilesSession {
   language: string;
@@ -294,6 +299,29 @@ export interface GoogleMapTilesViewportAttribution {
   copyright: string;
 }
 
+export function buildGoogleMapTilesViewportUrl(
+  session: string,
+  apiKey: string,
+  bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+    zoom: number;
+  },
+): string {
+  const params = new URLSearchParams({
+    session,
+    key: apiKey,
+    zoom: String(Math.round(bounds.zoom)),
+    north: String(bounds.north),
+    south: String(bounds.south),
+    east: String(bounds.east),
+    west: String(bounds.west),
+  });
+  return `${GOOGLE_MAP_TILES_VIEWPORT_URL}?${params.toString()}`;
+}
+
 /** Dynamic attribution required by Map Tiles API policies. */
 export async function fetchGoogleMapTilesViewportAttribution(
   session: string,
@@ -306,17 +334,10 @@ export async function fetchGoogleMapTilesViewportAttribution(
     zoom: number;
   },
 ): Promise<GoogleMapTilesViewportAttribution | null> {
-  const params = new URLSearchParams({
-    session,
-    key: apiKey,
-    zoom: String(Math.round(bounds.zoom)),
-    north: String(bounds.north),
-    south: String(bounds.south),
-    east: String(bounds.east),
-    west: String(bounds.west),
-  });
   try {
-    const response = await fetch(`${VIEWPORT_URL}?${params.toString()}`);
+    const response = await fetch(
+      buildGoogleMapTilesViewportUrl(session, apiKey, bounds),
+    );
     if (!response.ok) return null;
     const body = (await response.json()) as { copyright?: string };
     const copyright =

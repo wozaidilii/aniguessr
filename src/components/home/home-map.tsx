@@ -300,7 +300,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
             }
             refreshOverlayLayers();
           },
-          "bottom-left",
+          "home",
         ).then((result) => {
           if (result.applied) activeBasemap = "google";
         });

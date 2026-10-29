@@ -2,19 +2,9 @@
   isolation: isolate;
 }
 
-.pilgrimage-map .google-map-tiles-attribution {
-  margin: 0 8px max(8px, env(safe-area-inset-bottom, 0px)) 0;
-  max-width: min(calc(100% - 56px), 260px);
-}
-
-.pilgrimage-map .google-map-tiles-attribution-text {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.home-map .google-map-tiles-attribution {
+.google-map-tiles-attribution {
+  position: absolute;
+  z-index: 4;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -26,32 +16,26 @@
   font-size: 10px;
   line-height: 1.35;
   color: #4a4452;
+  pointer-events: none;
 }
 
-.home-map .google-map-tiles-attribution-text,
-.pilgrimage-map .google-map-tiles-attribution-text {
+.google-map-tiles-attribution-text {
   display: block;
   max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .google-map-tiles-attribution img {
   display: block;
-  height: 18px;
+  height: 14px;
   width: auto;
 }
 
-.pilgrimage-map .google-map-tiles-attribution {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  padding: 4px 6px;
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(31, 36, 48, 0.08);
-  font-size: 10px;
-  line-height: 1.35;
-  color: #4a4452;
+.pilgrimage-map .google-map-tiles-attribution--pilgrimage {
+  left: 8px;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  max-width: min(calc(100% - 48px), 260px);
 }
 
 .pilgrimage-map .maplibregl-popup-content {

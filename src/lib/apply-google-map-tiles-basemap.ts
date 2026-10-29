@@ -1,5 +1,5 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
-import { GoogleMapTilesAttributionControl } from "~/components/map/google-map-tiles-attribution-control";
+import { mountGoogleMapTilesAttribution } from "~/components/map/google-map-tiles-attribution-control";
 import type { HomeMapBasemapKind } from "~/lib/home-map-basemap";
 import {
   buildGoogleMapTilesMapStyle,
@@ -8,6 +8,7 @@ import {
   type GoogleMapTilesSessionFailure,
 } from "~/lib/google-map-tiles-basemap";
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
+import type { GoogleMapTilesAttributionSurface } from "~/components/map/google-map-tiles-attribution-control";
 
 let loggedCreateSessionFailure = false;
 
@@ -41,7 +42,7 @@ export async function applyGoogleMapTilesBasemap(
   map: MapLibreMap,
   locale: GoogleMapTilesLocale,
   onStyleReady: () => void,
-  placement: "bottom-left" | "bottom-right" = "bottom-left",
+  surface: GoogleMapTilesAttributionSurface,
 ): Promise<ApplyGoogleMapTilesBasemapResult> {
   const apiKey = resolveGoogleMapTilesApiKey();
   if (!apiKey) {
@@ -62,9 +63,11 @@ export async function applyGoogleMapTilesBasemap(
 
   return await new Promise((resolve) => {
     const finish = (): void => {
-      map.addControl(
-        new GoogleMapTilesAttributionControl(sessionResult.session, apiKey),
-        placement,
+      mountGoogleMapTilesAttribution(
+        map,
+        sessionResult.session,
+        apiKey,
+        surface,
       );
       onStyleReady();
       resolve({ applied: true, activeBasemap: "google" });

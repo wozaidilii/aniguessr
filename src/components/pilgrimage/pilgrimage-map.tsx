@@ -254,7 +254,7 @@ export function PilgrimageMap({
             installSpotLayers();
             setLayerEpoch((value) => value + 1);
           },
-          "bottom-right",
+          "pilgrimage",
         ).then((result) => {
           if (result.applied) activeBasemap = "google";
         });

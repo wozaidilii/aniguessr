@@ -1341,6 +1341,39 @@
   border-top-color: rgba(255, 255, 255, 0.96);
 }
 
+.home-map .google-map-tiles-attribution--home {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(31, 36, 48, 0.08);
+  font-size: 10px;
+  line-height: 1.35;
+  color: #4a4452;
+  pointer-events: none;
+  left: 10px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  max-width: min(calc(100% - 72px), 260px);
+}
+
+.home-map .google-map-tiles-attribution-text {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-map .google-map-tiles-attribution img {
+  display: block;
+  height: 14px;
+  width: auto;
+}
+
 @media (max-width: 1023px) {
   .home-wrap {
     width: min(100% - 32px, 1248px);
@@ -2128,9 +2161,10 @@
     overflow: hidden;
   }
 
-  .home-map .google-map-tiles-attribution {
-    margin: 0 0 max(10px, env(safe-area-inset-bottom, 0px)) 8px;
-    max-width: min(calc(100vw - 120px), 240px);
+  .home-map .google-map-tiles-attribution--home {
+    left: 8px;
+    bottom: calc(var(--home-sheet-height, 96px) + 10px + env(safe-area-inset-bottom, 0px));
+    max-width: min(calc(100% - 56px), 240px);
   }
 
   .home-chip-scrim {

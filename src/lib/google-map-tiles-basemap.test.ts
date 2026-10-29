@@ -1,8 +1,13 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import {
   buildGoogleMapTilesMapStyle,
+  buildGoogleMapTilesViewportUrl,
   clearCachedGoogleMapTilesSession,
   createGoogleMapTilesSession,
+  GOOGLE_MAP_TILES_LOGO_PATH,
+  GOOGLE_MAP_TILES_VIEWPORT_URL,
   googleMapTilesLanguageRegion,
   googleMapTilesRasterUrlTemplate,
   readCachedGoogleMapTilesSession,
@@ -68,6 +73,38 @@ describe("google map tiles style", () => {
     expect(googleMapTilesRasterUrlTemplate("sess", "test-key")).toContain(
       "key=test-key",
     );
+  });
+
+  it("uses the self-hosted Google logo path", () => {
+    expect(GOOGLE_MAP_TILES_LOGO_PATH).toBe(
+      "/images/maps/google-powered-by-on-white.png",
+    );
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "images",
+      "maps",
+      "google-powered-by-on-white.png",
+    );
+    const bytes = readFileSync(filePath);
+    expect(bytes[0]).toBe(0x89);
+    expect(bytes[1]).toBe(0x50);
+  });
+
+  it("builds viewport attribution URLs on /tile/v1/viewport", () => {
+    expect(GOOGLE_MAP_TILES_VIEWPORT_URL).toBe(
+      "https://tile.googleapis.com/tile/v1/viewport",
+    );
+    const url = buildGoogleMapTilesViewportUrl("sess", "test-key", {
+      north: 36,
+      south: 35,
+      east: 140,
+      west: 139,
+      zoom: 10,
+    });
+    expect(url.startsWith(GOOGLE_MAP_TILES_VIEWPORT_URL)).toBe(true);
+    expect(url).not.toContain("tile.googleapis.com/v1/viewport");
+    expect(url).toContain("session=sess");
   });
 });
 
