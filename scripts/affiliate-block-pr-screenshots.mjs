@@ -1,8 +1,10 @@
 /**
  * PR screenshots for affiliate block §9 (Designer spec).
  * Usage:
- *   AFFILIATE_ENABLED=1 KLOOK_AFFILIATE_ID=... RAKUTEN_AFFILIATE_ID=... \
- *     node scripts/affiliate-block-pr-screenshots.mjs
+ *   node scripts/affiliate-block-pr-screenshots.mjs
+ *
+ * Runs `npm run build` first (override with SKIP_AFFILIATE_PR_BUILD=1) using the
+ * public R2 image base from .env.example so spot hero screenshots render in PR PNGs.
  *
  * Fallback (B-version) shots apply a Playwright DOM override on a Kamakura spot page.
  */
@@ -23,6 +25,39 @@ const KLOOK_AID = process.env.KLOOK_AFFILIATE_ID ?? "141236";
 const RAKUTEN_AID =
   process.env.RAKUTEN_AFFILIATE_ID ??
   "58ec3be6.d1d6c631.58ec3be7.5408d7db";
+/** Public R2 root (browser-readable). Required at `next build` so SSG spot pages keep screenshots. */
+const IMAGE_BASE_URL =
+  process.env.NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL ??
+  "https://pub-fb0cf55dbd0b4c4cb42bf8312f34dbd4.r2.dev";
+
+function sharedEnv(extra = {}) {
+  return {
+    ...process.env,
+    DATABASE_URL:
+      process.env.DATABASE_URL ??
+      "postgresql://postgres:postgres@127.0.0.1:5432/aniguessr",
+    AFFILIATE_ENABLED: "true",
+    KLOOK_AFFILIATE_ID: KLOOK_AID,
+    RAKUTEN_AFFILIATE_ID: RAKUTEN_AID,
+    NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL: IMAGE_BASE_URL,
+    ...extra,
+  };
+}
+
+function runBuild() {
+  return new Promise((resolve, reject) => {
+    const child = spawn("npm", ["run", "build"], {
+      cwd: ROOT,
+      env: sharedEnv(),
+      stdio: "inherit",
+    });
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`npm run build exited ${code}`));
+    });
+  });
+}
 
 function waitForServer(url, timeoutMs = 120_000) {
   const start = Date.now();
@@ -45,14 +80,10 @@ function waitForServer(url, timeoutMs = 120_000) {
 }
 
 function startServer(extraEnv = {}) {
-  const env = {
-    ...process.env,
+  const env = sharedEnv({
     PORT: String(PORT),
-    AFFILIATE_ENABLED: "true",
-    KLOOK_AFFILIATE_ID: KLOOK_AID,
-    RAKUTEN_AFFILIATE_ID: RAKUTEN_AID,
     ...extraEnv,
-  };
+  });
   return spawn("npm", ["run", "start"], {
     cwd: ROOT,
     env,
@@ -158,6 +189,12 @@ async function runSet(label, { forceFallbackDom = false } = {}) {
 
 async function main() {
   await mkdir(OUT, { recursive: true });
+  if (process.env.SKIP_AFFILIATE_PR_BUILD !== "1") {
+    console.error(
+      "Building with NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL for spot screenshots…",
+    );
+    await runBuild();
+  }
   const thumb = await runSet("pilot-kamakura-thumbnail");
   const fallback = await runSet("fallback-test-override-dom", {
     forceFallbackDom: true,
