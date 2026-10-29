@@ -838,7 +838,7 @@
   text-decoration: none;
 }
 
-/* Same size and color as the shared anitabi attribution line. */
+/* Same size and color as the pilgrimage footer rights link. */
 a.rights-contact-link {
   color: var(--dark-text-secondary, #c9c4bd);
   font-size: 12px;

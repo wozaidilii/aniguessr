@@ -50199,7 +50199,7 @@
       "episodeContext": "第二集，时间戳898秒（约14分58秒）",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=876&pid=9oam8n3",
       "funfact": [
-        "该场景位于东京都东久留米市的一处住宅区街道，具体位置在Anitabi上标注为‘我这里有一份不错的工作’。",
+        "该场景位于东京都东久留米市的一处住宅区街道。",
         "此镜头出现在第二集约14分58秒处，是朋也向渚透露自己打工决定的经典片段。"
       ],
       "difficulty": 2,
@@ -50218,7 +50218,7 @@
           "answerName": "東京都東久留米市の通り",
           "episodeContext": "第2話、タイムスタンプ898秒（約14分58秒）",
           "funfact": [
-            "このシーンは東京都東久留米市の住宅街の通りにあり、Anitabiでは「俺はここでいい仕事を見つけたんだ」として登録されている。",
+            "このシーンは東京都東久留米市の住宅街の通りにあり、では「俺はここでいい仕事を見つけたんだ」として登録されている。",
             "第2話の約14分58秒に登場し、朋也が渚にアルバイトを始めたことを伝える名場面である。"
           ]
         },
@@ -50230,7 +50230,7 @@
           "answerName": "A street in Higashikurume, Tokyo",
           "episodeContext": "Episode 2, timestamp 898 seconds (approx. 14:58)",
           "funfact": [
-            "This scene is located on a residential street in Higashikurume, Tokyo, labeled as 'I've Got a Pretty Good Job Here' on Anitabi.",
+            "This scene is located on a residential street in Higashikurume, Tokyo, labeled as 'I've Got a Pretty Good Job Here' on .",
             "It appears at approximately 14:58 in Episode 2, a key moment where Tomoya shares his part-time job plans with Nagisa."
           ]
         }
@@ -155690,7 +155690,7 @@
       "funfact": [
         "该公园现实位于日本神奈川县横须贺市，是动画中日常场景的取景地。",
         "公园内设有和平钟，呼应作品和平主题。",
-        "根据Anitabi社区考证，该地点出现在第二季的某个日常片段中。"
+        "根据社区考证，该地点出现在第二季的某个日常片段中。"
       ],
       "difficulty": 3,
       "confidence": "medium",
@@ -155709,7 +155709,7 @@
           "funfact": [
             "現実の公園は神奈川県横須賀市にあり、アニメの日常シーンのロケ地として使用されました。",
             "公園内には平和の鐘が設置されており、作品の平和テーマに通じます。",
-            "Anitabiコミュニティの調査によると、第2期のある日常シーンで登場します。"
+            "コミュニティの調査によると、第2期のある日常シーンで登場します。"
           ]
         },
         "en": {
@@ -155722,7 +155722,7 @@
           "funfact": [
             "The real park is located at Yokosuka City, Kanagawa Prefecture, Japan, and served as a filming location for daily scenes.",
             "A peace bell is installed in the park, echoing the series' peace theme.",
-            "According to Anitabi community verification, this location appears in a daily life segment of the second season."
+            "According to community verification, this location appears in a daily life segment of the second season."
           ]
         }
       },
@@ -511842,7 +511842,7 @@
       "funfact": [
         "该巡礼点的现实原型位于宫城县大崎市鸣子温泉附近，而非作品主要舞台熊本县人吉市。",
         "鸣子是作品中的女主角之一，名字与宫城县的鸣子温泉同名。",
-        "该点被Anitabi用户标注为‘鳴子镇’，可能源于粉丝对角色关联场景的想象。"
+        "该点被用户标注为‘鳴子镇’，可能源于粉丝对角色关联场景的想象。"
       ],
       "difficulty": 3,
       "confidence": "low",
@@ -511862,7 +511862,7 @@
           "funfact": [
             "この巡礼スポットの現実の位置は宮城県大崎市鳴子温泉付近であり、作品の主要舞台である熊本県人吉市ではない。",
             "鳴子は作品のヒロインの一人で、その名前は宮城県の鳴子温泉と一致する。",
-            "Anitabiユーザーによって「鳴子町」とタグ付けされた場所であり、ファンの想像による関連付けと見られる。"
+            "ユーザーによって「鳴子町」とタグ付けされた場所であり、ファンの想像による関連付けと見られる。"
           ]
         },
         "en": {
@@ -511875,7 +511875,7 @@
           "funfact": [
             "The real-world location of this pilgrimage point is near Naruko Onsen in Osaki City, Miyagi Prefecture, not the main setting Hitoyoshi City in Kumamoto.",
             "Naruko is one of the heroines in the game, whose name matches the Naruko Onsen in Miyagi.",
-            "This spot was tagged as 'Naruko Town' by an Anitabi user, likely a fan-imagined connection to the character."
+            "This spot was tagged as 'Naruko Town' by an user, likely a fan-imagined connection to the character."
           ]
         }
       },
@@ -552430,7 +552430,7 @@
       "episodeContext": "第12集 约9分28秒",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=165553&pid=ks0xbqkl3",
       "funfact": [
-        "该场景出自《LoveLive! Sunshine!!》第一季第12集约9分28秒处（来源：Anitabi）。",
+        "该场景出自《LoveLive! Sunshine!!》第一季第12集约9分28秒处。",
         "现实中的东京站丸之内北口是东京的标志性红砖建筑，也是许多动画的取景地。"
       ],
       "difficulty": 2,
@@ -552448,7 +552448,7 @@
           "aspect": "駅出口シーン",
           "episodeContext": "第12話 約9分28秒",
           "funfact": [
-            "このシーンは『ラブライブ！サンシャイン!!』第1期第12話の約9分28秒に登場します（出典：Anitabi）。",
+            "このシーンは『ラブライブ！サンシャイン!!』第1期第12話の約9分28秒に登場します。",
             "現実の東京駅丸の内北口は、赤レンガの象徴的な建物であり、多くのアニメのロケ地として知られています。"
           ]
         },
@@ -552459,7 +552459,7 @@
           "answerName": "Tokyo Station Marunouchi North Exit",
           "episodeContext": "Episode 12 at approximately 9:28",
           "funfact": [
-            "This scene appears in Episode 12 of the first season of LoveLive! Sunshine!! at approximately 9:28 (source: Anitabi).",
+            "This scene appears in Episode 12 of the first season of LoveLive! Sunshine!! at approximately 9:28 .",
             "In reality, Tokyo Station Marunouchi North Exit is an iconic red-brick building and a popular filming location for many anime."
           ]
         }
@@ -602128,7 +602128,7 @@
       "funfact": [
         "该咖啡店实际位于JR岐阜站的高架桥下，是当地常见的连锁喫茶店。",
         "作品中该场景出现在某个阳光明媚的午后，店内光线透过落地窗洒在地板上。",
-        "巡礼点由Anitabi用户AmaiAya提供，具体集数未公开。"
+        "巡礼点由用户AmaiAya提供，具体集数未公开。"
       ],
       "difficulty": 4,
       "confidence": "low",
@@ -602147,7 +602147,7 @@
           "funfact": [
             "実際のカフェはJR岐阜駅の高架下に位置する、地域に多いチェーン喫茶店である。",
             "作品内では、日差しが明るい午後に、床一面に光が差し込むシーンとして描かれている。",
-            "聖地情報はAnitabiユーザーAmaiAyaによる提供で、具体的な話数は不明。"
+            "聖地情報はAmaiAyaによる提供で、具体的な話数は不明。"
           ]
         },
         "en": {
@@ -602160,7 +602160,7 @@
           "funfact": [
             "The actual coffee shop is located under the viaduct of JR Gifu Station, a common chain café in the area.",
             "This scene takes place on a sunny afternoon, with light streaming through the floor-to-ceiling windows.",
-            "The pilgrimage point was contributed by Anitabi user AmaiAya; the exact episode is unknown."
+            "The pilgrimage point was contributed by user AmaiAya; the exact episode is unknown."
           ]
         }
       },
@@ -610366,7 +610366,7 @@
       "funfact": [
         "该海报取景地位于山梨县南巨摩郡身延町的本栖湖附近，画面中的山峰为富士山。",
         "官方海报共有两版，一版是夕阳场景，另一版是早晨场景。",
-        "该海报用于动画第一季的官方宣传，在Anitabi上被收录为巡礼点。"
+        "该海报用于动画第一季的官方宣传。"
       ],
       "difficulty": 2,
       "confidence": "high",
@@ -610386,7 +610386,7 @@
           "funfact": [
             "ポスターのロケ地は山梨県南巨摩郡身延町の本栖湖付近で、背景の山は富士山です。",
             "公式ポスターには夕方バージョンと朝バージョンの2種類があります。",
-            "このポスターはアニメ第1期のプロモーションに使用され、Anitabiで巡礼スポットとして登録されています。"
+            "このポスターはアニメ第1期のプロモーションに使用され、で巡礼スポットとして登録されています。"
           ]
         },
         "en": {
@@ -610399,7 +610399,7 @@
           "funfact": [
             "The location of the poster is near Lake Motosu in Minamikoma District, Yamanashi Prefecture. The mountain in the background is Mount Fuji.",
             "There are two versions of the official poster: sunset and morning.",
-            "This poster was used for the promotion of the first season and is recorded as a pilgrimage spot on Anitabi."
+            "This poster was used for the promotion of the first season and is recorded as a pilgrimage spot on ."
           ]
         }
       },
@@ -682255,11 +682255,11 @@
       "lng": 134.1476,
       "location": "香川县",
       "answerName": "重岩（小豆岛）",
-      "episodeContext": "第8集（根据anitabi记录；实际为第一季第12集）",
+      "episodeContext": "第8集",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=219200&pid=u3svxa1x7",
       "funfact": [
         "这个场景的原型是香川县小豆岛上的“重岩”，一块高约11米的巨大花岗岩。",
-        "该场景出现在动画第一季第12集（林间学校篇），与anitabi记录的第8集可能因版本不同存在差异。"
+        "该场景出现在动画第一季第12集（林间学校篇），与记录的第8集可能因版本不同存在差异。"
       ],
       "difficulty": 2,
       "confidence": "high",
@@ -682275,10 +682275,10 @@
           "animeTitle": "からかい上手の高木さん",
           "aspect": "自然景観",
           "answerName": "重岩（小豆島）",
-          "episodeContext": "第8話（anitabiの記録による；実際は第1期第12話）",
+          "episodeContext": "第8話",
           "funfact": [
             "このシーンのモデルは香川県小豆島にある「重岩」で、高さ約11メートルの巨大な花崗岩です。",
-            "このシーンはアニメ第1期第12話（林間学校編）に登場しますが、anitabiの記録では第8話となっており、エピソード番号の違いによる可能性があります。"
+            "このシーンはアニメ第1期第12話（林間学校編）に登場しますが、話となっており、エピソード番号の違いによる可能性があります。"
           ]
         },
         "en": {
@@ -682287,10 +682287,10 @@
           "animeTitle": "Teasing Master Takagi-san",
           "aspect": "Natural scenery",
           "answerName": "Omoiwa (Heavy Rock, Shodoshima)",
-          "episodeContext": "Episode 8 (according to anitabi; actually Episode 12 of Season 1)",
+          "episodeContext": "Episode 8",
           "funfact": [
             "The real-life location is the 'Omoiwa' (Heavy Rock) on Shodoshima Island in Kagawa Prefecture, a large granite rock about 11 meters high.",
-            "This scene appears in Episode 12 of the first season (Forest School arc), though the anitabi record lists Episode 8, possibly due to episode numbering differences."
+            "This scene appears in Episode 12 of the first season (Forest School arc), though the record lists Episode 8, possibly due to episode numbering differences."
           ]
         }
       },
@@ -702366,7 +702366,7 @@
       "funfact": [
         "该场景取景自日本静冈县热海市的一座人行天桥，附近有温泉街和海滨。",
         "天桥的阶梯和栏杆在动画中经过美术加工，与实景略有不同。",
-        "这部作品是一部短篇漫画，尚未动画化，因此anitabi条目可能来源于同人创作或实地考察。"
+        "这部作品是一部短篇漫画，尚未动画化，因此条目可能来源于同人创作或实地考察。"
       ],
       "difficulty": 5,
       "confidence": "low",
@@ -702386,7 +702386,7 @@
           "funfact": [
             "このシーンのロケ地は静岡県熱海市にある歩道橋で、温泉街や海岸が近くにあります。",
             "マンガ内の階段や欄干は実際の場所から美術的にアレンジされています。",
-            "本作は短編漫画であり、アニメ化されていないため、anitabiエントリーはファン作品や現地調査に基づく可能性があります。"
+            "本作は短編漫画であり、アニメ化されていないため、エントリーはファン作品や現地調査に基づく可能性があります。"
           ]
         },
         "en": {
@@ -702399,7 +702399,7 @@
           "funfact": [
             "This scene is based on a pedestrian bridge in Atami City, Shizuoka Prefecture, near a hot spring street and the coast.",
             "The stairs and railings in the manga were artistically modified from the actual location.",
-            "The work is a one-shot manga that has not been adapted into anime, so the anitabi entry may come from fan works or field research."
+            "The work is a one-shot manga that has not been adapted into anime, so the entry may come from fan works or field research."
           ]
         }
       },
@@ -724355,7 +724355,7 @@
       "sourceUrl": "https://anitabi.cn/map?bangumiId=236103&pid=lk02dnue3",
       "funfact": [
         "该列车实际是东武铁道8000系8577F，涂装再现了昭和30年代（1955-1964年）的样式。",
-        "这个场景位于东京都内的一个铁路道口，具体位置在Anitabi上有标记。"
+        "这个场景位于东京都内的一个铁路道口。"
       ],
       "difficulty": 4,
       "confidence": "high",
@@ -724373,7 +724373,7 @@
           "episodeContext": "第5話 99秒",
           "funfact": [
             "この電車は実際には東武鉄道8000系8577Fで、昭和30年代（1955～1964年）の塗装を再現している。",
-            "この踏切は東京都内に位置し、正確な場所はAnitabiに記されている。"
+            "この踏切は東京都内に位置し、正確な場所はに記されている。"
           ]
         },
         "en": {
@@ -724385,7 +724385,7 @@
           "episodeContext": "Episode 5, 99 seconds",
           "funfact": [
             "The train is actually Tobu Railway 8000 series 8577F, with livery reproducing the Showa 30s (1955-1964) style.",
-            "This crossing is located in Tokyo, with the exact spot marked on Anitabi."
+            "This crossing is located in Tokyo, with the exact spot marked on ."
           ]
         }
       },
@@ -750857,7 +750857,7 @@
       "sourceUrl": "https://anitabi.cn/map?bangumiId=243981&pid=9mq3uln",
       "funfact": [
         "该地点是第2话中侑和灯子放学后行走的街道。",
-        "实际取景地位于东京都练马区石神井町（anitabi数据误标为品川区）。"
+        "实际取景地位于东京都练马区石神井町（数据误标为品川区）。"
       ],
       "difficulty": 3,
       "confidence": "medium",
@@ -750875,7 +750875,7 @@
           "episodeContext": "第2話、8分42秒頃",
           "funfact": [
             "この場所は第2話で侑と燈子が放課後に歩いた通りである。",
-            "実際のロケ地は東京都練馬区石神井町（anitabiのデータでは品川区と誤表記されている）。"
+            "実際のロケ地は東京都練馬区石神井町（のデータでは品川区と誤表記されている）。"
           ]
         },
         "en": {
@@ -750887,7 +750887,7 @@
           "episodeContext": "Episode 2, around 8:42",
           "funfact": [
             "This location is the street where Yuu and Touko walk in episode 2 after school.",
-            "The real-world location is in Shakujii-cho, Nerima-ku, Tokyo (mistakenly labeled as Shinagawa-ku in anitabi data)."
+            "The real-world location is in Shakujii-cho, Nerima-ku, Tokyo (mistakenly labeled as Shinagawa-ku in data)."
           ]
         }
       },
@@ -767020,7 +767020,7 @@
       "sourceUrl": "https://anitabi.cn/map?bangumiId=252655&pid=e9u6rkl",
       "funfact": [
         "这里是佐贺县佐贺市的豊玉姫神社，位于国道34号附近，是作品中源樱首次以僵尸身份登场的标志性取景地。",
-        "该场景对应第一集开头约3分钟处，但Anitabi标记的时间戳1379秒（约22分59秒）可能为其他镜头重复出现，核心仍是同一神社。"
+        "该场景对应第一集开头约3分钟处，但标记的时间戳1379秒（约22分59秒）可能为其他镜头重复出现，核心仍是同一神社。"
       ],
       "difficulty": 2,
       "confidence": "high",
@@ -767038,7 +767038,7 @@
           "episodeContext": "第1話でさくらがゾンビとして目覚めるシーン",
           "funfact": [
             "佐賀県佐賀市にある豊玉姫神社。国道34号線近くに位置し、作品中でさくらがゾンビとして初めて登場する象徴的なロケ地です。",
-            "このシーンは第1話冒頭約3分に該当しますが、Anitabiのタイムスタンプ1379秒（約22分59秒）は同じ神社の別カットを示している可能性があります。"
+            "このシーンは第1話冒頭約3分に該当しますが、秒（約22分59秒）は同じ神社の別カットを示している可能性があります。"
           ]
         },
         "en": {
@@ -767050,7 +767050,7 @@
           "episodeContext": "Scene of Sakura waking up as a zombie in Episode 1",
           "funfact": [
             "This is Toyotamahime Shrine in Saga City, Saga Prefecture, located near Route 34. It is the iconic filming location where Sakura first appears as a zombie in the series.",
-            "The scene corresponds to the opening minutes of Episode 1, though the Anitabi timestamp of 1379 seconds (approx. 22:59) may indicate a later repeated shot of the same shrine."
+            "The scene corresponds to the opening minutes of Episode 1, though the timestamp of 1379 seconds (approx. 22:59) may indicate a later repeated shot of the same shrine."
           ]
         }
       },
@@ -843951,7 +843951,7 @@
       "episodeContext": "未特定集数，作为背景素材使用",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=280440&pid=r1vxj8yhg",
       "funfact": [
-        "根据Anitabi标注，该巡礼点是游戏背景素材『豊岳駅』的现实参考，实际取景于日本某地方线路的无人站。",
+        "根据标注，该巡礼点是游戏背景素材『豊岳駅』的现实参考，实际取景于日本某地方线路的无人站。",
         "作品中该车站作为连接事件核心『豊岳町』的关键交通节点出现。"
       ],
       "difficulty": 4,
@@ -843968,7 +843968,7 @@
           "aspect": "駅のシーン",
           "episodeContext": "特定のエピソードなし、背景素材として使用",
           "funfact": [
-            "Anitabiの注釈によると、この聖地巡礼ポイントは背景素材『豊岳駅』の実在参考地であり、日本の某地方路線の無人駅を取材したもの。",
+            "の注釈によると、この聖地巡礼ポイントは背景素材『豊岳駅』の実在参考地であり、日本の某地方路線の無人駅を取材したもの。",
             "作品中では、この駅が物語の鍵を握る『豊岳町』への交通の要所として登場する。"
           ]
         },
@@ -843980,7 +843980,7 @@
           "answerName": "Toyotake Station (background material)",
           "episodeContext": "No specific episode, used as background material",
           "funfact": [
-            "According to Anitabi annotation, this pilgrimage point is the real-life reference for the background material 'Toyotake Station', actually filmed at an unmanned station on a local line in Japan.",
+            "According to annotation, this pilgrimage point is the real-life reference for the background material 'Toyotake Station', actually filmed at an unmanned station on a local line in Japan.",
             "In the work, this station appears as a key transportation hub connecting to the fictional 'Toyotake Town', central to the story."
           ]
         }
@@ -844202,7 +844202,7 @@
       "episodeContext": "背景素材",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=280440&pid=r2t6b3ylk",
       "funfact": [
-        "根据Anitabi条目，该点是作品中的背景素材，具体场景不明。"
+        "根据条目，该点是作品中的背景素材，具体场景不明。"
       ],
       "difficulty": 4,
       "confidence": "low",
@@ -844218,7 +844218,7 @@
           "aspect": "庭園シーン",
           "answerName": "背景素材邦老園の実在原型",
           "funfact": [
-            "Anitabiのエントリによると、この地点は作品内の背景素材であり、具体的なシーンは特定されていません。"
+            "のエントリによると、この地点は作品内の背景素材であり、具体的なシーンは特定されていません。"
           ]
         },
         "en": {
@@ -844229,7 +844229,7 @@
           "answerName": "Real prototype of background material Banglao Garden",
           "episodeContext": "Background material",
           "funfact": [
-            "According to the Anitabi entry, this point is a background material in the work, with no specific scene identified."
+            "According to the entry, this point is a background material in the work, with no specific scene identified."
           ]
         }
       },
@@ -909773,7 +909773,7 @@
       "episodeContext": "游戏内场景",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=295957&pid=51i52cpuc",
       "funfact": [
-        "该巡礼点的现实原型位于日本，具体坐标可在Anitabi上查看。"
+        "该巡礼点的现实原型位于日本。"
       ],
       "difficulty": 3,
       "confidence": "medium",
@@ -909789,7 +909789,7 @@
           "aspect": "シーン描写",
           "episodeContext": "ゲーム内シーン",
           "funfact": [
-            "この巡礼地の実在の場所は日本にあり、具体的な座標はAnitabiで確認できます。"
+            "この巡礼地の実在の場所は日本にあり、具体的な座標はで確認できます。"
           ]
         },
         "en": {
@@ -909800,7 +909800,7 @@
           "answerName": "Naruse Shrine",
           "episodeContext": "In-game scene",
           "funfact": [
-            "The real-life location of this pilgrimage point is in Japan; specific coordinates can be found on Anitabi."
+            "The real-life location of this pilgrimage point is in Japan; specific coordinates can be found on ."
           ]
         }
       },
@@ -1078650,7 +1078650,7 @@
       "sourceUrl": "https://anitabi.cn/map?bangumiId=405785&pid=9o8dxjz",
       "funfact": [
         "该告示牌在动画第三季中出现，对应现实中的私有地入口。",
-        "根据Anitabi数据，该点位于静冈县某私人土地，周边环境与动画描绘一致。"
+        "根据数据，该点位于静冈县某私人土地，周边环境与动画描绘一致。"
       ],
       "difficulty": 2,
       "confidence": "low",
@@ -1078669,7 +1078669,7 @@
           "episodeContext": "3期の特定されていないエピソードの背景シーン",
           "funfact": [
             "この看板はアニメ3期に登場し、実際の私有地の入口に対応しています。",
-            "Anitabiのデータによると、この地点は静岡県の私有地にあり、周囲の環境はアニメの描写と一致しています。"
+            "のデータによると、この地点は静岡県の私有地にあり、周囲の環境はアニメの描写と一致しています。"
           ]
         },
         "en": {
@@ -1078681,7 +1078681,7 @@
           "episodeContext": "Background scene from an unspecified episode in Season 3",
           "funfact": [
             "This sign appears in Season 3 of the anime, corresponding to a real private property entrance.",
-            "According to Anitabi data, this spot is located on private land in Shizuoka Prefecture, with surroundings matching the anime depiction."
+            "According to data, this spot is located on private land in Shizuoka Prefecture, with surroundings matching the anime depiction."
           ]
         }
       },
@@ -1197259,7 +1197259,7 @@
       "funfact": [
         "该场景取景于东京国际机场（羽田机场）第二航站楼的停车场联络道，动画中作为麻衣从美国返回时的接送点。",
         "动画中出现的出租车和航站楼外观与实景高度一致，连道路标线都忠实再现。",
-        "该巡礼点由Anitabi用户@舞影一诺根据第12集649秒的镜头确认。"
+        "该巡礼点由用户@舞影一诺根据第12集649秒的镜头确认。"
       ],
       "difficulty": 2,
       "confidence": "medium",
@@ -1197279,7 +1197279,7 @@
           "funfact": [
             "このシーンは東京国際空港（羽田空港）第2ターミナルの駐車場連絡路で撮影され、アニメでは麻衣がアメリカから帰国した際の出迎え地点として使用された。",
             "アニメに登場するタクシーやターミナルの外観は実物と非常に類似しており、道路標示も忠実に再現されている。",
-            "この聖地巡礼スポットは、Anitabiユーザーの舞影一諾が第12話649秒のカットに基づいて確認した。"
+            "この聖地巡礼スポットは、ユーザーの舞影一諾が第12話649秒のカットに基づいて確認した。"
           ]
         },
         "en": {
@@ -1197292,7 +1197292,7 @@
           "funfact": [
             "This scene was filmed at the parking lot access road of Terminal 2 at Tokyo International Airport (Haneda Airport), used in the anime as the pick-up point when Mai returns from the United States.",
             "The taxis and terminal exterior in the anime closely match the real location, even the road markings are faithfully reproduced.",
-            "This pilgrimage point was confirmed by the Anitabi user @舞影一诺 based on the frame at 649 seconds of episode 12."
+            "This pilgrimage point was confirmed by the user @舞影一诺 based on the frame at 649 seconds of episode 12."
           ]
         }
       },
@@ -1237297,7 +1237297,7 @@
       "episodeContext": "OP1，第86秒",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=498934&pid=rp3j0bzxs",
       "funfact": [
-        "该场景的取景地原型是京都府立嵯峨野高等学校（位于京都市右京区，anitabi标记为舞鹤市可能为误标）。",
+        "该场景的取景地原型是京都府立嵯峨野高等学校（位于京都市右京区，标记为舞鹤市可能为误标）。",
         "OP由武井友负责作画，强调光影与樱花的氛围。",
         "这是OP中第一个展现学校全景的镜头，配合前奏音乐营造出新学期开始的期待感。"
       ],
@@ -1237316,7 +1237316,7 @@
           "aspect": "OPシーン",
           "episodeContext": "OP1、86秒",
           "funfact": [
-            "このシーンのモデルは実際の京都府立嵯峨野高等学校（京都市右京区所在。anitabiでは舞鶴市とされているが、誤りと思われる）。",
+            "このシーンのモデルは実際の京都府立嵯峨野高等学校（京都市右京区所在。では舞鶴市とされているが、誤りと思われる）。",
             "オープニングアニメーションは武井友が作画し、光と桜に重点を置いている。",
             "OPで初めて学校全景が映るカットであり、新学期の始まりを予感させる。"
           ]
@@ -1237329,7 +1237329,7 @@
           "answerName": "Kyoto Prefectural Sagano High School",
           "episodeContext": "OP1, 86 seconds",
           "funfact": [
-            "The scene is modeled after the real Kyoto Prefectural Sagano High School (located in Ukyo-ku, Kyoto City; the anitabi entry lists it under Maizuru City, possibly a mistake).",
+            "The scene is modeled after the real Kyoto Prefectural Sagano High School (located in Ukyo-ku, Kyoto City; the entry lists it under Maizuru City, possibly a mistake).",
             "The opening animation was directed by Tomoake Takei, emphasizing light and cherry blossoms.",
             "This is the first full-view shot of the school in the OP, setting the tone for the new school year."
           ]
@@ -1252507,7 +1252507,7 @@
       "funfact": [
         "该地点位于前桥市中央地区，现实中是当地知名的服装店。",
         "动画中Marl的蓝白配色招牌与实际店铺风格一致。",
-        "本条巡礼点信息来自Anitabi用户贡献，具体集数不详，但从背景细节推测为日常场景。"
+        "本条巡礼点信息来自用户贡献，具体集数不详，但从背景细节推测为日常场景。"
       ],
       "difficulty": 4,
       "confidence": "medium",
@@ -1252527,7 +1252527,7 @@
           "funfact": [
             "この場所は前橋市中心部にあり、実在する有名な衣料品店の隣接地です。",
             "アニメのマールの青と白の看板は、実際の店舗のデザインを忠実に再現しています。",
-            "本巡礼スポットはAnitabiユーザーの投稿によるもので、具体的な話数は不明ですが、背景の詳細から日常シーンであると推測されます。"
+            "本巡礼スポットはユーザーの投稿によるもので、具体的な話数は不明ですが、背景の詳細から日常シーンであると推測されます。"
           ]
         },
         "en": {
@@ -1252540,7 +1252540,7 @@
           "funfact": [
             "The location is in central Maebashi; the shop is a well-known clothing store in real life.",
             "The blue-and-white sign in the anime matches the actual store's design.",
-            "This pilgrimage spot was contributed by an Anitabi user; the specific episode is unknown, but background details suggest a daily-life scene."
+            "This pilgrimage spot was contributed by an user; the specific episode is unknown, but background details suggest a daily-life scene."
           ]
         }
       },
@@ -1260041,7 +1260041,7 @@
           "episodeContext": "第13話",
           "funfact": [
             "実際のロケ地は東京都内の静かな住宅街。店舗は架空だが、北側の建築ディテールは忠実に再現されている。",
-            "Anitabiユーザーによって座標が特定された。"
+            "ユーザーによって座標が特定された。"
           ]
         },
         "en": {
@@ -1260053,7 +1260053,7 @@
           "episodeContext": "Episode 13",
           "funfact": [
             "The real-life location is a quiet residential street in Tokyo. The shop itself is fictional, but the northern side's architecture was faithfully adapted.",
-            "The coordinates for this spot were identified by an Anitabi user."
+            "The coordinates for this spot were identified by an user."
           ]
         }
       },
@@ -1263781,7 +1263781,7 @@
       "lng": 139.7356,
       "location": "东京都",
       "answerName": "Maxell Aqua Park 品川 前",
-      "episodeContext": "未知集数（来源：Anitabi@concert）",
+      "episodeContext": "未知集数",
       "sourceUrl": "https://anitabi.cn/map?bangumiId=513345&pid=1t1xc76",
       "funfact": [
         "该水族馆现实位于东京都港区，全名为「マクセル アクアパーク品川」，是都内知名的都市型水族馆。",
@@ -1263801,10 +1263801,10 @@
           "animeTitle": "薫る花は凛と咲く",
           "aspect": "水族館前広場",
           "answerName": "マクセルアクアパーク品川 前",
-          "episodeContext": "不明（出典：Anitabi@concert）",
+          "episodeContext": "不明",
           "funfact": [
             "この水族館は東京都港区に実在し、正式名称は「マクセル アクアパーク品川」。都内有数の都市型水族館である。",
-            "アニメの第何話か（出典：Anitabi@concert）で、校外学習の一場面として登場する。"
+            "アニメの第何話かで、校外学習の一場面として登場する。"
           ]
         },
         "en": {
@@ -1263813,10 +1263813,10 @@
           "animeTitle": "The Fragrant Flower Blooms with Dignity",
           "aspect": "Aquarium Plaza",
           "answerName": "In front of Maxell Aqua Park Shinagawa",
-          "episodeContext": "Unknown episode (source: Anitabi@concert)",
+          "episodeContext": "Unknown episode",
           "funfact": [
             "This aquarium is located in Minato, Tokyo, officially named 'Maxell Aqua Park Shinagawa', a famous urban aquarium.",
-            "In an unknown episode (source: Anitabi@concert), this scene appears during the characters' off-campus trip."
+            "In an unknown episode , this scene appears during the characters' off-campus trip."
           ]
         }
       },
@@ -1267177,7 +1267177,7 @@
         "en": {
           "title": "Dogo Onsen Station",
           "description": "In *Watashi o Tabetai, Hitodenashi*, at dusk, one of the main characters stands in front of a vintage wooden station with a clock tower, where the setting sun filters through the waiting shed glass. She gazes down the train tracks, with stone-paved streets and paper lanterns typical of a hot spring town behind her.",
-          "animeTitle": "I Want to Eat Your Pancreas? (Wait, correct title: I Want to Eat Your Something) Actually official English title is unknown, but based on context, I'll use: \"The Girl Who Was Not Human Who Wants to Eat Me\" but that's not official. The closest romanization: \"Watashi o Tabetai, Hitodenashi\" is the Japanese title. For en, use the Japanese title in italics or quote. Standard: \"Watashi o Tabetai, Hitodenashi\" (literally \"I Want to Eat Me, Inhuman\"). But anitabi uses English sometimes. Let's assume commonly used: \"The Non-Human Girl Who Wants to Eat Me\"? Not sure. Safer: use the romanized title: \"Watashi o Tabetai, Hitodenashi\".",
+          "animeTitle": "I Want to Eat Your Pancreas? (Wait, correct title: I Want to Eat Your Something) Actually official English title is unknown, but based on context, I'll use: \"The Girl Who Was Not Human Who Wants to Eat Me\" but that's not official. The closest romanization: \"Watashi o Tabetai, Hitodenashi\" is the Japanese title. For en, use the Japanese title in italics or quote. Standard: \"Watashi o Tabetai, Hitodenashi\" (literally \"I Want to Eat Me, Inhuman\"). But Safer: use the romanized title: \"Watashi o Tabetai, Hitodenashi\".",
           "aspect": "Station front",
           "answerName": "Dogo Onsen Station",
           "episodeContext": "Episode 13, 04:38",
@@ -1281883,7 +1281883,7 @@
           "answerName": "Sekine Building",
           "episodeContext": "Unknown episode, timestamp ~2846s",
           "funfact": [
-            "This scene was filmed at Sekine Building (関根ビル) in Tachikawa, Tokyo, and the building's exterior matches the anime. [Anitabi]",
+            "This scene was filmed at Sekine Building (関根ビル) in Tachikawa, Tokyo, and the building's exterior matches the anime.",
             "The clip appears approximately 47 minutes into the film, marking the first meeting between the protagonist and the heroine."
           ]
         }
