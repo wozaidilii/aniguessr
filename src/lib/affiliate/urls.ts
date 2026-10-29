@@ -8,6 +8,7 @@ import {
   getRakutenAffiliateId,
 } from "~/lib/affiliate/config";
 import { resolveKlookContentPath } from "~/lib/affiliate/klook-targets";
+import { resolveRakutenTravelDestination } from "~/lib/affiliate/rakuten-targets";
 
 export interface AffiliateLinkContext {
   locale: PilgrimageLocale;
@@ -39,11 +40,10 @@ function searchQuery(areaLabel: string, lat?: number, lng?: number) {
   return "";
 }
 
-function buildRakutenTravelUrl(input: {
+function buildRakutenSearchUrl(input: {
   areaLabel: string;
   lat?: number;
   lng?: number;
-  affiliateId: string;
 }) {
   const query = searchQuery(input.areaLabel, input.lat, input.lng);
   const destination = new URL("https://travel.rakuten.co.jp/HOTEL/search/");
@@ -53,12 +53,39 @@ function buildRakutenTravelUrl(input: {
     destination.searchParams.set("f_lat", String(input.lat));
     destination.searchParams.set("f_lng", String(input.lng));
   }
+  return destination.toString();
+}
 
-  const wrapped = new URL(
-    `https://hb.afl.rakuten.co.jp/hgc/${encodeURIComponent(input.affiliateId)}/`,
+/** Confirmed affiliate wrapper: hgc/{id}/?pc={encoded travel.rakuten.co.jp URL} */
+export function buildRakutenTrackedUrl(input: {
+  affiliateId: string;
+  pcUrl: string;
+}) {
+  const redirect = new URL(
+    `https://hb.afl.rakuten.co.jp/hgc/${input.affiliateId}/`,
   );
-  wrapped.searchParams.set("pc", destination.toString());
-  return wrapped.toString();
+  redirect.searchParams.set("pc", input.pcUrl);
+  return redirect.toString();
+}
+
+function buildRakutenTravelUrl(input: {
+  areaLabel: string;
+  lat?: number;
+  lng?: number;
+  locationSlug?: string;
+  affiliateId: string;
+}) {
+  const pcUrl = resolveRakutenTravelDestination({
+    areaLabel: input.areaLabel,
+    lat: input.lat,
+    lng: input.lng,
+    locationSlug: input.locationSlug,
+  });
+
+  return buildRakutenTrackedUrl({
+    affiliateId: input.affiliateId,
+    pcUrl,
+  });
 }
 
 export function buildKlookDestinationUrl(
@@ -96,6 +123,7 @@ export function buildAffiliateLinks(
       areaLabel: context.areaLabel,
       lat: context.lat,
       lng: context.lng,
+      locationSlug: context.locationSlug,
       affiliateId,
     });
     return [{ provider, href, linkType: "hotel" }];

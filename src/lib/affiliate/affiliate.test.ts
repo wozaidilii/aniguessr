@@ -14,7 +14,6 @@ import {
   shouldRenderAffiliateBlock,
 } from "~/lib/affiliate/config";
 import { resolveKlookContentPath } from "~/lib/affiliate/klook-targets";
-import { affiliateProviderForLocale } from "~/lib/affiliate/provider";
 import {
   AFFILIATE_BLOCK_MIN_HEIGHT,
   resolveAffiliatePage,
@@ -23,12 +22,16 @@ import {
   buildAffiliateLinks,
   buildKlookDestinationUrl,
   buildKlookTrackedUrl,
+  buildRakutenTrackedUrl,
   klookLocalePath,
 } from "~/lib/affiliate/urls";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 
 const mockedAllowlist = vi.mocked(isAffiliateAllowlisted);
 const KLOOK_AID = "141236";
+const RAKUTEN_AID = "58ec3be6.d1d6c631.58ec3be7.5408d7db";
+const KAMAKURA_RAKUTEN_PC =
+  "https://travel.rakuten.co.jp/HOTEL/search/?f_daihyo=鎌倉&f_target=1";
 const KAMAKURA_TOUR_PATH =
   "activity/25457-kamakura-enoshima-day-tour-tokyo/";
 
@@ -73,7 +76,9 @@ describe("affiliate gating", () => {
     });
     expect(jaLinks).toHaveLength(1);
     expect(jaLinks[0]?.provider).toBe("rakuten_travel");
-    expect(jaLinks[0]?.href).toContain("rakuten-test-id");
+    expect(jaLinks[0]?.href).toContain(
+      "https://hb.afl.rakuten.co.jp/hgc/rakuten-test-id/",
+    );
   });
 
   it("renders nothing when affiliate id is missing", () => {
@@ -93,6 +98,47 @@ describe("affiliate gating", () => {
       buildAffiliateLinks({
         locale: "en",
         areaLabel: "Kamakura",
+        locationSlug: "kamakura-kanagawa",
+      }),
+    ).toEqual([]);
+  });
+});
+
+describe("Rakuten tracked URLs", () => {
+  beforeEach(() => {
+    vi.stubEnv("RAKUTEN_AFFILIATE_ID", RAKUTEN_AID);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("builds the confirmed hgc redirect with encoded pc for Kamakura", () => {
+    const links = buildAffiliateLinks({
+      locale: "ja",
+      areaLabel: "鎌倉市",
+      locationSlug: "kamakura-kanagawa",
+    });
+    expect(links).toHaveLength(1);
+    const href = links[0]?.href;
+    expect(href).toBe(
+      buildRakutenTrackedUrl({
+        affiliateId: RAKUTEN_AID,
+        pcUrl: KAMAKURA_RAKUTEN_PC,
+      }),
+    );
+    expect(href).toBe(
+      `https://hb.afl.rakuten.co.jp/hgc/${RAKUTEN_AID}/?pc=${encodeURIComponent(KAMAKURA_RAKUTEN_PC)}`,
+    );
+    expect(new URL(href!).searchParams.get("pc")).toBe(KAMAKURA_RAKUTEN_PC);
+  });
+
+  it("returns no ja link when RAKUTEN_AFFILIATE_ID is missing", () => {
+    vi.unstubAllEnvs();
+    expect(
+      buildAffiliateLinks({
+        locale: "ja",
+        areaLabel: "鎌倉市",
         locationSlug: "kamakura-kanagawa",
       }),
     ).toEqual([]);
