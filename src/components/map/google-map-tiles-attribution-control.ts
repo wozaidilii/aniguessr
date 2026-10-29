@@ -1,6 +1,7 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import {
   GOOGLE_MAP_TILES_LOGO_PATH,
+  buildGoogleMapTilesViewportUrl,
   fetchGoogleMapTilesViewportAttribution,
 } from "~/lib/google-map-tiles-basemap";
 
@@ -24,6 +25,7 @@ export class GoogleMapTilesAttributionOverlay {
   private container: HTMLDivElement | undefined;
   private copyrightEl: HTMLSpanElement | undefined;
   private refreshTimer = 0;
+  private lastViewportUrl = "";
   private readonly session: string;
   private readonly apiKey: string;
   private readonly surface: GoogleMapTilesAttributionSurface;
@@ -83,6 +85,18 @@ export class GoogleMapTilesAttributionOverlay {
     const copyrightText = attribution?.copyright?.trim() ?? "";
     if (!copyrightText) return;
 
+    this.lastViewportUrl = buildGoogleMapTilesViewportUrl(
+      this.session,
+      this.apiKey,
+      {
+        north: bounds.getNorth(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        west: bounds.getWest(),
+        zoom,
+      },
+    );
+
     const container = document.createElement("div");
     container.className = `google-map-tiles-attribution google-map-tiles-attribution--${this.surface}`;
     container.style.zIndex = String(GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX);
@@ -133,6 +147,19 @@ export class GoogleMapTilesAttributionOverlay {
     if (!map || !copyrightEl) return;
     const bounds = map.getBounds();
     const zoom = map.getZoom();
+    const viewportUrl = buildGoogleMapTilesViewportUrl(
+      this.session,
+      this.apiKey,
+      {
+        north: bounds.getNorth(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        west: bounds.getWest(),
+        zoom,
+      },
+    );
+    if (viewportUrl === this.lastViewportUrl) return;
+    this.lastViewportUrl = viewportUrl;
     const result = await fetchGoogleMapTilesViewportAttribution(
       this.session,
       this.apiKey,

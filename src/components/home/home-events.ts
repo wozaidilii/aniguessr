@@ -1,5 +1,7 @@
 export const HOME_ORIGIN_EVENT = "aniguessr:home-origin";
 export const HOME_BOUNDS_EVENT = "aniguessr:home-bounds";
+/** Ask the homepage map to republish bounds (e.g. nearby sheet opened). */
+export const HOME_REPUBLISH_BOUNDS_EVENT = "aniguessr:home-republish-bounds";
 export const HOME_FOCUS_WORK_EVENT = "aniguessr:home-focus-work";
 /** User drag or zoom on the homepage map. */
 export const HOME_MAP_GESTURE_EVENT = "aniguessr:home-map-gesture";

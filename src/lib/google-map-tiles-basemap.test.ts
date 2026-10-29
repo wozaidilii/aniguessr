@@ -257,6 +257,13 @@ describe("google map tiles style", () => {
     expect(a?.copyright).toBe("© Google");
     expect(b?.copyright).toBe("© Google");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    const again = await fetchGoogleMapTilesViewportAttribution(
+      "sess",
+      "test-key",
+      bounds,
+    );
+    expect(again?.copyright).toBe("© Google");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     vi.unstubAllGlobals();
     resetGoogleMapTilesViewportAttributionCacheForTests();
   });

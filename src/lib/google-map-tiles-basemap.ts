@@ -400,10 +400,15 @@ const viewportAttributionInflight = new Map<
   string,
   Promise<GoogleMapTilesViewportAttribution | null>
 >();
+const viewportAttributionResolved = new Map<
+  string,
+  GoogleMapTilesViewportAttribution | null
+>();
 
-/** Test hook: clear in-flight viewport dedupe. */
+/** Test hook: clear viewport dedupe caches. */
 export function resetGoogleMapTilesViewportAttributionCacheForTests(): void {
   viewportAttributionInflight.clear();
+  viewportAttributionResolved.clear();
 }
 
 /** Dynamic attribution required by Map Tiles API policies. */
@@ -419,6 +424,9 @@ export async function fetchGoogleMapTilesViewportAttribution(
   },
 ): Promise<GoogleMapTilesViewportAttribution | null> {
   const url = buildGoogleMapTilesViewportUrl(session, apiKey, bounds);
+  if (viewportAttributionResolved.has(url)) {
+    return viewportAttributionResolved.get(url) ?? null;
+  }
   const existing = viewportAttributionInflight.get(url);
   if (existing) return existing;
 
@@ -437,5 +445,7 @@ export async function fetchGoogleMapTilesViewportAttribution(
     }
   })();
   viewportAttributionInflight.set(url, request);
-  return request;
+  const result = await request;
+  viewportAttributionResolved.set(url, result);
+  return result;
 }
