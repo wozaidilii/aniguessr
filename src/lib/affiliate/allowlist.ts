@@ -1,3 +1,4 @@
+import "server-only";
 import { readFileSync } from "node:fs";
 import committedAllowlist from "../../../data/affiliate-allowlist.json";
 
