@@ -9,10 +9,10 @@ import {
   type CSSProperties,
 } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
-import { withAnimeLocale } from "~/lib/anime-locale";
 import { getHomePageCopy } from "~/lib/home-page-copy";
-import { homeSiteLocale, type HomeLocale } from "~/lib/home-locale";
+import { homeLoginHref, type HomeLocale } from "~/lib/home-locale";
 import { isEscapeKey } from "~/lib/menu-dismiss";
 import {
   anchorBelowTriggerRight,
@@ -180,8 +180,8 @@ export function HomeAccount({
   dismissSignal?: number;
 }) {
   const copy = getHomePageCopy(locale);
-  const siteLocale = homeSiteLocale(locale);
-  const loginHref = withAnimeLocale("/login", siteLocale);
+  const pathname = usePathname();
+  const loginHref = homeLoginHref(locale, pathname);
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
