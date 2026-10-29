@@ -7,12 +7,15 @@ import {
   getKlookAffiliateId,
   getRakutenAffiliateId,
 } from "~/lib/affiliate/config";
+import { resolveKlookContentPath } from "~/lib/affiliate/klook-targets";
 
 export interface AffiliateLinkContext {
   locale: PilgrimageLocale;
   areaLabel: string;
   lat?: number;
   lng?: number;
+  spotId?: string;
+  locationSlug?: string;
 }
 
 export interface AffiliateLinkOffer {
@@ -21,7 +24,7 @@ export interface AffiliateLinkOffer {
   linkType: "hotel" | "tour";
 }
 
-function klookLocalePath(locale: PilgrimageLocale) {
+export function klookLocalePath(locale: PilgrimageLocale) {
   if (locale === "zh-tw") return "zh-TW";
   if (locale === "zh") return "zh-CN";
   return "en-US";
@@ -58,25 +61,26 @@ function buildRakutenTravelUrl(input: {
   return wrapped.toString();
 }
 
-function buildKlookUrl(input: {
+export function buildKlookDestinationUrl(
+  locale: PilgrimageLocale,
+  contentPath: string,
+) {
+  const normalized = contentPath.replace(/^\//, "");
+  const pathLocale = klookLocalePath(locale);
+  const url = `https://www.klook.com/${pathLocale}/${normalized}`;
+  return url.endsWith("/") ? url : `${url}/`;
+}
+
+export function buildKlookTrackedUrl(input: {
   locale: PilgrimageLocale;
-  areaLabel: string;
-  lat?: number;
-  lng?: number;
   affiliateId: string;
+  contentPath: string;
 }) {
-  const query = searchQuery(input.areaLabel, input.lat, input.lng);
-  const pathLocale = klookLocalePath(input.locale);
-  const destination = new URL(
-    `https://www.klook.com/${pathLocale}/search/result/`,
-  );
-  if (query) destination.searchParams.set("query", query);
-  if (input.lat !== undefined && input.lng !== undefined) {
-    destination.searchParams.set("latitude", String(input.lat));
-    destination.searchParams.set("longitude", String(input.lng));
-  }
-  destination.searchParams.set("aid", input.affiliateId);
-  return destination.toString();
+  const destination = buildKlookDestinationUrl(input.locale, input.contentPath);
+  const redirect = new URL("https://affiliate.klook.com/redirect");
+  redirect.searchParams.set("aid", input.affiliateId);
+  redirect.searchParams.set("k_site", destination);
+  return redirect.toString();
 }
 
 export function buildAffiliateLinks(
@@ -99,12 +103,18 @@ export function buildAffiliateLinks(
 
   const affiliateId = getKlookAffiliateId();
   if (!affiliateId) return [];
-  const href = buildKlookUrl({
-    locale: context.locale,
-    areaLabel: context.areaLabel,
-    lat: context.lat,
-    lng: context.lng,
-    affiliateId,
+
+  const contentPath = resolveKlookContentPath({
+    spotId: context.spotId,
+    locationSlug: context.locationSlug,
   });
-  return [{ provider, href, linkType: "tour" }];
+  if (!contentPath) return [];
+
+  const href = buildKlookTrackedUrl({
+    locale: context.locale,
+    affiliateId,
+    contentPath,
+  });
+
+  return [{ provider: "klook", href, linkType: "tour" }];
 }

@@ -173,6 +173,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
     pageType: "spot" as const,
     locale,
     spotId: spot.id,
+    locationSlug: spot.locationSlug,
     areaLabel: location,
     lat: spot.lat,
     lng: spot.lng,

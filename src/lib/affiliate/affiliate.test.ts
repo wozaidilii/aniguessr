@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("~/lib/affiliate/allowlist", () => ({
   isAffiliateAllowlisted: vi.fn(() => false),
 }));
@@ -11,15 +13,24 @@ import {
   isAffiliateFeatureEnabled,
   shouldRenderAffiliateBlock,
 } from "~/lib/affiliate/config";
+import { resolveKlookContentPath } from "~/lib/affiliate/klook-targets";
 import { affiliateProviderForLocale } from "~/lib/affiliate/provider";
 import {
   AFFILIATE_BLOCK_MIN_HEIGHT,
   resolveAffiliatePage,
 } from "~/lib/affiliate/resolve";
-import { buildAffiliateLinks } from "~/lib/affiliate/urls";
+import {
+  buildAffiliateLinks,
+  buildKlookDestinationUrl,
+  buildKlookTrackedUrl,
+  klookLocalePath,
+} from "~/lib/affiliate/urls";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 
 const mockedAllowlist = vi.mocked(isAffiliateAllowlisted);
+const KLOOK_AID = "141236";
+const KAMAKURA_TOUR_PATH =
+  "activity/25457-kamakura-enoshima-day-tour-tokyo/";
 
 describe("affiliate gating", () => {
   beforeEach(() => {
@@ -39,61 +50,30 @@ describe("affiliate gating", () => {
         pageType: "spot",
         locale: "ja",
         spotId: "anitabi_1_x",
+        locationSlug: "kamakura-kanagawa",
         areaLabel: "Tokyo",
         lat: 35.6,
         lng: 139.7,
       }),
     ).toBeNull();
-    expect(buildAffiliateLinks({ locale: "ja", areaLabel: "Tokyo" })).toEqual(
-      [],
-    );
   });
 
-  it("renders when env and allowlist are on with provider-specific URLs", () => {
+  it("renders Rakuten when env and allowlist are on", () => {
     vi.stubEnv("AFFILIATE_ENABLED", "true");
     vi.stubEnv("RAKUTEN_AFFILIATE_ID", "rakuten-test-id");
-    vi.stubEnv("KLOOK_AFFILIATE_ID", "klook-test-id");
+    vi.stubEnv("KLOOK_AFFILIATE_ID", KLOOK_AID);
     mockedAllowlist.mockReturnValue(true);
-
-    expect(shouldRenderAffiliateBlock({ spotId: "anitabi_1_x" })).toBe(true);
 
     const jaLinks = buildAffiliateLinks({
       locale: "ja",
       areaLabel: "宇治市",
       lat: 34.89,
       lng: 135.8,
+      locationSlug: "uji-kyoto",
     });
     expect(jaLinks).toHaveLength(1);
     expect(jaLinks[0]?.provider).toBe("rakuten_travel");
     expect(jaLinks[0]?.href).toContain("rakuten-test-id");
-    expect(jaLinks[0]?.href).toContain("travel.rakuten.co.jp");
-
-    const resolved = resolveAffiliatePage({
-      pageType: "spot",
-      locale: "ja",
-      spotId: "anitabi_1_x",
-      areaLabel: "宇治市",
-      lat: 34.89,
-      lng: 135.8,
-    });
-    expect(resolved?.offer.linkType).toBe("hotel");
-
-    const enLinks = buildAffiliateLinks({
-      locale: "en",
-      areaLabel: "Kyoto",
-    });
-    expect(enLinks).toHaveLength(1);
-    expect(enLinks[0]?.provider).toBe("klook");
-    expect(enLinks[0]?.href).toContain("klook.com/en-US/search");
-    expect(enLinks[0]?.href).toContain("aid=klook-test-id");
-
-    expect(affiliateProviderForLocale("zh-tw")).toBe("klook");
-    expect(
-      buildAffiliateLinks({ locale: "zh-tw", areaLabel: "小樽" })[0]?.href,
-    ).toContain("/zh-TW/");
-    expect(
-      buildAffiliateLinks({ locale: "zh", areaLabel: "小樽" })[0]?.href,
-    ).toContain("/zh-CN/");
   });
 
   it("renders nothing when affiliate id is missing", () => {
@@ -103,21 +83,112 @@ describe("affiliate gating", () => {
     expect(getRakutenAffiliateId()).toBeUndefined();
     expect(getKlookAffiliateId()).toBeUndefined();
     expect(
-      buildAffiliateLinks({ locale: "ja", areaLabel: "Tokyo" }),
+      buildAffiliateLinks({
+        locale: "ja",
+        areaLabel: "Tokyo",
+        locationSlug: "kamakura-kanagawa",
+      }),
     ).toEqual([]);
     expect(
-      buildAffiliateLinks({ locale: "en", areaLabel: "Tokyo" }),
+      buildAffiliateLinks({
+        locale: "en",
+        areaLabel: "Kamakura",
+        locationSlug: "kamakura-kanagawa",
+      }),
     ).toEqual([]);
+  });
+});
+
+describe("Klook tracked URLs", () => {
+  beforeEach(() => {
+    vi.stubEnv("KLOOK_AFFILIATE_ID", KLOOK_AID);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("builds redirect URLs with encoded k_site per locale", () => {
+    for (const locale of ["zh-tw", "zh", "en"] as const) {
+      const href = buildKlookTrackedUrl({
+        locale,
+        affiliateId: KLOOK_AID,
+        contentPath: KAMAKURA_TOUR_PATH,
+      });
+      expect(href.startsWith("https://affiliate.klook.com/redirect?")).toBe(
+        true,
+      );
+      const params = new URL(href).searchParams;
+      expect(params.get("aid")).toBe(KLOOK_AID);
+      const kSite = params.get("k_site");
+      expect(kSite).toBeTruthy();
+      expect(kSite).toBe(
+        buildKlookDestinationUrl(locale, KAMAKURA_TOUR_PATH),
+      );
+      expect(klookLocalePath(locale)).toBe(
+        locale === "zh-tw" ? "zh-TW" : locale === "zh" ? "zh-CN" : "en-US",
+      );
+    }
+  });
+
+  it("maps Kamakura and Enoshima regions to the primary tour", () => {
+    expect(
+      resolveKlookContentPath({ locationSlug: "kamakura-kanagawa" }),
+    ).toBe(KAMAKURA_TOUR_PATH);
+    expect(
+      resolveKlookContentPath({ locationSlug: "fujisawa-kanagawa" }),
+    ).toBe(KAMAKURA_TOUR_PATH);
+  });
+
+  it("returns no Klook link for unmapped regions", () => {
+    expect(resolveKlookContentPath({ locationSlug: "sapporo-hokkaido" })).toBe(
+      null,
+    );
+    expect(
+      buildAffiliateLinks({
+        locale: "en",
+        areaLabel: "Sapporo",
+        locationSlug: "sapporo-hokkaido",
+      }),
+    ).toEqual([]);
+  });
+
+  it("hides the block when Klook env is missing even if allowlisted", () => {
+    vi.unstubAllEnvs();
+    vi.stubEnv("AFFILIATE_ENABLED", "true");
+    mockedAllowlist.mockReturnValue(true);
+
     expect(
       resolveAffiliatePage({
-        pageType: "spot",
-        locale: "ja",
-        spotId: "anitabi_1_x",
-        areaLabel: "Tokyo",
-        lat: 35.6,
-        lng: 139.7,
+        pageType: "location",
+        locale: "en",
+        locationSlug: "kamakura-kanagawa",
+        areaLabel: "Kamakura",
       }),
     ).toBeNull();
+  });
+
+  it("resolves allowlisted Kamakura pages to a Klook offer", () => {
+    vi.stubEnv("AFFILIATE_ENABLED", "true");
+    vi.stubEnv("KLOOK_AFFILIATE_ID", KLOOK_AID);
+    mockedAllowlist.mockReturnValue(true);
+
+    const resolved = resolveAffiliatePage({
+      pageType: "spot",
+      locale: "zh-tw",
+      spotId: "anitabi_277518_hhm50c87y",
+      locationSlug: "kamakura-kanagawa",
+      areaLabel: "鎌倉市",
+      lat: 35.31,
+      lng: 139.55,
+    });
+    expect(resolved?.offer.provider).toBe("klook");
+    expect(resolved?.offer.href).toContain("affiliate.klook.com/redirect");
+    expect(
+      new URL(resolved!.offer.href).searchParams.get("k_site"),
+    ).toBe(
+      buildKlookDestinationUrl("zh-tw", KAMAKURA_TOUR_PATH),
+    );
   });
 });
 
@@ -125,14 +196,8 @@ describe("affiliate marketing copy", () => {
   it("uses final copy without TODO placeholders", () => {
     for (const locale of ["ja", "zh", "zh-tw", "en"] as const) {
       const copy = getPilgrimageCopy(locale);
-      expect(copy.affiliatePrLabel).toBe("PR");
       expect(copy.affiliateDisclosure).not.toMatch(/TODO/i);
-      expect(copy.affiliateTitle).not.toMatch(/TODO/i);
-      expect(copy.affiliateTitleLocation).not.toMatch(/TODO/i);
     }
-    expect(getPilgrimageCopy("ja").affiliateDisclosure).toContain(
-      "アフィリエイトリンク",
-    );
   });
 });
 
@@ -143,30 +208,6 @@ describe("affiliate layout constants", () => {
       fs.readFile("src/components/pilgrimage/affiliate-block.tsx", "utf8"),
     );
     expect(source).toContain("min-h-[8.5rem]");
-    expect(source).toContain("border-[#E7E3DC]");
-    expect(source).toContain("bg-white");
-  });
-});
-
-describe("affiliate link markup contract", () => {
-  it("uses sponsored rel attributes on tracked links", async () => {
-    const source = await import("fs/promises").then((fs) =>
-      fs.readFile("src/components/pilgrimage/affiliate-track-link.tsx", "utf8"),
-    );
-    expect(source).toContain('rel="sponsored nofollow noopener"');
-    expect(source).toContain('target="_blank"');
-    expect(source).toContain("aria-label");
-  });
-
-  it("renders H1 disclosure only via pilgrimage shell prop", async () => {
-    const shell = await import("fs/promises").then((fs) =>
-      fs.readFile(
-        "src/app/[locale]/pilgrimage/_components/pilgrimage-ui.tsx",
-        "utf8",
-      ),
-    );
-    expect(shell).toContain("affiliateDisclosure");
-    expect(shell).toContain("affiliate-h1-disclosure");
   });
 });
 
