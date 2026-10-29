@@ -7,6 +7,7 @@ import {
   buildGoogleMapTilesViewportUrl,
   clearCachedGoogleMapTilesSession,
   createGoogleMapTilesSession,
+  fetchGoogleMapTilesViewportAttribution,
   GOOGLE_MAP_TILES_LOGO_PATH,
   GOOGLE_MAP_TILES_SESSION_STYLES_VERSION,
   GOOGLE_MAP_TILES_VIEWPORT_URL,
@@ -16,6 +17,7 @@ import {
   googleMapTilesSessionCacheFingerprint,
   googleMapTilesSessionCacheStorageKey,
   readCachedGoogleMapTilesSession,
+  resetGoogleMapTilesViewportAttributionCacheForTests,
   writeCachedGoogleMapTilesSession,
 } from "~/lib/google-map-tiles-basemap";
 
@@ -185,9 +187,14 @@ describe("google map tiles session cache", () => {
 
 describe("google map tiles style", () => {
   it("builds a 256px raster MapLibre style", () => {
-    const style = buildGoogleMapTilesMapStyle("sess", "test-key");
+    const style = buildGoogleMapTilesMapStyle("sess", "test-key", 200);
     const source = style.sources?.["google-roadmap"];
     expect(source).toMatchObject({ type: "raster", tileSize: 256 });
+    const layer = style.layers?.[0];
+    expect(layer).toMatchObject({
+      id: "google-roadmap",
+      paint: { "raster-fade-duration": 200 },
+    });
     expect(googleMapTilesRasterUrlTemplate("sess", "test-key")).toContain(
       "session=sess",
     );
@@ -226,6 +233,32 @@ describe("google map tiles style", () => {
     expect(url.startsWith(GOOGLE_MAP_TILES_VIEWPORT_URL)).toBe(true);
     expect(url).not.toContain("tile.googleapis.com/v1/viewport");
     expect(url).toContain("session=sess");
+  });
+
+  it("dedupes in-flight viewport attribution requests for the same bounds", async () => {
+    resetGoogleMapTilesViewportAttributionCacheForTests();
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ copyright: "© Google" }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    const bounds = {
+      north: 36,
+      south: 35,
+      east: 140,
+      west: 139,
+      zoom: 10,
+    };
+    const [a, b] = await Promise.all([
+      fetchGoogleMapTilesViewportAttribution("sess", "test-key", bounds),
+      fetchGoogleMapTilesViewportAttribution("sess", "test-key", bounds),
+    ]);
+    expect(a?.copyright).toBe("© Google");
+    expect(b?.copyright).toBe("© Google");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
+    resetGoogleMapTilesViewportAttributionCacheForTests();
   });
 });
 

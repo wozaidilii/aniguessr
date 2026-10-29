@@ -1,8 +1,5 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { mountGoogleMapTilesAttribution } from "~/components/map/google-map-tiles-attribution-control";
-import {
-  googleMapBasemapFadeMs,
-} from "~/lib/google-map-basemap-placeholder";
 import type { HomeMapBasemapKind } from "~/lib/home-map-basemap";
 import { homeMapInitialStyleUrl } from "~/lib/home-map-basemap";
 import {
@@ -18,7 +15,6 @@ import {
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
 import type { GoogleMapTilesAttributionSurface } from "~/components/map/google-map-tiles-attribution-control";
 import { whenGoogleRoadmapTilesVisible } from "~/lib/google-map-tiles-visible";
-import { fadeInGoogleMapBasemapCanvas } from "~/lib/google-map-basemap-placeholder";
 import { swapMapStyleUrl } from "~/lib/map-style-swap";
 
 let loggedCreateSessionFailure = false;
@@ -100,7 +96,6 @@ export async function applyGoogleMapTilesBasemap(
     let detachQuotaMonitor: (() => void) | undefined;
 
     const finishAfterTiles = (): void => {
-      fadeInGoogleMapBasemapCanvas(map, googleMapBasemapFadeMs());
       mountGoogleMapTilesAttribution(
         map,
         sessionResult.session,

@@ -170,6 +170,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     const googleSessionPromise = attemptGoogleBasemap
       ? createGoogleMapTilesSession(locale, resolveGoogleMapTilesApiKey())
       : undefined;
+    const labelsPromise = loadHomeMapLabels();
     const map = new maplibregl.Map({
       container,
       style: resolveHomeMapInitialStyle(),
@@ -555,7 +556,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     window.addEventListener("storage", onFavorites);
     ensureYou();
 
-    void loadHomeMapLabels()
+    void labelsPromise
       .then((labels) => {
         if (cancelled || !labels) return;
         labelsReady = labels;

@@ -157,6 +157,5 @@ describe("applyGoogleMapTilesBasemap", () => {
     expect(result.applied).toBe(true);
     expect(onVisible).toHaveBeenCalledTimes(1);
     expect(mountGoogleMapTilesAttribution).toHaveBeenCalledTimes(1);
-    expect(map.canvas.style.opacity).toBe("1");
   });
 });

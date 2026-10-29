@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   HOME_IDEOGRAPH_FONT,
   HOME_MAP_STYLE,
   homePlaceNameField,
   homePlaceNameKey,
+  isHomeMapOverlayLayerId,
   tuneHomeMapStyle,
 } from "~/lib/home-map-style";
 import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
@@ -41,5 +42,48 @@ describe("homepage map style", () => {
       ["get", "name:zh-Hant"],
       ["get", "name"],
     ]);
+  });
+
+  it("does not rewrite home pill text-field after a Positron style swap", () => {
+    const pillTextField = [
+      "format",
+      ["get", "label"],
+      { "text-color": "#2a2430" },
+      " ",
+      {},
+      ["to-string", ["get", "count"]],
+      { "text-color": "#E0488F" },
+    ];
+    const setLayoutProperty = vi.fn();
+    const map = {
+      getStyle: () => ({
+        layers: [
+          {
+            id: "home-pref-major",
+            type: "symbol",
+            layout: { "text-field": pillTextField },
+          },
+          {
+            id: "label_city",
+            type: "symbol",
+            layout: { "text-field": ["get", "name"] },
+          },
+        ],
+      }),
+      setPaintProperty: vi.fn(),
+      setLayoutProperty,
+    };
+    tuneHomeMapStyle(map as never, "ja");
+    expect(isHomeMapOverlayLayerId("home-pref-major")).toBe(true);
+    expect(setLayoutProperty).toHaveBeenCalledWith(
+      "label_city",
+      "text-field",
+      homePlaceNameField("ja"),
+    );
+    expect(setLayoutProperty).not.toHaveBeenCalledWith(
+      "home-pref-major",
+      "text-field",
+      expect.anything(),
+    );
   });
 });

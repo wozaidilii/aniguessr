@@ -24,7 +24,6 @@ export class GoogleMapTilesAttributionOverlay {
   private container: HTMLDivElement | undefined;
   private copyrightEl: HTMLSpanElement | undefined;
   private refreshTimer = 0;
-  private resizeObserver: ResizeObserver | undefined;
   private readonly session: string;
   private readonly apiKey: string;
   private readonly surface: GoogleMapTilesAttributionSurface;
@@ -106,17 +105,6 @@ export class GoogleMapTilesAttributionOverlay {
 
     map.on("moveend", this.scheduleRefresh);
     map.on("resize", this.scheduleRefresh);
-    this.resizeObserver = new ResizeObserver(() => {
-      this.scheduleRefresh();
-    });
-    if (this.surface === "home") {
-      const sheet = document.querySelector(".home-nearby-sheet");
-      if (sheet) this.resizeObserver.observe(sheet);
-      const homeRoot = map.getContainer().closest(".home");
-      if (homeRoot) this.resizeObserver.observe(homeRoot);
-    } else {
-      this.resizeObserver.observe(map.getContainer());
-    }
   }
 
   detach(): void {
@@ -125,8 +113,6 @@ export class GoogleMapTilesAttributionOverlay {
       this.map.off("moveend", this.scheduleRefresh);
       this.map.off("resize", this.scheduleRefresh);
     }
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = undefined;
     window.clearTimeout(this.refreshTimer);
     this.container?.remove();
     this.container = undefined;

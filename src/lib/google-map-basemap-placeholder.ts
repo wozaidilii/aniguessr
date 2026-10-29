@@ -14,29 +14,6 @@ export function buildGoogleMapBasemapPlaceholderStyle(): StyleSpecification {
   };
 }
 
-export function googleMapBasemapFadeMs(): number {
-  if (typeof window === "undefined") return 200;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 200;
-}
-
-/** Fade raster tiles in after the Google style is applied. */
-export function fadeInGoogleMapBasemapCanvas(
-  map: { getCanvas: () => HTMLCanvasElement },
-  durationMs = googleMapBasemapFadeMs(),
-): void {
-  const canvas = map.getCanvas();
-  canvas.style.opacity = "0";
-  if (durationMs <= 0) {
-    canvas.style.transition = "";
-    canvas.style.opacity = "1";
-    return;
-  }
-  canvas.style.transition = `opacity ${durationMs}ms ease`;
-  requestAnimationFrame(() => {
-    canvas.style.opacity = "1";
-  });
-}
-
 export function injectGoogleMapTilesPreconnect(): void {
   if (typeof document === "undefined") return;
   const existing = document.querySelector(

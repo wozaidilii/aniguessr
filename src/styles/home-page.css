@@ -2183,6 +2183,12 @@
     max-width: calc(100% - 8px);
   }
 
+  .home-map .maplibregl-ctrl-bottom-left {
+    bottom: calc(var(--home-sheet-height, 96px) + 10px + env(safe-area-inset-bottom, 0px));
+    left: 8px;
+    z-index: 40;
+  }
+
   .home-map .maplibregl-ctrl-attrib {
     max-width: calc(100vw - 24px);
     overflow: hidden;
