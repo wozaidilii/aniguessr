@@ -65,6 +65,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 - Adding one telemetry provider must not remove or replace existing providers unless the task explicitly asks for a provider migration.
 - Public analytics tokens must remain public-only. Secret analytics API keys do not belong in client components or `NEXT_PUBLIC_*` variables.
 - Dependency additions must use the existing package manager and update the lockfile.
+- Browser telemetry must sanitize private planner fragments (`#trip=...`) as well as identity query parameters before transmission. Maintain parity between the TypeScript sanitizer and the inlined PostHog `before_send` hook; test query-less URLs and nested redirects. Ordinary navigation hashes may remain.
 
 #### 4. Validation & Error Matrix
 

@@ -31,8 +31,8 @@ export function exportTripText(
   for (const day of plan.days) {
     lines.push(
       `## ${dayLabel(locale, day.day)} ${tripDate(state.startDate, day.day, locale)}`,
-      copy.rest,
     );
+    if (day.stops.length) lines.push(copy.rest);
     if (day.overBudget) lines.push(copy.overBudget);
     if (!day.stops.length) lines.push(copy.freeDay);
     for (const visit of day.stops) {

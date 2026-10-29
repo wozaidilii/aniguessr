@@ -26,6 +26,8 @@ export interface TripState {
   routeIds: string[];
   excludedIds: string[];
   stopOrder: string[];
+  /** Optional day boundaries, keyed by stop ID; transfers still count on the new day. */
+  dayBreakBefore: string[];
   days: number;
   pace: TravelPace;
   transport: TravelMode;

@@ -53,11 +53,13 @@ describe("trip entry and editing", () => {
       excludedIds: Array.from({ length: 180 }, (_, i) => `spot:${i}`),
       spotIds: ["s"],
       visitMinutes: { "spot:s": 90 },
+      dayBreakBefore: ["spot:s"],
     };
     const removed = removeTripStop(state, "spot:s");
     expect(tripStateSchema.safeParse(removed).success).toBe(true);
     expect(removed.spotIds).toEqual([]);
     expect(removed.excludedIds).toHaveLength(180);
     expect(removed.visitMinutes).toEqual({});
+    expect(removed.dayBreakBefore).toEqual([]);
   });
 });

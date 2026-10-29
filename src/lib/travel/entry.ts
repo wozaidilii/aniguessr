@@ -94,6 +94,7 @@ export function removeTripStop(state: TripState, id: string): TripState {
       -180,
     ),
     stopOrder: state.stopOrder.filter((item) => item !== id),
+    dayBreakBefore: state.dayBreakBefore.filter((item) => item !== id),
     visitMinutes,
   };
 }

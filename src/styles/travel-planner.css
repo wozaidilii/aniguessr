@@ -1297,6 +1297,18 @@
   }
 }
 
+.trip-day-boundary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #59645a;
+  cursor: pointer;
+}
+.trip-day-boundary input {
+  accent-color: #a82756;
+}
 .trip-mobile-jump {
   display: none;
 }

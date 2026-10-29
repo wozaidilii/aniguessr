@@ -10,6 +10,14 @@ import {
 import { formatTripTime } from "./export";
 
 describe("trip draft boundaries", () => {
+  it("loads legacy drafts without manual day boundaries", () => {
+    const legacy = { ...emptyTrip(), dayBreakBefore: undefined };
+    expect(parseTrip(JSON.stringify(legacy))?.dayBreakBefore).toEqual([]);
+    expect(
+      tripFromHash(`#trip=${encodeURIComponent(JSON.stringify(legacy))}`)
+        ?.dayBreakBefore,
+    ).toEqual([]);
+  });
   it("rejects oversized encoded links and safely round-trips escaped unicode", () => {
     const tooLarge = {
       ...emptyTrip(),
@@ -30,6 +38,7 @@ describe("trip draft boundaries", () => {
       spotIds: ["a&b/地点"],
       routeIds: ["hub:tokyo", "hub:kyoto"],
       stopOrder: ["spot:a&b/地点"],
+      dayBreakBefore: ["spot:a&b/地点"],
       startDate: "2026-12-30",
     };
     const url = new URL(tripShareUrl("https://example.org", "zh-tw", state));

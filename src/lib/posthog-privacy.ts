@@ -26,6 +26,7 @@ const NESTED_URL_QUERY_PARAMS = [
 
 const PII_QUERY_PARAM_SET = new Set<string>(POSTHOG_PII_QUERY_PARAMS);
 const NESTED_URL_QUERY_PARAM_SET = new Set<string>(NESTED_URL_QUERY_PARAMS);
+const PRIVATE_TRIP_FRAGMENT = "#trip=";
 
 function isPiiQueryParam(key: string) {
   return PII_QUERY_PARAM_SET.has(key.toLowerCase());
@@ -79,14 +80,18 @@ function rewriteSearchParams(params: URLSearchParams, depth: number) {
   }
 }
 
-/** Removes PII query params. Returns the original string when nothing changes. */
+/** Removes identity queries and private trip fragments; preserves ordinary navigation hashes. */
 export function sanitizePostHogUrl(value: string, depth = 0): string {
-  if (depth > 3 || !value?.includes("?")) return value;
+  if (
+    depth > 3 ||
+    (!value?.includes("?") && !value?.includes(PRIVATE_TRIP_FRAGMENT))
+  )
+    return value;
 
   let url: URL;
   let kind: "absolute" | "path" | "query";
   try {
-    if (value.startsWith("?")) {
+    if (value.startsWith("?") || value.startsWith("#")) {
       kind = "query";
       url = new URL(value, "https://aniguessr.local/");
     } else if (value.startsWith("/")) {
@@ -101,8 +106,10 @@ export function sanitizePostHogUrl(value: string, depth = 0): string {
   }
 
   const before = url.searchParams.toString();
+  const privateTrip = url.hash.startsWith(PRIVATE_TRIP_FRAGMENT);
+  if (privateTrip) url.hash = "";
   rewriteSearchParams(url.searchParams, depth);
-  if (url.searchParams.toString() === before) return value;
+  if (!privateTrip && url.searchParams.toString() === before) return value;
   return rebuildUrl(url, kind);
 }
 
@@ -135,6 +142,7 @@ export function buildPostHogBeforeSendHook() {
   return `function (event) {
     var pii = ${JSON.stringify([...POSTHOG_PII_QUERY_PARAMS])};
     var nested = ${JSON.stringify([...NESTED_URL_QUERY_PARAMS])};
+    var privateTripFragment = ${JSON.stringify(PRIVATE_TRIP_FRAGMENT)};
     function isPii(key) { return pii.indexOf(String(key).toLowerCase()) !== -1; }
     function isNested(key) { return nested.indexOf(String(key).toLowerCase()) !== -1; }
     function isUrlKey(key) {
@@ -150,11 +158,11 @@ export function buildPostHogBeforeSendHook() {
       return url.toString();
     }
     function sanitize(value, depth) {
-      if (depth > 3 || typeof value !== "string" || value.indexOf("?") === -1) return value;
+      if (depth > 3 || typeof value !== "string" || (value.indexOf("?") === -1 && value.indexOf(privateTripFragment) === -1)) return value;
       var url;
       var kind;
       try {
-        if (value.charAt(0) === "?") {
+        if (value.charAt(0) === "?" || value.charAt(0) === "#") {
           kind = "query";
           url = new URL(value, "https://aniguessr.local/");
         } else if (value.charAt(0) === "/") {
@@ -168,6 +176,8 @@ export function buildPostHogBeforeSendHook() {
         return value;
       }
       var before = url.searchParams.toString();
+      var privateTrip = url.hash.indexOf(privateTripFragment) === 0;
+      if (privateTrip) url.hash = "";
       var keys = [];
       url.searchParams.forEach(function (_item, key) { keys.push(key); });
       var seen = {};
@@ -192,7 +202,7 @@ export function buildPostHogBeforeSendHook() {
         url.searchParams.delete(key);
         for (var k = 0; k < cleaned.length; k++) url.searchParams.append(key, cleaned[k]);
       }
-      if (url.searchParams.toString() === before) return value;
+      if (!privateTrip && url.searchParams.toString() === before) return value;
       return rebuild(url, kind);
     }
     function walk(record) {

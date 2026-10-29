@@ -51,6 +51,7 @@ export function PlannerItinerary({
   onRemove,
   onMove,
   onDuration,
+  onDayBreak,
 }: {
   plan: TripPlan;
   state: TripState;
@@ -59,6 +60,7 @@ export function PlannerItinerary({
   onRemove: (id: string) => void;
   onMove: (id: string, delta: number) => void;
   onDuration: (id: string, minutes: number) => void;
+  onDayBreak: (id: string) => void;
 }) {
   const copy = getTravelCopy(locale);
   return (
@@ -205,6 +207,18 @@ export function PlannerItinerary({
                           </a>
                           <StopLinks stop={stop} locale={locale} />
                         </div>
+                        {(index > 0 ||
+                          state.dayBreakBefore.includes(stop.id)) && (
+                          <label className="trip-day-boundary trip-no-print">
+                            <input
+                              type="checkbox"
+                              checked={state.dayBreakBefore.includes(stop.id)}
+                              onChange={() => onDayBreak(stop.id)}
+                              aria-label={`${copy.startNewDay}: ${tripStopName(stop, locale)}`}
+                            />
+                            {copy.startNewDay}
+                          </label>
+                        )}
                       </div>
                     </li>
                   );
@@ -225,6 +239,15 @@ export function PlannerItinerary({
             {plan.unscheduled.map((stop) => (
               <li key={stop.id}>
                 <span>{tripStopName(stop, locale)}</span>
+                {state.dayBreakBefore.includes(stop.id) && (
+                  <button
+                    type="button"
+                    className="trip-text-button trip-no-print"
+                    onClick={() => onDayBreak(stop.id)}
+                  >
+                    {copy.removeDayBreak}
+                  </button>
+                )}
                 <button
                   type="button"
                   className="trip-text-button trip-no-print"

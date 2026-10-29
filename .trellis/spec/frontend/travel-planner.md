@@ -16,8 +16,10 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 - Reuse `loadNavCatalog`, multilingual search folding, `localizedSpotName`, favorite IDs, geodesic distance and the existing map style. Never send the raw SEO index to the client.
 - Pages remain daily ISR, cookie-independent and localized in zh/zh-tw/ja/en. User selections load after hydration.
 - A draft permits 8 anime, 60 explicit spots, 60 curated places, 12 ordered route anchors, 1–14 days, 1–50 km corridor radius, and 0–720 minutes per visit. Arrays and string sizes are bounded; normalized IDs are unique.
+- `dayBreakBefore` is a bounded set of stop IDs, defaulting to `[]` when loading legacy version-1 drafts. A boundary starts the next day only after a scheduled visit; never double-advance when a manual break and the budget both trigger. Carry the transfer to the new day and show any overflow. Removal cleans up the boundary; reset/undo/share/export preserve the same day grouping.
 - Anime mode suggests at most 6 spatially distinct visits per work within 50km of its local starting cluster. Deduplicate automatic frames against explicit same-work spots and anchors too. Explicit selected stops are not silently dropped or merged. Extra automatic frames, disappeared IDs and unscheduled stops are reported.
 - Route mode preserves anchor order. Great-circle corridor proximity is geographic discovery, NOT a road/rail route or detour estimate. Label this in the UI.
+- Route discovery falls back to ordered selected visits when there are no anchors. Selected anime anchors are included visits, not omitted frames.
 - Daily budgets include 60 minutes for meals/rest. Carry transfers across day boundaries. A single impossible transfer must show over-budget status; never claim it fits. Transport estimates must be non-decreasing with distance; use cumulative urban/intercity segments rather than changing the entire leg's speed at a threshold.
 - No hidden truncation of Google Maps waypoints: use per-leg direction URLs with origin/destination/travelmode.
 - Shared/contextual trips are previews until edited or explicitly saved. Valid and invalid previews preserve the stored draft; invalid entries display the saved trip when available. Offer restore and 20-step in-session undo. Hash changes, Back and locale changes preserve these semantics. Attach hash listeners independently of one-time hydration guards.
@@ -29,6 +31,8 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 - Guide entries require canonical HTTPS URL, identifiable publisher, actual article language, source kind, region/topic coverage and `checkedAt`. Match scheduled destinations (not unscheduled visits), cover distinct regions before extra guides, return at most 8. Do not use commission in ranking. Print/download/copy preserve attribution. A checked link is not a guarantee of current prices/hours.
 - Guide and Klook destination matching use explicit trusted coverage; never infer Japan from a rectangular latitude/longitude range. Uncovered destinations use global Klook and an honest no-guide state.
 - Community handoff is an editable English draft plus a verified forum link. Do not automatically post or claim an authenticated content/API partnership. Omit exact dates, coordinates and private/promotional links from generated questions; edits remain local.
+- Keep edited community text visible after an itinerary change. Mark it outdated and disable copying until the user regenerates or explicitly confirms their own update. Guide lists may use user-initiated Web Share; treat cancellation as a no-op and unsupported/failed sharing as copy/selectable-text fallback. Do not claim delivery from a resolved share promise. Ignore late clipboard/share results after a newer action or trip change.
+- PostHog URL properties and its mirrored SDK `before_send` hook must strip `#trip=...`, including query-less URLs and nested redirects, while preserving ordinary `#game`/`#rank` hashes. A fragment's absence from HTTP requests does not prevent a browser analytics SDK from reading it.
 
 ## 4. Validation & Error Matrix
 | Input/state | Behavior |
@@ -55,6 +59,9 @@ Changes to `/[locale]/pilgrimage/planner`, `src/lib/travel`, `src/components/tra
 - Monotonic estimate thresholds, explicit-frame proximity, remote automatic outliers, encoding expansion, removal at limits, guide region/interest filtering, foreign-country fallback and exported attribution.
 - Browser: preview across locale changes; restore/undo/Back; editable community draft; clipboard failure; guide print/download parity.
 - Shared session reader: SSR, denied storage getter/read, malformed session and valid legacy session. Browser: blocked storage still allows itinerary editing and reports persistence failure.
+- Manual boundaries: legacy defaults, serialization, first-stop boundary, transfers, simultaneous budget/boundary trigger, overflow/reset/removal. Export free days must not claim scheduled meal allowances.
+- Both telemetry sanitizers: private trip fragment with/without query, nested redirect, query-only and fragment-only values, ordinary hash preservation.
+- Browser: manual-day undo/reset/export; stale community text and explicit review; native sharing/cancellation/fallback, delayed clipboard rejection and mobile layout.
 
 ## 7. Wrong vs Correct
 Wrong: reuse a React `ready` flag to add a source immediately after recreating a MapLibre map.

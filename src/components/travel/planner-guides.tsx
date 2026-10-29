@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { localizedNavText, type NavCatalog } from "~/lib/pilgrimage-nav";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { getTravelCopy } from "~/lib/travel/copy";
@@ -37,26 +37,49 @@ export function PlannerGuides({
     key: string;
     text: string;
   } | null>(null);
-  const key = `${locale}:${JSON.stringify(state)}`;
+  const key = JSON.stringify(state);
+  const revision = useRef(0);
   useEffect(() => {
+    revision.current++;
     setStatus("");
     setFallback("");
-  }, [key]);
-  const currentQuestion = question?.key === key ? question : null;
+  }, [key, locale]);
+  const questionStale = question !== null && question.key !== key;
   const scheduled = plan.days.flatMap((day) =>
     day.stops.map(({ stop }) => stop),
   );
   const inJapan =
     scheduled.length > 0 && scheduled.every((stop) => !!travelRegionFor(stop));
   async function copyText(text: string, message: string) {
+    const requestRevision = ++revision.current;
     try {
       await navigator.clipboard.writeText(text);
+      if (revision.current !== requestRevision) return;
       setStatus(message);
       setFallback("");
     } catch {
+      if (revision.current !== requestRevision) return;
       setStatus(copy.copyFallback);
       setFallback(text);
     }
+  }
+  async function shareGuides() {
+    const requestRevision = ++revision.current;
+    const text = exportGuideText(plan, state, locale);
+    setStatus("");
+    setFallback("");
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: copy.title, text });
+        if (revision.current !== requestRevision) return;
+        setStatus(copy.shareOpened);
+        return;
+      } catch (error) {
+        if (revision.current !== requestRevision) return;
+        if (error instanceof Error && error.name === "AbortError") return;
+      }
+    }
+    await copyText(text, copy.copied);
   }
   return (
     <section
@@ -66,15 +89,24 @@ export function PlannerGuides({
       <div className="trip-section-heading">
         <h2 id="trip-guides-title">{copy.title}</h2>
         {guides.length > 0 && (
-          <button
-            type="button"
-            className="trip-text-button trip-no-print"
-            onClick={() =>
-              void copyText(exportGuideText(plan, state, locale), copy.copied)
-            }
-          >
-            {copy.copy}
-          </button>
+          <div className="trip-links trip-no-print">
+            <button
+              type="button"
+              className="trip-text-button"
+              onClick={() => void shareGuides()}
+            >
+              {copy.share}
+            </button>
+            <button
+              type="button"
+              className="trip-text-button trip-no-print"
+              onClick={() =>
+                void copyText(exportGuideText(plan, state, locale), copy.copied)
+              }
+            >
+              {copy.copy}
+            </button>
+          </div>
         )}
       </div>
       <p className="trip-muted">{copy.intro}</p>
@@ -139,6 +171,7 @@ export function PlannerGuides({
                 type="button"
                 className="trip-button"
                 onClick={() => {
+                  revision.current++;
                   setQuestion({
                     key,
                     text: buildCommunityQuestion(plan, state, catalog),
@@ -157,31 +190,51 @@ export function PlannerGuides({
                 {copy.openForum} ↗
               </a>
             </div>
-            {currentQuestion && (
-              <>
-                <label htmlFor="trip-community-question">
-                  {copy.questionLabel}
-                </label>
-                <textarea
-                  id="trip-community-question"
-                  rows={12}
-                  value={currentQuestion.text}
-                  onChange={(event) =>
-                    setQuestion({ key, text: event.target.value })
-                  }
-                />
+            <p className="trip-guide-caveat">{copy.privacy}</p>
+          </>
+        )}
+        {question && (
+          <>
+            {questionStale && (
+              <p className="trip-notice" role="status">
+                {copy.questionStale}
+              </p>
+            )}
+            <label htmlFor="trip-community-question">
+              {copy.questionLabel}
+            </label>
+            <textarea
+              id="trip-community-question"
+              rows={12}
+              value={question.text}
+              onChange={(event) => {
+                revision.current++;
+                setQuestion({ ...question, text: event.target.value });
+                setFallback("");
+                setStatus("");
+              }}
+            />
+            <div className="trip-links">
+              {questionStale && inJapan && (
                 <button
                   type="button"
                   className="trip-button"
-                  onClick={() =>
-                    void copyText(currentQuestion.text, copy.questionCopied)
-                  }
+                  onClick={() => setQuestion({ ...question, key })}
                 >
-                  {copy.copyQuestion}
+                  {copy.questionReviewed}
                 </button>
-              </>
-            )}
-            <p className="trip-guide-caveat">{copy.privacy}</p>
+              )}
+              <button
+                type="button"
+                className="trip-button"
+                disabled={questionStale || !inJapan}
+                onClick={() =>
+                  void copyText(question.text, copy.questionCopied)
+                }
+              >
+                {copy.copyQuestion}
+              </button>
+            </div>
           </>
         )}
         <p role="status" aria-live="polite">

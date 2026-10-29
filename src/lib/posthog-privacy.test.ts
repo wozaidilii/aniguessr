@@ -18,6 +18,45 @@ function beforeSend() {
 }
 
 describe("posthog url privacy", () => {
+  it.each([
+    [
+      "https://aniguessr.ayiora.com/zh/pilgrimage/planner#trip=%7Bprivate-dates%7D",
+      "https://aniguessr.ayiora.com/zh/pilgrimage/planner",
+    ],
+    [
+      "/en/pilgrimage/planner?utm_source=friend#trip=private-dates",
+      "/en/pilgrimage/planner?utm_source=friend",
+    ],
+    ["?name=Alice#trip=private-dates", ""],
+    ["#trip=private-dates", ""],
+    [
+      "/zh/login?next=%2Fzh%2Fpilgrimage%2Fplanner%23trip%3Dprivate-dates",
+      "/zh/login?next=%2Fzh%2Fpilgrimage%2Fplanner",
+    ],
+    [
+      "https://aniguessr.ayiora.com/ja#game",
+      "https://aniguessr.ayiora.com/ja#game",
+    ],
+    ["/zh?mode=anime#rank", "/zh?mode=anime#rank"],
+  ])(
+    "keeps private trips out of both telemetry paths: %s",
+    (input, expected) => {
+      expect(sanitizePostHogUrl(input)).toBe(expected);
+      const event = beforeSend()({
+        properties: {
+          $current_url: input,
+          $set_once: { $initial_current_url: input },
+        },
+      });
+      expect(event?.properties).toEqual({
+        $current_url: expected,
+        $set_once: { $initial_current_url: expected },
+      });
+      expect(sanitizePostHogProperties({ next_path: input })).toEqual({
+        next_path: expected,
+      });
+    },
+  );
   it("strips the display name and keeps the account id and game settings", () => {
     const cleaned = sanitizePostHogUrl(BATTLE_URL);
 

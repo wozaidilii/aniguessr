@@ -79,6 +79,28 @@ describe("travel corridor geometry", () => {
 });
 
 describe("itinerary selection and ordering", () => {
+  it("discovers around existing visits when route mode has no anchors", () => {
+    const data = catalog([
+      spot("start", 35, 139),
+      spot("end", 35.04, 139),
+      spot("near", 35.02, 139.001),
+    ]);
+    const plan = buildTripPlan(data, {
+      ...emptyTrip(),
+      mode: "route",
+      spotIds: ["start", "end"],
+    });
+    expect(plan.discoveries.map((item) => item.stop.spotId)).toContain("near");
+  });
+  it("does not count a selected anime anchor as omitted", () => {
+    const plan = buildTripPlan(catalog([spot("anchor", 35, 139)]), {
+      ...emptyTrip(),
+      animeIds: ["a"],
+      routeIds: ["spot:anchor"],
+    });
+    expect(plan.ordered.map((stop) => stop.spotId)).toEqual(["anchor"]);
+    expect(plan.omittedAnimeSpots).toBe(0);
+  });
   it("removes a crossing introduced by nearest-neighbor ordering without moving the start", () => {
     const points = [
       spot("start", 0, 0),
@@ -241,6 +263,57 @@ describe("itinerary selection and ordering", () => {
 });
 
 describe("daily budgets", () => {
+  it("starts a requested new day and carries its transfer without moving the first visit", () => {
+    const stops = [
+      spotStop(spot("a", 35, 139)),
+      spotStop(spot("b", 35.01, 139)),
+      spotStop(spot("c", 35.02, 139)),
+    ];
+    const state = {
+      ...emptyTrip(),
+      days: 2,
+      dayBreakBefore: ["spot:a", "spot:b"],
+    };
+    const result = scheduleStops(stops, state);
+    expect(
+      result.days.map((day) => day.stops.map(({ stop }) => stop.id)),
+    ).toEqual([["spot:a"], ["spot:b", "spot:c"]]);
+    const transfer = result.days[1]!.stops[0]!;
+    expect(transfer.from?.id).toBe("spot:a");
+    expect(transfer.travelMinutes).toBeGreaterThan(0);
+    expect(transfer.arrivalMinutes).toBe(540 + transfer.travelMinutes);
+    expect(result.unscheduled).toEqual([]);
+  });
+  it("does not skip two days when a manual boundary also exceeds the time budget", () => {
+    const stops = [
+      spotStop(spot("a", 35, 139)),
+      spotStop(spot("b", 35, 139)),
+    ].map((stop) => ({ ...stop, minutes: 200 }));
+    const result = scheduleStops(stops, {
+      ...emptyTrip(),
+      days: 2,
+      pace: "relaxed",
+      dayBreakBefore: ["spot:b"],
+    });
+    expect(result.days.map((day) => day.stops.length)).toEqual([1, 1]);
+    expect(result.unscheduled).toEqual([]);
+  });
+  it("retains overflow from manual boundaries and refits it when the boundary is reset", () => {
+    const stops = [
+      spotStop(spot("a", 35, 139)),
+      spotStop(spot("b", 35, 139)),
+      spotStop(spot("c", 35, 139)),
+    ];
+    const state = { ...emptyTrip(), days: 1, dayBreakBefore: ["spot:b"] };
+    const result = scheduleStops(stops, state);
+    expect(result.unscheduled.map((stop) => stop.id)).toEqual([
+      "spot:b",
+      "spot:c",
+    ]);
+    const reset = scheduleStops(stops, { ...state, dayBreakBefore: [] });
+    expect(reset.days[0]!.stops).toHaveLength(3);
+    expect(reset.unscheduled).toEqual([]);
+  });
   it.each(["walking", "driving", "transit"] as const)(
     "keeps %s estimates non-decreasing across distance thresholds",
     (mode) => {

@@ -592,6 +592,16 @@ export function TravelPlanner({
               </section>
               <div className="trip-order-tools trip-no-print">
                 <p>{copy.orderHelp}</p>
+                <p>{copy.dayBreakHelp}</p>
+                {state.dayBreakBefore.length > 0 && (
+                  <button
+                    type="button"
+                    className="trip-text-button"
+                    onClick={() => patch({ dayBreakBefore: [] })}
+                  >
+                    {copy.resetDays}
+                  </button>
+                )}
                 {state.stopOrder.length > 0 && (
                   <button
                     type="button"
@@ -609,6 +619,13 @@ export function TravelPlanner({
                 locale={locale}
                 onRemove={remove}
                 onMove={move}
+                onDayBreak={(id) =>
+                  patch({
+                    dayBreakBefore: state.dayBreakBefore.includes(id)
+                      ? state.dayBreakBefore.filter((item) => item !== id)
+                      : [...state.dayBreakBefore, id],
+                  })
+                }
                 onDuration={(id, minutes) =>
                   patch({
                     visitMinutes: { ...state.visitMinutes, [id]: minutes },

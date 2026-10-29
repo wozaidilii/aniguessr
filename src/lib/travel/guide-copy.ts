@@ -15,6 +15,9 @@ const en = {
   transport: "Transport & routes",
   read: "Read original guide",
   copy: "Copy guide list",
+  share: "Share guides",
+  shareOpened:
+    "Opened system sharing. Confirm the recipient and send in your chosen app.",
   copied: "Guide list copied.",
   copyFallback: "Copy the text below:",
   caveat:
@@ -29,6 +32,9 @@ const en = {
   questionLabel: "Editable English question",
   copyQuestion: "Copy question",
   questionCopied: "Question copied. Nothing has been posted.",
+  questionStale:
+    "Your itinerary changed. Your edits are kept below. Regenerate the question, or update it yourself and confirm it matches the current trip before copying.",
+  questionReviewed: "I updated and checked this question",
   openForum: "Open Japan travel forum",
   privacy:
     "The draft omits exact travel dates, coordinates and private trip links. No message is sent automatically.",
@@ -50,6 +56,8 @@ const zh: Copy = {
   transport: "交通与路线",
   read: "阅读原文",
   copy: "复制攻略清单",
+  share: "分享攻略",
+  shareOpened: "已交给系统分享，请在所选应用中确认接收人并发送。",
   copied: "攻略清单已复制。",
   copyFallback: "请复制下方文字：",
   caveat:
@@ -64,6 +72,9 @@ const zh: Copy = {
   questionLabel: "可编辑的英文提问",
   copyQuestion: "复制提问",
   questionCopied: "提问已复制，尚未发布。",
+  questionStale:
+    "行程已变更，你的修改保留在下方。请重新生成提纲，或自行更新并确认与当前行程一致后再复制。",
+  questionReviewed: "已更新并核对提纲",
   openForum: "打开日本旅行论坛",
   privacy: "提纲省略具体出行日期、坐标和私人行程链接，不会自动向外发送消息。",
   questionUnavailable: "社区交流入口目前覆盖已核验的日本目的地。",
@@ -82,6 +93,8 @@ const tw: Copy = {
   transport: "交通與路線",
   read: "閱讀原文",
   copy: "複製攻略清單",
+  share: "分享攻略",
+  shareOpened: "已交給系統分享，請在所選應用程式中確認接收人並傳送。",
   copied: "攻略清單已複製。",
   copyFallback: "請複製下方文字：",
   caveat:
@@ -96,6 +109,9 @@ const tw: Copy = {
   questionLabel: "可編輯的英文提問",
   copyQuestion: "複製提問",
   questionCopied: "提問已複製，尚未發布。",
+  questionStale:
+    "行程已變更，你的修改保留在下方。請重新產生提綱，或自行更新並確認與目前行程一致後再複製。",
+  questionReviewed: "已更新並核對提綱",
   openForum: "開啟日本旅行論壇",
   privacy: "提綱省略具體出行日期、座標與私人行程連結，不會自動向外傳送訊息。",
   questionUnavailable: "社群交流入口目前涵蓋已核驗的日本目的地。",
@@ -115,6 +131,9 @@ const ja: Copy = {
   transport: "交通・ルート",
   read: "原文を読む",
   copy: "ガイド一覧をコピー",
+  share: "ガイドを共有",
+  shareOpened:
+    "共有画面を開きました。選択したアプリで送信先を確認して送信してください。",
   copied: "ガイド一覧をコピーしました。",
   copyFallback: "以下の文章をコピーしてください：",
   caveat:
@@ -129,6 +148,9 @@ const ja: Copy = {
   questionLabel: "編集できる英語の質問",
   copyQuestion: "質問をコピー",
   questionCopied: "質問をコピーしました。投稿はしていません。",
+  questionStale:
+    "旅程が変更されました。編集内容は下に残っています。再作成するか、ご自身で修正して現在の旅程と一致することを確認してからコピーしてください。",
+  questionReviewed: "修正と確認が完了しました",
   openForum: "日本旅行フォーラムを開く",
   privacy:
     "具体的な旅行日、座標、非公開の旅程リンクは含めません。自動送信は行いません。",

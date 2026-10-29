@@ -189,9 +189,11 @@ function alongRouteOrder(anchors: TripStop[], extras: TripStop[]): TripStop[] {
 
 export function scheduleStops(
   ordered: TripStop[],
-  state: Pick<TripState, "days" | "pace" | "transport">,
+  state: Pick<TripState, "days" | "pace" | "transport"> &
+    Partial<Pick<TripState, "dayBreakBefore">>,
 ): { days: TripDay[]; unscheduled: TripStop[] } {
   const budget = DAY_BUDGET[state.pace];
+  const dayBreaks = new Set(state.dayBreakBefore ?? []);
   const days: TripDay[] = Array.from({ length: state.days }, (_, i) => ({
     day: i + 1,
     stops: [],
@@ -213,7 +215,8 @@ export function scheduleStops(
     // Reserve one hour for lunch/rest on any day with visits.
     if (
       day.stops.length &&
-      day.minutes + travelMinutes + stop.minutes > budget
+      (dayBreaks.has(stop.id) ||
+        day.minutes + travelMinutes + stop.minutes > budget)
     ) {
       dayIndex++;
       day = days[dayIndex];
@@ -269,6 +272,7 @@ export function buildTripPlan(catalog: NavCatalog, state: TripState): TripPlan {
   const anchors = state.routeIds
     .map(resolve)
     .filter((stop): stop is TripStop => !!stop);
+  const anchorIds = new Set(anchors.map((stop) => stop.id));
   const chosen = new Map<string, TripStop>();
   for (const id of [
     ...state.spotIds.map((id) => `spot:${id}`),
@@ -321,7 +325,8 @@ export function buildTripPlan(catalog: NavCatalog, state: TripState): TripPlan {
       chosen.set(stop.id, stop);
     }
     omittedAnimeSpots += candidates.filter(
-      (spot) => !chosen.has(`spot:${spot.id}`),
+      (spot) =>
+        !chosen.has(`spot:${spot.id}`) && !anchorIds.has(`spot:${spot.id}`),
     ).length;
   }
   for (const anchor of anchors) chosen.delete(anchor.id);
@@ -341,7 +346,7 @@ export function buildTripPlan(catalog: NavCatalog, state: TripState): TripPlan {
     minutes: state.visitMinutes[stop.id] ?? stop.minutes,
   }));
   const included = new Set(ordered.map((stop) => stop.id));
-  const route = state.mode === "route" ? anchors : ordered;
+  const route = state.mode === "route" && anchors.length ? anchors : ordered;
   const discoveries = spots
     .filter(
       (spot) =>
