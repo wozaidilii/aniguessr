@@ -2,37 +2,6 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import type { HomeBoundsDetail } from "~/components/home/home-events";
 import { publishHomeBoundsDetail } from "~/lib/home-bounds-store";
 
-type MapPadding = {
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-function normalizeMapPadding(padding: MapPadding): {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-} {
-  return {
-    top: padding.top ?? 0,
-    bottom: padding.bottom ?? 0,
-    left: padding.left ?? 0,
-    right: padding.right ?? 0,
-  };
-}
-
-function hasMapPadding(padding: MapPadding): boolean {
-  const normalized = normalizeMapPadding(padding);
-  return (
-    normalized.top > 0 ||
-    normalized.bottom > 0 ||
-    normalized.left > 0 ||
-    normalized.right > 0
-  );
-}
-
 function cornersFromContainer(map: MapLibreMap): {
   west: number;
   south: number;
@@ -65,8 +34,7 @@ function cornersFromContainer(map: MapLibreMap): {
 
 /**
  * Geographic bounds of the full map canvas (all four corners).
- * Used for nearby spot counts so padding from the bottom sheet does not
- * shrink the counted area to the strip above the sheet.
+ * Does not mutate map padding (setPadding would re-enter moveend handlers).
  */
 export function geographicBoundsFromMapCanvas(map: MapLibreMap): {
   west: number;
@@ -74,16 +42,7 @@ export function geographicBoundsFromMapCanvas(map: MapLibreMap): {
   east: number;
   north: number;
 } {
-  const padding = normalizeMapPadding(map.getPadding());
-  if (!hasMapPadding(padding)) {
-    return cornersFromContainer(map);
-  }
-  map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
-  try {
-    return cornersFromContainer(map);
-  } finally {
-    map.setPadding(padding);
-  }
+  return cornersFromContainer(map);
 }
 
 export function buildHomeBoundsDetail(map: MapLibreMap): HomeBoundsDetail {
@@ -99,7 +58,22 @@ export function buildHomeBoundsDetail(map: MapLibreMap): HomeBoundsDetail {
   };
 }
 
+let publishing = false;
+
+export function resetHomeMapBoundsPublishForTests(): void {
+  publishing = false;
+}
+
 /** Publish bounds for the nearby list using canvas-corner geography. */
-export function publishHomeMapBounds(map: MapLibreMap): void {
-  publishHomeBoundsDetail(buildHomeBoundsDetail(map));
+export function publishHomeMapBounds(
+  map: MapLibreMap,
+  detail?: HomeBoundsDetail,
+): void {
+  if (publishing) return;
+  publishing = true;
+  try {
+    publishHomeBoundsDetail(detail ?? buildHomeBoundsDetail(map));
+  } finally {
+    publishing = false;
+  }
 }

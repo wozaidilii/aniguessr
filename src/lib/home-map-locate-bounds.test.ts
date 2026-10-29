@@ -1,8 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { HomeBoundsDetail } from "~/components/home/home-events";
+import { resetLatestHomeBoundsDetailForTests } from "~/lib/home-bounds-store";
 import {
   buildHomeBoundsDetail,
   geographicBoundsFromMapCanvas,
+  publishHomeMapBounds,
+  resetHomeMapBoundsPublishForTests,
 } from "~/lib/home-map-bounds-publish";
 import { countHomeNearbyPlaces } from "~/lib/home-nearby-count";
 import type { NavCatalog, NavSpot } from "~/lib/pilgrimage-nav";
@@ -30,44 +33,47 @@ function catalogWithGrid(): NavCatalog {
 
 const locateCenter = { lat: 35.3, lng: 139.481 };
 
-function mockMapWithPadding(
-  padding: { top: number; bottom: number; left: number; right: number },
-  corners: {
-    nw: { lng: number; lat: number };
-    ne: { lng: number; lat: number };
-    sw: { lng: number; lat: number };
-    se: { lng: number; lat: number };
-  },
-) {
-  let currentPadding = { ...padding };
+function mockMapWithCorners(corners: {
+  nw: { lng: number; lat: number };
+  ne: { lng: number; lat: number };
+  sw: { lng: number; lat: number };
+  se: { lng: number; lat: number };
+}) {
+  const setPadding = vi.fn();
+  const moveendHandlers: Array<() => void> = [];
   return {
-    getPadding: () => currentPadding,
-    setPadding: (value: typeof padding) => {
-      currentPadding = { ...value };
+    map: {
+      getPadding: () => ({ top: 0, bottom: 200, left: 24, right: 24 }),
+      setPadding,
+      on: (event: string, handler: () => void) => {
+        if (event === "moveend") moveendHandlers.push(handler);
+      },
+      getContainer: () => ({ clientWidth: 390, clientHeight: 420 }),
+      unproject: (point: [number, number]) => {
+        const [x, y] = point;
+        const width = 390;
+        const height = 420;
+        if (x === 0 && y === 0) return corners.nw;
+        if (x === width && y === 0) return corners.ne;
+        if (x === 0 && y === height) return corners.sw;
+        if (x === width && y === height) return corners.se;
+        return locateCenter;
+      },
+      getBounds: () => ({
+        getWest: () => 139.47,
+        getSouth: () => 35.29,
+        getEast: () => 139.49,
+        getNorth: () => 35.31,
+      }),
+      getCenter: () => locateCenter,
     },
-    getContainer: () => ({ clientWidth: 390, clientHeight: 420 }),
-    unproject: (point: [number, number]) => {
-      const [x, y] = point;
-      const width = 390;
-      const height = 420;
-      if (x === 0 && y === 0) return corners.nw;
-      if (x === width && y === 0) return corners.ne;
-      if (x === 0 && y === height) return corners.sw;
-      if (x === width && y === height) return corners.se;
-      return locateCenter;
-    },
-    getBounds: () => ({
-      getWest: () => 139.47,
-      getSouth: () => 35.29,
-      getEast: () => 139.49,
-      getNorth: () => 35.31,
-    }),
-    getCenter: () => locateCenter,
+    setPadding,
+    moveendHandlers,
   };
 }
 
 describe("locate nearby count with sheet padding", () => {
-  it("keeps the clustered count when sheet padding changes but canvas geography does not", () => {
+  it("keeps count when republishing a locked locate snapshot after sheet padding", () => {
     const catalog = catalogWithGrid();
     const wideCorners = {
       nw: { lng: 139.42, lat: 35.36 },
@@ -75,45 +81,69 @@ describe("locate nearby count with sheet padding", () => {
       sw: { lng: 139.42, lat: 35.24 },
       se: { lng: 139.56, lat: 35.24 },
     };
-    const locateMap = mockMapWithPadding(
-      { top: 56, bottom: 96, left: 24, right: 24 },
-      wideCorners,
-    );
+    const locateMap = mockMapWithCorners(wideCorners).map;
     const afterLocate = buildHomeBoundsDetail(locateMap as never);
     const beforeOpen = countHomeNearbyPlaces(catalog, afterLocate, {
       subjectId: null,
     }).inView;
 
-    const sheetOpenMap = mockMapWithPadding(
-      { top: 56, bottom: 280, left: 24, right: 24 },
-      wideCorners,
-    );
-    expect(geographicBoundsFromMapCanvas(sheetOpenMap as never)).toEqual(
-      geographicBoundsFromMapCanvas(locateMap as never),
-    );
-    const afterSheet = buildHomeBoundsDetail(sheetOpenMap as never);
-    const afterOpen = countHomeNearbyPlaces(catalog, afterSheet, {
+    const tightCorners = {
+      nw: { lng: 139.47, lat: 35.32 },
+      ne: { lng: 139.5, lat: 35.32 },
+      sw: { lng: 139.47, lat: 35.28 },
+      se: { lng: 139.5, lat: 35.28 },
+    };
+    const sheetMap = mockMapWithCorners(tightCorners).map;
+    const afterSheetLive = countHomeNearbyPlaces(
+      catalog,
+      buildHomeBoundsDetail(sheetMap as never),
+      { subjectId: null },
+    ).inView;
+    const afterSheetLocked = countHomeNearbyPlaces(catalog, afterLocate, {
       subjectId: null,
     }).inView;
 
-    expect(beforeOpen).toBeGreaterThan(0);
-    expect(afterOpen).toBe(beforeOpen);
+    expect(beforeOpen).toBeGreaterThan(afterSheetLive);
+    expect(afterSheetLocked).toBe(beforeOpen);
   });
 
-  it("uses the same detail shape for republish after sheet open", () => {
+  it("does not call setPadding or recurse when publishing on moveend", () => {
+    resetHomeMapBoundsPublishForTests();
+    resetLatestHomeBoundsDetailForTests();
+    const wideCorners = {
+      nw: { lng: 139.42, lat: 35.36 },
+      ne: { lng: 139.56, lat: 35.36 },
+      sw: { lng: 139.42, lat: 35.24 },
+      se: { lng: 139.56, lat: 35.24 },
+    };
+    const { map, setPadding, moveendHandlers } = mockMapWithCorners(wideCorners);
+    let publishCount = 0;
+    const handler = () => {
+      publishCount += 1;
+      publishHomeMapBounds(map as never);
+    };
+    moveendHandlers.push(handler);
+    handler();
+    expect(setPadding).not.toHaveBeenCalled();
+    expect(publishCount).toBe(1);
+  });
+
+  it("uses the same detail shape for locked republish", () => {
     const corners = {
       nw: { lng: 139.42, lat: 35.36 },
       ne: { lng: 139.56, lat: 35.36 },
       sw: { lng: 139.42, lat: 35.24 },
       se: { lng: 139.56, lat: 35.24 },
     };
-    const map = mockMapWithPadding(
-      { top: 0, bottom: 220, left: 0, right: 0 },
-      corners,
-    );
+    const map = mockMapWithCorners(corners).map;
     const detail: HomeBoundsDetail = buildHomeBoundsDetail(map as never);
     expect(detail.west).toBe(139.42);
     expect(detail.east).toBe(139.56);
-    expect(detail.lat).toBe(locateCenter.lat);
+    expect(geographicBoundsFromMapCanvas(map as never)).toEqual({
+      west: 139.42,
+      south: 35.24,
+      east: 139.56,
+      north: 35.36,
+    });
   });
 });
