@@ -6,9 +6,10 @@ import {
 
 export type GoogleMapTilesAttributionSurface = "home" | "pilgrimage";
 
-const detachByMap = new WeakMap<MapLibreMap, () => void>();
+/** Above MapLibre HTML markers (e.g. home “you” at 30); map symbol pills stay on canvas below. */
+export const GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX = 40;
 
-/** Google logo + viewport copyright; positioned above home sheet / within map viewport. */
+const detachByMap = new WeakMap<MapLibreMap, () => void>();
 export class GoogleMapTilesAttributionOverlay {
   private map: MapLibreMap | undefined;
   private container: HTMLDivElement | undefined;
@@ -34,6 +35,7 @@ export class GoogleMapTilesAttributionOverlay {
     this.map = map;
     const container = document.createElement("div");
     container.className = `google-map-tiles-attribution google-map-tiles-attribution--${this.surface}`;
+    container.style.zIndex = String(GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX);
     container.setAttribute("aria-label", "Google Maps");
     const logo = document.createElement("img");
     logo.src = GOOGLE_MAP_TILES_LOGO_PATH;

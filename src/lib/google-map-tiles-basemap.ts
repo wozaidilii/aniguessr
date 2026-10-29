@@ -10,7 +10,7 @@ export interface GoogleMapTilesLanguageRegion {
   region: string;
 }
 
-const SESSION_CACHE_KEY = "aniguessr.googleMapTilesSession.v1";
+const SESSION_CACHE_KEY = "aniguessr.googleMapTilesSession.v2";
 const CREATE_SESSION_URL = "https://tile.googleapis.com/v1/createSession";
 const TILE_PATH = "https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}";
 /** Viewport metadata (copyright) — must use `/tile/v1/viewport`, not `/v1/viewport`. */
@@ -24,9 +24,61 @@ export const GOOGLE_MAP_TILES_LOGO_PATH =
 /** @deprecated Use GOOGLE_MAP_TILES_LOGO_PATH */
 export const GOOGLE_MAP_TILES_LOGO_URL = GOOGLE_MAP_TILES_LOGO_PATH;
 
+/** Bump when createSession `styles` change so old cached sessions are not reused. */
+export const GOOGLE_MAP_TILES_SESSION_STYLES_VERSION = "poi-labels-hide-v1";
+
+export type GoogleMapTilesStyleRule = {
+  featureType?: string;
+  elementType?: string;
+  stylers: Array<Record<string, string | number>>;
+};
+
+const POI_TYPES_HIDE_LABELS_AND_ICONS = [
+  "poi.business",
+  "poi.medical",
+  "poi.attraction",
+  "poi.place_of_worship",
+] as const;
+
+/** Map Tiles API `styles` (Maps JS styled-map syntax). Roadmap sessions only. */
+export function googleMapTilesCreateSessionStyles(): GoogleMapTilesStyleRule[] {
+  const hidePoi: GoogleMapTilesStyleRule[] =
+    POI_TYPES_HIDE_LABELS_AND_ICONS.map((featureType) => ({
+      featureType,
+      stylers: [{ visibility: "off" }],
+    }));
+
+  const parkKeepFillHideLabels: GoogleMapTilesStyleRule[] = [
+    {
+      featureType: "poi.park",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.icon",
+      stylers: [{ visibility: "off" }],
+    },
+  ];
+
+  return [...hidePoi, ...parkKeepFillHideLabels];
+}
+
+export function googleMapTilesSessionCacheStorageKey(): string {
+  return SESSION_CACHE_KEY;
+}
+
+export function googleMapTilesSessionCacheFingerprint(
+  language: string,
+  region: string,
+): string {
+  return `${language}|${region}|${GOOGLE_MAP_TILES_SESSION_STYLES_VERSION}`;
+}
+
 interface CachedGoogleMapTilesSession {
   language: string;
   region: string;
+  stylesVersion: string;
   session: string;
   expirySec: number;
 }
@@ -87,6 +139,9 @@ function sessionStillValid(
   nowSec: number,
 ): boolean {
   if (cached.language !== language || cached.region !== region) return false;
+  if (cached.stylesVersion !== GOOGLE_MAP_TILES_SESSION_STYLES_VERSION) {
+    return false;
+  }
   if (!cached.session) return false;
   if (!cached.expirySec) return true;
   return cached.expirySec - 60 > nowSec;
@@ -127,6 +182,7 @@ export function writeCachedGoogleMapTilesSession(
     const payload: CachedGoogleMapTilesSession = {
       language,
       region,
+      stylesVersion: GOOGLE_MAP_TILES_SESSION_STYLES_VERSION,
       session,
       expirySec,
     };
@@ -136,6 +192,7 @@ export function writeCachedGoogleMapTilesSession(
     memoryCachedSession = {
       language,
       region,
+      stylesVersion: GOOGLE_MAP_TILES_SESSION_STYLES_VERSION,
       session,
       expirySec,
     };
@@ -147,9 +204,29 @@ export function clearCachedGoogleMapTilesSession(): void {
   if (typeof sessionStorage === "undefined") return;
   try {
     sessionStorage.removeItem(SESSION_CACHE_KEY);
+    sessionStorage.removeItem("aniguessr.googleMapTilesSession.v1");
   } catch {
     // ignore
   }
+}
+
+export interface GoogleMapTilesCreateSessionBody {
+  mapType: "roadmap";
+  language: string;
+  region: string;
+  styles: GoogleMapTilesStyleRule[];
+}
+
+export function buildGoogleMapTilesCreateSessionBody(
+  language: string,
+  region: string,
+): GoogleMapTilesCreateSessionBody {
+  return {
+    mapType: "roadmap",
+    language,
+    region,
+    styles: googleMapTilesCreateSessionStyles(),
+  };
 }
 
 function failureFromResponse(
@@ -208,11 +285,9 @@ export async function createGoogleMapTilesSession(
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mapType: "roadmap",
-          language,
-          region,
-        }),
+        body: JSON.stringify(
+          buildGoogleMapTilesCreateSessionBody(language, region),
+        ),
       },
     );
   } catch (error) {

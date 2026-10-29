@@ -2,14 +2,19 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import {
+  buildGoogleMapTilesCreateSessionBody,
   buildGoogleMapTilesMapStyle,
   buildGoogleMapTilesViewportUrl,
   clearCachedGoogleMapTilesSession,
   createGoogleMapTilesSession,
   GOOGLE_MAP_TILES_LOGO_PATH,
+  GOOGLE_MAP_TILES_SESSION_STYLES_VERSION,
   GOOGLE_MAP_TILES_VIEWPORT_URL,
+  googleMapTilesCreateSessionStyles,
   googleMapTilesLanguageRegion,
   googleMapTilesRasterUrlTemplate,
+  googleMapTilesSessionCacheFingerprint,
+  googleMapTilesSessionCacheStorageKey,
   readCachedGoogleMapTilesSession,
   writeCachedGoogleMapTilesSession,
 } from "~/lib/google-map-tiles-basemap";
@@ -32,6 +37,125 @@ describe("google map tiles locale mapping", () => {
       language: "zh-TW",
       region: "JP",
     });
+  });
+});
+
+describe("google map tiles createSession styles", () => {
+  it("hides selected POI labels/icons and park labels while keeping park fill", () => {
+    const styles = googleMapTilesCreateSessionStyles();
+    expect(styles).toEqual(
+      expect.arrayContaining([
+        {
+          featureType: "poi.business",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.medical",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.attraction",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.place_of_worship",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.park",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }],
+        },
+        {
+          featureType: "poi.park",
+          elementType: "labels.icon",
+          stylers: [{ visibility: "off" }],
+        },
+      ]),
+    );
+    expect(
+      styles.some(
+        (rule) =>
+          rule.featureType === "poi.park" && rule.elementType === "geometry",
+      ),
+    ).toBe(false);
+  });
+
+  it("includes styles in the createSession POST body", () => {
+    const body = buildGoogleMapTilesCreateSessionBody("zh-TW", "JP");
+    expect(body).toEqual({
+      mapType: "roadmap",
+      language: "zh-TW",
+      region: "JP",
+      styles: googleMapTilesCreateSessionStyles(),
+    });
+  });
+});
+
+describe("google map tiles session cache versioning", () => {
+  afterEach(() => {
+    clearCachedGoogleMapTilesSession();
+    vi.unstubAllGlobals();
+  });
+
+  it("uses v2 storage key and styles version in the fingerprint", () => {
+    expect(googleMapTilesSessionCacheStorageKey()).toBe(
+      "aniguessr.googleMapTilesSession.v2",
+    );
+    expect(googleMapTilesSessionCacheFingerprint("ja", "JP")).toBe(
+      `ja|JP|${GOOGLE_MAP_TILES_SESSION_STYLES_VERSION}`,
+    );
+  });
+
+  it("ignores legacy v1 cache entries without stylesVersion", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    });
+    store.set(
+      "aniguessr.googleMapTilesSession.v1",
+      JSON.stringify({
+        language: "ja",
+        region: "JP",
+        session: "legacy-session",
+        expirySec: 4_000_000_000,
+      }),
+    );
+    expect(readCachedGoogleMapTilesSession("ja", "JP", 3_000_000_000)).toBe(
+      null,
+    );
+  });
+
+  it("invalidates cache when stylesVersion on disk does not match", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    });
+    store.set(
+      googleMapTilesSessionCacheStorageKey(),
+      JSON.stringify({
+        language: "ja",
+        region: "JP",
+        stylesVersion: "old-styles",
+        session: "stale-session",
+        expirySec: 4_000_000_000,
+      }),
+    );
+    expect(readCachedGoogleMapTilesSession("ja", "JP", 3_000_000_000)).toBe(
+      null,
+    );
   });
 });
 
@@ -119,6 +243,29 @@ describe("createGoogleMapTilesSession", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.message).toContain("not configured");
+  });
+
+  it("posts styles with createSession", async () => {
+    clearCachedGoogleMapTilesSession();
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ session: "new-session", expiry: "4000000000" }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await createGoogleMapTilesSession("zh-tw", "test-key");
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0]![1];
+    expect(typeof init?.body).toBe("string");
+    const body = JSON.parse(init!.body as string) as {
+      styles: unknown[];
+      language: string;
+      region: string;
+    };
+    expect(body.language).toBe("zh-TW");
+    expect(body.region).toBe("JP");
+    expect(body.styles).toEqual(googleMapTilesCreateSessionStyles());
   });
 
   it("surfaces API errors from createSession", async () => {
