@@ -1,93 +1,65 @@
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
-import { buildAffiliateLinks } from "~/lib/affiliate/urls";
-import { shouldRenderAffiliateBlock } from "~/lib/affiliate/config";
+import {
+  resolveAffiliatePage,
+  type AffiliatePageInput,
+} from "~/lib/affiliate/resolve";
 import { AffiliateTrackLink } from "~/components/pilgrimage/affiliate-track-link";
 
-interface AffiliateBlockSpotProps {
-  pageType: "spot";
-  locale: PilgrimageLocale;
-  spotId: string;
-  areaLabel: string;
-  lat: number;
-  lng: number;
-}
+export type AffiliateBlockProps = AffiliatePageInput;
 
-interface AffiliateBlockLocationProps {
-  pageType: "location";
-  locale: PilgrimageLocale;
-  locationSlug: string;
-  areaLabel: string;
-  lat?: number;
-  lng?: number;
+function providerSubtext(locale: PilgrimageLocale) {
+  return locale === "ja" ? "楽天トラベル" : "Klook";
 }
-
-export type AffiliateBlockProps =
-  | AffiliateBlockSpotProps
-  | AffiliateBlockLocationProps;
 
 export function AffiliateBlock(props: AffiliateBlockProps) {
-  const allowlistKey =
-    props.pageType === "spot"
-      ? { spotId: props.spotId }
-      : { locationSlug: props.locationSlug };
+  const resolved = resolveAffiliatePage(props);
+  if (!resolved) return null;
 
-  if (!shouldRenderAffiliateBlock(allowlistKey)) return null;
-
-  const offers = buildAffiliateLinks({
-    locale: props.locale,
-    areaLabel: props.areaLabel,
-    lat: props.lat,
-    lng: props.lng,
-  });
-  if (offers.length === 0) return null;
-
-  const copy = getPilgrimageCopy(props.locale);
+  const { offer, input } = resolved;
+  const copy = getPilgrimageCopy(input.locale);
+  const mainText =
+    offer.linkType === "hotel"
+      ? copy.affiliateHotelLink
+      : copy.affiliateTourLink;
+  const subText = providerSubtext(input.locale);
+  const title =
+    input.pageType === "location"
+      ? copy.affiliateTitleLocation
+      : copy.affiliateTitle;
 
   return (
     <section
-      className="mt-6 min-h-[7.5rem] rounded-xl border border-white/10 bg-white/[0.03] p-4"
+      className="mt-4 min-h-[8.5rem] rounded-2xl border border-[#E7E3DC] bg-white p-5"
       data-testid="affiliate-block"
       aria-labelledby="affiliate-block-heading"
     >
-      <p className="text-[11px] leading-5 text-pink-100/55">
-        {copy.affiliateDisclosure}
-      </p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <h3
           id="affiliate-block-heading"
-          className="text-xs font-black tracking-[0.14em] text-cyan-100/80 uppercase"
+          className="text-[15px] leading-[22px] font-extrabold text-[#1F2430]"
         >
-          {copy.affiliateTitle}
+          {title}
         </h3>
-        <span
-          className="rounded border border-pink-100/25 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-pink-100/70"
-          aria-label={copy.affiliatePrLabel}
-        >
+        <span className="rounded border border-[#B9BDC6] px-1.5 py-0.5 text-[11px] leading-4 font-bold tracking-[0.04em] text-[#646B79]">
           {copy.affiliatePrLabel}
         </span>
       </div>
-      <ul className="mt-3 grid gap-2">
-        {offers.map((offer) => (
-          <li key={`${offer.provider}-${offer.linkType}`}>
-            <AffiliateTrackLink
-              href={offer.href}
-              locale={props.locale}
-              provider={offer.provider}
-              pageType={props.pageType}
-              spotId={props.pageType === "spot" ? props.spotId : undefined}
-              locationSlug={
-                props.pageType === "location" ? props.locationSlug : undefined
-              }
-              className="inline-flex text-sm font-bold text-cyan-100 underline-offset-2 hover:text-cyan-50 hover:underline"
-            >
-              {offer.linkType === "hotel"
-                ? copy.affiliateHotelLink
-                : copy.affiliateTourLink}
-            </AffiliateTrackLink>
-          </li>
-        ))}
-      </ul>
+
+      <AffiliateTrackLink
+        href={offer.href}
+        locale={input.locale}
+        provider={offer.provider}
+        pageType={input.pageType}
+        linkType={offer.linkType}
+        mainText={mainText}
+        subText={subText}
+        spotId={input.pageType === "spot" ? input.spotId : undefined}
+        locationSlug={
+          input.pageType === "location" ? input.locationSlug : undefined
+        }
+        className="mt-3"
+      />
     </section>
   );
 }

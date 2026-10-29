@@ -21,6 +21,7 @@ export const env = createEnv({
     AFFILIATE_ENABLED: z.enum(["true", "false"]).optional(),
     RAKUTEN_AFFILIATE_ID: z.string().min(1).optional(),
     KLOOK_AFFILIATE_ID: z.string().min(1).optional(),
+    AFFILIATE_ALLOWLIST_PATH: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_PUSHER_KEY: z.string().optional(),
@@ -57,6 +58,7 @@ export const env = createEnv({
     AFFILIATE_ENABLED: process.env.AFFILIATE_ENABLED,
     RAKUTEN_AFFILIATE_ID: process.env.RAKUTEN_AFFILIATE_ID,
     KLOOK_AFFILIATE_ID: process.env.KLOOK_AFFILIATE_ID,
+    AFFILIATE_ALLOWLIST_PATH: process.env.AFFILIATE_ALLOWLIST_PATH,
     NEXT_PUBLIC_PUSHER_KEY: process.env.NEXT_PUBLIC_PUSHER_KEY,
     NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
     NEXT_PUBLIC_BAIDU_MAP_AK: process.env.NEXT_PUBLIC_BAIDU_MAP_AK,

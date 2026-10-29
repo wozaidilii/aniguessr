@@ -33,12 +33,15 @@ export function PilgrimageShell({
   kicker,
   title,
   description,
+  affiliateDisclosure,
   children,
 }: {
   locale: PilgrimageLocale;
   kicker: string;
   title: string;
   description?: string;
+  /** Shown under H1 only when the affiliate block renders on this page. */
+  affiliateDisclosure?: string | null;
   children: React.ReactNode;
 }) {
   return (
@@ -49,6 +52,14 @@ export function PilgrimageShell({
           <h1 className="text-3xl leading-tight font-black text-white sm:text-4xl">
             {title}
           </h1>
+          {affiliateDisclosure ? (
+            <p
+              className="mt-2 text-xs leading-[18px] text-[#646B79]"
+              data-testid="affiliate-h1-disclosure"
+            >
+              {affiliateDisclosure}
+            </p>
+          ) : null}
           {description ? (
             <p className="mt-4 text-base leading-7 text-pink-50/75 sm:text-lg">
               {description}

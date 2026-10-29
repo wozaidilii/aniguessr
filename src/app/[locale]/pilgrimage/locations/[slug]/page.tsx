@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
+import { resolveAffiliatePage } from "~/lib/affiliate/resolve";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { spotPlaceName } from "~/lib/spot-name-overrides";
@@ -134,6 +135,17 @@ export default async function PilgrimageLocationPage({ params }: Props) {
     name,
     location.spotCount,
   );
+
+  const affiliateInput = {
+    pageType: "location" as const,
+    locale,
+    locationSlug: location.slug,
+    areaLabel: name,
+    lat: listed[0]?.lat,
+    lng: listed[0]?.lng,
+  };
+  const affiliatePage = resolveAffiliatePage(affiliateInput);
+
   const jsonLd = buildPlaceCollectionJsonLd({
     name: locale === "zh-tw" ? seo.title || visibleTitle : name,
     description:
@@ -162,18 +174,14 @@ export default async function PilgrimageLocationPage({ params }: Props) {
       kicker={copy.locationArchive}
       title={visibleTitle}
       description={visibleDescription}
+      affiliateDisclosure={
+        affiliatePage ? copy.affiliateDisclosure : undefined
+      }
     >
       <JsonLd data={jsonLd} />
       <PilgrimageMapPanel locale={locale} locationSlug={location.slug} />
       <NearbySpots locale={locale} />
-      <AffiliateBlock
-        pageType="location"
-        locale={locale}
-        locationSlug={location.slug}
-        areaLabel={name}
-        lat={listed[0]?.lat}
-        lng={listed[0]?.lng}
-      />
+      {affiliatePage ? <AffiliateBlock {...affiliateInput} /> : null}
       <PilgrimageSpotList
         locale={locale}
         spots={spots.map((spot) => ({
