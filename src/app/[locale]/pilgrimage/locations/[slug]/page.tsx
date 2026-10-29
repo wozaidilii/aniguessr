@@ -1,6 +1,7 @@
 import { type Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
+import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
 import { NearbySpots } from "~/components/pilgrimage/nearby-spots";
 import { PilgrimageMapPanel } from "~/components/pilgrimage/pilgrimage-map-panel";
 import { spotPlaceName } from "~/lib/spot-name-overrides";
@@ -165,6 +166,14 @@ export default async function PilgrimageLocationPage({ params }: Props) {
       <JsonLd data={jsonLd} />
       <PilgrimageMapPanel locale={locale} locationSlug={location.slug} />
       <NearbySpots locale={locale} />
+      <AffiliateBlock
+        pageType="location"
+        locale={locale}
+        locationSlug={location.slug}
+        areaLabel={name}
+        lat={listed[0]?.lat}
+        lng={listed[0]?.lng}
+      />
       <PilgrimageSpotList
         locale={locale}
         spots={spots.map((spot) => ({

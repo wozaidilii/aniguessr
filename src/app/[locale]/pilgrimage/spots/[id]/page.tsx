@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
+import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
 import {
   formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
@@ -270,6 +271,15 @@ export default async function PilgrimageSpotPage({ params }: Props) {
               </ul>
             </section>
           ) : null}
+
+          <AffiliateBlock
+            pageType="spot"
+            locale={locale}
+            spotId={spot.id}
+            areaLabel={location}
+            lat={spot.lat}
+            lng={spot.lng}
+          />
         </div>
 
         <aside className="anime-panel h-fit p-5">
