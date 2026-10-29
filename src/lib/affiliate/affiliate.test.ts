@@ -38,6 +38,9 @@ const KAMAKURA_TOUR_PATH =
 describe("affiliate gating", () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
+    vi.stubEnv("AFFILIATE_ENABLED", "");
+    vi.stubEnv("RAKUTEN_AFFILIATE_ID", "");
+    vi.stubEnv("KLOOK_AFFILIATE_ID", "");
     mockedAllowlist.mockReturnValue(false);
   });
 
@@ -106,6 +109,8 @@ describe("affiliate gating", () => {
 
 describe("Rakuten tracked URLs", () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
+    vi.stubEnv("KLOOK_AFFILIATE_ID", "");
     vi.stubEnv("RAKUTEN_AFFILIATE_ID", RAKUTEN_AID);
   });
 
@@ -134,7 +139,7 @@ describe("Rakuten tracked URLs", () => {
   });
 
   it("returns no ja link when RAKUTEN_AFFILIATE_ID is missing", () => {
-    vi.unstubAllEnvs();
+    vi.stubEnv("RAKUTEN_AFFILIATE_ID", "");
     expect(
       buildAffiliateLinks({
         locale: "ja",
@@ -147,6 +152,8 @@ describe("Rakuten tracked URLs", () => {
 
 describe("Klook tracked URLs", () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
+    vi.stubEnv("RAKUTEN_AFFILIATE_ID", "");
     vi.stubEnv("KLOOK_AFFILIATE_ID", KLOOK_AID);
   });
 
@@ -200,7 +207,7 @@ describe("Klook tracked URLs", () => {
   });
 
   it("hides the block when Klook env is missing even if allowlisted", () => {
-    vi.unstubAllEnvs();
+    vi.stubEnv("KLOOK_AFFILIATE_ID", "");
     vi.stubEnv("AFFILIATE_ENABLED", "true");
     mockedAllowlist.mockReturnValue(true);
 

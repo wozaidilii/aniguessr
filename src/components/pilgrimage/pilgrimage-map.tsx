@@ -275,14 +275,16 @@ export function PilgrimageMap({
         void applyGoogleMapTilesBasemap(
           map,
           locale,
-          () => {
-            activeBasemap = "google";
-            try {
-              if (openFreeMapAttribution) {
-                map.removeControl(openFreeMapAttribution);
+          (basemap) => {
+            activeBasemap = basemap;
+            if (basemap === "google") {
+              try {
+                if (openFreeMapAttribution) {
+                  map.removeControl(openFreeMapAttribution);
+                }
+              } catch {
+                // ignore
               }
-            } catch {
-              // ignore
             }
             installSpotLayers();
             setLayerEpoch((value) => value + 1);

@@ -1,7 +1,6 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { mountGoogleMapTilesAttribution } from "~/components/map/google-map-tiles-attribution-control";
 import {
-  fadeInGoogleMapBasemapCanvas,
   googleMapBasemapFadeMs,
 } from "~/lib/google-map-basemap-placeholder";
 import type { HomeMapBasemapKind } from "~/lib/home-map-basemap";
@@ -18,6 +17,9 @@ import {
 } from "~/lib/google-map-tiles-basemap";
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
 import type { GoogleMapTilesAttributionSurface } from "~/components/map/google-map-tiles-attribution-control";
+import { whenGoogleRoadmapTilesVisible } from "~/lib/google-map-tiles-visible";
+import { fadeInGoogleMapBasemapCanvas } from "~/lib/google-map-basemap-placeholder";
+import { swapMapStyleUrl } from "~/lib/map-style-swap";
 
 let loggedCreateSessionFailure = false;
 
@@ -54,17 +56,15 @@ export interface ApplyGoogleMapTilesBasemapOptions {
 
 function applyPositronFallback(
   map: MapLibreMap,
-  onStyleReady: () => void,
+  onStyleReady: (activeBasemap: HomeMapBasemapKind) => void,
   options?: ApplyGoogleMapTilesBasemapOptions,
 ): Promise<ApplyGoogleMapTilesBasemapResult> {
   return new Promise((resolve) => {
-    const finish = (): void => {
+    swapMapStyleUrl(map, homeMapInitialStyleUrl(), () => {
       options?.onFallbackToOpenFreemap?.();
-      onStyleReady();
+      onStyleReady("openfreemap");
       resolve({ applied: false, activeBasemap: "openfreemap" });
-    };
-    void map.once("style.load", finish);
-    void map.setStyle(homeMapInitialStyleUrl());
+    });
   });
 }
 
@@ -75,7 +75,7 @@ function applyPositronFallback(
 export async function applyGoogleMapTilesBasemap(
   map: MapLibreMap,
   locale: GoogleMapTilesLocale,
-  onStyleReady: () => void,
+  onStyleReady: (activeBasemap: HomeMapBasemapKind) => void,
   surface: GoogleMapTilesAttributionSurface,
   options?: ApplyGoogleMapTilesBasemapOptions,
 ): Promise<ApplyGoogleMapTilesBasemapResult & { detachQuotaMonitor?: () => void }> {
@@ -97,7 +97,10 @@ export async function applyGoogleMapTilesBasemap(
   const style = buildGoogleMapTilesMapStyle(sessionResult.session, apiKey);
 
   return await new Promise((resolve) => {
+    let detachQuotaMonitor: (() => void) | undefined;
+
     const finishAfterTiles = (): void => {
+      fadeInGoogleMapBasemapCanvas(map, googleMapBasemapFadeMs());
       mountGoogleMapTilesAttribution(
         map,
         sessionResult.session,
@@ -105,8 +108,6 @@ export async function applyGoogleMapTilesBasemap(
         surface,
       );
       options?.onGoogleBasemapVisible?.();
-      onStyleReady();
-      let detachQuotaMonitor: (() => void) | undefined;
       if (options?.restoreOpenFreeMapAttribution && options.onRevertedToOpenFreemap) {
         detachQuotaMonitor = attachGoogleMapTilesQuotaMonitor(map, {
           restoreOpenFreeMapAttribution: options.restoreOpenFreeMapAttribution,
@@ -121,9 +122,9 @@ export async function applyGoogleMapTilesBasemap(
     };
 
     void map.once("style.load", () => {
-      fadeInGoogleMapBasemapCanvas(map, googleMapBasemapFadeMs());
-      void map.once("idle", finishAfterTiles);
+      onStyleReady("google");
+      whenGoogleRoadmapTilesVisible(map, finishAfterTiles);
     });
-    void map.setStyle(style);
+    void map.setStyle(style, { diff: false });
   });
 }

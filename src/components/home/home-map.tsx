@@ -3,12 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import {
-  HOME_BOUNDS_EVENT,
   HOME_FOCUS_WORK_EVENT,
   HOME_MAP_ACTIVE_EVENT,
   HOME_ORIGIN_EVENT,
   signalHomeMapGesture,
-  type HomeBoundsDetail,
   type HomeFocusWorkDetail,
   type HomeOriginDetail,
 } from "~/components/home/home-events";
@@ -35,6 +33,7 @@ import {
 } from "~/lib/home-map-style";
 import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
 import { buildHomeBoundsDetail } from "~/lib/home-map-bounds-publish";
+import { publishHomeBoundsDetail } from "~/lib/home-bounds-store";
 import {
   injectGoogleMapTilesPreconnect,
 } from "~/lib/google-map-basemap-placeholder";
@@ -323,14 +322,16 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         void applyGoogleMapTilesBasemap(
           map,
           locale,
-          () => {
-            activeBasemap = "google";
-            try {
-              if (openFreeMapAttribution) {
-                map.removeControl(openFreeMapAttribution);
+          (basemap) => {
+            activeBasemap = basemap;
+            if (basemap === "google") {
+              try {
+                if (openFreeMapAttribution) {
+                  map.removeControl(openFreeMapAttribution);
+                }
+              } catch {
+                // Already removed after a style swap.
               }
-            } catch {
-              // Already removed after a style swap.
             }
             refreshOverlayLayers();
           },
@@ -717,8 +718,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
 }
 
 function publishBounds(map: maplibregl.Map) {
-  const detail = buildHomeBoundsDetail(map);
-  window.dispatchEvent(new CustomEvent(HOME_BOUNDS_EVENT, { detail }));
+  publishHomeBoundsDetail(buildHomeBoundsDetail(map));
 }
 
 function showPopup(

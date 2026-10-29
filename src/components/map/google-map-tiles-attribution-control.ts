@@ -10,6 +10,15 @@ export type GoogleMapTilesAttributionSurface = "home" | "pilgrimage";
 export const GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX = 40;
 
 const detachByMap = new WeakMap<MapLibreMap, () => void>();
+
+function waitForImage(img: HTMLImageElement): Promise<void> {
+  if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Google logo failed to load"));
+  });
+}
+
 export class GoogleMapTilesAttributionOverlay {
   private map: MapLibreMap | undefined;
   private container: HTMLDivElement | undefined;
@@ -19,6 +28,7 @@ export class GoogleMapTilesAttributionOverlay {
   private readonly session: string;
   private readonly apiKey: string;
   private readonly surface: GoogleMapTilesAttributionSurface;
+  private mountGeneration = 0;
 
   constructor(
     session: string,
@@ -33,27 +43,66 @@ export class GoogleMapTilesAttributionOverlay {
   attach(map: MapLibreMap): void {
     this.detach();
     this.map = map;
-    const container = document.createElement("div");
-    container.className = `google-map-tiles-attribution google-map-tiles-attribution--${this.surface}`;
-    container.style.zIndex = String(GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX);
-    container.setAttribute("aria-label", "Google Maps");
+    const generation = ++this.mountGeneration;
+    void this.mountWhenReady(map, generation);
+  }
+
+  private async mountWhenReady(
+    map: MapLibreMap,
+    generation: number,
+  ): Promise<void> {
     const logo = document.createElement("img");
     logo.src = GOOGLE_MAP_TILES_LOGO_PATH;
     logo.alt = "Google";
     logo.width = 120;
     logo.height = 14;
     logo.decoding = "async";
+
+    const bounds = map.getBounds();
+    const zoom = map.getZoom();
+    let attribution: Awaited<
+      ReturnType<typeof fetchGoogleMapTilesViewportAttribution>
+    >;
+    try {
+      const [, fetched] = await Promise.all([
+        waitForImage(logo),
+        fetchGoogleMapTilesViewportAttribution(this.session, this.apiKey, {
+          north: bounds.getNorth(),
+          south: bounds.getSouth(),
+          east: bounds.getEast(),
+          west: bounds.getWest(),
+          zoom,
+        }),
+      ]);
+      attribution = fetched;
+    } catch {
+      return;
+    }
+
+    if (generation !== this.mountGeneration || this.map !== map) return;
+
+    const copyrightText = attribution?.copyright?.trim() ?? "";
+    if (!copyrightText) return;
+
+    const container = document.createElement("div");
+    container.className = `google-map-tiles-attribution google-map-tiles-attribution--${this.surface}`;
+    container.style.zIndex = String(GOOGLE_MAP_TILES_ATTRIBUTION_Z_INDEX);
+    container.setAttribute("aria-label", "Google Maps");
+
     const copyright = document.createElement("span");
     copyright.className = "google-map-tiles-attribution-text";
+    copyright.textContent = copyrightText;
+
     container.append(logo, copyright);
-    this.container = container;
-    this.copyrightEl = copyright;
 
     const anchor =
       this.surface === "home"
         ? map.getContainer().closest(".home-map")
         : map.getContainer().closest(".pilgrimage-map");
     (anchor ?? map.getContainer()).appendChild(container);
+
+    this.container = container;
+    this.copyrightEl = copyright;
 
     map.on("moveend", this.scheduleRefresh);
     map.on("resize", this.scheduleRefresh);
@@ -68,11 +117,10 @@ export class GoogleMapTilesAttributionOverlay {
     } else {
       this.resizeObserver.observe(map.getContainer());
     }
-
-    this.scheduleRefresh();
   }
 
   detach(): void {
+    this.mountGeneration += 1;
     if (this.map) {
       this.map.off("moveend", this.scheduleRefresh);
       this.map.off("resize", this.scheduleRefresh);
@@ -110,7 +158,8 @@ export class GoogleMapTilesAttributionOverlay {
         zoom,
       },
     );
-    copyrightEl.textContent = result?.copyright ?? "";
+    const text = result?.copyright?.trim() ?? "";
+    if (text) copyrightEl.textContent = text;
   }
 }
 

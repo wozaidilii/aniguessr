@@ -2,7 +2,8 @@ import { isAffiliateAllowlisted } from "~/lib/affiliate/allowlist";
 
 function normalizeEnv(value: string | undefined) {
   const trimmed = value?.trim();
-  return trimmed ?? undefined;
+  if (!trimmed) return undefined;
+  return trimmed;
 }
 
 export function isAffiliateFeatureEnabled() {

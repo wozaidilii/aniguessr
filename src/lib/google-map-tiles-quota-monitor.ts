@@ -5,6 +5,7 @@ import type {
 } from "maplibre-gl";
 import { detachGoogleMapTilesAttribution } from "~/components/map/google-map-tiles-attribution-control";
 import { homeMapInitialStyleUrl } from "~/lib/home-map-basemap";
+import { swapMapStyleUrl } from "~/lib/map-style-swap";
 import {
   createGoogleTileLoadCounters,
   isGoogleRoadmapTileErrorMessage,
@@ -77,8 +78,7 @@ export function attachGoogleMapTilesQuotaMonitor(
       callbacks.onReverted();
     };
 
-    void map.once("style.load", finish);
-    void map.setStyle(homeMapInitialStyleUrl());
+    swapMapStyleUrl(map, homeMapInitialStyleUrl(), finish);
   };
 
   const onError = (event: ErrorEvent): void => {

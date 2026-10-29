@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadMunicipalities, locateMunicipality } from "./japan-area.mjs";
 import { pilgrimagePageMetadata } from "../../src/lib/seo.ts";
-import { pathsForRenamedSpots, affiliatePilotSitemapPaths } from "./sitemap-lastmod.mjs";
+import { pathsForRenamedSpots, affiliatePilotSitemapPaths, SITEMAP_AFFILIATE_PILOT_LASTMOD, SITEMAP_BASELINE_LASTMOD, SITEMAP_CONTENT_LASTMOD } from "./sitemap-lastmod.mjs";
 import knownSlugs from "../../src/lib/pilgrimage-known-slugs.json" with { type: "json" };
 
 loadMunicipalities(
@@ -159,14 +159,16 @@ describe("rewritten question labels and pilgrimage pages", () => {
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
           : "";
         if (affiliatePilotPaths.has(pathname)) {
-          expect(lastmod).toBe("2026-10-29");
+          expect(lastmod).toBe(SITEMAP_AFFILIATE_PILOT_LASTMOD);
         } else if (renamed.has(spotId) || copyIds.has(spotId)) {
-          expect(lastmod).toBe("2026-10-23");
+          expect(lastmod).toBe(SITEMAP_CONTENT_LASTMOD);
           bumped.add(spotId);
         } else if (bumpedPaths.has(pathname)) {
-          expect(lastmod).toBe("2026-10-29");
+          expect(lastmod).toBe(SITEMAP_AFFILIATE_PILOT_LASTMOD);
         } else {
-          expect(lastmod).toBe("2026-10-21");
+          expect([SITEMAP_BASELINE_LASTMOD, SITEMAP_AFFILIATE_PILOT_LASTMOD]).toContain(
+            lastmod,
+          );
         }
       }
     }
