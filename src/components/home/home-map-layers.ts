@@ -212,8 +212,9 @@ export function installHomeMapLayers(map: Map): void {
 
   if (!map.getLayer("home-dots")) {
     map.addLayer({
-    type: "circle",
-    source: HOME_DOTS_SOURCE,
+      id: "home-dots",
+      type: "circle",
+      source: HOME_DOTS_SOURCE,
     minzoom: 8.5,
     maxzoom: 12,
     paint: {

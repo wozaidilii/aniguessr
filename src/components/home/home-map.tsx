@@ -248,33 +248,50 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       boundsPublishTimer = window.setTimeout(run, 120);
     };
 
-    let boundsSettleGeneration = 0;
-    let basemapReady = !attemptGoogleBasemap;
-    let startupCameraDone = false;
+    let startupCameraRan = false;
 
-    const scheduleNearbyBoundsWhenSettled = (): void => {
-      if (!basemapReady || !startupCameraDone) return;
-      boundsSettleGeneration += 1;
-      const generation = boundsSettleGeneration;
+    const publishFirstNearbyBoundsAfterStartupCamera = (): void => {
+      void map.once("moveend", () => {
+        void map.once("idle", () => {
+          if (cancelled || nearbyBoundsReady) return;
+          nearbyBoundsReady = true;
+          if (!originPinned) {
+            publishNearbyBounds(true);
+          }
+        });
+      });
+    };
+
+    const runStartupCameraOnce = (): void => {
+      if (startupCameraRan || cancelled) return;
+      startupCameraRan = true;
+
+      const startup = homeStartupCamera(Boolean(focusedId), readHomeOrigin());
+      if (startup.kind === "user") {
+        publishFirstNearbyBoundsAfterStartupCamera();
+        flyToUser(startup.lat, startup.lng, false);
+        return;
+      }
+      if (startup.kind === "kanto") {
+        publishFirstNearbyBoundsAfterStartupCamera();
+        map.fitBounds(KANTO_SHONAN_BOUNDS, {
+          padding: {
+            top: homeMapTopPadding(map),
+            right: 28,
+            bottom: 28,
+            left: 28,
+          },
+          animate: false,
+        });
+        return;
+      }
       void map.once("idle", () => {
-        if (cancelled || generation !== boundsSettleGeneration) return;
+        if (cancelled || nearbyBoundsReady) return;
         nearbyBoundsReady = true;
         if (!originPinned) {
           publishNearbyBounds(true);
         }
       });
-    };
-
-    const markBasemapReady = (): void => {
-      if (basemapReady) return;
-      basemapReady = true;
-      scheduleNearbyBoundsWhenSettled();
-    };
-
-    const markStartupCameraDone = (): void => {
-      if (startupCameraDone) return;
-      startupCameraDone = true;
-      scheduleNearbyBoundsWhenSettled();
     };
 
     map.on("load", () => {
@@ -371,26 +388,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       bindMapInteractions();
       refreshOverlayLayers();
 
-      const startup = homeStartupCamera(Boolean(focusedId), readHomeOrigin());
-      if (startup.kind === "user") {
-        flyToUser(startup.lat, startup.lng, false);
-        map.once("moveend", () => markStartupCameraDone());
-      } else if (startup.kind === "kanto") {
-        map.fitBounds(KANTO_SHONAN_BOUNDS, {
-          padding: {
-            top: homeMapTopPadding(map),
-            right: 28,
-            bottom: 28,
-            left: 28,
-          },
-          animate: false,
-        });
-        markStartupCameraDone();
-      } else {
-        markStartupCameraDone();
-      }
-      if (basemapReady) {
-        scheduleNearbyBoundsWhenSettled();
+      if (!attemptGoogleBasemap) {
+        runStartupCameraOnce();
       }
       mapRef.current = map;
       ensureYou();
@@ -412,7 +411,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
               }
             }
             refreshOverlayLayers();
-            markBasemapReady();
           },
           "home",
           {
@@ -439,10 +437,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
             activeBasemap = "openfreemap";
             refreshOverlayLayers();
           }
-          markBasemapReady();
+          runStartupCameraOnce();
         });
-      } else {
-        markBasemapReady();
       }
     });
     map.on("moveend", () => {

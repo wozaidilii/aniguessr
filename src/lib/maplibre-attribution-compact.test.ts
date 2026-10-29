@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import { collapseMapLibreAttribution } from "~/lib/maplibre-attribution-compact";
 
 describe("collapseMapLibreAttribution", () => {
-  it("applies MapLibre collapsed compact attribution state", () => {
-    const classNames = new Set(["maplibregl-ctrl-attrib"]);
+  it("removes compact-show and closes details for collapsed pill", () => {
+    const classNames = new Set([
+      "maplibregl-ctrl-attrib",
+      "maplibregl-compact",
+      "maplibregl-compact-show",
+    ]);
     const openAttr: { value: string | null } = { value: "" };
     const root = {
       classList: {
@@ -29,7 +33,7 @@ describe("collapseMapLibreAttribution", () => {
     const map = { getContainer: () => container };
     collapseMapLibreAttribution(map as never);
     expect(classNames.has("maplibregl-compact")).toBe(true);
-    expect(classNames.has("maplibregl-compact-show")).toBe(true);
+    expect(classNames.has("maplibregl-compact-show")).toBe(false);
     expect(openAttr.value).toBeNull();
   });
 });
