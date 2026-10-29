@@ -219,22 +219,7 @@ export default async function PilgrimageSpotPage({ params }: Props) {
 
       <article className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
         <div className="anime-panel order-1 p-5 sm:p-6 lg:col-start-1 lg:row-start-1">
-          {suppressScreenshots ? (
-            <figure className="mb-5">
-              <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-                <p className="text-sm font-bold text-pink-50/85">{place}</p>
-                <p className="text-xs leading-5 text-pink-100/60">{location}</p>
-                <a
-                  href={streetViewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="anime-button-secondary px-4 py-2 text-sm whitespace-nowrap"
-                >
-                  {copy.streetView}
-                </a>
-              </div>
-            </figure>
-          ) : imageUrl ? (
+          {!suppressScreenshots && imageUrl ? (
             <figure className="mb-5">
               {/* Decorative: the scene title and caption name the work. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
