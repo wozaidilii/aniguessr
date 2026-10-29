@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "~/components/JsonLd";
 import { AffiliateBlock } from "~/components/pilgrimage/affiliate-block";
 import { resolveAffiliatePage } from "~/lib/affiliate/resolve";
+import { shouldSuppressAffiliatePilotScreenshots } from "~/lib/affiliate/pilot-media";
 import {
   formatPlaceWorkSubtitle,
   googleMapsDirectionsUrl,
@@ -23,7 +24,7 @@ import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { buildSpotSeo, type SpotSeoFields } from "~/lib/pilgrimage-seo-meta";
 import { applyPilgrimageSeoOverride } from "~/lib/pilgrimage-seo-overrides";
 import { getPilgrimageCopy } from "~/lib/pilgrimage-copy";
-import { withPilgrimageOg } from "~/lib/og/metadata";
+import { withPilgrimageOg, withHomeOg } from "~/lib/og/metadata";
 import { absoluteUrl, pilgrimagePageMetadata } from "~/lib/seo";
 import { buildTouristAttractionJsonLd } from "~/lib/structured-data";
 import { loadSpotOg } from "~/server/og/load";
@@ -143,6 +144,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     seo.description,
     true,
   );
+  const suppressScreenshots = shouldSuppressAffiliatePilotScreenshots({
+    spotId: spot.id,
+  });
+  if (suppressScreenshots) {
+    return withHomeOg(metadata, locale, { staticArt: true });
+  }
   const og = loadSpotOg(locale, spot.id);
   if (og.status !== "ready") return metadata;
   return withPilgrimageOg(metadata, locale, "spots", spot.id, og.card);
@@ -179,6 +186,9 @@ export default async function PilgrimageSpotPage({ params }: Props) {
     lng: spot.lng,
   };
   const affiliatePage = resolveAffiliatePage(affiliateInput);
+  const suppressScreenshots = shouldSuppressAffiliatePilotScreenshots({
+    spotId: spot.id,
+  });
 
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
@@ -209,7 +219,22 @@ export default async function PilgrimageSpotPage({ params }: Props) {
 
       <article className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
         <div className="anime-panel order-1 p-5 sm:p-6 lg:col-start-1 lg:row-start-1">
-          {imageUrl ? (
+          {suppressScreenshots ? (
+            <figure className="mb-5">
+              <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+                <p className="text-sm font-bold text-pink-50/85">{place}</p>
+                <p className="text-xs leading-5 text-pink-100/60">{location}</p>
+                <a
+                  href={streetViewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="anime-button-secondary px-4 py-2 text-sm whitespace-nowrap"
+                >
+                  {copy.streetView}
+                </a>
+              </div>
+            </figure>
+          ) : imageUrl ? (
             <figure className="mb-5">
               {/* Decorative: the scene title and caption name the work. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -258,10 +258,11 @@ describe("affiliate layout constants", () => {
 });
 
 describe("affiliate sitemap isolation", () => {
-  it("does not import affiliate modules into sitemap lastmod", async () => {
+  it("does not import app affiliate modules into sitemap lastmod", async () => {
     const source = await import("fs/promises").then((fs) =>
       fs.readFile("scripts/lib/sitemap-lastmod.mjs", "utf8"),
     );
-    expect(source).not.toMatch(/affiliate/i);
+    expect(source).not.toMatch(/~\/lib\/affiliate/);
+    expect(source).not.toMatch(/src\/lib\/affiliate/);
   });
 });

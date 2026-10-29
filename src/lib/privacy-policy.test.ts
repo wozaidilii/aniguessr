@@ -54,6 +54,14 @@ describe("privacy policy text", () => {
       expect(markdown).toContain(
         locale === "en" ? "October 21, 2026" : "2026年10月21日",
       );
+      expect(markdown).toContain(
+        locale === "en"
+          ? "Revised: October 29, 2026"
+          : locale === "ja"
+            ? "改定日：2026年10月29日"
+            : "改定日期：2026年10月29日",
+      );
+      expect(markdown).toMatch(/アフィリエイト|联盟链接|聯盟連結|Affiliate links/u);
       expect(privacyTitle(locale).length).toBeGreaterThan(0);
       expect(
         parsePrivacyDocument(markdown).some((block) => block.type === "table"),
