@@ -28,6 +28,7 @@ export const env = createEnv({
     NEXT_PUBLIC_PUSHER_CLUSTER: z.string().optional(),
     NEXT_PUBLIC_BAIDU_MAP_AK: z.string().optional(),
     NEXT_PUBLIC_GOOGLE_MAP_AK: z.string().optional(),
+    NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY: z.string().optional(),
     NEXT_PUBLIC_TENCENT_MAP_AK: z.string().optional(),
     NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL: z.string().url().optional(),
     NEXT_PUBLIC_ANIME_GUESSR_USE_LOCAL_IMAGES: z
@@ -64,6 +65,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
     NEXT_PUBLIC_BAIDU_MAP_AK: process.env.NEXT_PUBLIC_BAIDU_MAP_AK,
     NEXT_PUBLIC_GOOGLE_MAP_AK: process.env.NEXT_PUBLIC_GOOGLE_MAP_AK,
+    NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY:
+      process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY,
     NEXT_PUBLIC_TENCENT_MAP_AK: process.env.NEXT_PUBLIC_TENCENT_MAP_AK,
     NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL:
       process.env.NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL,

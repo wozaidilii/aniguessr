@@ -21,8 +21,31 @@ describe("home map basemap mode", () => {
     expect(shouldTuneOpenFreemapPlaceLabels("openfreemap")).toBe(true);
   });
 
-  it("does not attempt Google tiles without a public API key", () => {
+  it("does not attempt Google tiles without a configured tiles key", () => {
     expect(shouldAttemptGoogleMapTilesBasemap()).toBe(false);
+  });
+});
+
+describe("home map basemap with tiles key", () => {
+  it("attempts Google tiles when NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY is set", () => {
+    const prev = process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP;
+    const prevTiles = process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+    delete process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP;
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY = "tiles-key";
+    try {
+      expect(shouldAttemptGoogleMapTilesBasemap()).toBe(true);
+    } finally {
+      if (prev === undefined) {
+        delete process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP;
+      } else {
+        process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP = prev;
+      }
+      if (prevTiles === undefined) {
+        delete process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+      } else {
+        process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY = prevTiles;
+      }
+    }
   });
 });
 

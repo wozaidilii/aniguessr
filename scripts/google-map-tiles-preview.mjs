@@ -1,6 +1,9 @@
 /**
  * Google Map Tiles preview: createSession probe, verification, and PNGs.
- * Does not print NEXT_PUBLIC_GOOGLE_MAP_AK.
+ * Does not print API keys. Prefer NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY for probes.
+ *
+ * For after-Google screenshots + tile-usage.json, use:
+ *   node scripts/google-map-tiles-after-screenshots.mjs <outputDir>
  */
 import { spawn } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -12,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const OUT = "/cursor/stores/bot/aniguessr-map/preview";
 const PROD = "https://aniguessr.ayiora.com";
+const REFERER = "https://aniguessr.ayiora.com/";
 const PORT = 3460;
 const LOCAL = `http://127.0.0.1:${PORT}`;
 const LOCATION_PATH = "/ja/pilgrimage/locations/kamakura-kanagawa";
@@ -29,17 +33,22 @@ function sharedEnv(extra = {}) {
     NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL: IMAGE_BASE_URL,
     NEXT_PUBLIC_HOME_MAP_BASEMAP:
       process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP ?? "google",
+    NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY:
+      process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY,
     ...extra,
   };
 }
 
 async function probeCreateSession() {
-  const key = process.env.NEXT_PUBLIC_GOOGLE_MAP_AK;
+  const key =
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY ??
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_AK;
   if (!key) {
     return {
       ok: false,
       status: null,
-      message: "NEXT_PUBLIC_GOOGLE_MAP_AK not set in this environment",
+      message:
+        "Neither NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY nor NEXT_PUBLIC_GOOGLE_MAP_AK is set",
     };
   }
   try {
@@ -47,7 +56,10 @@ async function probeCreateSession() {
       `https://tile.googleapis.com/v1/createSession?key=${encodeURIComponent(key)}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Referer: REFERER,
+        },
         body: JSON.stringify({
           mapType: "roadmap",
           language: "ja",

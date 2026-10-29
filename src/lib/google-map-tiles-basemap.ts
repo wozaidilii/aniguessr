@@ -1,7 +1,7 @@
 import type { StyleSpecification } from "maplibre-gl";
 import type { HomeLocale } from "~/lib/home-locale";
 import type { PilgrimageLocale } from "~/lib/pilgrimage-locale";
-import { GOOGLE_MAP_AK } from "~/lib/google-street-view";
+import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
 
 export type GoogleMapTilesLocale = HomeLocale | PilgrimageLocale;
 
@@ -180,13 +180,13 @@ function readStringField(body: unknown, field: string): string {
 /** Creates a roadmap session (client-side; uses public API key). */
 export async function createGoogleMapTilesSession(
   locale: GoogleMapTilesLocale,
-  apiKey: string | undefined = GOOGLE_MAP_AK,
+  apiKey: string | undefined = resolveGoogleMapTilesApiKey(),
 ): Promise<GoogleMapTilesSessionResponse> {
   if (!apiKey) {
     return {
       ok: false,
       status: null,
-      message: "NEXT_PUBLIC_GOOGLE_MAP_AK is not configured",
+      message: "Google Map Tiles API key is not configured",
     };
   }
 

@@ -7,7 +7,25 @@ import {
   type GoogleMapTilesLocale,
   type GoogleMapTilesSessionFailure,
 } from "~/lib/google-map-tiles-basemap";
-import { GOOGLE_MAP_AK } from "~/lib/google-street-view";
+import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
+
+let loggedCreateSessionFailure = false;
+
+function warnCreateSessionFailureOnce(failure: GoogleMapTilesSessionFailure): void {
+  if (loggedCreateSessionFailure) return;
+  loggedCreateSessionFailure = true;
+  if (typeof console === "undefined") return;
+  console.warn(
+    "[AniGuessr map] Google Map Tiles unavailable; staying on OpenFreeMap Positron.",
+    failure.status ?? "network",
+    failure.googleStatus ?? failure.message,
+  );
+}
+
+/** Test hook: reset single warn guard. */
+export function resetGoogleMapTilesBasemapWarnForTests(): void {
+  loggedCreateSessionFailure = false;
+}
 
 export interface ApplyGoogleMapTilesBasemapResult {
   applied: boolean;
@@ -25,13 +43,14 @@ export async function applyGoogleMapTilesBasemap(
   onStyleReady: () => void,
   placement: "bottom-left" | "bottom-right" = "bottom-left",
 ): Promise<ApplyGoogleMapTilesBasemapResult> {
-  const apiKey = GOOGLE_MAP_AK;
+  const apiKey = resolveGoogleMapTilesApiKey();
   if (!apiKey) {
     return { applied: false, activeBasemap: "openfreemap" };
   }
 
   const sessionResult = await createGoogleMapTilesSession(locale, apiKey);
   if (!sessionResult.ok) {
+    warnCreateSessionFailureOnce(sessionResult);
     return {
       applied: false,
       activeBasemap: "openfreemap",
