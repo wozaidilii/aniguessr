@@ -2,28 +2,25 @@ import { describe, expect, it } from "vitest";
 import { collapseMapLibreAttribution } from "~/lib/maplibre-attribution-compact";
 
 describe("collapseMapLibreAttribution", () => {
-  it("removes expanded compact attribution state", () => {
-    const classNames = new Set([
-      "maplibregl-ctrl-attrib",
-      "maplibregl-compact",
-      "maplibregl-compact-show",
-    ]);
-    const attrs: Record<string, string> = { "aria-expanded": "true" };
-    const button = {
-      setAttribute: (name: string, value: string) => {
-        attrs[name] = value;
-      },
-      getAttribute: (name: string) => attrs[name] ?? null,
-    };
+  it("applies MapLibre collapsed compact attribution state", () => {
+    const classNames = new Set(["maplibregl-ctrl-attrib"]);
+    const openAttr: { value: string | null } = { value: "" };
     const root = {
       classList: {
+        add: (name: string) => {
+          classNames.add(name);
+        },
         remove: (name: string) => {
           classNames.delete(name);
         },
         contains: (name: string) => classNames.has(name),
       },
-      querySelector: (selector: string) =>
-        selector === "button" ? button : null,
+      removeAttribute: (name: string) => {
+        if (name === "open") openAttr.value = null;
+      },
+      getAttribute: (name: string) =>
+        name === "open" ? openAttr.value : null,
+      querySelector: () => null,
     };
     const container = {
       querySelector: (selector: string) =>
@@ -31,7 +28,8 @@ describe("collapseMapLibreAttribution", () => {
     };
     const map = { getContainer: () => container };
     collapseMapLibreAttribution(map as never);
-    expect(classNames.has("maplibregl-compact-show")).toBe(false);
-    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(classNames.has("maplibregl-compact")).toBe(true);
+    expect(classNames.has("maplibregl-compact-show")).toBe(true);
+    expect(openAttr.value).toBeNull();
   });
 });

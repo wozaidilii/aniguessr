@@ -31,7 +31,6 @@ function catalogWithGrid(): NavCatalog {
   return { spots, animes: {} };
 }
 
-const locateCenter = { lat: 35.3, lng: 139.481 };
 
 function mockMapWithCorners(corners: {
   nw: { lng: number; lat: number };
@@ -39,25 +38,41 @@ function mockMapWithCorners(corners: {
   sw: { lng: number; lat: number };
   se: { lng: number; lat: number };
 }) {
-  const setPadding = vi.fn();
+  const mapSetPadding = vi.fn();
+  const cloneSetPadding = vi.fn();
   const moveendHandlers: Array<() => void> = [];
+  const width = 390;
+  const height = 420;
+  const screenPointToLocation = (point: { x: number; y: number }) => {
+    if (point.x === 0 && point.y === 0) return corners.nw;
+    if (point.x === width && point.y === 0) return corners.ne;
+    if (point.x === 0 && point.y === height) return corners.sw;
+    if (point.x === width && point.y === height) return corners.se;
+    return { lat: 35.3, lng: 139.481 };
+  };
   return {
     map: {
       getPadding: () => ({ top: 0, bottom: 200, left: 24, right: 24 }),
-      setPadding,
+      setPadding: mapSetPadding,
       on: (event: string, handler: () => void) => {
         if (event === "moveend") moveendHandlers.push(handler);
       },
-      getContainer: () => ({ clientWidth: 390, clientHeight: 420 }),
+      getContainer: () => ({ clientWidth: width, clientHeight: height }),
       unproject: (point: [number, number]) => {
         const [x, y] = point;
-        const width = 390;
-        const height = 420;
         if (x === 0 && y === 0) return corners.nw;
         if (x === width && y === 0) return corners.ne;
         if (x === 0 && y === height) return corners.sw;
         if (x === width && y === height) return corners.se;
-        return locateCenter;
+        return { lat: 35.3, lng: 139.481 };
+      },
+      transform: {
+        clone: () => ({
+          setPadding: cloneSetPadding,
+          width,
+          height,
+          screenPointToLocation,
+        }),
       },
       getBounds: () => ({
         getWest: () => 139.47,
@@ -65,9 +80,9 @@ function mockMapWithCorners(corners: {
         getEast: () => 139.49,
         getNorth: () => 35.31,
       }),
-      getCenter: () => locateCenter,
+      getCenter: () => ({ lat: 35.3, lng: 139.481 }),
     },
-    setPadding,
+    mapSetPadding,
     moveendHandlers,
   };
 }
@@ -116,7 +131,7 @@ describe("locate nearby count with sheet padding", () => {
       sw: { lng: 139.42, lat: 35.24 },
       se: { lng: 139.56, lat: 35.24 },
     };
-    const { map, setPadding, moveendHandlers } = mockMapWithCorners(wideCorners);
+    const { map, mapSetPadding, moveendHandlers } = mockMapWithCorners(wideCorners);
     let publishCount = 0;
     const handler = () => {
       publishCount += 1;
@@ -124,7 +139,7 @@ describe("locate nearby count with sheet padding", () => {
     };
     moveendHandlers.push(handler);
     handler();
-    expect(setPadding).not.toHaveBeenCalled();
+    expect(mapSetPadding).not.toHaveBeenCalled();
     expect(publishCount).toBe(1);
   });
 

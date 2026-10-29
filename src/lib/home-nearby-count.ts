@@ -1,7 +1,7 @@
 import type { NavCatalog } from "~/lib/pilgrimage-nav";
 import type { HomeBoundsDetail } from "~/components/home/home-events";
 import type { HomeFocusWorkDetail } from "~/components/home/home-events";
-import { clusterSamePlaces, haversineKm } from "~/lib/pilgrimage-nav";
+import { clusterPlacesByProximity, haversineKm } from "~/lib/pilgrimage-nav";
 
 export interface HomeNearbyCountResult {
   inView: number;
@@ -29,6 +29,6 @@ export function countHomeNearbyPlaces(
       distanceKm: haversineKm(detail.lat, detail.lng, spot.lat, spot.lng),
     }))
     .sort((a, b) => a.distanceKm - b.distanceKm);
-  const groups = clusterSamePlaces(ranked);
+  const groups = clusterPlacesByProximity(ranked);
   return { inView: groups.length, rankedCount: ranked.length };
 }

@@ -143,6 +143,7 @@ function addPillLayer(
   minzoom: number,
   maxzoom: number,
 ) {
+  if (map.getLayer(id)) return;
   map.addLayer({
     id,
     type: "symbol",
@@ -186,23 +187,31 @@ const CLUSTER_RING_RADIUS = asExpr([
 
 export function installHomeMapLayers(map: Map): void {
   addHomePillImages(map);
-  map.addSource(HOME_DOTS_SOURCE, { type: "geojson", data: EMPTY });
-  map.addSource(HOME_CLUSTER_SOURCE, {
-    type: "geojson",
-    data: EMPTY,
-    cluster: true,
-    clusterRadius: 22,
-    clusterMaxZoom: 15,
-    clusterProperties: {
-      favCount: asExpr(FAVORITE_CLUSTER_SUM),
-      dimSum: ["+", ["coalesce", ["get", "dim"], 0]],
-    },
-  });
-  map.addSource(HOME_AREA_SOURCE, { type: "geojson", data: EMPTY });
-  map.addSource(HOME_PREF_SOURCE, { type: "geojson", data: EMPTY });
+  if (!map.getSource(HOME_DOTS_SOURCE)) {
+    map.addSource(HOME_DOTS_SOURCE, { type: "geojson", data: EMPTY });
+  }
+  if (!map.getSource(HOME_CLUSTER_SOURCE)) {
+    map.addSource(HOME_CLUSTER_SOURCE, {
+      type: "geojson",
+      data: EMPTY,
+      cluster: true,
+      clusterRadius: 22,
+      clusterMaxZoom: 15,
+      clusterProperties: {
+        favCount: asExpr(FAVORITE_CLUSTER_SUM),
+        dimSum: ["+", ["coalesce", ["get", "dim"], 0]],
+      },
+    });
+  }
+  if (!map.getSource(HOME_AREA_SOURCE)) {
+    map.addSource(HOME_AREA_SOURCE, { type: "geojson", data: EMPTY });
+  }
+  if (!map.getSource(HOME_PREF_SOURCE)) {
+    map.addSource(HOME_PREF_SOURCE, { type: "geojson", data: EMPTY });
+  }
 
-  map.addLayer({
-    id: "home-dots",
+  if (!map.getLayer("home-dots")) {
+    map.addLayer({
     type: "circle",
     source: HOME_DOTS_SOURCE,
     minzoom: 8.5,
@@ -212,7 +221,8 @@ export function installHomeMapLayers(map: Map): void {
       "circle-radius": 1,
       "circle-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.12, 0.45]),
     } satisfies CirclePaint,
-  });
+    });
+  }
 
   addPillLayer(
     map,
@@ -266,117 +276,129 @@ export function installHomeMapLayers(map: Map): void {
     1,
   ]);
 
-  map.addLayer({
-    id: "home-cluster-favorite-ring",
-    type: "circle",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 12,
-    filter: asFilter([
-      "all",
-      ["has", "point_count"],
-      [">", ["get", "favCount"], 0],
-    ]),
-    paint: {
-      "circle-color": "rgba(14, 143, 138, 0.18)",
-      "circle-radius": CLUSTER_RING_RADIUS,
-      "circle-stroke-width": 2,
-      "circle-stroke-color": HOME_FAVORITE_COLOR,
-      "circle-opacity": clusterDim,
-    } satisfies CirclePaint,
-  });
-  map.addLayer({
-    id: "home-clusters",
-    type: "circle",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 12,
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": SPOT_COLOR,
-      "circle-radius": CLUSTER_RADIUS,
-      "circle-opacity": clusterDim,
-      "circle-stroke-width": 2,
-      "circle-stroke-color": "#ffffff",
-    } satisfies CirclePaint,
-  });
-  map.addLayer({
-    id: "home-cluster-count",
-    type: "symbol",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 12,
-    filter: ["has", "point_count"],
-    layout: {
-      "text-field": ["get", "point_count_abbreviated"],
-      "text-font": ["Noto Sans Bold"],
-      "text-size": 10.5,
-    },
-    paint: {
-      "text-color": "#ffffff",
-    },
-  });
-  map.addLayer({
-    id: "home-point-favorite-ring",
-    type: "circle",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 12,
-    filter: asFilter(["all", ["!", ["has", "point_count"]], POINT_IS_FAVORITE]),
-    paint: {
-      "circle-color": "rgba(14, 143, 138, 0.28)",
-      "circle-radius": asExpr([
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        12,
-        6,
-        16,
-        9,
+  if (!map.getLayer("home-cluster-favorite-ring")) {
+    map.addLayer({
+      id: "home-cluster-favorite-ring",
+      type: "circle",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 12,
+      filter: asFilter([
+        "all",
+        ["has", "point_count"],
+        [">", ["get", "favCount"], 0],
       ]),
-      "circle-stroke-width": 2,
-      "circle-stroke-color": HOME_FAVORITE_COLOR,
-    } satisfies CirclePaint,
-  });
-  map.addLayer({
-    id: "home-points",
-    type: "circle",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 12,
-    filter: ["!", ["has", "point_count"]],
-    paint: {
-      "circle-color": asExpr([
-        "case",
-        POINT_IS_FAVORITE,
-        HOME_FAVORITE_COLOR,
-        ["==", ["get", "dim"], 1],
-        "#9aa4ad",
-        SPOT_COLOR,
-      ]),
-      "circle-radius": POINT_RADIUS,
-      "circle-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.45, 1]),
-      "circle-stroke-width": 1.6,
-      "circle-stroke-color": "#ffffff",
-    } satisfies CirclePaint,
-  });
-  map.addLayer({
-    id: "home-names",
-    type: "symbol",
-    source: HOME_CLUSTER_SOURCE,
-    minzoom: 14.5,
-    filter: ["!", ["has", "point_count"]],
-    layout: {
-      "text-field": ["get", "name"],
-      "text-font": TEXT_FONT,
-      "text-size": 11,
-      "text-offset": [0, 0.9],
-      "text-anchor": "top",
-      "text-optional": true,
-      "text-max-width": 10,
-    },
-    paint: {
-      "text-color": "#4a4452",
-      "text-halo-color": "#ffffff",
-      "text-halo-width": 1.2,
-      "text-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.35, 1]),
-    },
-  });
+      paint: {
+        "circle-color": "rgba(14, 143, 138, 0.18)",
+        "circle-radius": CLUSTER_RING_RADIUS,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": HOME_FAVORITE_COLOR,
+        "circle-opacity": clusterDim,
+      } satisfies CirclePaint,
+    });
+  }
+  if (!map.getLayer("home-clusters")) {
+    map.addLayer({
+      id: "home-clusters",
+      type: "circle",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 12,
+      filter: ["has", "point_count"],
+      paint: {
+        "circle-color": SPOT_COLOR,
+        "circle-radius": CLUSTER_RADIUS,
+        "circle-opacity": clusterDim,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#ffffff",
+      } satisfies CirclePaint,
+    });
+  }
+  if (!map.getLayer("home-cluster-count")) {
+    map.addLayer({
+      id: "home-cluster-count",
+      type: "symbol",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 12,
+      filter: ["has", "point_count"],
+      layout: {
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 10.5,
+      },
+      paint: {
+        "text-color": "#ffffff",
+      },
+    });
+  }
+  if (!map.getLayer("home-point-favorite-ring")) {
+    map.addLayer({
+      id: "home-point-favorite-ring",
+      type: "circle",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 12,
+      filter: asFilter(["all", ["!", ["has", "point_count"]], POINT_IS_FAVORITE]),
+      paint: {
+        "circle-color": "rgba(14, 143, 138, 0.28)",
+        "circle-radius": asExpr([
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          6,
+          16,
+          9,
+        ]),
+        "circle-stroke-width": 2,
+        "circle-stroke-color": HOME_FAVORITE_COLOR,
+      } satisfies CirclePaint,
+    });
+  }
+  if (!map.getLayer("home-points")) {
+    map.addLayer({
+      id: "home-points",
+      type: "circle",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 12,
+      filter: ["!", ["has", "point_count"]],
+      paint: {
+        "circle-color": asExpr([
+          "case",
+          POINT_IS_FAVORITE,
+          HOME_FAVORITE_COLOR,
+          ["==", ["get", "dim"], 1],
+          "#9aa4ad",
+          SPOT_COLOR,
+        ]),
+        "circle-radius": POINT_RADIUS,
+        "circle-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.45, 1]),
+        "circle-stroke-width": 1.6,
+        "circle-stroke-color": "#ffffff",
+      } satisfies CirclePaint,
+    });
+  }
+  if (!map.getLayer("home-names")) {
+    map.addLayer({
+      id: "home-names",
+      type: "symbol",
+      source: HOME_CLUSTER_SOURCE,
+      minzoom: 14.5,
+      filter: ["!", ["has", "point_count"]],
+      layout: {
+        "text-field": ["get", "name"],
+        "text-font": TEXT_FONT,
+        "text-size": 11,
+        "text-offset": [0, 0.9],
+        "text-anchor": "top",
+        "text-optional": true,
+        "text-max-width": 10,
+      },
+      paint: {
+        "text-color": "#4a4452",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2,
+        "text-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.35, 1]),
+      },
+    });
+  }
 }
 
 export function setHomeGeoJson(

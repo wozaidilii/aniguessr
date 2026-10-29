@@ -35,7 +35,7 @@ import {
 } from "~/lib/home-map-style";
 import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
 import { publishHomeMapBounds, buildHomeBoundsDetail } from "~/lib/home-map-bounds-publish";
-import { collapseMapLibreAttribution } from "~/lib/maplibre-attribution-compact";
+import { scheduleCollapseMapLibreAttribution } from "~/lib/maplibre-attribution-compact";
 import {
   injectGoogleMapTilesPreconnect,
 } from "~/lib/google-map-basemap-placeholder";
@@ -150,7 +150,7 @@ function addOpenFreeMapAttributionControl(
   position: "bottom-left",
 ): void {
   map.addControl(control, position);
-  collapseMapLibreAttribution(map);
+  scheduleCollapseMapLibreAttribution(map);
 }
 
 function openFreeMapAttributionOptions(): maplibregl.AttributionControlOptions {
@@ -212,7 +212,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     }
     const ensureOpenFreeMapAttribution = (): void => {
       if (openFreeMapAttribution) {
-        collapseMapLibreAttribution(map);
+        scheduleCollapseMapLibreAttribution(map);
         return;
       }
       openFreeMapAttribution = new maplibregl.AttributionControl(
@@ -249,8 +249,11 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     };
 
     let boundsSettleGeneration = 0;
+    let basemapReady = !attemptGoogleBasemap;
+    let startupCameraDone = false;
 
     const scheduleNearbyBoundsWhenSettled = (): void => {
+      if (!basemapReady || !startupCameraDone) return;
       boundsSettleGeneration += 1;
       const generation = boundsSettleGeneration;
       void map.once("idle", () => {
@@ -260,6 +263,18 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           publishNearbyBounds(true);
         }
       });
+    };
+
+    const markBasemapReady = (): void => {
+      if (basemapReady) return;
+      basemapReady = true;
+      scheduleNearbyBoundsWhenSettled();
+    };
+
+    const markStartupCameraDone = (): void => {
+      if (startupCameraDone) return;
+      startupCameraDone = true;
+      scheduleNearbyBoundsWhenSettled();
     };
 
     map.on("load", () => {
@@ -359,6 +374,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       const startup = homeStartupCamera(Boolean(focusedId), readHomeOrigin());
       if (startup.kind === "user") {
         flyToUser(startup.lat, startup.lng, false);
+        map.once("moveend", () => markStartupCameraDone());
       } else if (startup.kind === "kanto") {
         map.fitBounds(KANTO_SHONAN_BOUNDS, {
           padding: {
@@ -369,8 +385,13 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
           },
           animate: false,
         });
+        markStartupCameraDone();
+      } else {
+        markStartupCameraDone();
       }
-      scheduleNearbyBoundsWhenSettled();
+      if (basemapReady) {
+        scheduleNearbyBoundsWhenSettled();
+      }
       mapRef.current = map;
       ensureYou();
 
@@ -391,7 +412,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
               }
             }
             refreshOverlayLayers();
-            scheduleNearbyBoundsWhenSettled();
+            markBasemapReady();
           },
           "home",
           {
@@ -418,7 +439,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
             activeBasemap = "openfreemap";
             refreshOverlayLayers();
           }
+          markBasemapReady();
         });
+      } else {
+        markBasemapReady();
       }
     });
     map.on("moveend", () => {
