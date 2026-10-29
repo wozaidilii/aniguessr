@@ -34,6 +34,8 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
   const router = useRouter();
   const nav = siteNavModel(pathname, locale);
   const [open, setOpen] = useState(false);
+  const [accountDismiss, setAccountDismiss] = useState(0);
+  const [localeDismiss, setLocaleDismiss] = useState(0);
   const [pendingId, setPendingId] = useState<SiteNavLink["id"] | null>(null);
   const [hash, setHash] = useState("");
   const navRef = useRef<HTMLElement | null>(null);
@@ -50,6 +52,7 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     href: item.href,
     hrefLang: hrefLangForLocale(item.locale),
   }));
+  const rankHref = nav.links.find((link) => link.id === "rank")?.href ?? "#rank";
 
   useEffect(() => {
     const sync = () => setHash(window.location.hash);
@@ -136,6 +139,26 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
     setHash(`#${id}`);
   }
 
+  function toggleDrawer() {
+    setOpen((value) => {
+      const next = !value;
+      if (next) {
+        setAccountDismiss((value) => value + 1);
+        setLocaleDismiss((value) => value + 1);
+      }
+      return next;
+    });
+  }
+
+  function onLocaleOpen() {
+    setAccountDismiss((value) => value + 1);
+  }
+
+  function onAccountOpen() {
+    setLocaleDismiss((value) => value + 1);
+    if (open) setOpen(false);
+  }
+
   return (
     <header className="home-hdr" data-testid="site-header">
       <div className="home-hdr-in">
@@ -169,18 +192,25 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
             label={copy.langLabel}
             links={localeLinks}
             rowClassName="home-lang"
-            onOpen={() => setOpen(false)}
-            dismissSignal={open}
+            menuClassName="home-hdr-lang"
+            ssrOnlyLinks
+            onOpen={onLocaleOpen}
+            dismissSignal={localeDismiss}
           />
           <div className="home-hdr-login">
-            <HomeAccount locale={locale} />
+            <HomeAccount
+              locale={locale}
+              rankHref={rankHref}
+              onOpen={onAccountOpen}
+              dismissSignal={accountDismiss}
+            />
           </div>
           <button
             type="button"
             className="home-burger"
             aria-expanded={open}
             aria-label={open ? copy.closeMenu : copy.menu}
-            onClick={() => setOpen((value) => !value)}
+            onClick={toggleDrawer}
           >
             <i />
             <i />
@@ -205,13 +235,14 @@ export function HomeHeader({ locale }: { locale: HomeLocale }) {
               {labels[link.id]}
             </Link>
           ))}
+          <hr className="home-menu-divider home-sheet-lang-divider" />
+          <p className="home-sheet-lang-label">{copy.langLabel}</p>
           <LocaleLinkGroup
-            className="home-lang"
+            className="home-lang home-sheet-lang"
             label={copy.langLabel}
             locale={locale}
             links={localeLinks}
           />
-          <HomeAccount locale={locale} />
         </div>
       ) : null}
     </header>

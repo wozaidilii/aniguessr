@@ -67,6 +67,16 @@ export interface HomePageCopy {
   navRank: string;
   login: string;
   logout: string;
+  accountMenu: string;
+  editProfile: string;
+  cancel: string;
+  profileTitle: string;
+  username: string;
+  country: string;
+  countryUnset: string;
+  saveProfile: string;
+  saving: string;
+  saved: string;
   menu: string;
   closeMenu: string;
   langLabel: string;
@@ -215,8 +225,18 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     navRank: "ランキング",
     login: "ログイン",
     logout: "ログアウト",
+    accountMenu: "アカウントメニュー",
+    editProfile: "プロフィールを編集",
+    cancel: "キャンセル",
+    profileTitle: "プレイヤー",
+    username: "ユーザー名",
+    country: "地域",
+    countryUnset: "未設定",
+    saveProfile: "保存",
+    saving: "保存中...",
+    saved: "保存しました",
     menu: "メニュー",
-    closeMenu: "閉じる",
+    closeMenu: "メニューを閉じる",
     langLabel: "言語",
     searchPill: "作品・エリアで探す",
     favoritesPill: "お気に入り",
@@ -325,8 +345,18 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     navRank: "排行榜",
     login: "登录",
     logout: "退出登录",
+    accountMenu: "账号菜单",
+    editProfile: "编辑资料",
+    cancel: "取消",
+    profileTitle: "玩家资料",
+    username: "用户名",
+    country: "地区",
+    countryUnset: "未设置",
+    saveProfile: "保存资料",
+    saving: "保存中...",
+    saved: "已保存",
     menu: "菜单",
-    closeMenu: "关闭",
+    closeMenu: "关闭菜单",
     langLabel: "语言",
     searchPill: "按作品和地区找",
     favoritesPill: "想去",
@@ -435,8 +465,18 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     navRank: "排行榜",
     login: "登入",
     logout: "登出",
+    accountMenu: "帳號選單",
+    editProfile: "編輯資料",
+    cancel: "取消",
+    profileTitle: "玩家資料",
+    username: "使用者名稱",
+    country: "地區",
+    countryUnset: "未設定",
+    saveProfile: "儲存資料",
+    saving: "儲存中...",
+    saved: "已儲存",
     menu: "選單",
-    closeMenu: "關閉",
+    closeMenu: "關閉選單",
     langLabel: "語言",
     searchPill: "依作品和地區找",
     favoritesPill: "想去",
@@ -546,8 +586,18 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     navRank: "Ranking",
     login: "Log in",
     logout: "Log out",
+    accountMenu: "Account menu",
+    editProfile: "Edit profile",
+    cancel: "Cancel",
+    profileTitle: "Player profile",
+    username: "Username",
+    country: "Region",
+    countryUnset: "No region",
+    saveProfile: "Save profile",
+    saving: "Saving...",
+    saved: "Saved",
     menu: "Menu",
-    closeMenu: "Close",
+    closeMenu: "Close menu",
     langLabel: "Language",
     searchPill: "Browse series and areas",
     favoritesPill: "Favorites",
