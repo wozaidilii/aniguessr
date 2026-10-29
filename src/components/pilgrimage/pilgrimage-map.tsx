@@ -20,6 +20,12 @@ import {
 import { encodeSpotId } from "~/lib/pilgrimage-slug";
 import { workFocusFrame } from "~/lib/home-map-focus";
 import { tuneHomeMapStyle } from "~/lib/home-map-style";
+import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
+import {
+  shouldAttemptGoogleMapTilesBasemap,
+  shouldTuneOpenFreemapPlaceLabels,
+  type HomeMapBasemapKind,
+} from "~/lib/home-map-basemap";
 import {
   PILGRIMAGE_FIT_MAX_ZOOM,
   PILGRIMAGE_FIT_PADDING,
@@ -78,10 +84,16 @@ export function PilgrimageMap({
     };
   }, [attempt]);
 
+  const [layerEpoch, setLayerEpoch] = useState(0);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     let loaded = false;
+    let activeBasemap: HomeMapBasemapKind = "openfreemap";
+    let mapInteractionsBound = false;
+    let googleUpgradeStarted = false;
+    let detachQuotaMonitor: (() => void) | undefined;
     const map = new maplibregl.Map({
       container,
       style: PILGRIMAGE_MAP_STYLE,
@@ -92,10 +104,10 @@ export function PilgrimageMap({
       maxZoom: 18,
       maxBounds: PILGRIMAGE_JAPAN_BOUNDS,
     });
-    map.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      "bottom-right",
-    );
+    const openFreeMapAttribution = new maplibregl.AttributionControl({
+      compact: true,
+    });
+    map.addControl(openFreeMapAttribution, "bottom-right");
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
       "top-right",
@@ -103,113 +115,175 @@ export function PilgrimageMap({
     const timer = window.setTimeout(() => {
       if (!loaded) setError(true);
     }, 15_000);
+    const installSpotLayers = (): void => {
+      tuneHomeMapStyle(map, locale, {
+        skip: !shouldTuneOpenFreemapPlaceLabels(activeBasemap),
+      });
+      if (!map.getSource(SOURCE_ID)) {
+        map.addSource(SOURCE_ID, {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: [] },
+          ...SPOT_CLUSTER,
+        });
+      }
+      const clusterRing = spotClusterFavoriteRing();
+      if (!map.getLayer(clusterRing.id)) {
+        map.addLayer({
+          id: clusterRing.id,
+          type: "circle",
+          source: SOURCE_ID,
+          filter: clusterRing.filter,
+          paint: clusterRing.paint,
+        });
+      }
+      if (!map.getLayer("spot-clusters")) {
+        map.addLayer({
+          id: "spot-clusters",
+          type: "circle",
+          source: SOURCE_ID,
+          filter: ["has", "point_count"],
+          paint: spotClusterPaint(),
+        });
+      }
+      if (!map.getLayer("spot-cluster-count")) {
+        map.addLayer({
+          id: "spot-cluster-count",
+          type: "symbol",
+          source: SOURCE_ID,
+          filter: ["has", "point_count"],
+          layout: {
+            "text-field": ["get", "point_count_abbreviated"],
+            "text-font": ["Noto Sans Regular"],
+            "text-size": 12,
+          },
+          paint: { "text-color": "#1f2430" },
+        });
+      }
+      const favoriteRing = spotFavoriteRing();
+      if (!map.getLayer(favoriteRing.id)) {
+        map.addLayer({
+          id: favoriteRing.id,
+          type: "circle",
+          source: SOURCE_ID,
+          filter: favoriteRing.filter,
+          paint: favoriteRing.paint,
+        });
+      }
+      if (!map.getLayer("spot-points")) {
+        map.addLayer({
+          id: "spot-points",
+          type: "circle",
+          source: SOURCE_ID,
+          filter: ["!", ["has", "point_count"]],
+          paint: spotPointPaint(),
+        });
+      }
+      if (!mapInteractionsBound) {
+        mapInteractionsBound = true;
+        const pointCursor = (cursor: string) => {
+          map.getCanvas().style.cursor = cursor;
+        };
+        const onClusterClick = (event: maplibregl.MapLayerMouseEvent) => {
+          const feature = event.features?.[0];
+          if (feature?.geometry.type !== "Point") return;
+          const clusterId = Number(feature.properties?.cluster_id);
+          if (!Number.isFinite(clusterId)) return;
+          const source = geoJsonSource(map);
+          if (!source) return;
+          const center = feature.geometry.coordinates;
+          const reduce = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+          ).matches;
+          void Promise.resolve(source.getClusterExpansionZoom(clusterId)).then(
+            (zoom) => {
+              map.easeTo({
+                center: [center[0] ?? 0, center[1] ?? 0],
+                zoom,
+                duration: reduce ? 0 : 400,
+              });
+            },
+          );
+        };
+        const onPointClick = (event: maplibregl.MapLayerMouseEvent) => {
+          const feature = event.features?.[0];
+          if (feature?.geometry.type !== "Point") return;
+          const [lng, lat] = feature.geometry.coordinates;
+          const props = feature.properties;
+          showSpotPopup(map, popupRef, locale, {
+            id: String(props?.id ?? ""),
+            subjectId: String(props?.subjectId ?? ""),
+            name: String(props?.name ?? ""),
+            anime: String(props?.anime ?? ""),
+            lng: lng ?? 0,
+            lat: lat ?? 0,
+          });
+        };
+        for (const layer of ["spot-clusters", clusterRing.id]) {
+          map.on("mouseenter", layer, () => pointCursor("pointer"));
+          map.on("mouseleave", layer, () => pointCursor(""));
+          map.on("click", layer, onClusterClick);
+        }
+        for (const layer of ["spot-points", favoriteRing.id]) {
+          map.on("mouseenter", layer, () => pointCursor("pointer"));
+          map.on("mouseleave", layer, () => pointCursor(""));
+          map.on("click", layer, onPointClick);
+        }
+      }
+    };
+
     map.on("load", () => {
       loaded = true;
       window.clearTimeout(timer);
-      tuneHomeMapStyle(map, locale);
-      map.addSource(SOURCE_ID, {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] },
-        ...SPOT_CLUSTER,
-      });
-      const clusterRing = spotClusterFavoriteRing();
-      map.addLayer({
-        id: clusterRing.id,
-        type: "circle",
-        source: SOURCE_ID,
-        filter: clusterRing.filter,
-        paint: clusterRing.paint,
-      });
-      map.addLayer({
-        id: "spot-clusters",
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        paint: spotClusterPaint(),
-      });
-      map.addLayer({
-        id: "spot-cluster-count",
-        type: "symbol",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["Noto Sans Regular"],
-          "text-size": 12,
-        },
-        paint: { "text-color": "#1f2430" },
-      });
-      const favoriteRing = spotFavoriteRing();
-      map.addLayer({
-        id: favoriteRing.id,
-        type: "circle",
-        source: SOURCE_ID,
-        filter: favoriteRing.filter,
-        paint: favoriteRing.paint,
-      });
-      map.addLayer({
-        id: "spot-points",
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["!", ["has", "point_count"]],
-        paint: spotPointPaint(),
-      });
-      const pointCursor = (cursor: string) => {
-        map.getCanvas().style.cursor = cursor;
-      };
-      const onClusterClick = (event: maplibregl.MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
-        if (feature?.geometry.type !== "Point") return;
-        const clusterId = Number(feature.properties?.cluster_id);
-        if (!Number.isFinite(clusterId)) return;
-        const source = geoJsonSource(map);
-        if (!source) return;
-        const center = feature.geometry.coordinates;
-        const reduce = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
-        void Promise.resolve(source.getClusterExpansionZoom(clusterId)).then(
-          (zoom) => {
-            map.easeTo({
-              center: [center[0] ?? 0, center[1] ?? 0],
-              zoom,
-              duration: reduce ? 0 : 400,
-            });
-          },
-        );
-      };
-      const onPointClick = (event: maplibregl.MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
-        if (feature?.geometry.type !== "Point") return;
-        const [lng, lat] = feature.geometry.coordinates;
-        const props = feature.properties;
-        showSpotPopup(map, popupRef, locale, {
-          id: String(props?.id ?? ""),
-          subjectId: String(props?.subjectId ?? ""),
-          name: String(props?.name ?? ""),
-          anime: String(props?.anime ?? ""),
-          lng: lng ?? 0,
-          lat: lat ?? 0,
-        });
-      };
-      for (const layer of ["spot-clusters", clusterRing.id]) {
-        map.on("mouseenter", layer, () => pointCursor("pointer"));
-        map.on("mouseleave", layer, () => pointCursor(""));
-        map.on("click", layer, onClusterClick);
-      }
-      for (const layer of ["spot-points", favoriteRing.id]) {
-        map.on("mouseenter", layer, () => pointCursor("pointer"));
-        map.on("mouseleave", layer, () => pointCursor(""));
-        map.on("click", layer, onPointClick);
-      }
+      installSpotLayers();
       mapRef.current = map;
       setMapLoaded(true);
+      setLayerEpoch((value) => value + 1);
       map.resize();
+
+      if (shouldAttemptGoogleMapTilesBasemap() && !googleUpgradeStarted) {
+        googleUpgradeStarted = true;
+        void applyGoogleMapTilesBasemap(
+          map,
+          locale,
+          () => {
+            activeBasemap = "google";
+            try {
+              map.removeControl(openFreeMapAttribution);
+            } catch {
+              // ignore
+            }
+            installSpotLayers();
+            setLayerEpoch((value) => value + 1);
+          },
+          "pilgrimage",
+          {
+            restoreOpenFreeMapAttribution: () => {
+              try {
+                map.addControl(openFreeMapAttribution, "bottom-right");
+              } catch {
+                // ignore duplicate add
+              }
+            },
+            onRevertedToOpenFreemap: () => {
+              activeBasemap = "openfreemap";
+              installSpotLayers();
+              setLayerEpoch((value) => value + 1);
+            },
+          },
+        ).then((result) => {
+          if (result.applied) activeBasemap = "google";
+          if (result.detachQuotaMonitor) {
+            detachQuotaMonitor?.();
+            detachQuotaMonitor = result.detachQuotaMonitor;
+          }
+        });
+      }
     });
     const observer = new ResizeObserver(() => map.resize());
     observer.observe(container);
     return () => {
       window.clearTimeout(timer);
+      detachQuotaMonitor?.();
       observer.disconnect();
       map.remove();
       mapRef.current = null;
@@ -297,6 +371,7 @@ export function PilgrimageMap({
     favorites.ids,
     favorites.ready,
     favoritesOnly,
+    layerEpoch,
     locale,
     locationSlug,
     mapLoaded,
