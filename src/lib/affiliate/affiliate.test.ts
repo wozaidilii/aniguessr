@@ -257,6 +257,16 @@ describe("affiliate layout constants", () => {
   });
 });
 
+describe("affiliate link visual", () => {
+  it("uses the external-link SVG instead of a text arrow", async () => {
+    const source = await import("fs/promises").then((fs) =>
+      fs.readFile("src/components/pilgrimage/affiliate-track-link.tsx", "utf8"),
+    );
+    expect(source).not.toContain("↗");
+    expect(source).toContain("AffiliateExternalLinkIcon");
+  });
+});
+
 describe("affiliate sitemap isolation", () => {
   it("does not import app affiliate modules into sitemap lastmod", async () => {
     const source = await import("fs/promises").then((fs) =>

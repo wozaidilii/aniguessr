@@ -4,16 +4,24 @@ import {
   resolveAffiliatePage,
   type AffiliatePageInput,
 } from "~/lib/affiliate/resolve";
+import { resolveAffiliateThumbnail } from "~/lib/affiliate/thumbnail";
 import { AffiliateTrackLink } from "~/components/pilgrimage/affiliate-track-link";
 
-export type AffiliateBlockProps = AffiliatePageInput;
+export type AffiliateBlockProps = AffiliatePageInput & {
+  /**
+   * Screenshot / QA only: force B-version icon row on pilot pages.
+   * Never set in production routes.
+   */
+  forceLinkVisualFallback?: boolean;
+};
 
 function providerSubtext(locale: PilgrimageLocale) {
   return locale === "ja" ? "楽天トラベル" : "Klook";
 }
 
 export function AffiliateBlock(props: AffiliateBlockProps) {
-  const resolved = resolveAffiliatePage(props);
+  const { forceLinkVisualFallback, ...pageInput } = props;
+  const resolved = resolveAffiliatePage(pageInput);
   if (!resolved) return null;
 
   const { offer, input } = resolved;
@@ -27,6 +35,14 @@ export function AffiliateBlock(props: AffiliateBlockProps) {
     input.pageType === "location"
       ? copy.affiliateTitleLocation
       : copy.affiliateTitle;
+  const locationSlug =
+    input.pageType === "spot" ? input.locationSlug : input.locationSlug;
+  const forceFallback =
+    forceLinkVisualFallback === true ||
+    process.env.AFFILIATE_FORCE_LINK_FALLBACK === "1";
+  const thumbnail = forceFallback
+    ? null
+    : resolveAffiliateThumbnail(locationSlug, input.locale);
 
   return (
     <section
@@ -58,6 +74,7 @@ export function AffiliateBlock(props: AffiliateBlockProps) {
         locationSlug={
           input.pageType === "location" ? input.locationSlug : undefined
         }
+        thumbnail={thumbnail}
         className="mt-3"
       />
     </section>

@@ -158,13 +158,13 @@ describe("rewritten question labels and pilgrimage pages", () => {
         const spotId = pathname.startsWith("/pilgrimage/spots/")
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
           : "";
-        if (renamed.has(spotId) || copyIds.has(spotId)) {
+        if (affiliatePilotPaths.has(pathname)) {
+          expect(lastmod).toBe("2026-10-29");
+        } else if (renamed.has(spotId) || copyIds.has(spotId)) {
           expect(lastmod).toBe("2026-10-23");
           bumped.add(spotId);
-        } else if (affiliatePilotPaths.has(pathname)) {
-          expect(lastmod).toBe("2026-10-21");
         } else if (bumpedPaths.has(pathname)) {
-          expect(lastmod).toBe("2026-10-21");
+          expect(lastmod).toBe("2026-10-29");
         } else {
           expect(lastmod).toBe("2026-10-21");
         }

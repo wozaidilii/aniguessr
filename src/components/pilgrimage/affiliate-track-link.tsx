@@ -6,6 +6,8 @@ import {
 } from "~/lib/posthog";
 import { type PilgrimageLocale } from "~/lib/pilgrimage-locale";
 import { type AffiliateProvider } from "~/lib/affiliate/provider";
+import { AffiliateExternalLinkIcon } from "~/components/pilgrimage/affiliate-external-link-icon";
+import type { AffiliateThumbnail } from "~/lib/affiliate/thumbnail";
 
 const NEW_TAB_ARIA: Record<PilgrimageLocale, string> = {
   ja: "（新しいタブで開きます）",
@@ -25,6 +27,7 @@ interface AffiliateTrackLinkProps {
   spotId?: string;
   locationSlug?: string;
   className?: string;
+  thumbnail?: AffiliateThumbnail | null;
 }
 
 function BedIcon() {
@@ -71,8 +74,12 @@ export function AffiliateTrackLink({
   spotId,
   locationSlug,
   className,
+  thumbnail = null,
 }: AffiliateTrackLinkProps) {
   const Icon = linkType === "hotel" ? BedIcon : TicketIcon;
+  const rowClass = thumbnail
+    ? "min-h-[72px] py-[7px] pl-[7px] pr-3.5"
+    : "min-h-14 px-3.5 py-2";
 
   return (
     <a
@@ -80,7 +87,8 @@ export function AffiliateTrackLink({
       target="_blank"
       rel="sponsored nofollow noopener"
       aria-label={`${mainText} ${subText}${NEW_TAB_ARIA[locale]}`}
-      className={`group flex min-h-14 items-center gap-3 rounded-xl border border-[#E7E3DC] px-3.5 py-2 hover:border-[#C4275F] hover:bg-[#FFF7FA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C4275F] ${className ?? ""}`}
+      className={`group flex items-center gap-3 rounded-xl border border-[#E7E3DC] hover:border-[#C4275F] hover:bg-[#FFF7FA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C4275F] ${rowClass} ${className ?? ""}`}
+      data-affiliate-link-visual={thumbnail ? "thumbnail" : "fallback"}
       onClick={() => {
         capturePostHogEvent(POSTHOG_EVENTS.affiliateLinkClicked, {
           locale,
@@ -91,9 +99,22 @@ export function AffiliateTrackLink({
         });
       }}
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F3F1EC]">
-        <Icon />
-      </span>
+      {thumbnail ? (
+        // eslint-disable-next-line @next/next/no-img-element -- fixed 56×56 affiliate thumb (spec §9.2)
+        <img
+          src={thumbnail.src}
+          width={56}
+          height={56}
+          loading="lazy"
+          decoding="async"
+          alt={thumbnail.alt}
+          className="h-14 w-14 shrink-0 rounded-[10px] object-cover bg-[#F3F1EC]"
+        />
+      ) : (
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F3F1EC]">
+          <Icon />
+        </span>
+      )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm leading-5 font-bold text-[#1F2430]">
           {mainText}
@@ -102,12 +123,7 @@ export function AffiliateTrackLink({
           {subText}
         </span>
       </span>
-      <span
-        className="shrink-0 text-sm leading-none text-[#9AA0AA]"
-        aria-hidden
-      >
-        ↗
-      </span>
+      <AffiliateExternalLinkIcon />
     </a>
   );
 }

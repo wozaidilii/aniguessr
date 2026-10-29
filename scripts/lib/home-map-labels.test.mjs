@@ -173,7 +173,7 @@ describe("homepage map labels", () => {
       expect(toshima).toMatchObject({
         ja: "豊島区",
         zh: "豊岛区",
-        tw: "豊島區",
+        tw: "豐島區",
         en: "Toshima",
       });
       const yokohama = byId.get("yokohama-kanagawa-14104");
