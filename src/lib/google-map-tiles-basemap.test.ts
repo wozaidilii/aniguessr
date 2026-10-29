@@ -41,43 +41,40 @@ describe("google map tiles locale mapping", () => {
 });
 
 describe("google map tiles createSession styles", () => {
-  it("hides selected POI labels/icons and park labels while keeping park fill", () => {
+  it("hides all POI and natural-feature labels while keeping geometry fills", () => {
     const styles = googleMapTilesCreateSessionStyles();
-    expect(styles).toEqual(
-      expect.arrayContaining([
-        {
-          featureType: "poi.business",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.medical",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.attraction",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.place_of_worship",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.park",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "poi.park",
-          elementType: "labels.icon",
-          stylers: [{ visibility: "off" }],
-        },
-      ]),
-    );
+    expect(styles).toEqual([
+      {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "poi",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "landscape.natural",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "landscape.natural",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
+      },
+    ]);
     expect(
       styles.some(
         (rule) =>
-          rule.featureType === "poi.park" && rule.elementType === "geometry",
+          rule.elementType === "geometry" ||
+          rule.elementType === "geometry.fill",
       ),
+    ).toBe(false);
+    expect(
+      styles.some((rule) => rule.stylers.some((s) => s.visibility === "off") &&
+        !rule.elementType),
     ).toBe(false);
   });
 

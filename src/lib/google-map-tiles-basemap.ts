@@ -25,7 +25,7 @@ export const GOOGLE_MAP_TILES_LOGO_PATH =
 export const GOOGLE_MAP_TILES_LOGO_URL = GOOGLE_MAP_TILES_LOGO_PATH;
 
 /** Bump when createSession `styles` change so old cached sessions are not reused. */
-export const GOOGLE_MAP_TILES_SESSION_STYLES_VERSION = "poi-labels-hide-v1";
+export const GOOGLE_MAP_TILES_SESSION_STYLES_VERSION = "poi-labels-hide-v2";
 
 export type GoogleMapTilesStyleRule = {
   featureType?: string;
@@ -33,35 +33,25 @@ export type GoogleMapTilesStyleRule = {
   stylers: Array<Record<string, string | number>>;
 };
 
-const POI_TYPES_HIDE_LABELS_AND_ICONS = [
-  "poi.business",
-  "poi.medical",
-  "poi.attraction",
-  "poi.place_of_worship",
-] as const;
+const LABELS_OFF: GoogleMapTilesStyleRule["stylers"] = [
+  { visibility: "off" },
+];
+
+function hideFeatureLabels(
+  featureType: string,
+): GoogleMapTilesStyleRule[] {
+  return [
+    { featureType, elementType: "labels", stylers: LABELS_OFF },
+    { featureType, elementType: "labels.icon", stylers: LABELS_OFF },
+  ];
+}
 
 /** Map Tiles API `styles` (Maps JS styled-map syntax). Roadmap sessions only. */
 export function googleMapTilesCreateSessionStyles(): GoogleMapTilesStyleRule[] {
-  const hidePoi: GoogleMapTilesStyleRule[] =
-    POI_TYPES_HIDE_LABELS_AND_ICONS.map((featureType) => ({
-      featureType,
-      stylers: [{ visibility: "off" }],
-    }));
-
-  const parkKeepFillHideLabels: GoogleMapTilesStyleRule[] = [
-    {
-      featureType: "poi.park",
-      elementType: "labels",
-      stylers: [{ visibility: "off" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "labels.icon",
-      stylers: [{ visibility: "off" }],
-    },
+  return [
+    ...hideFeatureLabels("poi"),
+    ...hideFeatureLabels("landscape.natural"),
   ];
-
-  return [...hidePoi, ...parkKeepFillHideLabels];
 }
 
 export function googleMapTilesSessionCacheStorageKey(): string {
