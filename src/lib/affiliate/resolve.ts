@@ -14,6 +14,7 @@ interface AffiliateSpotInput {
   pageType: "spot";
   locale: PilgrimageLocale;
   spotId: string;
+  locationSlug: string;
   areaLabel: string;
   lat: number;
   lng: number;
@@ -41,6 +42,11 @@ function linkContext(input: AffiliatePageInput) {
     areaLabel: input.areaLabel,
     lat: input.lat,
     lng: input.lng,
+    spotId: input.pageType === "spot" ? input.spotId : undefined,
+    locationSlug:
+      input.pageType === "spot"
+        ? input.locationSlug
+        : input.locationSlug,
   };
 }
 

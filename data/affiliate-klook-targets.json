@@ -1,0 +1,24 @@
+{
+  "activitySets": {
+    "kamakura-enoshima": {
+      "primary": "activity/25457-kamakura-enoshima-day-tour-tokyo/",
+      "alternates": [
+        "activity/241456-enoshima-kamakura-freepass/",
+        "activity/122939-kamakura-day-tour-kamakura-buddha-enoshima-day-tour-from-tokyo/"
+      ]
+    }
+  },
+  "spots": {},
+  "locations": {
+    "kamakura-kanagawa": { "tour": "kamakura-enoshima" },
+    "fujisawa-kanagawa": { "tour": "kamakura-enoshima" },
+    "minato-tokyo": { "destination": "tokyo" },
+    "shibuya-tokyo": { "destination": "tokyo" },
+    "kyoto-kyoto": { "destination": "kyoto" }
+  },
+  "destinations": {
+    "kamakura": "destination/c23622-kamakura/",
+    "tokyo": "destination/c28-tokyo/",
+    "kyoto": "destination/c30-kyoto/"
+  }
+}
