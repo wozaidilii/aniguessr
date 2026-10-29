@@ -58,9 +58,9 @@ describe("pilgrimage navigation", () => {
       "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     );
     expect(PILGRIMAGE_MAP_STYLE).not.toMatch(/[?&]key=/);
-    expect(
-      PILGRIMAGE_MAP_STYLE.startsWith("https://tiles.openfreemap.org/"),
-    ).toBe(true);
+    expect(PILGRIMAGE_MAP_STYLE).toBe(
+      "https://tiles.openfreemap.org/styles/positron",
+    );
   });
 
   it("builds a Google Maps directions link without an API key", () => {

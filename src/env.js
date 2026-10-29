@@ -38,6 +38,7 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_TOKEN: z.string().optional(),
     NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_HOME_MAP_BASEMAP: z.enum(["google", "openfreemap"]).optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -74,6 +75,7 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_TOKEN: process.env.NEXT_PUBLIC_POSTHOG_TOKEN,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_HOME_MAP_BASEMAP: process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

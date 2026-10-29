@@ -31,9 +31,15 @@ import {
 import { loadHomeMapLabels, type HomeMapLabels } from "~/lib/home-map-labels";
 import {
   HOME_IDEOGRAPH_FONT,
-  HOME_MAP_STYLE,
   tuneHomeMapStyle,
 } from "~/lib/home-map-style";
+import { applyGoogleMapTilesBasemap } from "~/lib/apply-google-map-tiles-basemap";
+import {
+  homeMapInitialStyleUrl,
+  shouldAttemptGoogleMapTilesBasemap,
+  shouldTuneOpenFreemapPlaceLabels,
+  type HomeMapBasemapKind,
+} from "~/lib/home-map-basemap";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import type { HomeLocale } from "~/lib/home-locale";
 import { readHomeOrigin, rememberHomeOrigin } from "~/lib/home-origin";
@@ -147,9 +153,12 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     let loaded = false;
     let originPinned = false;
     let lastBottom = -1;
+    let activeBasemap: HomeMapBasemapKind = "openfreemap";
+    let mapInteractionsBound = false;
+    let googleUpgradeStarted = false;
     const map = new maplibregl.Map({
       container,
-      style: HOME_MAP_STYLE,
+      style: homeMapInitialStyleUrl(),
       center: KANTO_INITIAL_CENTER,
       zoom: KANTO_INITIAL_ZOOM,
       attributionControl: false,
@@ -158,90 +167,107 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       localIdeographFontFamily: HOME_IDEOGRAPH_FONT,
     });
     mapRef.current = map;
-    map.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      "bottom-left",
-    );
+    const openFreeMapAttribution = new maplibregl.AttributionControl({
+      compact: true,
+    });
+    map.addControl(openFreeMapAttribution, "bottom-left");
     const timer = window.setTimeout(() => {
       if (!loaded) setError(true);
     }, 15_000);
     map.on("load", () => {
       loaded = true;
       window.clearTimeout(timer);
-      tuneHomeMapStyle(map, locale);
-      installHomeMapLayers(map);
-      const pointCursor = (cursor: string) => {
-        map.getCanvas().style.cursor = cursor;
-      };
-      map.on("mouseenter", "home-clusters", () => pointCursor("pointer"));
-      map.on("mouseleave", "home-clusters", () => pointCursor(""));
-      map.on("mouseenter", "home-points", () => pointCursor("pointer"));
-      map.on("mouseleave", "home-points", () => pointCursor(""));
-      for (const layerId of HOME_PILL_LAYER_IDS) {
-        map.on("mouseenter", layerId, () => pointCursor("pointer"));
-        map.on("mouseleave", layerId, () => pointCursor(""));
-        map.on("click", layerId, (event) => {
-          const props = event.features?.[0]?.properties;
-          if (!props) return;
-          const west = Number(props.west);
-          const south = Number(props.south);
-          const east = Number(props.east);
-          const north = Number(props.north);
-          if (![west, south, east, north].every(Number.isFinite)) return;
-          map.fitBounds(
-            [
-              [west, south],
-              [east, north],
-            ],
-            {
-              padding: {
-                top: homeMapTopPadding(map),
-                right: 48,
-                bottom: 48,
-                left: 48,
-              },
-              maxZoom: 14,
-              duration: prefersReducedMotion() ? 0 : 600,
-            },
-          );
+
+      const refreshOverlayLayers = (): void => {
+        tuneHomeMapStyle(map, locale, {
+          skip: !shouldTuneOpenFreemapPlaceLabels(activeBasemap),
         });
-      }
-      map.on("click", "home-clusters", (event) => {
-        const feature = event.features?.[0];
-        if (feature?.geometry.type !== "Point") return;
-        const clusterId = Number(feature.properties?.cluster_id);
-        if (!Number.isFinite(clusterId)) return;
-        const source = map.getSource(HOME_CLUSTER_SOURCE);
-        if (source?.type !== "geojson") return;
-        const center = feature.geometry.coordinates;
-        void Promise.resolve(
-          (source as maplibregl.GeoJSONSource).getClusterExpansionZoom(
-            clusterId,
-          ),
-        ).then((zoom) => {
-          map.easeTo({
-            center: [center[0] ?? 0, center[1] ?? 0],
-            zoom,
-            duration: window.matchMedia("(prefers-reduced-motion: reduce)")
-              .matches
-              ? 0
-              : 400,
+        installHomeMapLayers(map);
+        pushLabels();
+        if (focusedId) showFocus();
+        else pushSpots();
+      };
+
+      const bindMapInteractions = (): void => {
+        if (mapInteractionsBound) return;
+        mapInteractionsBound = true;
+        const pointCursor = (cursor: string) => {
+          map.getCanvas().style.cursor = cursor;
+        };
+        map.on("mouseenter", "home-clusters", () => pointCursor("pointer"));
+        map.on("mouseleave", "home-clusters", () => pointCursor(""));
+        map.on("mouseenter", "home-points", () => pointCursor("pointer"));
+        map.on("mouseleave", "home-points", () => pointCursor(""));
+        for (const layerId of HOME_PILL_LAYER_IDS) {
+          map.on("mouseenter", layerId, () => pointCursor("pointer"));
+          map.on("mouseleave", layerId, () => pointCursor(""));
+          map.on("click", layerId, (event) => {
+            const props = event.features?.[0]?.properties;
+            if (!props) return;
+            const west = Number(props.west);
+            const south = Number(props.south);
+            const east = Number(props.east);
+            const north = Number(props.north);
+            if (![west, south, east, north].every(Number.isFinite)) return;
+            map.fitBounds(
+              [
+                [west, south],
+                [east, north],
+              ],
+              {
+                padding: {
+                  top: homeMapTopPadding(map),
+                  right: 48,
+                  bottom: 48,
+                  left: 48,
+                },
+                maxZoom: 14,
+                duration: prefersReducedMotion() ? 0 : 600,
+              },
+            );
+          });
+        }
+        map.on("click", "home-clusters", (event) => {
+          const feature = event.features?.[0];
+          if (feature?.geometry.type !== "Point") return;
+          const clusterId = Number(feature.properties?.cluster_id);
+          if (!Number.isFinite(clusterId)) return;
+          const source = map.getSource(HOME_CLUSTER_SOURCE);
+          if (source?.type !== "geojson") return;
+          const center = feature.geometry.coordinates;
+          void Promise.resolve(
+            (source as maplibregl.GeoJSONSource).getClusterExpansionZoom(
+              clusterId,
+            ),
+          ).then((zoom) => {
+            map.easeTo({
+              center: [center[0] ?? 0, center[1] ?? 0],
+              zoom,
+              duration: window.matchMedia("(prefers-reduced-motion: reduce)")
+                .matches
+                ? 0
+                : 400,
+            });
           });
         });
-      });
-      map.on("click", "home-points", (event) => {
-        const feature = event.features?.[0];
-        if (feature?.geometry.type !== "Point") return;
-        const [lng, lat] = feature.geometry.coordinates;
-        const props = feature.properties;
-        showPopup(map, popupRef, locale, {
-          id: String(props?.id ?? ""),
-          name: String(props?.name ?? ""),
-          anime: String(props?.anime ?? ""),
-          lng: lng ?? 0,
-          lat: lat ?? 0,
+        map.on("click", "home-points", (event) => {
+          const feature = event.features?.[0];
+          if (feature?.geometry.type !== "Point") return;
+          const [lng, lat] = feature.geometry.coordinates;
+          const props = feature.properties;
+          showPopup(map, popupRef, locale, {
+            id: String(props?.id ?? ""),
+            name: String(props?.name ?? ""),
+            anime: String(props?.anime ?? ""),
+            lng: lng ?? 0,
+            lat: lat ?? 0,
+          });
         });
-      });
+      };
+
+      bindMapInteractions();
+      refreshOverlayLayers();
+
       const startup = homeStartupCamera(Boolean(focusedId), readHomeOrigin());
       if (startup.kind === "user") {
         flyToUser(startup.lat, startup.lng, false);
@@ -259,8 +285,26 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       publishBounds(map);
       mapRef.current = map;
       ensureYou();
-      if (focusedId) showFocus();
-      else pushSpots();
+
+      if (shouldAttemptGoogleMapTilesBasemap() && !googleUpgradeStarted) {
+        googleUpgradeStarted = true;
+        void applyGoogleMapTilesBasemap(
+          map,
+          locale,
+          () => {
+            activeBasemap = "google";
+            try {
+              map.removeControl(openFreeMapAttribution);
+            } catch {
+              // Already removed after a style swap.
+            }
+            refreshOverlayLayers();
+          },
+          "bottom-left",
+        ).then((result) => {
+          if (result.applied) activeBasemap = "google";
+        });
+      }
     });
     map.on("moveend", () => {
       publishBounds(map);
@@ -454,11 +498,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     window.addEventListener("storage", onFavorites);
     ensureYou();
 
-    map.on("load", () => {
-      pushLabels();
-      if (focusedId) showFocus();
-      else pushSpots();
-    });
     void loadHomeMapLabels()
       .then((labels) => {
         if (cancelled || !labels) return;

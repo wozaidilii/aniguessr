@@ -1,8 +1,9 @@
 import type { ExpressionSpecification, Map } from "maplibre-gl";
 import type { HomeLocale } from "~/lib/home-locale";
+import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
 
-/** Light basemap shared by the homepage and pilgrimage mini maps. */
-export const HOME_MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
+/** Light OpenFreeMap fallback while Google tiles load or on error. */
+export const HOME_MAP_STYLE = OPENFREEMAP_POSITRON_STYLE;
 
 export const HOME_IDEOGRAPH_FONT =
   "Hiragino Sans, Noto Sans CJK JP, Noto Sans JP, Yu Gothic, Meiryo, sans-serif";
@@ -41,7 +42,12 @@ function setPaint(map: Map, id: string, name: string, value: unknown): void {
 }
 
 /** Point place names at the page locale and quiet the city labels and water. */
-export function tuneHomeMapStyle(map: Map, locale: HomeLocale): void {
+export function tuneHomeMapStyle(
+  map: Map,
+  locale: HomeLocale,
+  options?: { skip?: boolean },
+): void {
+  if (options?.skip) return;
   const field = homePlaceNameField(locale);
   const style = map.getStyle();
   for (const layer of style.layers ?? []) {

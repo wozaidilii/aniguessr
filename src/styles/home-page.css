@@ -2128,6 +2128,11 @@
     overflow: hidden;
   }
 
+  .home-map .google-map-tiles-attribution {
+    margin: 0 0 max(10px, env(safe-area-inset-bottom, 0px)) 8px;
+    max-width: min(calc(100vw - 120px), 240px);
+  }
+
   .home-chip-scrim {
     display: block;
     position: absolute;
