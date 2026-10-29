@@ -370,28 +370,16 @@ describe("pilgrimage navigation", () => {
     expect(source).not.toMatch(/cache\.put\(event\.request/);
   });
 
-  it("keeps one default-on anitabi attribution line and no per-locale credit CTA", () => {
-    const source = readFileSync(
-      "src/components/anitabi-attribution.tsx",
-      "utf8",
-    );
+  it("does not render anitabi attribution in the pilgrimage shell or homepage footer", () => {
     const shell = readFileSync(
       "src/app/[locale]/pilgrimage/_components/pilgrimage-ui.tsx",
       "utf8",
     );
-    expect(source).toContain("SHOW_ANITABI_ATTRIBUTION = true");
-    expect(source).toContain("部分地点数据来自 ");
-    expect(source).toContain("，经修改后使用，采用 ");
-    expect(source).toContain(" 授权");
-    expect(source).toContain("部分地點資料來自 ");
-    expect(source).toContain("一部のスポット情報は ");
-    expect(source).toContain(" のデータを改変して使用しています（");
-    expect(source).toContain("Some location data is adapted from ");
-    expect(source).toContain(" and used under ");
-    expect(source).toContain("text-xs");
-    expect(source).toContain("text-[var(--dark-text-secondary)]");
-    expect(shell).toContain("<AnitabiAttribution locale={locale}");
-    expect(shell).not.toContain("AnitabiCredit");
+    const footer = readFileSync("src/components/home/home-footer.tsx", "utf8");
+    expect(shell).not.toContain("AnitabiAttribution");
+    expect(shell).not.toContain("anitabi.cn");
+    expect(footer).not.toContain("AnitabiAttribution");
+    expect(footer).not.toContain("anitabi.cn");
     expect(getPilgrimageCopy("ja").samePlaceWorks).toBe(
       "同じ場所が登場する作品：",
     );

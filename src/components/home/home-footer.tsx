@@ -1,4 +1,3 @@
-import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { BrandLockup } from "~/components/brand/BrandLockup";
 import { RightsContactLink } from "~/components/rights-contact-link";
 import {
@@ -82,7 +81,6 @@ export function HomeFooter({ locale }: { locale: HomeLocale }) {
         </div>
       </div>
       <div className="home-wrap home-ftr-bottom">
-        <AnitabiAttribution locale={locale} className="home-credit" />
         <p className="home-copyline">{copy.footerCopy}</p>
       </div>
     </footer>

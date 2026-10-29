@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AnitabiAttribution } from "~/components/anitabi-attribution";
 import { RightsContactLink } from "~/components/rights-contact-link";
 import { PilgrimageFavoritesProvider } from "~/components/pilgrimage/favorites";
 import { DeferPaint } from "~/components/site/defer-paint";
@@ -57,8 +56,7 @@ export function PilgrimageShell({
         </header>
 
         <PilgrimageFavoritesProvider>{children}</PilgrimageFavoritesProvider>
-        <AnitabiAttribution locale={locale} className="mt-10 text-center" />
-        <div className="mt-2 text-center">
+        <div className="mt-10 text-center">
           <RightsContactLink locale={locale} />
         </div>
         <p className="mt-1.5 text-center text-xs text-white/45">© 2026 Ayiora</p>
