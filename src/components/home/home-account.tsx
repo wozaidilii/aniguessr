@@ -373,7 +373,7 @@ export function HomeAccount({
             : null}
           {menuOpen && mobileSheet && typeof document !== "undefined"
             ? createPortal(
-                <div className="home-account-sheet" role="presentation">
+                <>
                   <div
                     className="home-account-scrim"
                     aria-hidden="true"
@@ -393,7 +393,7 @@ export function HomeAccount({
                     onLogout={handleLogout}
                     onNavigate={closeMenu}
                   />
-                </div>,
+                </>,
                 document.body,
               )
             : null}

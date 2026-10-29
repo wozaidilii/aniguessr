@@ -4,6 +4,7 @@
  * Usage:
  *   node scripts/aniguessr-header-screenshots.mjs [baseUrl]
  *   node scripts/aniguessr-header-screenshots.mjs --only-open [baseUrl]
+ *   node scripts/aniguessr-header-screenshots.mjs --designer-pass [baseUrl]
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -11,6 +12,7 @@ import { chromium } from "playwright";
 
 const args = process.argv.slice(2);
 const onlyOpen = args.includes("--only-open");
+const designerPass = args.includes("--designer-pass");
 const baseUrl = args.find((arg) => arg.startsWith("http")) ?? "http://127.0.0.1:3000";
 const outDir =
   process.env.HEADER_SHOTS_DIR ??
@@ -49,99 +51,16 @@ async function langButtonX(page) {
   return box?.x ?? null;
 }
 
-await mkdir(outDir, { recursive: true });
-
-const browser = await chromium.launch();
-const measurements = [];
-
-for (const locale of locales) {
-  for (const signedIn of onlyOpen ? [true] : [false, true]) {
-    for (const viewport of onlyOpen
-      ? [
-          { width: 1440, height: 900, tag: "1440" },
-          { width: 390, height: 844, tag: "390" },
-        ]
-      : [
-          { width: 1440, height: 900, tag: "1440" },
-          { width: 390, height: 844, tag: "390" },
-        ]) {
-      const context = await browser.newContext({ viewport });
-      const page = await context.newPage();
-      await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
-      if (signedIn) {
-        await page.evaluate((session) => {
-          localStorage.setItem(
-            "histoguessr_player_session",
-            JSON.stringify(session),
-          );
-        }, demoSession);
-        await page.reload({ waitUntil: "networkidle" });
-      }
-
-      if (!onlyOpen) {
-        const auth = signedIn ? "signed-in" : "signed-out";
-        await shot(page, `${viewport.tag}-${locale}-${auth}.png`);
-      }
-
-      if (!onlyOpen && viewport.width >= 768) {
-        const x = await langButtonX(page);
-        measurements.push({ locale, signedIn, x });
-      }
-
-      if (signedIn && viewport.width >= 768) {
-        await page.locator(".home-avatar-btn").click();
-        await page.locator(".home-account-menu.home-header-overlay").waitFor({
-          state: "visible",
-        });
-        await shot(page, `${viewport.tag}-${locale}-account-menu-open.png`);
-        await page.keyboard.press("Escape");
-        await page.locator(".home-hdr-lang .home-lang-current").click();
-        await page.locator(".home-lang-popover-portal").waitFor({
-          state: "visible",
-        });
-        await shot(page, `${viewport.tag}-${locale}-lang-menu-open.png`);
-        await page.keyboard.press("Escape");
-        await page.locator(".home-avatar-btn").click();
-        await page
-          .getByRole("menuitem")
-          .filter({ hasText: /編輯|编辑|Edit|プロフィール/ })
-          .first()
-          .click();
-        await page.locator(".home-profile-layer").waitFor({ state: "visible" });
-        await shot(page, `${viewport.tag}-${locale}-profile-dialog-open.png`);
-        await page.keyboard.press("Escape");
-      }
-
-      if (signedIn && viewport.width < 768) {
-        await page.locator(".home-avatar-btn").click();
-        await page.locator(".home-account-sheet-panel").waitFor({
-          state: "visible",
-        });
-        await shot(page, `${viewport.tag}-${locale}-account-sheet-open.png`);
-      }
-
-      if (!onlyOpen && !signedIn && viewport.width < 768) {
-        await page.locator(".home-burger").click();
-        await shot(page, `${viewport.tag}-${locale}-drawer-open.png`);
-      }
-
-      await context.close();
-    }
-  }
-}
-
-if (!onlyOpen) {
+async function writeMeasurements(measurements, base) {
   const shifts = [];
   for (const locale of locales) {
     const out = measurements.find((m) => m.locale === locale && !m.signedIn)?.x;
     const inn = measurements.find((m) => m.locale === locale && m.signedIn)?.x;
     if (out != null && inn != null) shifts.push(Math.abs(inn - out));
   }
-
   const maxShift = shifts.length ? Math.max(...shifts) : null;
-  const cookieRes = await fetch(`${baseUrl}/ja`);
+  const cookieRes = await fetch(`${base}/ja`);
   const setCookie = cookieRes.headers.get("set-cookie");
-
   await writeFile(
     path.join(outDir, "measurements.json"),
     JSON.stringify(
@@ -170,9 +89,104 @@ if (!onlyOpen) {
       2,
     ),
   );
-
   console.log(`Max language control x-shift: ${maxShift}px`);
   console.log(`GET /ja Set-Cookie: ${setCookie ?? "(none)"}`);
+}
+
+await mkdir(outDir, { recursive: true });
+
+const browser = await chromium.launch();
+const measurements = [];
+
+for (const locale of locales) {
+  if (designerPass || !onlyOpen) {
+    for (const signedIn of [false, true]) {
+      const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const page = await context.newPage();
+      await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
+      if (signedIn) {
+        await page.evaluate((session) => {
+          localStorage.setItem(
+            "histoguessr_player_session",
+            JSON.stringify(session),
+          );
+        }, demoSession);
+        await page.reload({ waitUntil: "networkidle" });
+      }
+      if (!designerPass) {
+        await shot(page, `1440-${locale}-${signedIn ? "signed-in" : "signed-out"}.png`);
+      }
+      const x = await langButtonX(page);
+      measurements.push({ locale, signedIn, x });
+      await context.close();
+    }
+  }
+
+  if (designerPass || onlyOpen) {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
+    await page.evaluate((session) => {
+      localStorage.setItem(
+        "histoguessr_player_session",
+        JSON.stringify(session),
+      );
+    }, demoSession);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator(".home-hdr-lang .home-lang-current").click();
+    await page.locator(".home-lang-popover-portal").waitFor({ state: "visible" });
+    await shot(page, `1440-${locale}-lang-menu-open.png`);
+    await context.close();
+  }
+
+  if (designerPass || !onlyOpen) {
+    for (const signedIn of designerPass ? [false] : [false, true]) {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const page = await context.newPage();
+      await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
+      if (signedIn) {
+        await page.evaluate((session) => {
+          localStorage.setItem(
+            "histoguessr_player_session",
+            JSON.stringify(session),
+          );
+        }, demoSession);
+        await page.reload({ waitUntil: "networkidle" });
+      }
+      if (!designerPass) {
+        await shot(page, `390-${locale}-${signedIn ? "signed-in" : "signed-out"}.png`);
+      } else if (!signedIn) {
+        await shot(page, `390-${locale}-signed-out.png`);
+      }
+      if (!signedIn && (designerPass || !onlyOpen)) {
+        await page.locator(".home-burger").click();
+        await page.locator(".home-sheet-nav").waitFor({ state: "visible" });
+        await shot(page, `390-${locale}-drawer-open.png`);
+      }
+      await context.close();
+    }
+  }
+
+  if (designerPass || onlyOpen) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/${locale}`, { waitUntil: "networkidle" });
+    await page.evaluate((session) => {
+      localStorage.setItem(
+        "histoguessr_player_session",
+        JSON.stringify(session),
+      );
+    }, demoSession);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator(".home-avatar-btn").click();
+    await page.locator(".home-account-sheet-panel").waitFor({ state: "visible" });
+    await shot(page, `390-${locale}-account-sheet-open.png`);
+    await context.close();
+  }
+}
+
+if (!onlyOpen || designerPass) {
+  await writeMeasurements(measurements, baseUrl);
 }
 
 await browser.close();

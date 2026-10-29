@@ -1964,12 +1964,22 @@ a.rights-contact-link:hover {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  min-width: 100%;
   padding: 4px;
   border: 1px solid #e5e3de;
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(31, 36, 48, 0.12);
+}
+
+.home-lang-popover:not(.home-lang-popover-portal) {
+  min-width: 100%;
+}
+
+.home-lang-popover.home-lang-popover-portal {
+  min-width: 208px;
+  max-width: 208px;
+  width: 208px;
+  box-sizing: border-box;
 }
 
 .home-lang-popover[hidden] {
