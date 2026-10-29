@@ -71,3 +71,36 @@ Completed three review passes: monotonic transfer estimates, bounded route impro
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Travel review: day control and reliable guide handoff
+
+**Date**: 2026-10-29
+**Task**: Travel review: day control and reliable guide handoff
+**Branch**: `codex/anime-travel-planner`
+
+### Summary
+
+Added backward-compatible manual day boundaries with transfer/overflow/reset/undo support; fixed route discovery without anchors, omitted anchor counts, and free-day export. Preserved stale edited forum questions with review controls; added native guide sharing with cancellation/copy/async fallback protection. Stripped private trip fragments from manual and SDK telemetry URL properties. Prepared verified partnership brief and unsent outreach. Check/build and production desktop/mobile/four-locale flows pass; 507 tests pass with four unchanged baseline failures.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1b2d8d8` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
