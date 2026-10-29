@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadMunicipalities, locateMunicipality } from "./japan-area.mjs";
 import { pilgrimagePageMetadata } from "../../src/lib/seo.ts";
+import { pathsForRenamedSpots } from "./sitemap-lastmod.mjs";
 import knownSlugs from "../../src/lib/pilgrimage-known-slugs.json" with { type: "json" };
 
 loadMunicipalities(
@@ -14,6 +15,16 @@ const nav = JSON.parse(
     path.join(process.cwd(), "public/data/seo/spots-nav.json"),
     "utf8",
   ),
+);
+
+const seoIndex = JSON.parse(
+  readFileSync(
+    path.join(process.cwd(), "public/data/seo/index.json"),
+    "utf8",
+  ),
+);
+const subjectSlugById = new Map(
+  (seoIndex.animes ?? []).map((anime) => [String(anime.subjectId), anime.slug]),
 );
 
 function areaSlug(lng, lat) {
@@ -63,6 +74,40 @@ describe("rewritten question labels and pilgrimage pages", () => {
         "utf8",
       ),
     );
+    const step1 = JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "scripts/data/intl-seo-step1-sitemap.json"),
+        "utf8",
+      ),
+    );
+    const step1Paths = new Set(
+      (step1.locationMetaSlugs ?? []).map(
+        (slug) => `/pilgrimage/locations/${slug}`,
+      ),
+    );
+    const zhTwPlaceIds = new Set(
+      Object.keys(
+        JSON.parse(
+          readFileSync(
+            path.join(
+              process.cwd(),
+              "scripts/data/zh-tw-spot-place-overrides.json",
+            ),
+            "utf8",
+          ),
+        ),
+      ),
+    );
+    const navSpots = nav.spots.map((row) => ({
+      id: String(row[0]),
+      locationSlug: String(row[2]),
+      subjectSlug: subjectSlugById.get(String(row[1])),
+      redirectTo: null,
+    }));
+    const bumpedPaths = new Set(step1Paths);
+    for (const route of pathsForRenamedSpots([...zhTwPlaceIds], navSpots)) {
+      bumpedPaths.add(route);
+    }
     const renamed = new Set(
       (fixes.names?.fixes ?? []).map((row) => String(row.id)),
     );
@@ -93,9 +138,10 @@ describe("rewritten question labels and pilgrimage pages", () => {
       )) {
         const loc = match[1];
         const lastmod = match[2];
-        const pathname =
+        const pathname = decodeURIComponent(
           new URL(loc).pathname.replace(/^\/(?:zh-tw|zh|ja|en)(?=\/|$)/u, "") ||
-          "/";
+            "/",
+        );
         paths.add(pathname);
         const spotId = pathname.startsWith("/pilgrimage/spots/")
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
@@ -103,6 +149,8 @@ describe("rewritten question labels and pilgrimage pages", () => {
         if (renamed.has(spotId) || copyIds.has(spotId)) {
           expect(lastmod).toBe("2026-10-23");
           bumped.add(spotId);
+        } else if (bumpedPaths.has(pathname)) {
+          expect(lastmod).toBe(step1.lastmodOn ?? "2026-10-29");
         } else {
           expect(lastmod).toBe("2026-10-21");
         }
@@ -137,7 +185,10 @@ describe("rewritten question labels and pilgrimage pages", () => {
       "/zh/pilgrimage/locations/chiba-chiba-12106",
     );
     expect(metadata.alternates?.languages).toMatchObject({
-      zh: "https://aniguessr.ayiora.com/zh/pilgrimage/locations/chiba-chiba-12106",
+      "zh-Hans":
+        "https://aniguessr.ayiora.com/zh/pilgrimage/locations/chiba-chiba-12106",
+      "zh-CN":
+        "https://aniguessr.ayiora.com/zh/pilgrimage/locations/chiba-chiba-12106",
       ja: "https://aniguessr.ayiora.com/ja/pilgrimage/locations/chiba-chiba-12106",
       en: "https://aniguessr.ayiora.com/en/pilgrimage/locations/chiba-chiba-12106",
       "x-default":
@@ -145,6 +196,10 @@ describe("rewritten question labels and pilgrimage pages", () => {
       "zh-Hant":
         "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/chiba-chiba-12106",
       "zh-TW":
+        "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/chiba-chiba-12106",
+      "zh-HK":
+        "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/chiba-chiba-12106",
+      "zh-MO":
         "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/chiba-chiba-12106",
     });
   });

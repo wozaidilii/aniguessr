@@ -28,6 +28,8 @@ export const PILGRIMAGE_COPY: Record<
     samePlaceWorks: string;
     samePlaceSiblings: string;
     emptyIndex: string;
+    locationSpotIndex: string;
+    locationSpotIndexMore: (count: number) => string;
     searchWorks: string;
     searchWorksEmpty: string;
     alsoKnownAs: string;
@@ -98,6 +100,8 @@ export const PILGRIMAGE_COPY: Record<
     samePlaceWorks: "同一地点出现的作品：",
     samePlaceSiblings: "同一作品的附近地点：",
     emptyIndex: "SEO 索引尚未生成，请先运行 npm run data:build-pilgrimage-seo",
+    locationSpotIndex: "本页全部取景地",
+    locationSpotIndexMore: (count) => `其余 ${count.toLocaleString()} 处（链接索引）`,
     searchWorks: "搜索作品名",
     searchWorksEmpty: "没有找到相关作品",
     alsoKnownAs: "别名",
@@ -169,6 +173,8 @@ export const PILGRIMAGE_COPY: Record<
     samePlaceSiblings: "同じ作品の近くのスポット：",
     emptyIndex:
       "SEO インデックス未生成。npm run data:build-pilgrimage-seo を実行してください",
+    locationSpotIndex: "このページの撮影地一覧",
+    locationSpotIndexMore: (count) => `ほか ${count.toLocaleString()} 件（リンク索引）`,
     searchWorks: "作品名で検索",
     searchWorksEmpty: "該当する作品が見つかりません",
     alsoKnownAs: "別名",
@@ -243,6 +249,9 @@ export const PILGRIMAGE_COPY: Record<
     samePlaceSiblings: "Other spots from this work: ",
     emptyIndex:
       "SEO index not built yet. Run npm run data:build-pilgrimage-seo first.",
+    locationSpotIndex: "All spots on this page",
+    locationSpotIndexMore: (count) =>
+      `${count.toLocaleString()} more spots (link index)`,
     searchWorks: "Search anime titles",
     searchWorksEmpty: "No matching titles",
     alsoKnownAs: "Also known as",
@@ -317,6 +326,8 @@ export const PILGRIMAGE_COPY: Record<
     samePlaceWorks: "同一地點出現的作品：",
     samePlaceSiblings: "同一作品的附近地點：",
     emptyIndex: "SEO 索引尚未生成，請先執行 npm run data:build-pilgrimage-seo",
+    locationSpotIndex: "本頁全部取景地",
+    locationSpotIndexMore: (count) => `其餘 ${count.toLocaleString()} 處（連結索引）`,
     searchWorks: "搜尋作品名稱",
     searchWorksEmpty: "找不到相關作品",
     alsoKnownAs: "別名",

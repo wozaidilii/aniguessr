@@ -1,7 +1,11 @@
 import { type Metadata } from "next";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { type GameLocale } from "~/lib/game-locale";
-import { absoluteUrl, localeAlternates } from "~/lib/seo";
+import {
+  absoluteUrl,
+  localeAlternates,
+  traditionalChineseAlternates,
+} from "~/lib/seo";
 import { withPilgrimageLocale } from "~/lib/pilgrimage-locale";
 
 const GAME_PATH = "/game/anime";
@@ -35,9 +39,12 @@ export function gameAnimeMetadata(locale: GameLocale): Metadata {
       ? withPilgrimageLocale(GAME_PATH, "zh-tw")
       : withAnimeLocale(GAME_PATH, locale);
   const languages = localeAlternates(GAME_PATH);
-  const zhTwUrl = absoluteUrl(withPilgrimageLocale(GAME_PATH, "zh-tw"));
-  languages["zh-Hant"] = zhTwUrl;
-  languages["zh-TW"] = zhTwUrl;
+  Object.assign(
+    languages,
+    traditionalChineseAlternates(
+      absoluteUrl(withPilgrimageLocale(GAME_PATH, "zh-tw")),
+    ),
+  );
   return {
     title: { absolute: seo.title },
     description: seo.description,

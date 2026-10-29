@@ -21,7 +21,9 @@ describe("sitemap entries", () => {
     ]);
     for (const entry of entries) {
       expect(entry.alternates?.languages).toMatchObject({
-        zh: "https://aniguessr.ayiora.com/zh",
+        "zh-Hans": "https://aniguessr.ayiora.com/zh",
+        "zh-CN": "https://aniguessr.ayiora.com/zh",
+        "zh-SG": "https://aniguessr.ayiora.com/zh",
         ja: "https://aniguessr.ayiora.com/ja",
         en: "https://aniguessr.ayiora.com/en",
         "x-default": "https://aniguessr.ayiora.com/en",

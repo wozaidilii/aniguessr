@@ -1,4 +1,5 @@
 import spotNameOverridesJson from "../../scripts/data/spot-name-overrides.json";
+import zhTwSpotPlaceOverridesJson from "../../scripts/data/zh-tw-spot-place-overrides.json";
 import { jaSpotPlaceOverride } from "~/lib/ja-place-overrides";
 import {
   pickSpotPlaceFromRecord,
@@ -29,10 +30,17 @@ export interface LocaleNameSet {
   en: string;
 }
 
+const ZH_TW_SPOT_PLACE_OVERRIDES: Record<string, string> =
+  zhTwSpotPlaceOverridesJson;
+
 export function spotDisplayNameOverride(
   locale: PilgrimageLocale,
   spotId: string,
 ): string | undefined {
+  if (locale === "zh-tw") {
+    const place = filled(ZH_TW_SPOT_PLACE_OVERRIDES[spotId]);
+    if (place) return place;
+  }
   return filled(SPOT_NAME_OVERRIDES[locale]?.[spotId]?.name);
 }
 

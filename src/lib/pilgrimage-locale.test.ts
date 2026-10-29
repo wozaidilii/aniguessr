@@ -34,6 +34,8 @@ describe("pilgrimage zh-TW locale", () => {
       "https://aniguessr.ayiora.com/zh-tw/pilgrimage/locations/fujisawa-kanagawa",
     );
     expect(languages["zh-Hant"]).toBe(languages["zh-TW"]);
+    expect(languages["zh-HK"]).toBe(languages["zh-TW"]);
+    expect(languages["zh-MO"]).toBe(languages["zh-TW"]);
     expect(languages.en).toBe(
       "https://aniguessr.ayiora.com/en/pilgrimage/locations/fujisawa-kanagawa",
     );

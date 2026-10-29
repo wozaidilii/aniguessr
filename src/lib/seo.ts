@@ -1,7 +1,5 @@
 import { type Metadata } from "next";
 import {
-  ANIME_LOCALES,
-  DEFAULT_ANIME_LOCALE,
   stripLocalePrefix,
   withAnimeLocale,
   type AnimeLocale,
@@ -29,16 +27,40 @@ export function absoluteUrl(path = "/"): string {
   return `${SITE_URL}${suffix === "/" ? "" : suffix}` || SITE_URL;
 }
 
+/** Simplified Chinese pages (/zh): zh-Hans plus regional aliases. */
+export function simplifiedChineseAlternates(
+  zhUrl: string,
+): Record<string, string> {
+  return {
+    "zh-Hans": zhUrl,
+    "zh-CN": zhUrl,
+    "zh-SG": zhUrl,
+  };
+}
+
+/** Traditional Chinese pages (/zh-tw): Hant/TW plus HK/MO aliases. */
+export function traditionalChineseAlternates(
+  zhTwUrl: string,
+): Record<string, string> {
+  return {
+    "zh-Hant": zhTwUrl,
+    "zh-TW": zhTwUrl,
+    "zh-HK": zhTwUrl,
+    "zh-MO": zhTwUrl,
+  };
+}
+
 /** 为指定裸路径生成 /{locale}/... 形式的 hreflang 映射。 */
 export function localeAlternates(path = "/"): Record<string, string> {
   const barePath = stripLocalePrefix(path);
-  const entries = ANIME_LOCALES.map((locale: AnimeLocale) => {
-    const localizedPath = withAnimeLocale(barePath, locale);
-    return [locale, absoluteUrl(localizedPath)] as const;
-  });
+  const zhUrl = absoluteUrl(withAnimeLocale(barePath, "zh"));
+  const jaUrl = absoluteUrl(withAnimeLocale(barePath, "ja"));
+  const enUrl = absoluteUrl(withAnimeLocale(barePath, "en"));
   return {
-    ...Object.fromEntries(entries),
-    "x-default": absoluteUrl(withAnimeLocale(barePath, DEFAULT_ANIME_LOCALE)),
+    ...simplifiedChineseAlternates(zhUrl),
+    ja: jaUrl,
+    en: enUrl,
+    "x-default": enUrl,
   };
 }
 
@@ -80,8 +102,7 @@ export function pilgrimagePageMetadata(
   const languages: Record<string, string> = localeAlternates(path);
   if (includeZhTw) {
     const zhTwUrl = absoluteUrl(withPilgrimageLocale(path, "zh-tw"));
-    languages["zh-Hant"] = zhTwUrl;
-    languages["zh-TW"] = zhTwUrl;
+    Object.assign(languages, traditionalChineseAlternates(zhTwUrl));
   }
   const metadata: Metadata = {
     alternates: {
@@ -121,10 +142,7 @@ export function zhTwOnlyPageMetadata(
     description,
     alternates: {
       canonical,
-      languages: {
-        "zh-Hant": url,
-        "zh-TW": url,
-      },
+      languages: traditionalChineseAlternates(url),
     },
     openGraph: {
       title,

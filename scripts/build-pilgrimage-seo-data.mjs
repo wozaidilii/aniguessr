@@ -38,6 +38,7 @@ import {
   indexableLocations,
   lastmodForPath,
   parseSitemapLastmods,
+  pathsForRenamedSpots,
   SITEMAP_BASELINE_LASTMOD,
   SITEMAP_CONTENT_LASTMOD,
 } from "./lib/sitemap-lastmod.mjs";
@@ -58,6 +59,14 @@ const NAME_FIXES_PATH = path.join(
   process.cwd(),
   "scripts/data/spot-name-suffix-fixes.json",
 );
+const STEP1_SITEMAP_PATH = path.join(
+  process.cwd(),
+  "scripts/data/intl-seo-step1-sitemap.json",
+);
+const ZH_TW_PLACE_OVERRIDES_PATH = path.join(
+  process.cwd(),
+  "scripts/data/zh-tw-spot-place-overrides.json",
+);
 const COPY_EDITS_PATH = path.join(
   process.cwd(),
   "scripts/data/spot-copy-edits.json",
@@ -76,7 +85,6 @@ const PUBLIC_ROUTES = [
   ["/game/history-year", 0.6],
   ["/game/history-tuxun", 0.6],
   ["/character", 0.6],
-  ["/login", 0.3],
   ["/privacy", 0.4],
 ];
 
@@ -815,6 +823,44 @@ async function main() {
     visibleSpots,
     membershipPaths,
   );
+  const contentChangedPaths = new Set();
+  let step1LastmodOn = changedOn;
+  try {
+    const step1 = JSON.parse(await readFile(STEP1_SITEMAP_PATH, "utf8"));
+    if (typeof step1.lastmodOn === "string" && step1.lastmodOn.trim()) {
+      step1LastmodOn = step1.lastmodOn.trim();
+    }
+    if (Array.isArray(step1.locationMetaSlugs)) {
+      for (const slug of step1.locationMetaSlugs) {
+        if (typeof slug === "string" && slug) {
+          contentChangedPaths.add(`/pilgrimage/locations/${slug}`);
+        }
+      }
+    }
+    if (Array.isArray(step1.zhTwRenamedSpotIds)) {
+      for (const route of pathsForRenamedSpots(
+        step1.zhTwRenamedSpotIds,
+        visibleSpots,
+      )) {
+        contentChangedPaths.add(route);
+      }
+    }
+  } catch {
+    // optional sidecar for one-off SEO releases
+  }
+  try {
+    const zhTwPlaces = JSON.parse(
+      await readFile(ZH_TW_PLACE_OVERRIDES_PATH, "utf8"),
+    );
+    const ids = Object.keys(zhTwPlaces ?? {});
+    if (ids.length > 0) {
+      for (const route of pathsForRenamedSpots(ids, visibleSpots)) {
+        contentChangedPaths.add(route);
+      }
+    }
+  } catch {
+    // optional zh-TW display-name overrides
+  }
   const unchangedFallback = SITEMAP_BASELINE_LASTMOD;
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
@@ -830,6 +876,8 @@ async function main() {
           previous: previousLastmod,
           changed: changedPaths,
           changedOn,
+          contentChanged: contentChangedPaths,
+          contentChangedOn: step1LastmodOn,
           fallback: unchangedFallback,
         }),
         { zhTw: Boolean(item.zhTw) },
