@@ -336,9 +336,15 @@ export function googleMapTilesRasterUrlTemplate(
   return `${TILE_PATH}?${params.toString()}`;
 }
 
+export function googleMapTilesRasterFadeMs(): number {
+  if (typeof window === "undefined") return 200;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 200;
+}
+
 export function buildGoogleMapTilesMapStyle(
   session: string,
   apiKey: string,
+  rasterFadeMs = googleMapTilesRasterFadeMs(),
 ): StyleSpecification {
   return {
     version: 8,
@@ -355,6 +361,9 @@ export function buildGoogleMapTilesMapStyle(
         id: "google-roadmap",
         type: "raster",
         source: "google-roadmap",
+        paint: {
+          "raster-fade-duration": rasterFadeMs,
+        },
       },
     ],
   };
@@ -387,6 +396,16 @@ export function buildGoogleMapTilesViewportUrl(
   return `${GOOGLE_MAP_TILES_VIEWPORT_URL}?${params.toString()}`;
 }
 
+const viewportAttributionInflight = new Map<
+  string,
+  Promise<GoogleMapTilesViewportAttribution | null>
+>();
+
+/** Test hook: clear in-flight viewport dedupe. */
+export function resetGoogleMapTilesViewportAttributionCacheForTests(): void {
+  viewportAttributionInflight.clear();
+}
+
 /** Dynamic attribution required by Map Tiles API policies. */
 export async function fetchGoogleMapTilesViewportAttribution(
   session: string,
@@ -399,16 +418,24 @@ export async function fetchGoogleMapTilesViewportAttribution(
     zoom: number;
   },
 ): Promise<GoogleMapTilesViewportAttribution | null> {
-  try {
-    const response = await fetch(
-      buildGoogleMapTilesViewportUrl(session, apiKey, bounds),
-    );
-    if (!response.ok) return null;
-    const body = (await response.json()) as { copyright?: string };
-    const copyright =
-      typeof body.copyright === "string" ? body.copyright.trim() : "";
-    return copyright ? { copyright } : null;
-  } catch {
-    return null;
-  }
+  const url = buildGoogleMapTilesViewportUrl(session, apiKey, bounds);
+  const existing = viewportAttributionInflight.get(url);
+  if (existing) return existing;
+
+  const request = (async (): Promise<GoogleMapTilesViewportAttribution | null> => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) return null;
+      const body = (await response.json()) as { copyright?: string };
+      const copyright =
+        typeof body.copyright === "string" ? body.copyright.trim() : "";
+      return copyright ? { copyright } : null;
+    } catch {
+      return null;
+    } finally {
+      viewportAttributionInflight.delete(url);
+    }
+  })();
+  viewportAttributionInflight.set(url, request);
+  return request;
 }

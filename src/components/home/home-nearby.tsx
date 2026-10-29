@@ -25,6 +25,8 @@ import {
   type NavCatalog,
   type NavSpot,
 } from "~/lib/pilgrimage-nav";
+import { readLatestHomeBoundsDetail } from "~/lib/home-bounds-store";
+import { countHomeNearbyPlaces } from "~/lib/home-nearby-count";
 
 interface ListedSpot {
   id: string;
@@ -47,7 +49,7 @@ export function HomeNearby({
   const distanceLabel = getPilgrimageCopy(locale).formatDistance;
   const limit = variant === "sheet" ? 3 : 12;
   const [open, setOpen] = useState(false);
-  const [inView, setInView] = useState(0);
+  const [inView, setInView] = useState<number | null>(null);
   const [spots, setSpots] = useState<ListedSpot[]>([]);
   const [workHref, setWorkHref] = useState<string | null>(null);
   const focusRef = useRef<HomeFocusWorkDetail>(readHomeFocusWork());
@@ -61,6 +63,7 @@ export function HomeNearby({
     } = {};
     const paint = (catalog: NavCatalog, detail: HomeBoundsDetail) => {
       const focus = focusRef.current;
+      const { inView: count } = countHomeNearbyPlaces(catalog, detail, focus);
       const focused = focus.subjectId
         ? catalog.spots.filter((spot) => spot.subjectId === focus.subjectId)
         : catalog.spots.filter(
@@ -77,7 +80,7 @@ export function HomeNearby({
         }))
         .sort((a, b) => a.distanceKm - b.distanceKm);
       const groups = clusterSamePlaces(ranked);
-      setInView(groups.length);
+      setInView(count);
       setSpots(
         groups.slice(0, limit).map((group) => toListed(group, locale, catalog)),
       );
@@ -102,6 +105,8 @@ export function HomeNearby({
         window.addEventListener(HOME_BOUNDS_EVENT, bag.bounds);
         window.addEventListener(HOME_FOCUS_WORK_EVENT, onFocus);
         bag.focus = onFocus;
+        const replay = readLatestHomeBoundsDetail();
+        if (replay) paint(catalog, replay);
       })
       .catch(() => undefined);
     return () => {

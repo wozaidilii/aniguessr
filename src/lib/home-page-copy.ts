@@ -96,7 +96,7 @@ export interface HomePageCopy {
   dismissPopular: string;
   clearWorkFilter: string;
   workPage: string;
-  aroundCount: (count: number) => string;
+  aroundCount: (count: number | null) => string;
   searchSpotCount: (count: number) => string;
   footerTagline: string;
   footerMap: string;
@@ -254,7 +254,10 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     dismissPopular: "人気の作品を閉じる",
     clearWorkFilter: "作品の絞り込みを解除",
     workPage: "作品ページへ",
-    aroundCount: (count) => `この周辺 ${formatCount("ja", count)}件`,
+    aroundCount: (count) =>
+      count == null
+        ? "この周辺 — 件"
+        : `この周辺 ${formatCount("ja", count)}件`,
     searchSpotCount: (count) => `${formatCount("ja", count)} か所`,
     footerTagline: "アニメ聖地巡礼マップと聖地当てゲーム。",
     footerMap: "MAP",
@@ -374,7 +377,10 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     dismissPopular: "关闭热门作品",
     clearWorkFilter: "清除作品筛选",
     workPage: "作品页面",
-    aroundCount: (count) => `这一带 ${formatCount("zh", count)} 处`,
+    aroundCount: (count) =>
+      count == null
+        ? "这一带 — 处"
+        : `这一带 ${formatCount("zh", count)} 处`,
     searchSpotCount: (count) => `${formatCount("zh", count)} 处`,
     footerTagline: "动漫圣地巡礼地图和圣地猜猜看小游戏。",
     footerMap: "MAP",
@@ -494,7 +500,10 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     dismissPopular: "關閉熱門作品",
     clearWorkFilter: "清除作品篩選",
     workPage: "作品頁面",
-    aroundCount: (count) => `這一帶 ${formatCount("zh-tw", count)} 處`,
+    aroundCount: (count) =>
+      count == null
+        ? "這一帶 — 處"
+        : `這一帶 ${formatCount("zh-tw", count)} 處`,
     searchSpotCount: (count) => `${formatCount("zh-tw", count)} 處`,
     footerTagline: "動漫聖地巡禮地圖和聖地猜猜看小遊戲。",
     footerMap: "MAP",
@@ -615,7 +624,9 @@ export const HOME_PAGE_COPY: Record<HomeLocale, HomePageCopy> = {
     clearWorkFilter: "Clear title filter",
     workPage: "Work page",
     aroundCount: (count) =>
-      `${formatCount("en", count)} ${count === 1 ? "spot" : "spots"} in view`,
+      count == null
+        ? "— spots in view"
+        : `${formatCount("en", count)} ${count === 1 ? "spot" : "spots"} in view`,
     searchSpotCount: (count) =>
       `${formatCount("en", count)} ${count === 1 ? "spot" : "spots"}`,
     mapLabel: "Anime pilgrimage map",

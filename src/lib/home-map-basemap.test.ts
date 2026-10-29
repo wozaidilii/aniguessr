@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   homeMapBasemapMode,
   homeMapInitialStyleUrl,
+  resolveHomeMapInitialStyle,
   shouldAttemptGoogleMapTilesBasemap,
   shouldTuneOpenFreemapPlaceLabels,
 } from "~/lib/home-map-basemap";
@@ -19,6 +20,31 @@ describe("home map basemap mode", () => {
 
   it("uses Positron as the initial style URL", () => {
     expect(homeMapInitialStyleUrl()).toBe(OPENFREEMAP_POSITRON_STYLE);
+  });
+
+  it("uses an empty placeholder style when Google tiles will load", () => {
+    const prevTiles = process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+    const prevAk = process.env.NEXT_PUBLIC_GOOGLE_MAP_AK;
+    delete process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP;
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_AK = "test-key";
+    try {
+      const style = resolveHomeMapInitialStyle();
+      expect(typeof style).toBe("object");
+      if (typeof style === "object") {
+        expect(style.sources).toEqual({});
+      }
+    } finally {
+      if (prevTiles === undefined) {
+        delete process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+      } else {
+        process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY = prevTiles;
+      }
+      if (prevAk === undefined) {
+        delete process.env.NEXT_PUBLIC_GOOGLE_MAP_AK;
+      } else {
+        process.env.NEXT_PUBLIC_GOOGLE_MAP_AK = prevAk;
+      }
+    }
   });
 
   it("skips OpenFreeMap label tuning on the Google basemap", () => {

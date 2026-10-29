@@ -6,7 +6,7 @@
  *   NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL
  *
  * Usage:
- *   node scripts/google-map-tiles-after-screenshots.mjs <outputDir> [--port 3460] [--skip-build]
+ *   node scripts/google-map-tiles-after-screenshots.mjs <outputDir> [--port 3460] [--skip-build] [--timing-log]
  *
  * Playwright adds Referer https://aniguessr.ayiora.com/ only for tile.googleapis.com.
  */
@@ -34,7 +34,10 @@ const SKIP_BUILD = args.includes("--skip-build");
 const BASE = `http://127.0.0.1:${PORT}`;
 
 const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_ANIME_GUESSR_IMAGE_BASE_URL;
-const TILES_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+const TILES_KEY =
+  process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY ??
+  process.env.NEXT_PUBLIC_GOOGLE_MAP_AK;
+const TIMING_LOG = args.includes("--timing-log");
 
 function sharedEnv() {
   return {
@@ -46,6 +49,8 @@ function sharedEnv() {
     NEXT_PUBLIC_HOME_MAP_BASEMAP:
       process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP ?? "google",
     NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY: TILES_KEY,
+    NEXT_PUBLIC_GOOGLE_MAP_AK:
+      process.env.NEXT_PUBLIC_GOOGLE_MAP_AK ?? TILES_KEY,
     PORT: String(PORT),
   };
 }
@@ -367,6 +372,45 @@ async function main() {
     }
 
     await browser.close();
+
+    if (TIMING_LOG) {
+      const timingContext = await chromium.launch();
+      const timingPageContext = await timingContext.newContext({
+        viewport: { width: 1440, height: 900 },
+      });
+      await attachGoogleTileRouting(timingPageContext);
+      const timingPage = await timingPageContext.newPage();
+      const marks = { navigationStartMs: Date.now() };
+      await timingPage.goto(`${BASE}/ja`, { waitUntil: "commit", timeout: 120_000 });
+      marks.domContentLoadedMs = Date.now();
+      await timingPage.waitForSelector(".home-map-canvas canvas", {
+        timeout: 60_000,
+      });
+      marks.firstCanvasMs = Date.now();
+      await waitForGoogleAttribution(timingPage);
+      marks.googleAttributionMs = Date.now();
+      await timingPageContext.close();
+      await timingContext.close();
+      await writeFile(
+        path.join(OUT, "load-timing.json"),
+        JSON.stringify(
+          {
+            viewport: "1440x900",
+            pathname: "/ja",
+            marks,
+            deltasMs: {
+              toDomContentLoaded:
+                marks.domContentLoadedMs - marks.navigationStartMs,
+              toFirstCanvas: marks.firstCanvasMs - marks.navigationStartMs,
+              toGoogleAttribution:
+                marks.googleAttributionMs - marks.navigationStartMs,
+            },
+          },
+          null,
+          2,
+        ),
+      );
+    }
 
     await writeFile(
       path.join(OUT, "tile-usage.json"),

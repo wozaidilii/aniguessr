@@ -2,6 +2,11 @@ import type { ExpressionSpecification, Map } from "maplibre-gl";
 import type { HomeLocale } from "~/lib/home-locale";
 import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
 
+/** Map overlay layers (pills, clusters, spot labels) — never retune like OSM place labels. */
+export function isHomeMapOverlayLayerId(layerId: string): boolean {
+  return layerId.startsWith("home-");
+}
+
 /** Light OpenFreeMap fallback while Google tiles load or on error. */
 export const HOME_MAP_STYLE = OPENFREEMAP_POSITRON_STYLE;
 
@@ -58,6 +63,7 @@ export function tuneHomeMapStyle(
       setPaint(map, layer.id, "line-color", "#dce9f1");
     }
     if (layer.type !== "symbol" || isShieldLayer(layer.id)) continue;
+    if (isHomeMapOverlayLayerId(layer.id)) continue;
     if (
       layer.layout &&
       "text-field" in layer.layout &&

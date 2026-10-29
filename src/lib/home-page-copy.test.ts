@@ -7,6 +7,13 @@ import {
 } from "~/lib/home-page-copy";
 
 describe("homepage copy", () => {
+  it("shows a placeholder nearby count before bounds are known", () => {
+    expect(getHomePageCopy("ja").aroundCount(null)).toBe("この周辺 — 件");
+    expect(getHomePageCopy("zh").aroundCount(null)).toBe("这一带 — 处");
+    expect(getHomePageCopy("zh-tw").aroundCount(null)).toBe("這一帶 — 處");
+    expect(getHomePageCopy("en").aroundCount(null)).toBe("— spots in view");
+  });
+
   it("keeps existing game and rank nav labels and uses the marketing browse labels", () => {
     expect(getHomePageCopy("ja").navAnime).toBe("作品から探す");
     expect(getHomePageCopy("ja").navAreas).toBe("エリアから探す");
