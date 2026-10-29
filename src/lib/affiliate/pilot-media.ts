@@ -5,7 +5,7 @@ interface AffiliateAllowlist {
   locations: string[];
 }
 
-const allowlist = committedAllowlist as AffiliateAllowlist;
+const allowlist: AffiliateAllowlist = committedAllowlist;
 
 /** Allowlisted affiliate pilot pages must not show anime screenshots or spot OG cards. */
 export function shouldSuppressAffiliatePilotScreenshots(input: {
