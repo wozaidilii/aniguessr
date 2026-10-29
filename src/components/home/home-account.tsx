@@ -1,12 +1,23 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { withAnimeLocale } from "~/lib/anime-locale";
 import { getHomePageCopy } from "~/lib/home-page-copy";
 import { homeSiteLocale, type HomeLocale } from "~/lib/home-locale";
-import { isEscapeKey, isPointerOutsideRoot } from "~/lib/menu-dismiss";
+import { isEscapeKey } from "~/lib/menu-dismiss";
+import {
+  anchorBelowTriggerRight,
+  isOutsideOverlayNodes,
+} from "~/lib/overlay-portal";
 import {
   clearPlayerSession,
   getStoredPlayerSession,
@@ -21,6 +32,8 @@ import {
 import type { PlayerSession } from "~/types/player";
 import { api } from "~/trpc/react";
 import { HomeProfileDialog } from "~/components/home/home-profile-dialog";
+
+const DESKTOP_MENU_WIDTH = 272;
 
 function MenuIcon({
   kind,
@@ -73,6 +86,7 @@ function AccountMenuPanel({
   rankHref,
   menuRef,
   mobile,
+  style,
   onEditProfile,
   onLogout,
   onNavigate,
@@ -83,6 +97,7 @@ function AccountMenuPanel({
   rankHref: string;
   menuRef: React.RefObject<HTMLDivElement | null>;
   mobile: boolean;
+  style?: CSSProperties;
   onEditProfile: () => void;
   onLogout: () => void;
   onNavigate: () => void;
@@ -92,7 +107,10 @@ function AccountMenuPanel({
     <div
       id={id}
       ref={menuRef}
-      className={mobile ? "home-account-sheet-panel" : "home-account-menu"}
+      className={
+        mobile ? "home-account-sheet-panel" : "home-account-menu home-header-overlay"
+      }
+      style={style}
       role="menu"
       aria-label={copy.accountMenu}
     >
@@ -173,6 +191,10 @@ export function HomeAccount({
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileSheet, setMobileSheet] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [toast, setToast] = useState("");
@@ -198,6 +220,32 @@ export function HomeAccount({
     if (dismissSignal) setMenuOpen(false);
   }, [dismissSignal]);
 
+  const syncMenuAnchor = () => {
+    if (!buttonRef.current || mobileSheet) {
+      setMenuAnchor(null);
+      return;
+    }
+    const next = anchorBelowTriggerRight(
+      buttonRef.current,
+      DESKTOP_MENU_WIDTH,
+    );
+    setMenuAnchor({ top: next.top, left: next.left });
+  };
+
+  useLayoutEffect(() => {
+    if (!menuOpen || mobileSheet) {
+      setMenuAnchor(null);
+      return;
+    }
+    syncMenuAnchor();
+    window.addEventListener("resize", syncMenuAnchor);
+    window.addEventListener("scroll", syncMenuAnchor, true);
+    return () => {
+      window.removeEventListener("resize", syncMenuAnchor);
+      window.removeEventListener("scroll", syncMenuAnchor, true);
+    };
+  }, [menuOpen, mobileSheet]);
+
   useEffect(() => {
     if (!menuOpen) return;
     const previousOverflow = mobileSheet ? document.body.style.overflow : "";
@@ -208,17 +256,15 @@ export function HomeAccount({
       buttonRef.current?.focus();
     }
     function onPointer(event: PointerEvent) {
-      if (!isPointerOutsideRoot(rootRef.current, event.target)) return;
       if (
-        mobileSheet &&
-        event.target instanceof Element &&
-        event.target.classList.contains("home-account-scrim")
+        isOutsideOverlayNodes(
+          [buttonRef.current, menuRef.current],
+          event.target,
+        )
       ) {
         setMenuOpen(false);
-        buttonRef.current?.focus();
-        return;
+        if (mobileSheet) buttonRef.current?.focus();
       }
-      if (!mobileSheet) setMenuOpen(false);
     }
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
@@ -301,19 +347,30 @@ export function HomeAccount({
               </span>
             )}
           </button>
-          {menuOpen && !mobileSheet ? (
-            <AccountMenuPanel
-              id={menuId}
-              session={session}
-              copy={copy}
-              rankHref={rankHref}
-              menuRef={menuRef}
-              mobile={false}
-              onEditProfile={openProfileEditor}
-              onLogout={handleLogout}
-              onNavigate={closeMenu}
-            />
-          ) : null}
+          {menuOpen &&
+          !mobileSheet &&
+          menuAnchor &&
+          typeof document !== "undefined"
+            ? createPortal(
+                <AccountMenuPanel
+                  id={menuId}
+                  session={session}
+                  copy={copy}
+                  rankHref={rankHref}
+                  menuRef={menuRef}
+                  mobile={false}
+                  style={{
+                    top: menuAnchor.top,
+                    left: menuAnchor.left,
+                    width: DESKTOP_MENU_WIDTH,
+                  }}
+                  onEditProfile={openProfileEditor}
+                  onLogout={handleLogout}
+                  onNavigate={closeMenu}
+                />,
+                document.body,
+              )
+            : null}
           {menuOpen && mobileSheet && typeof document !== "undefined"
             ? createPortal(
                 <div className="home-account-sheet" role="presentation">

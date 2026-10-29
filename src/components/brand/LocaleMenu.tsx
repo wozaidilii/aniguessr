@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { type GameLocaleMenuLink } from "~/lib/game-locale";
 import { isHomeLocale } from "~/lib/home-locale";
 import { localeNativeName } from "~/lib/locale-native-names";
-import { isEscapeKey, isPointerOutsideRoot } from "~/lib/menu-dismiss";
+import { isEscapeKey } from "~/lib/menu-dismiss";
+import {
+  anchorBelowTriggerRight,
+  isOutsideOverlayNodes,
+} from "~/lib/overlay-portal";
 
 export type LocaleMenuLink = GameLocaleMenuLink;
 
 export { gameLocaleMenuLinks, hrefLangForLocale } from "~/lib/game-locale";
+
+const LANG_POPOVER_WIDTH = 208;
 
 function LocaleAnchors({
   links,
@@ -160,6 +167,10 @@ export function LocaleMenu({
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
+  const [popoverAnchor, setPopoverAnchor] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const current = links.find((item) => item.locale === locale);
   const currentNative =
     current && isHomeLocale(current.locale)
@@ -173,6 +184,32 @@ export function LocaleMenu({
   useEffect(() => {
     if (dismissSignal) setOpen(false);
   }, [dismissSignal]);
+
+  const syncPopoverAnchor = () => {
+    if (!buttonRef.current) {
+      setPopoverAnchor(null);
+      return;
+    }
+    const next = anchorBelowTriggerRight(
+      buttonRef.current,
+      LANG_POPOVER_WIDTH,
+    );
+    setPopoverAnchor({ top: next.top, left: next.left });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPopoverAnchor(null);
+      return;
+    }
+    syncPopoverAnchor();
+    window.addEventListener("resize", syncPopoverAnchor);
+    window.addEventListener("scroll", syncPopoverAnchor, true);
+    return () => {
+      window.removeEventListener("resize", syncPopoverAnchor);
+      window.removeEventListener("scroll", syncPopoverAnchor, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -203,8 +240,14 @@ export function LocaleMenu({
       }
     }
     function onPointer(event: PointerEvent) {
-      if (!isPointerOutsideRoot(rootRef.current, event.target)) return;
-      setOpen(false);
+      if (
+        isOutsideOverlayNodes(
+          [buttonRef.current, menuRef.current],
+          event.target,
+        )
+      ) {
+        setOpen(false);
+      }
     }
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
@@ -238,12 +281,6 @@ export function LocaleMenu({
         className={`home-lang-menu${menuClassName ? ` ${menuClassName}` : ""}`}
         ref={rootRef}
         data-open={open ? "true" : "false"}
-        onBlur={(event) => {
-          const next = event.relatedTarget;
-          if (next instanceof Node && event.currentTarget.contains(next))
-            return;
-          setOpen(false);
-        }}
       >
         <button
           ref={buttonRef}
@@ -276,17 +313,26 @@ export function LocaleMenu({
           {current?.label}
           <Chevron open={open} />
         </button>
-        <div
-          id={popoverId}
-          ref={menuRef}
-          className="home-lang-popover"
-          role="menu"
-          aria-label={label}
-          hidden={!open}
-        >
-          <LocaleAnchors links={links} current={locale} menuMode />
-        </div>
       </div>
+      {open && popoverAnchor && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              id={popoverId}
+              ref={menuRef}
+              className="home-lang-popover home-lang-popover-portal home-header-overlay"
+              role="menu"
+              aria-label={label}
+              style={{
+                top: popoverAnchor.top,
+                left: popoverAnchor.left,
+                width: LANG_POPOVER_WIDTH,
+              }}
+            >
+              <LocaleAnchors links={links} current={locale} menuMode />
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
