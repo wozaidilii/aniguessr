@@ -93,6 +93,7 @@ export function PilgrimageMap({
     let activeBasemap: HomeMapBasemapKind = "openfreemap";
     let mapInteractionsBound = false;
     let googleUpgradeStarted = false;
+    let detachQuotaMonitor: (() => void) | undefined;
     const map = new maplibregl.Map({
       container,
       style: PILGRIMAGE_MAP_STYLE,
@@ -255,8 +256,26 @@ export function PilgrimageMap({
             setLayerEpoch((value) => value + 1);
           },
           "pilgrimage",
+          {
+            restoreOpenFreeMapAttribution: () => {
+              try {
+                map.addControl(openFreeMapAttribution, "bottom-right");
+              } catch {
+                // ignore duplicate add
+              }
+            },
+            onRevertedToOpenFreemap: () => {
+              activeBasemap = "openfreemap";
+              installSpotLayers();
+              setLayerEpoch((value) => value + 1);
+            },
+          },
         ).then((result) => {
           if (result.applied) activeBasemap = "google";
+          if (result.detachQuotaMonitor) {
+            detachQuotaMonitor?.();
+            detachQuotaMonitor = result.detachQuotaMonitor;
+          }
         });
       }
     });
@@ -264,6 +283,7 @@ export function PilgrimageMap({
     observer.observe(container);
     return () => {
       window.clearTimeout(timer);
+      detachQuotaMonitor?.();
       observer.disconnect();
       map.remove();
       mapRef.current = null;

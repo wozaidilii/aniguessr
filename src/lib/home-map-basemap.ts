@@ -1,4 +1,5 @@
 import { resolveGoogleMapTilesApiKey } from "~/lib/google-map-tiles-api-key";
+import { isGoogleMapTilesQuotaFallbackActive } from "~/lib/google-map-tiles-quota-fallback";
 import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
 
 export type HomeMapBasemapKind = "google" | "openfreemap";
@@ -17,6 +18,7 @@ export function homeMapInitialStyleUrl(): string {
 /** True when we should try Map Tiles API (still falls back to Positron on failure). */
 export function shouldAttemptGoogleMapTilesBasemap(): boolean {
   if (homeMapBasemapMode() === "openfreemap") return false;
+  if (isGoogleMapTilesQuotaFallbackActive()) return false;
   return Boolean(resolveGoogleMapTilesApiKey());
 }
 

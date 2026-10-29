@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   homeMapBasemapMode,
   homeMapInitialStyleUrl,
@@ -6,6 +6,11 @@ import {
   shouldTuneOpenFreemapPlaceLabels,
 } from "~/lib/home-map-basemap";
 import { OPENFREEMAP_POSITRON_STYLE } from "~/lib/openfreemap-basemap";
+import {
+  clearGoogleMapTilesQuotaFallbackFlag,
+  GOOGLE_MAP_TILES_QUOTA_FALLBACK_KEY,
+  markGoogleMapTilesQuotaFallbackActive,
+} from "~/lib/google-map-tiles-quota-fallback";
 
 describe("home map basemap mode", () => {
   it("defaults to google unless openfreemap is set", () => {
@@ -40,6 +45,34 @@ describe("home map basemap with tiles key", () => {
       } else {
         process.env.NEXT_PUBLIC_HOME_MAP_BASEMAP = prev;
       }
+      if (prevTiles === undefined) {
+        delete process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+      } else {
+        process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY = prevTiles;
+      }
+    }
+  });
+
+  it("skips Google tiles when quota fallback is active in sessionStorage", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    });
+    const prevTiles = process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
+    process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY = "tiles-key";
+    try {
+      markGoogleMapTilesQuotaFallbackActive();
+      expect(store.get(GOOGLE_MAP_TILES_QUOTA_FALLBACK_KEY)).toBe("1");
+      expect(shouldAttemptGoogleMapTilesBasemap()).toBe(false);
+    } finally {
+      clearGoogleMapTilesQuotaFallbackFlag();
+      vi.unstubAllGlobals();
       if (prevTiles === undefined) {
         delete process.env.NEXT_PUBLIC_GOOGLE_MAP_TILES_KEY;
       } else {

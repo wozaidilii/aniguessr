@@ -156,6 +156,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     let activeBasemap: HomeMapBasemapKind = "openfreemap";
     let mapInteractionsBound = false;
     let googleUpgradeStarted = false;
+    let detachQuotaMonitor: (() => void) | undefined;
     const map = new maplibregl.Map({
       container,
       style: homeMapInitialStyleUrl(),
@@ -301,8 +302,25 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
             refreshOverlayLayers();
           },
           "home",
+          {
+            restoreOpenFreeMapAttribution: () => {
+              try {
+                map.addControl(openFreeMapAttribution, "bottom-left");
+              } catch {
+                // Control may already be present after a partial revert.
+              }
+            },
+            onRevertedToOpenFreemap: () => {
+              activeBasemap = "openfreemap";
+              refreshOverlayLayers();
+            },
+          },
         ).then((result) => {
           if (result.applied) activeBasemap = "google";
+          if (result.detachQuotaMonitor) {
+            detachQuotaMonitor?.();
+            detachQuotaMonitor = result.detachQuotaMonitor;
+          }
         });
       }
     });
@@ -552,6 +570,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     mountObserver.observe(document.body, { childList: true, subtree: true });
     return () => {
       cancelled = true;
+      detachQuotaMonitor?.();
       window.clearTimeout(timer);
       window.clearTimeout(resizeTimer);
       window.clearTimeout(padTimer);
