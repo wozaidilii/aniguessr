@@ -80,12 +80,14 @@ describe("google map tiles createSession styles", () => {
     ).toBe(false);
   });
 
-  it("includes styles in the createSession POST body", () => {
+  it("includes styles, scale, and highDpi in the createSession POST body", () => {
     const body = buildGoogleMapTilesCreateSessionBody("zh-TW", "JP");
     expect(body).toEqual({
       mapType: "roadmap",
       language: "zh-TW",
       region: "JP",
+      scale: "scaleFactor2x",
+      highDpi: true,
       styles: googleMapTilesCreateSessionStyles(),
     });
   });
@@ -299,9 +301,13 @@ describe("createGoogleMapTilesSession", () => {
       styles: unknown[];
       language: string;
       region: string;
+      scale: string;
+      highDpi: boolean;
     };
     expect(body.language).toBe("zh-TW");
     expect(body.region).toBe("JP");
+    expect(body.scale).toBe("scaleFactor2x");
+    expect(body.highDpi).toBe(true);
     expect(body.styles).toEqual(googleMapTilesCreateSessionStyles());
   });
 
