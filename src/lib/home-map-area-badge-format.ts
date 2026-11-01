@@ -131,12 +131,43 @@ export const PREFECTURE_BADGE_GAP = 2;
 export const PREFECTURE_BADGE_OFFSET_MAX_PX = 14;
 /** Max |dx| and |dy| when both axes move (standard prefecture diagonal search). */
 export const PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX = 10;
-/** Osaka extended search (24px / 18px per axis); Kyoto up-only rescue uses the same cap. */
+/** Osaka-only rescue after round-5 drop (24px / 18px per axis). */
 export const OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX = 24;
 export const OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX = 18;
 /** @deprecated Use OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX. */
 export const OSAKA_PREFECTURE_OFFSET_MAX_PX = OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX;
+/** Round-5 Osaka/Kyoto vertical pairing only (not general diagonal search). */
+export const OSAKA_KYOTO_PAIR_OFFSET_MAX_PX = 32;
 const BADGE_BORDER_PX = 1.5;
+
+/** Neighbours evicted in round-5 before dropping Osaka (lowest priority first). */
+const OSAKA_EVICTION_PREF_IDS: readonly string[] = [
+  "nara",
+  "okayama",
+  "wakayama",
+  "hyogo",
+  "shiga",
+  "mie",
+  "tokushima",
+  "kagawa",
+  "ehime",
+  "kochi",
+  "tottori",
+  "shimane",
+  "gifu",
+  "aichi",
+  "fukui",
+  "ishikawa",
+  "toyama",
+  "nagasaki",
+  "saga",
+  "oita",
+  "kumamoto",
+  "miyazaki",
+  "kagoshima",
+  "fukuoka",
+  "kyoto",
+];
 
 export interface PrefectureOffsetLimits {
   maxTotalPx: number;
@@ -334,18 +365,187 @@ function prefecturePlacedRects(
   );
 }
 
-/** Round-5-style pass: every prefecture except Osaka, standard 14px / 10px limits. */
-export function placePrefectureBadgeCentersWithoutOsaka(
+function tryOsakaKyotoPrefecturePairingRound5(
+  osaka: AreaBadgePlacementInput,
+  placed: AreaBadgePlacementInput[],
+  placedRects: AxisRect[],
+  viewport: AxisRect,
+  obstacles: readonly AxisRect[],
+  gap: number,
+  kyotoCandidate: AreaBadgePlacementInput | null = null,
+): boolean {
+  const kyotoIndex = placed.findIndex((item) => item.id === "kyoto");
+  const kyoto =
+    kyotoIndex >= 0 ? placed[kyotoIndex] : (kyotoCandidate ?? undefined);
+  if (!kyoto) return false;
+  const otherRects =
+    kyotoIndex >= 0
+      ? placedRects.filter((_, index) => index !== kyotoIndex)
+      : placedRects;
+
+  for (let delta = 1; delta <= OSAKA_KYOTO_PAIR_OFFSET_MAX_PX; delta += 1) {
+    for (const osakaSign of [1, -1] as const) {
+      const forcedKyoto = {
+        x: kyoto.x,
+        y: kyoto.y - delta,
+      };
+      if (
+        !prefecturePinInVisibleMap(kyoto.x, kyoto.y, viewport, obstacles) ||
+        prefectureBadgeBlockedAt(
+          forcedKyoto.x,
+          forcedKyoto.y,
+          kyoto.count,
+          viewport,
+          obstacles,
+          otherRects,
+          gap,
+        )
+      ) {
+        continue;
+      }
+      const kyotoRect = prefectureBadgeRectAt(
+        forcedKyoto.x,
+        forcedKyoto.y,
+        kyoto.count,
+      );
+      const forcedOsaka = {
+        x: osaka.x,
+        y: osaka.y + osakaSign * delta,
+      };
+      if (
+        !prefecturePinInVisibleMap(osaka.x, osaka.y, viewport, obstacles) ||
+        prefectureBadgeBlockedAt(
+          forcedOsaka.x,
+          forcedOsaka.y,
+          osaka.count,
+          viewport,
+          obstacles,
+          [...otherRects, kyotoRect],
+          gap,
+        )
+      ) {
+        continue;
+      }
+      if (kyotoIndex >= 0) {
+        placed[kyotoIndex] = { ...kyoto, ...forcedKyoto };
+        placedRects[kyotoIndex] = kyotoRect;
+      } else {
+        placed.push({ ...kyoto, ...forcedKyoto });
+        placedRects.push(kyotoRect);
+      }
+      placed.push({ ...osaka, ...forcedOsaka });
+      placedRects.push(
+        prefectureBadgeRectAt(forcedOsaka.x, forcedOsaka.y, osaka.count),
+      );
+      return true;
+    }
+  }
+  return false;
+}
+
+function tryOsakaPrefectureFallbackRound5(
+  osaka: AreaBadgePlacementInput,
+  placed: AreaBadgePlacementInput[],
+  placedRects: AxisRect[],
+  viewport: AxisRect,
+  obstacles: readonly AxisRect[],
+  gap: number,
+  kyotoCandidate: AreaBadgePlacementInput | null = null,
+): boolean {
+  const commitOsaka = (position: { x: number; y: number }): void => {
+    placed.push({ ...osaka, ...position });
+    placedRects.push(
+      prefectureBadgeRectAt(position.x, position.y, osaka.count),
+    );
+  };
+
+  if (
+    tryOsakaKyotoPrefecturePairingRound5(
+      osaka,
+      placed,
+      placedRects,
+      viewport,
+      obstacles,
+      gap,
+      kyotoCandidate,
+    )
+  ) {
+    return true;
+  }
+
+  const tryPlaceOsakaNow = (): { x: number; y: number } | null =>
+    findPrefectureBadgePosition(
+      osaka,
+      viewport,
+      obstacles,
+      placedRects,
+      gap,
+    );
+
+  const position = tryPlaceOsakaNow();
+  if (position) {
+    commitOsaka(position);
+    return true;
+  }
+
+  const evictOrder = new Map(
+    OSAKA_EVICTION_PREF_IDS.map((id, index) => [id, index]),
+  );
+  while (true) {
+    let evictIndex = -1;
+    let evictRank = Number.POSITIVE_INFINITY;
+    let evictCount = Number.POSITIVE_INFINITY;
+    for (let index = 0; index < placed.length; index += 1) {
+      const item = placed[index];
+      if (!item) continue;
+      const listedRank = evictOrder.get(item.id);
+      if (listedRank === undefined && item.count >= osaka.count) continue;
+      const rank = listedRank ?? 10_000 + item.count;
+      if (
+        rank < evictRank ||
+        (rank === evictRank && item.count < evictCount)
+      ) {
+        evictIndex = index;
+        evictRank = rank;
+        evictCount = item.count;
+      }
+    }
+    if (evictIndex < 0) return false;
+    placed.splice(evictIndex, 1);
+    placedRects.splice(evictIndex, 1);
+    const retry = tryPlaceOsakaNow();
+    if (retry) {
+      commitOsaka(retry);
+      return true;
+    }
+    if (
+      tryOsakaKyotoPrefecturePairingRound5(
+        osaka,
+        placed,
+        placedRects,
+        viewport,
+        obstacles,
+        gap,
+        kyotoCandidate,
+      )
+    ) {
+      return true;
+    }
+  }
+}
+
+/** Exact round-5 (c1708ea) prefecture placement: greedy order, 14px/10px, pairing + eviction fallback. */
+export function placePrefectureBadgeCentersRound5(
   candidates: readonly AreaBadgePlacementInput[],
   obstacles: readonly AxisRect[],
   viewport: AxisRect,
   gap = PREFECTURE_BADGE_GAP,
 ): AreaBadgePlacementInput[] {
-  const sorted = [...candidates]
-    .filter((item) => item.id !== "osaka")
-    .sort((a, b) => b.count - a.count);
+  const sorted = [...candidates].sort((a, b) => b.count - a.count);
   const placed: AreaBadgePlacementInput[] = [];
   const placedRects: AxisRect[] = [];
+  const kyotoCandidate =
+    candidates.find((item) => item.id === "kyoto") ?? null;
 
   for (const candidate of sorted) {
     const position = findPrefectureBadgePosition(
@@ -355,11 +555,27 @@ export function placePrefectureBadgeCentersWithoutOsaka(
       placedRects,
       gap,
     );
-    if (!position) continue;
-    placed.push({ ...candidate, ...position });
-    placedRects.push(
-      prefectureBadgeRectAt(position.x, position.y, candidate.count),
-    );
+    if (position) {
+      placed.push({ ...candidate, ...position });
+      placedRects.push(
+        prefectureBadgeRectAt(position.x, position.y, candidate.count),
+      );
+      continue;
+    }
+    if (
+      candidate.id === "osaka" &&
+      tryOsakaPrefectureFallbackRound5(
+        candidate,
+        placed,
+        placedRects,
+        viewport,
+        obstacles,
+        gap,
+        kyotoCandidate,
+      )
+    ) {
+      continue;
+    }
   }
   return placed;
 }
@@ -403,24 +619,24 @@ function mergeStableWithOsakaAndOptionalKyotoUp(
 
 function tryPlaceOsakaWithKyotoUpOnly(
   osaka: AreaBadgePlacementInput,
-  stablePlaced: readonly AreaBadgePlacementInput[],
+  r5Placed: readonly AreaBadgePlacementInput[],
   viewport: AxisRect,
   obstacles: readonly AxisRect[],
   gap: number,
 ): AreaBadgePlacementInput[] | null {
-  const kyotoIndex = stablePlaced.findIndex((item) => item.id === "kyoto");
+  const kyotoIndex = r5Placed.findIndex((item) => item.id === "kyoto");
   if (kyotoIndex < 0) return null;
-  const kyotoStable = stablePlaced[kyotoIndex]!;
-  const others = stablePlaced.filter((_, index) => index !== kyotoIndex);
+  const kyotoR5 = r5Placed[kyotoIndex]!;
+  const others = r5Placed.filter((_, index) => index !== kyotoIndex);
   const otherRects = prefecturePlacedRects(others);
 
   for (let upPx = 1; upPx <= OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX; upPx += 1) {
-    const kyotoY = kyotoStable.y - upPx;
+    const kyotoY = kyotoR5.y - upPx;
     if (
       prefectureBadgeBlockedAt(
-        kyotoStable.x,
+        kyotoR5.x,
         kyotoY,
-        kyotoStable.count,
+        kyotoR5.count,
         viewport,
         obstacles,
         otherRects,
@@ -430,9 +646,9 @@ function tryPlaceOsakaWithKyotoUpOnly(
       continue;
     }
     const kyotoRect = prefectureBadgeRectAt(
-      kyotoStable.x,
+      kyotoR5.x,
       kyotoY,
-      kyotoStable.count,
+      kyotoR5.count,
     );
     const osakaPosition = findPrefectureBadgePosition(
       osaka,
@@ -443,9 +659,9 @@ function tryPlaceOsakaWithKyotoUpOnly(
       OSAKA_EXTENDED_PREFECTURE_OFFSET_LIMITS,
     );
     if (!osakaPosition) continue;
-    const kyotoMoved = { ...kyotoStable, x: kyotoStable.x, y: kyotoY };
+    const kyotoMoved = { ...kyotoR5, x: kyotoR5.x, y: kyotoY };
     return mergeStableWithOsakaAndOptionalKyotoUp(
-      stablePlaced,
+      r5Placed,
       { ...osaka, ...osakaPosition },
       kyotoMoved,
     );
@@ -495,43 +711,47 @@ export function placeAreaBadgeCenters(
   return placed;
 }
 
-/** Prefecture placement: stable pass without Osaka, then Osaka-only fit. */
+/** Prefecture placement: round-5 base, then Osaka-only rescue when r5 dropped Osaka. */
 export function placePrefectureBadgeCenters(
   candidates: readonly AreaBadgePlacementInput[],
   obstacles: readonly AxisRect[],
   viewport: AxisRect,
   gap = PREFECTURE_BADGE_GAP,
 ): AreaBadgePlacementInput[] {
-  const stable = placePrefectureBadgeCentersWithoutOsaka(
+  const r5 = placePrefectureBadgeCentersRound5(
     candidates,
     obstacles,
     viewport,
     gap,
   );
+  if (r5.some((item) => item.id === "osaka")) {
+    return r5;
+  }
+
   const osaka = candidates.find((item) => item.id === "osaka");
-  if (!osaka) return stable;
+  if (!osaka) return r5;
 
   const osakaPlaced = tryPlaceOsakaInRemainingSpace(
     osaka,
-    stable,
+    r5,
     viewport,
     obstacles,
     gap,
   );
   if (osakaPlaced) {
-    return mergeStableWithOsakaAndOptionalKyotoUp(stable, osakaPlaced, null);
+    return mergeStableWithOsakaAndOptionalKyotoUp(r5, osakaPlaced, null);
   }
 
   const withKyotoUp = tryPlaceOsakaWithKyotoUpOnly(
     osaka,
-    stable,
+    r5,
     viewport,
     obstacles,
     gap,
   );
   if (withKyotoUp) return withKyotoUp;
 
-  return stable;
+  return r5;
 }
 
 /** Prefecture pills: zoom in [0, 7). Area pills: [7, 12). */
