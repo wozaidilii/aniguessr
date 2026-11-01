@@ -1,0 +1,5 @@
+# Reference-only index-shrink QA notes (not read at build or runtime).
+data/index-quality/merge-canonical-not-tierA-resolution.json
+
+# Optional local self-check fixture (generate at build; never commit large expected sitemap).
+data/index-quality/expected-sitemap-after.json
