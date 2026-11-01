@@ -188,10 +188,10 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       ".home-map-searchstack",
       ".home-chip-scrim",
       ".home-work-search",
-      ".home-nearby",
+      ".home-nearby-sheet",
       ".home-map-tools",
       ".maplibregl-ctrl-attrib",
-      ".google-map-tiles-attribution",
+      ".google-map-tiles-attribution.google-map-tiles-attribution--home",
     ] as const;
 
     function resolveLabelBundle(): HomeMapLabels | null {
