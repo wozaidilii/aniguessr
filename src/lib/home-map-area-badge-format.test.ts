@@ -2,11 +2,28 @@ import { describe, expect, it } from "vitest";
 import type { HomeMapLabel } from "~/lib/home-map-labels";
 import {
   areaBadgeAriaLabel,
+  areaBadgeLocationHref,
   areaBadgeTooltip,
   formatAreaBadgeCount,
   homeMapAreaBadgeZoomBand,
   placeAreaBadgeCenters,
 } from "~/lib/home-map-area-badge-format";
+
+const tokyoPref: HomeMapLabel = {
+  id: "tokyo",
+  ja: "東京都",
+  zh: "东京都",
+  tw: "東京都",
+  en: "Tokyo",
+  count: 7133,
+  lng: 139.69,
+  lat: 35.68,
+  west: 139.0,
+  south: 35.0,
+  east: 140.0,
+  north: 36.0,
+  major: true,
+};
 
 const shibuya: HomeMapLabel = {
   id: "shibuya-tokyo",
@@ -79,5 +96,18 @@ describe("areaBadgeAriaLabel", () => {
   it("localizes aria labels", () => {
     expect(areaBadgeAriaLabel(shibuya, "ja")).toBe("渋谷区 949件");
     expect(areaBadgeAriaLabel(shibuya, "en")).toBe("Shibuya 949 spots");
+  });
+});
+
+describe("areaBadgeLocationHref", () => {
+  it("never produces a locations href for prefecture badges", () => {
+    expect(areaBadgeLocationHref(tokyoPref, "pref", "ja")).toBeNull();
+    expect(areaBadgeLocationHref(tokyoPref, "pref", "en")).toBeNull();
+  });
+
+  it("links area badges to pilgrimage location pages", () => {
+    expect(areaBadgeLocationHref(shibuya, "area", "ja")).toBe(
+      "/ja/pilgrimage/locations/shibuya-tokyo",
+    );
   });
 });

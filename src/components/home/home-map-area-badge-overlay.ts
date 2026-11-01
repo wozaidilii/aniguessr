@@ -3,12 +3,13 @@ import type { HomeMapLabel } from "~/lib/home-map-labels";
 import type { HomeLocale } from "~/lib/home-locale";
 import {
   areaBadgeAriaLabel,
-  areaBadgeHref,
+  areaBadgeLocationHref,
   areaBadgeSizeTier,
   areaBadgeTooltip,
   formatAreaBadgeCount,
   homeMapAreaBadgeZoomBand,
   placeAreaBadgeCenters,
+  type HomeMapAreaBadgeKind,
   type AxisRect,
 } from "~/lib/home-map-area-badge-format";
 
@@ -16,7 +17,10 @@ export interface HomeMapAreaBadgeOverlayOptions {
   locale: HomeLocale;
   obstacleSelectors: readonly string[];
   getLabels: () => readonly HomeMapLabel[];
+  onPrefectureZoom: (label: HomeMapLabel) => void;
 }
+
+type BadgeElement = HTMLAnchorElement | HTMLButtonElement;
 
 function containerRect(map: MapLibreMap): AxisRect {
   const node = map.getContainer();
@@ -51,37 +55,95 @@ function obstacleRects(
   return rects;
 }
 
-function badgeElement(
+function appendBadgeContent(
+  element: BadgeElement,
   label: HomeMapLabel,
   locale: HomeLocale,
-  x: number,
-  y: number,
-): HTMLAnchorElement {
-  const link = document.createElement("a");
-  link.href = areaBadgeHref(label.id, locale);
-  link.className = `ag-b ${areaBadgeSizeTier(label.count)} ${label.major ? "major" : "minor"}`;
-  link.style.left = `${x}px`;
-  link.style.top = `${y}px`;
-  link.setAttribute("aria-label", areaBadgeAriaLabel(label, locale));
+): void {
+  element.setAttribute("aria-label", areaBadgeAriaLabel(label, locale));
   const count = document.createElement("span");
   count.className = "ag-b-count";
   count.textContent = formatAreaBadgeCount(label.count);
-  link.append(count);
+  element.append(count);
   const tip = document.createElement("span");
   tip.className = "ag-tip";
   tip.textContent = areaBadgeTooltip(label, locale);
   tip.setAttribute("aria-hidden", "true");
-  link.append(tip);
+  element.append(tip);
+}
+
+function badgeClassName(label: HomeMapLabel): string {
+  return `ag-b ${areaBadgeSizeTier(label.count)} ${label.major ? "major" : "minor"}`;
+}
+
+function createBadgeElement(
+  label: HomeMapLabel,
+  locale: HomeLocale,
+  kind: HomeMapAreaBadgeKind,
+  x: number,
+  y: number,
+  onPrefectureZoom: (label: HomeMapLabel) => void,
+): BadgeElement {
+  const className = badgeClassName(label);
+  if (kind === "pref") {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.style.left = `${x}px`;
+    button.style.top = `${y}px`;
+    button.dataset.badgeKind = "pref";
+    appendBadgeContent(button, label, locale);
+    button.addEventListener("click", () => onPrefectureZoom(label));
+    return button;
+  }
+  const href = areaBadgeLocationHref(label, "area", locale);
+  const link = document.createElement("a");
+  link.href = href ?? "#";
+  link.className = className;
+  link.style.left = `${x}px`;
+  link.style.top = `${y}px`;
+  link.dataset.badgeKind = "area";
+  appendBadgeContent(link, label, locale);
   return link;
+}
+
+function updateBadgeElement(
+  element: BadgeElement,
+  label: HomeMapLabel,
+  locale: HomeLocale,
+  kind: HomeMapAreaBadgeKind,
+  x: number,
+  y: number,
+): void {
+  element.style.left = `${x}px`;
+  element.style.top = `${y}px`;
+  element.className = badgeClassName(label);
+  element.dataset.badgeKind = kind;
+  element.setAttribute("aria-label", areaBadgeAriaLabel(label, locale));
+  if (element instanceof HTMLAnchorElement) {
+    const href = areaBadgeLocationHref(label, "area", locale);
+    if (href) element.href = href;
+  }
+  const countNode = element.querySelector(".ag-b-count");
+  if (countNode) countNode.textContent = formatAreaBadgeCount(label.count);
+  const tipNode = element.querySelector(".ag-tip");
+  if (tipNode) tipNode.textContent = areaBadgeTooltip(label, locale);
+}
+
+function badgeKindForElement(element: BadgeElement): HomeMapAreaBadgeKind | null {
+  const kind = element.dataset.badgeKind;
+  if (kind === "pref" || kind === "area") return kind;
+  return element instanceof HTMLButtonElement ? "pref" : "area";
 }
 
 export class HomeMapAreaBadgeOverlay {
   private readonly map: MapLibreMap;
   private readonly locale: HomeLocale;
   private readonly obstacleSelectors: readonly string[];
+  private readonly onPrefectureZoom: (label: HomeMapLabel) => void;
   private readonly root: HTMLDivElement;
   private readonly getLabels: () => readonly HomeMapLabel[];
-  private readonly pool = new Map<string, HTMLAnchorElement>();
+  private readonly pool = new Map<string, BadgeElement>();
   private readonly onMove = (): void => this.sync();
 
   constructor(map: MapLibreMap, options: HomeMapAreaBadgeOverlayOptions) {
@@ -89,6 +151,7 @@ export class HomeMapAreaBadgeOverlay {
     this.locale = options.locale;
     this.obstacleSelectors = options.obstacleSelectors;
     this.getLabels = options.getLabels;
+    this.onPrefectureZoom = options.onPrefectureZoom;
     this.root = document.createElement("div");
     this.root.className = "home-map-area-badges";
     map.getContainer().append(this.root);
@@ -114,6 +177,7 @@ export class HomeMapAreaBadgeOverlay {
       this.pool.clear();
       return;
     }
+    const kind: HomeMapAreaBadgeKind = band;
 
     const viewport = containerRect(this.map);
     const margin = 4;
@@ -158,20 +222,20 @@ export class HomeMapAreaBadgeOverlay {
       const label = labelById.get(item.id);
       if (!label) continue;
       let element = this.pool.get(item.id);
-      if (!element) {
-        element = badgeElement(label, this.locale, item.x, item.y);
+      if (!element || badgeKindForElement(element) !== kind) {
+        element?.remove();
+        element = createBadgeElement(
+          label,
+          this.locale,
+          kind,
+          item.x,
+          item.y,
+          this.onPrefectureZoom,
+        );
         this.pool.set(item.id, element);
         this.root.append(element);
       } else {
-        element.style.left = `${item.x}px`;
-        element.style.top = `${item.y}px`;
-        element.className = `ag-b ${areaBadgeSizeTier(label.count)} ${label.major ? "major" : "minor"}`;
-        element.href = areaBadgeHref(label.id, this.locale);
-        element.setAttribute("aria-label", areaBadgeAriaLabel(label, this.locale));
-        const countNode = element.querySelector(".ag-b-count");
-        if (countNode) countNode.textContent = formatAreaBadgeCount(label.count);
-        const tipNode = element.querySelector(".ag-tip");
-        if (tipNode) tipNode.textContent = areaBadgeTooltip(label, this.locale);
+        updateBadgeElement(element, label, this.locale, kind, item.x, item.y);
       }
     }
   }

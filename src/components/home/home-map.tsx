@@ -212,12 +212,34 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       return [];
     }
 
+    function zoomMapToLabelBounds(label: HomeMapLabel): void {
+      const { west, south, east, north } = label;
+      if (![west, south, east, north].every(Number.isFinite)) return;
+      map.fitBounds(
+        [
+          [west, south],
+          [east, north],
+        ],
+        {
+          padding: {
+            top: homeMapTopPadding(map),
+            right: 48,
+            bottom: 48,
+            left: 48,
+          },
+          maxZoom: 14,
+          duration: prefersReducedMotion() ? 0 : 600,
+        },
+      );
+    }
+
     function ensureAreaBadgeOverlay(): void {
       if (areaBadgeOverlay) return;
       areaBadgeOverlay = new HomeMapAreaBadgeOverlay(map, {
         locale,
         obstacleSelectors: BADGE_UI_OBSTACLES,
         getLabels: activeBadgeLabels,
+        onPrefectureZoom: zoomMapToLabelBounds,
       });
     }
     let googleUpgradeStarted = false;

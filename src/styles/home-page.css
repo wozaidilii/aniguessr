@@ -448,6 +448,17 @@
   cursor: pointer;
   pointer-events: auto;
   text-decoration: none;
+  --ag-b-border: 1.5px;
+  border-width: var(--ag-b-border);
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  background: none;
+}
+
+.home-map-area-badges button.ag-b {
+  font: inherit;
+  color: inherit;
 }
 
 .home-map-area-badges .ag-b.s {
@@ -473,19 +484,21 @@
 .home-map-area-badges .ag-b.major {
   background: #f7a8d0;
   color: #2a2430;
-  border: 1.5px solid #fff;
+  border-style: solid;
+  border-color: #fff;
 }
 
 .home-map-area-badges .ag-b.minor {
   background: #fff;
   color: #e0488f;
-  border: 1.5px solid #e0488f;
+  border-style: solid;
+  border-color: #e0488f;
 }
 
 .home-map-area-badges .ag-tip {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + 6px + var(--ag-b-border, 1.5px));
   transform: translateX(-50%);
   background: #2a2430;
   color: #fff;
@@ -516,10 +529,20 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
   }
 
-  .home-map-area-badges .ag-b:hover .ag-tip,
-  .home-map-area-badges .ag-b:focus-visible .ag-tip {
+  .home-map-area-badges .ag-b:hover .ag-tip {
     opacity: 1;
   }
+}
+
+.home-map-area-badges .ag-b:focus-visible,
+.home-map-area-badges .ag-b:focus-within {
+  z-index: 3;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
+}
+
+.home-map-area-badges .ag-b:focus-visible .ag-tip,
+.home-map-area-badges .ag-b:focus-within .ag-tip {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

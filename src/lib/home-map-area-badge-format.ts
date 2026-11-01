@@ -17,8 +17,16 @@ export function formatAreaBadgeCount(count: number): string {
   return String(count);
 }
 
-export function areaBadgeHref(labelId: string, locale: HomeLocale): string {
-  return withPilgrimageLocale(`/pilgrimage/locations/${labelId}`, locale);
+export type HomeMapAreaBadgeKind = "pref" | "area";
+
+/** Area badges link to location pages; prefecture badges must not navigate. */
+export function areaBadgeLocationHref(
+  label: HomeMapLabel,
+  kind: HomeMapAreaBadgeKind,
+  locale: HomeLocale,
+): string | null {
+  if (kind === "pref") return null;
+  return withPilgrimageLocale(`/pilgrimage/locations/${label.id}`, locale);
 }
 
 export function areaBadgeAriaLabel(
