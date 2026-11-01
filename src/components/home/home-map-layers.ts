@@ -4,32 +4,18 @@ import type {
   FilterSpecification,
   GeoJSONSource,
   Map,
-  SymbolLayerSpecification,
 } from "maplibre-gl";
 import {
   FAVORITE_CLUSTER_SUM,
   POINT_IS_FAVORITE,
   spotFavProperty,
 } from "~/components/pilgrimage/pilgrimage-map-layers";
-import type { HomeMapLabel } from "~/lib/home-map-labels";
-import { homeMapLabelText } from "~/lib/home-map-labels";
 import type { HomeLocale } from "~/lib/home-locale";
 import type { NavCatalog, NavSpot } from "~/lib/pilgrimage-nav";
 import { animeTitle, localizedSpotName } from "~/lib/pilgrimage-nav";
 
 export const HOME_DOTS_SOURCE = "home-dots";
 export const HOME_CLUSTER_SOURCE = "home-spots";
-export const HOME_AREA_SOURCE = "home-areas";
-export const HOME_PREF_SOURCE = "home-prefs";
-
-const PILL_LAYERS = [
-  "home-pref-minor",
-  "home-pref-major",
-  "home-area-minor",
-  "home-area-major",
-] as const;
-
-export const HOME_PILL_LAYER_IDS: readonly string[] = PILL_LAYERS;
 
 const SPOT_COLOR = "#E0488F";
 /** Homepage favorite ring. The pilgrimage map keeps its own cyan. */
@@ -50,110 +36,6 @@ const EMPTY: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
   features: [],
 };
-
-function capsuleImage(major: boolean): ImageData {
-  const ratio = 2;
-  const width = 72;
-  const height = 32;
-  const canvas = document.createElement("canvas");
-  canvas.width = width * ratio;
-  canvas.height = height * ratio;
-  const context = canvas.getContext("2d");
-  if (!context) {
-    throw new Error("Could not draw the map pill");
-  }
-  context.scale(ratio, ratio);
-  const inset = 1.5;
-  const x = inset;
-  const y = inset;
-  const w = width - inset * 2;
-  const h = height - inset * 2;
-  const radius = h / 2;
-  context.beginPath();
-  context.moveTo(x + radius, y);
-  context.arcTo(x + w, y, x + w, y + h, radius);
-  context.arcTo(x + w, y + h, x, y + h, radius);
-  context.arcTo(x, y + h, x, y, radius);
-  context.arcTo(x, y, x + w, y, radius);
-  context.closePath();
-  if (major) {
-    context.fillStyle = "#F7A8D0";
-    context.fill();
-  } else {
-    context.fillStyle = "#ffffff";
-    context.fill();
-    context.strokeStyle = "#E0488F";
-    context.lineWidth = 1.6;
-    context.stroke();
-  }
-  return context.getImageData(0, 0, canvas.width, canvas.height);
-}
-
-const PILL_IMAGE_OPTIONS = {
-  pixelRatio: 2,
-  stretchX: [[48, 96]] as [number, number][],
-  stretchY: [[20, 44]] as [number, number][],
-  content: [40, 14, 104, 50] as [number, number, number, number],
-};
-
-export function addHomePillImages(map: Map): void {
-  if (!map.hasImage("home-pill-major")) {
-    map.addImage("home-pill-major", capsuleImage(true), PILL_IMAGE_OPTIONS);
-  }
-  if (!map.hasImage("home-pill-minor")) {
-    map.addImage("home-pill-minor", capsuleImage(false), PILL_IMAGE_OPTIONS);
-  }
-}
-
-function pillLayout(
-  image: string,
-  textSize: number,
-): SymbolLayerSpecification["layout"] {
-  return {
-    "icon-image": image,
-    "icon-text-fit": "both",
-    "icon-text-fit-padding": [3, 9, 3, 9],
-    "text-field": [
-      "format",
-      ["get", "label"],
-      { "text-color": "#2a2430" },
-      " ",
-      {},
-      ["to-string", ["get", "count"]],
-      { "text-color": "#E0488F" },
-    ],
-    "text-font": TEXT_FONT,
-    "text-size": textSize,
-    "text-max-width": 24,
-    "symbol-sort-key": ["*", ["get", "count"], -1],
-    "icon-allow-overlap": false,
-    "text-allow-overlap": false,
-    "icon-ignore-placement": false,
-    "text-ignore-placement": false,
-  };
-}
-
-function addPillLayer(
-  map: Map,
-  id: string,
-  source: string,
-  image: string,
-  textSize: number,
-  major: boolean,
-  minzoom: number,
-  maxzoom: number,
-) {
-  if (map.getLayer(id)) return;
-  map.addLayer({
-    id,
-    type: "symbol",
-    source,
-    minzoom,
-    maxzoom,
-    filter: ["==", ["get", "major"], major ? 1 : 0],
-    layout: pillLayout(image, textSize),
-  });
-}
 
 const POINT_RADIUS = asExpr([
   "interpolate",
@@ -186,7 +68,6 @@ const CLUSTER_RING_RADIUS = asExpr([
 ]);
 
 export function installHomeMapLayers(map: Map): void {
-  addHomePillImages(map);
   if (!map.getSource(HOME_DOTS_SOURCE)) {
     map.addSource(HOME_DOTS_SOURCE, { type: "geojson", data: EMPTY });
   }
@@ -203,68 +84,21 @@ export function installHomeMapLayers(map: Map): void {
       },
     });
   }
-  if (!map.getSource(HOME_AREA_SOURCE)) {
-    map.addSource(HOME_AREA_SOURCE, { type: "geojson", data: EMPTY });
-  }
-  if (!map.getSource(HOME_PREF_SOURCE)) {
-    map.addSource(HOME_PREF_SOURCE, { type: "geojson", data: EMPTY });
-  }
 
   if (!map.getLayer("home-dots")) {
     map.addLayer({
       id: "home-dots",
       type: "circle",
       source: HOME_DOTS_SOURCE,
-    minzoom: 8.5,
-    maxzoom: 12,
-    paint: {
-      "circle-color": SPOT_COLOR,
-      "circle-radius": 1,
-      "circle-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.12, 0.45]),
-    } satisfies CirclePaint,
+      minzoom: 8.5,
+      maxzoom: 12,
+      paint: {
+        "circle-color": SPOT_COLOR,
+        "circle-radius": 1,
+        "circle-opacity": asExpr(["case", ["==", ["get", "dim"], 1], 0.12, 0.45]),
+      } satisfies CirclePaint,
     });
   }
-
-  addPillLayer(
-    map,
-    "home-pref-minor",
-    HOME_PREF_SOURCE,
-    "home-pill-minor",
-    12,
-    false,
-    0,
-    7,
-  );
-  addPillLayer(
-    map,
-    "home-pref-major",
-    HOME_PREF_SOURCE,
-    "home-pill-major",
-    13.5,
-    true,
-    0,
-    7,
-  );
-  addPillLayer(
-    map,
-    "home-area-minor",
-    HOME_AREA_SOURCE,
-    "home-pill-minor",
-    12,
-    false,
-    7,
-    12,
-  );
-  addPillLayer(
-    map,
-    "home-area-major",
-    HOME_AREA_SOURCE,
-    "home-pill-major",
-    13.5,
-    true,
-    7,
-    12,
-  );
 
   const clusterDim = asExpr([
     "case",
@@ -437,32 +271,6 @@ export function spotCollection(
         subjectId: spot.subjectId,
         dim: focusId && spot.subjectId !== focusId ? 1 : 0,
         fav: spotFavProperty(spot.subjectId, favorites),
-      },
-    })),
-  };
-}
-
-export function labelCollection(
-  labels: readonly HomeMapLabel[],
-  locale: HomeLocale,
-): GeoJSON.FeatureCollection {
-  return {
-    type: "FeatureCollection",
-    features: labels.map((label) => ({
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [label.lng, label.lat],
-      },
-      properties: {
-        id: label.id,
-        label: homeMapLabelText(label, locale),
-        count: label.count,
-        major: label.major ? 1 : 0,
-        west: label.west,
-        south: label.south,
-        east: label.east,
-        north: label.north,
       },
     })),
   };

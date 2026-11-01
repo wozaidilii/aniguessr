@@ -44,24 +44,16 @@ describe("homepage map style", () => {
     ]);
   });
 
-  it("does not rewrite home pill text-field after a Positron style swap", () => {
-    const pillTextField = [
-      "format",
-      ["get", "label"],
-      { "text-color": "#2a2430" },
-      " ",
-      {},
-      ["to-string", ["get", "count"]],
-      { "text-color": "#E0488F" },
-    ];
+  it("does not rewrite home overlay text-field after a Positron style swap", () => {
+    const clusterTextField = ["get", "point_count_abbreviated"];
     const setLayoutProperty = vi.fn();
     const map = {
       getStyle: () => ({
         layers: [
           {
-            id: "home-pref-major",
+            id: "home-cluster-count",
             type: "symbol",
-            layout: { "text-field": pillTextField },
+            layout: { "text-field": clusterTextField },
           },
           {
             id: "label_city",
@@ -74,14 +66,14 @@ describe("homepage map style", () => {
       setLayoutProperty,
     };
     tuneHomeMapStyle(map as never, "ja");
-    expect(isHomeMapOverlayLayerId("home-pref-major")).toBe(true);
+    expect(isHomeMapOverlayLayerId("home-cluster-count")).toBe(true);
     expect(setLayoutProperty).toHaveBeenCalledWith(
       "label_city",
       "text-field",
       homePlaceNameField("ja"),
     );
     expect(setLayoutProperty).not.toHaveBeenCalledWith(
-      "home-pref-major",
+      "home-cluster-count",
       "text-field",
       expect.anything(),
     );
