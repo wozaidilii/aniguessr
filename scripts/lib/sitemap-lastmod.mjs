@@ -53,9 +53,12 @@ export function lastmodForPath(
     contentChangedOn,
     affiliatePilot,
     affiliatePilotOn,
+    indexShrink,
+    indexShrinkOn,
     fallback,
   },
 ) {
+  if (indexShrink?.has(path)) return indexShrinkOn ?? changedOn;
   if (affiliatePilot?.has(path)) return affiliatePilotOn ?? changedOn;
   if (changed.has(path)) return changedOn;
   if (contentChanged?.has(path)) return contentChangedOn ?? changedOn;

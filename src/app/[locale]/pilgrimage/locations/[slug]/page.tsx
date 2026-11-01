@@ -104,6 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     seo.title,
     seo.description,
     true,
+    { indexable: resolved.location.indexable === true },
   );
   const og = loadLocationOg(locale, resolved.location.slug);
   if (og.status !== "ready") return metadata;

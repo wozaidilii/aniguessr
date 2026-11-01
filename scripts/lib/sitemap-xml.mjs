@@ -63,23 +63,31 @@ export function buildLocalizedSitemapEntries(
   lastModified,
   options = {},
 ) {
-  const zhUrl = `${origin}${withLocale(path, "zh")}`;
+  const includeZh = options.includeZh !== false;
   const languages = {
-    "zh-Hans": zhUrl,
-    "zh-CN": zhUrl,
-    "zh-SG": zhUrl,
     ja: `${origin}${withLocale(path, "ja")}`,
     en: `${origin}${withLocale(path, "en")}`,
     "x-default": `${origin}${withLocale(path, DEFAULT_LOCALE)}`,
   };
-  const locales = [...ANIME_LOCALES];
-  if (options.zhTw) {
+  if (includeZh) {
+    const zhUrl = `${origin}${withLocale(path, "zh")}`;
+    languages["zh-Hans"] = zhUrl;
+    languages["zh-CN"] = zhUrl;
+    languages["zh-SG"] = zhUrl;
+  }
+  if (options.zhTw || (Array.isArray(options.locales) && options.locales.includes("zh-tw"))) {
     const zhTwUrl = `${origin}${withLocale(path, "zh-tw")}`;
     languages["zh-Hant"] = zhTwUrl;
     languages["zh-TW"] = zhTwUrl;
     languages["zh-HK"] = zhTwUrl;
     languages["zh-MO"] = zhTwUrl;
-    locales.push("zh-tw");
+  }
+  let locales;
+  if (Array.isArray(options.locales) && options.locales.length > 0) {
+    locales = [...options.locales];
+  } else {
+    locales = includeZh ? [...ANIME_LOCALES] : ["ja", "en"];
+    if (options.zhTw) locales.push("zh-tw");
   }
   return locales.map((locale) => ({
     loc: `${origin}${withLocale(path, locale)}`,
@@ -121,6 +129,9 @@ export function buildZhTwOnlySitemapEntries(
 
 export function sitemapEntryCount(item) {
   if (item.zhTwOnly) return 1;
+  if (Array.isArray(item.locales) && item.locales.length > 0) {
+    return item.locales.length;
+  }
   return item.zhTw ? ANIME_LOCALES.length + 1 : ANIME_LOCALES.length;
 }
 

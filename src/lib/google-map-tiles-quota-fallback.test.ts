@@ -32,7 +32,7 @@ describe("google tile quota fallback counters", () => {
     const config = {
       ...GOOGLE_TILE_QUOTA_FALLBACK_DEFAULTS,
       consecutiveFailThreshold: 99,
-    };
+    } as unknown as typeof GOOGLE_TILE_QUOTA_FALLBACK_DEFAULTS;
     let counters = createGoogleTileLoadCounters();
     for (let i = 0; i < 3; i += 1) {
       counters = recordGoogleTileLoadSuccess(counters, config).counters;

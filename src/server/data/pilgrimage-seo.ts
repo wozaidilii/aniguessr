@@ -33,6 +33,8 @@ export interface PilgrimageAnimeSummary {
   spotCount: number;
   locationCount: number;
   years: number[];
+  tierACount?: number;
+  indexable?: boolean;
 }
 
 export interface PilgrimageLocationSummary {
@@ -40,6 +42,8 @@ export interface PilgrimageLocationSummary {
   name: LocalizedText;
   spotCount: number;
   animeCount: number;
+  tierACount?: number;
+  indexable?: boolean;
   /** True when the municipality ring steps into the sea. Unknown stays city art. */
   isCoastal?: boolean;
 }
@@ -51,6 +55,8 @@ export interface PilgrimageSpot {
   subjectSlug: string;
   locationSlug: string;
   redirectTo?: string | null;
+  mergedFrom?: string[];
+  indexable?: boolean;
   lat: number;
   lng: number;
   year: number | null;

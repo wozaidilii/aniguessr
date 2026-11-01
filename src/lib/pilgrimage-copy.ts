@@ -21,6 +21,7 @@ export const PILGRIMAGE_COPY: Record<
     answerName: string;
     episode: string;
     funfacts: string;
+    mergedScenes: string;
     coordinates: string;
     openMaps: string;
     relatedAnime: string;
@@ -99,6 +100,7 @@ export const PILGRIMAGE_COPY: Record<
     answerName: "现实地点",
     episode: "出现场景",
     funfacts: "巡礼贴士",
+    mergedScenes: "合并收录的场景",
     coordinates: "坐标",
     openMaps: "在 Google 地图打开",
     relatedAnime: "所属作品",
@@ -178,6 +180,7 @@ export const PILGRIMAGE_COPY: Record<
     answerName: "現実の場所",
     episode: "登場シーン",
     funfacts: "巡礼メモ",
+    mergedScenes: "統合したシーン",
     coordinates: "座標",
     openMaps: "Google マップで開く",
     relatedAnime: "作品",
@@ -261,6 +264,7 @@ export const PILGRIMAGE_COPY: Record<
     answerName: "Real-world place",
     episode: "Scene context",
     funfacts: "Visit notes",
+    mergedScenes: "Merged scenes",
     coordinates: "Coordinates",
     openMaps: "Open in Google Maps",
     relatedAnime: "Anime",
@@ -346,6 +350,7 @@ export const PILGRIMAGE_COPY: Record<
     answerName: "現實地點",
     episode: "出現場景",
     funfacts: "巡禮貼士",
+    mergedScenes: "合併收錄的場景",
     coordinates: "座標",
     openMaps: "在 Google 地圖開啟",
     relatedAnime: "所屬作品",
