@@ -297,8 +297,8 @@ function tryOsakaKyotoPrefecturePairing(
   gap: number,
   kyotoCandidate: AreaBadgePlacementInput | null = null,
 ): boolean {
-  let kyotoIndex = placed.findIndex((item) => item.id === "kyoto");
-  let kyoto =
+  const kyotoIndex = placed.findIndex((item) => item.id === "kyoto");
+  const kyoto =
     kyotoIndex >= 0 ? placed[kyotoIndex] : (kyotoCandidate ?? undefined);
   if (!kyoto) return false;
   const otherRects =
