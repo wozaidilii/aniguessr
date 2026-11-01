@@ -6,7 +6,7 @@ import {
   buildUrlSetXml,
   buildZhTwOnlySitemapEntries,
   chunkSitemapPaths,
-  rightsSitemapItem,
+  sitemapEntryCount,
 } from "./sitemap-xml.mjs";
 
 describe("static sitemap XML", () => {
@@ -68,38 +68,6 @@ describe("static sitemap XML", () => {
     expect(JSON.stringify(uncovered)).not.toContain("zh-Hant");
   });
 
-  it("lists the rights page in every locale, including zh-TW alternates", () => {
-    const item = rightsSitemapItem();
-    expect(item).toEqual({ path: "/rights", priority: 0.4, zhTw: true });
-    const entries = buildLocalizedSitemapEntries(
-      "https://aniguessr.ayiora.com",
-      item.path,
-      item.priority,
-      "2026-10-21",
-      { zhTw: item.zhTw },
-    );
-    expect(entries.map((entry) => entry.loc)).toEqual([
-      "https://aniguessr.ayiora.com/zh/rights",
-      "https://aniguessr.ayiora.com/ja/rights",
-      "https://aniguessr.ayiora.com/en/rights",
-      "https://aniguessr.ayiora.com/zh-tw/rights",
-    ]);
-    for (const entry of entries) {
-      expect(entry.languages["zh-Hans"]).toBe("https://aniguessr.ayiora.com/zh/rights");
-      expect(entry.languages["zh-CN"]).toBe(entry.languages["zh-Hans"]);
-      expect(entry.languages.ja).toBe("https://aniguessr.ayiora.com/ja/rights");
-      expect(entry.languages.en).toBe("https://aniguessr.ayiora.com/en/rights");
-      expect(entry.languages["zh-Hant"]).toBe(
-        "https://aniguessr.ayiora.com/zh-tw/rights",
-      );
-      expect(entry.languages["zh-TW"]).toBe(entry.languages["zh-Hant"]);
-      expect(entry.languages["zh-HK"]).toBe(entry.languages["zh-Hant"]);
-      expect(entry.languages["x-default"]).toBe(
-        "https://aniguessr.ayiora.com/en/rights",
-      );
-    }
-  });
-
   it("builds an index that points at public sitemap paths", () => {
     const xml = buildSitemapIndexXml([
       "https://aniguessr.ayiora.com/sitemap/0.xml",
@@ -109,6 +77,27 @@ describe("static sitemap XML", () => {
       "<loc>https://aniguessr.ayiora.com/sitemap/0.xml</loc>",
     );
     expect(xml.endsWith("</sitemapindex>")).toBe(true);
+  });
+
+  it("emits three locale URLs and seven hreflang tags for tier-A spots", () => {
+    const entries = buildLocalizedSitemapEntries(
+      "https://aniguessr.ayiora.com",
+      "/pilgrimage/spots/anitabi_1_test",
+      0.6,
+      "2026-11-01",
+      {
+        locales: ["ja", "en", "zh-tw"],
+        includeZh: false,
+        zhTw: true,
+      },
+    );
+    expect(entries).toHaveLength(3);
+    for (const entry of entries) {
+      expect(Object.keys(entry.languages)).toHaveLength(7);
+      expect(entry.languages["zh-Hans"]).toBeUndefined();
+      expect(entry.languages["zh-CN"]).toBeUndefined();
+      expect(entry.languages["zh-SG"]).toBeUndefined();
+    }
   });
 
   it("keeps a zh-TW-only index off the full-hub alternates and under the URL cap", () => {
@@ -137,5 +126,11 @@ describe("static sitemap XML", () => {
       [{ path: "/a", zhTw: true }],
       [{ path: "/b" }, { path: "/c", zhTwOnly: true }],
     ]);
+    expect(
+      sitemapEntryCount({
+        path: "/pilgrimage/spots/x",
+        locales: ["ja", "en", "zh-tw"],
+      }),
+    ).toBe(3);
   });
 });

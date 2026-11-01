@@ -85,6 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     seo.title,
     seo.description,
     true,
+    { indexable: anime.indexable === true },
   );
   const og = loadAnimeOg(locale, anime.slug);
   if (og.status !== "ready") return metadata;

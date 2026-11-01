@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { loadMunicipalities, locateMunicipality } from "./japan-area.mjs";
 import { pilgrimagePageMetadata } from "../../src/lib/seo.ts";
 import { pathsForRenamedSpots, affiliatePilotSitemapPaths, SITEMAP_AFFILIATE_PILOT_LASTMOD, SITEMAP_BASELINE_LASTMOD, SITEMAP_CONTENT_LASTMOD } from "./sitemap-lastmod.mjs";
+import { SITEMAP_INDEX_SHRINK_LASTMOD } from "./index-quality.mjs";
 import knownSlugs from "../../src/lib/pilgrimage-known-slugs.json" with { type: "json" };
 
 loadMunicipalities(
@@ -159,22 +160,34 @@ describe("rewritten question labels and pilgrimage pages", () => {
           ? decodeURIComponent(pathname.slice("/pilgrimage/spots/".length))
           : "";
         if (affiliatePilotPaths.has(pathname)) {
-          expect(lastmod).toBe(SITEMAP_AFFILIATE_PILOT_LASTMOD);
+          expect([
+            SITEMAP_AFFILIATE_PILOT_LASTMOD,
+            SITEMAP_INDEX_SHRINK_LASTMOD,
+          ]).toContain(lastmod);
         } else if (renamed.has(spotId) || copyIds.has(spotId)) {
-          expect(lastmod).toBe(SITEMAP_CONTENT_LASTMOD);
-          bumped.add(spotId);
-        } else if (bumpedPaths.has(pathname)) {
-          expect(lastmod).toBe(SITEMAP_AFFILIATE_PILOT_LASTMOD);
-        } else {
-          expect([SITEMAP_BASELINE_LASTMOD, SITEMAP_AFFILIATE_PILOT_LASTMOD]).toContain(
+          expect([SITEMAP_CONTENT_LASTMOD, SITEMAP_INDEX_SHRINK_LASTMOD]).toContain(
             lastmod,
           );
+          bumped.add(spotId);
+        } else if (bumpedPaths.has(pathname)) {
+          expect([
+            SITEMAP_AFFILIATE_PILOT_LASTMOD,
+            SITEMAP_INDEX_SHRINK_LASTMOD,
+          ]).toContain(lastmod);
+        } else {
+          expect([
+            SITEMAP_BASELINE_LASTMOD,
+            SITEMAP_AFFILIATE_PILOT_LASTMOD,
+            SITEMAP_INDEX_SHRINK_LASTMOD,
+            SITEMAP_CONTENT_LASTMOD,
+          ]).toContain(lastmod);
         }
       }
     }
     expect(bumped.size).toBeGreaterThan(0);
-    for (const slug of knownSlugs.location) {
-      expect(paths.has(`/pilgrimage/locations/${slug}`)).toBe(true);
+    for (const location of seoIndex.locations ?? []) {
+      if (location.indexable !== true) continue;
+      expect(paths.has(`/pilgrimage/locations/${location.slug}`)).toBe(true);
     }
     expect(paths.has("/pilgrimage/locations/chiba-chiba-12106")).toBe(true);
     expect(paths.has("/")).toBe(true);

@@ -1,0 +1,399 @@
+{
+ "reversals": [
+  {
+   "newCanonical": "anitabi_106372_nsrrwf2a4",
+   "oldCanonical": "anitabi_106372_nsrwbks9u",
+   "distance_m": 28.6
+  },
+  {
+   "newCanonical": "anitabi_138960_51i52mn3l",
+   "oldCanonical": "anitabi_138960_51i52mhm7",
+   "distance_m": 11.1
+  },
+  {
+   "newCanonical": "anitabi_143834_p6enknd1f",
+   "oldCanonical": "anitabi_143834_p6egzmzio",
+   "distance_m": 28.6,
+   "alsoRedirected": [
+    "anitabi_143834_iv7oi2jvu",
+    "anitabi_143834_p6f5qr7hp"
+   ]
+  },
+  {
+   "newCanonical": "anitabi_174592_51i53ptpk",
+   "oldCanonical": "anitabi_174592_51i53pw88",
+   "distance_m": 14.4
+  },
+  {
+   "newCanonical": "anitabi_226956_px4cz7k92",
+   "oldCanonical": "anitabi_226956_px47v7pzr",
+   "distance_m": 18.6
+  },
+  {
+   "newCanonical": "anitabi_282372_3q04ewj",
+   "oldCanonical": "anitabi_282372_nuqn8neza",
+   "distance_m": 11.1
+  },
+  {
+   "newCanonical": "anitabi_282923_u8l55lcly",
+   "oldCanonical": "anitabi_282923_u8l67bpx4",
+   "distance_m": 14.3
+  },
+  {
+   "newCanonical": "anitabi_293800_o4ndsql2u",
+   "oldCanonical": "anitabi_293800_o4nc3ruyb",
+   "distance_m": 11.1
+  },
+  {
+   "newCanonical": "anitabi_404480_pr40fu8q1",
+   "oldCanonical": "anitabi_306742_51i52g35v",
+   "distance_m": 11.1
+  },
+  {
+   "newCanonical": "anitabi_309_a0895737",
+   "oldCanonical": "anitabi_309_kpwsqgrej",
+   "distance_m": 17.9
+  },
+  {
+   "newCanonical": "anitabi_315727_5teal1y",
+   "oldCanonical": "anitabi_315727_5tebpnp",
+   "distance_m": 23.6
+  },
+  {
+   "newCanonical": "anitabi_3428_9u75i0z",
+   "oldCanonical": "anitabi_3428_9u7fym5",
+   "distance_m": 11.1
+  },
+  {
+   "newCanonical": "anitabi_386195_ksq1pzdpf",
+   "oldCanonical": "anitabi_386195_l4pr3xhte",
+   "distance_m": 14.4
+  },
+  {
+   "newCanonical": "anitabi_386772_r1p3xtc78",
+   "oldCanonical": "anitabi_386772_r1p6diwnd",
+   "distance_m": 20.8
+  },
+  {
+   "newCanonical": "anitabi_443428_ou6pqe1m4",
+   "oldCanonical": "anitabi_386809_bed99bdc",
+   "distance_m": 22.2
+  },
+  {
+   "newCanonical": "anitabi_429305_qw1bv3iov",
+   "oldCanonical": "anitabi_429305_qw198mcd9",
+   "distance_m": 29.3
+  },
+  {
+   "newCanonical": "anitabi_437593_2vrj8av",
+   "oldCanonical": "anitabi_437593_uovdayytl",
+   "distance_m": 28.4
+  },
+  {
+   "newCanonical": "anitabi_474906_m1mxtvetu",
+   "oldCanonical": "anitabi_474906_m18syhyf0",
+   "distance_m": 22.2
+  },
+  {
+   "newCanonical": "anitabi_513018_tuabw1",
+   "oldCanonical": "anitabi_513018_tu18wl",
+   "distance_m": 14.3
+  },
+  {
+   "newCanonical": "anitabi_531159_92cxgf",
+   "oldCanonical": "anitabi_531159_92pwyv",
+   "distance_m": 21.2
+  },
+  {
+   "newCanonical": "anitabi_95225_51i52900y",
+   "oldCanonical": "anitabi_95225_51i5290oy",
+   "distance_m": 24.0
+  },
+  {
+   "newCanonical": "anitabi_95225_51i529100",
+   "oldCanonical": "anitabi_95225_51i5290u3",
+   "distance_m": 24.0
+  },
+  {
+   "newCanonical": "anitabi_995_9k5v656",
+   "oldCanonical": "anitabi_995_9k5tof1",
+   "distance_m": 11.1
+  }
+ ],
+ "noRedirect": [
+  {
+   "id": "anitabi_169425_51i520e07",
+   "canonical": "anitabi_169425_51i520d2l",
+   "distance_m": 24.0,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_169425_51i520f7o",
+   "canonical": "anitabi_169425_51i520frm",
+   "distance_m": 21.1,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_181857_qfwr9l66h",
+   "canonical": "anitabi_181857_qfwt41aaz",
+   "distance_m": 14.4,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l325x",
+   "canonical": "anitabi_224173_5oy8l322u",
+   "distance_m": 44.5,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l32jk",
+   "canonical": "anitabi_224173_5oy8l322u",
+   "distance_m": 33.4,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l32ls",
+   "canonical": "anitabi_224173_5oy8l322u",
+   "distance_m": 42.6,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l32dp",
+   "canonical": "anitabi_224173_5oy8l328i",
+   "distance_m": 28.7,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l32ke",
+   "canonical": "anitabi_224173_5oy8l32aw",
+   "distance_m": 27.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_224173_5oy8l32ix",
+   "canonical": "anitabi_224173_5oy8l32fy",
+   "distance_m": 28.7,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_236510_51i52br71",
+   "canonical": "anitabi_236510_51i52brej",
+   "distance_m": 14.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_278557_59yg07nmx",
+   "canonical": "anitabi_278557_59yg07n9e",
+   "distance_m": 21.2,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_292902_3h8n4rz",
+   "canonical": "anitabi_292902_3h8p2sp",
+   "distance_m": 14.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_292902_3ecj8ud",
+   "canonical": "anitabi_292902_a60bba62",
+   "distance_m": 11.1,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_294713_d2c21c60",
+   "canonical": "anitabi_294713_554218cf",
+   "distance_m": 36.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_306742_51i52g3mg",
+   "canonical": "anitabi_306742_51i52g34h",
+   "distance_m": 27.1,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_306742_51i52g3op",
+   "canonical": "anitabi_306742_51i52g34h",
+   "distance_m": 37.8,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_306742_51i52g48g",
+   "canonical": "anitabi_306742_51i52g34h",
+   "distance_m": 71.5,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_306742_51i52g4da",
+   "canonical": "anitabi_306742_51i52g34h",
+   "distance_m": 58.6,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_319115_ilaogt42u",
+   "canonical": "anitabi_319115_ilaogt3ye",
+   "distance_m": 28.7,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_319577_nffi2uxvq",
+   "canonical": "anitabi_319577_nfflcu9bb",
+   "distance_m": 14.4,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_147568_51i51xy3h",
+   "canonical": "anitabi_4022_m2xcy4ibj",
+   "distance_m": 16.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_147568_51i51xyln",
+   "canonical": "anitabi_4022_m4mpefybp",
+   "distance_m": 14.4,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_402656_4zgxxpg",
+   "canonical": "anitabi_402656_4zgh0dz",
+   "distance_m": 54.2,
+   "dupPassesQuality": true,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": true
+  },
+  {
+   "id": "anitabi_405785_46xtgo6",
+   "canonical": "anitabi_405785_k926a3xfw",
+   "distance_m": 21.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_407332_e09e3036",
+   "canonical": "anitabi_407332_6bf18602",
+   "distance_m": 29.4,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_513018_1mnq4k0",
+   "canonical": "anitabi_474906_m1mxtvetu",
+   "oldCanonical": "anitabi_474906_m18syhyf0",
+   "distance_m": 34.6,
+   "dupPassesQuality": false,
+   "case": "reversed group; >30 m from new canonical: no 301, noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_492881_uhxnggj5a",
+   "canonical": "anitabi_492881_uhxt5g170",
+   "distance_m": 18.1,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_5395_ntrt7pp3u",
+   "canonical": "anitabi_5395_ntrsw841y",
+   "distance_m": 29.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_5395_nts42tmzb",
+   "canonical": "anitabi_5395_nts5ric3c",
+   "distance_m": 29.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_59825_51i5282q5",
+   "canonical": "anitabi_59825_51i52832b",
+   "distance_m": 14.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_90815_51i52dxhs",
+   "canonical": "anitabi_90815_51i52dxp8",
+   "distance_m": 18.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_90815_51i52dyy5",
+   "canonical": "anitabi_90815_51i52e21p",
+   "distance_m": 11.1,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_94236_51i51wms1",
+   "canonical": "anitabi_94236_51i51wmtv",
+   "distance_m": 14.3,
+   "dupPassesQuality": false,
+   "case": "canonical not tier A; no passing duplicate within 30 m: no 301, both noindex",
+   "indexable": false
+  },
+  {
+   "id": "anitabi_95225_51i528yvc",
+   "canonical": "anitabi_95225_51i52900y",
+   "oldCanonical": "anitabi_95225_51i5290oy",
+   "distance_m": 45.2,
+   "dupPassesQuality": true,
+   "case": "reversed group; >30 m from new canonical: no 301, noindex",
+   "indexable": true
+  }
+ ]
+}

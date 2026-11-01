@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   loadMunicipalities,
@@ -30,13 +30,24 @@ import {
   buildUrlSetXml,
   chunkSitemapPaths,
   resolveSiteOrigin,
-  rightsSitemapItem,
   sitemapEntryCount,
 } from "./lib/sitemap-xml.mjs";
 import {
+  annotateSpotIndexQuality,
+  annotateWorkAndLocationIndexQuality,
+  applySameWorkMerges,
+  countIndexQualityReport,
+  flattenRedirectChains,
+  indexShrinkLastmodPaths,
+  loadSameWorkMergeMap,
+  loadTierASpotIds,
+  spotSitemapLocales,
+  validateIndexQualityData,
+  SITEMAP_INDEX_SHRINK_LASTMOD,
+} from "./lib/index-quality.mjs";
+import {
   affiliatePilotSitemapPaths,
   contentChangedSitemapPaths,
-  indexableLocations,
   lastmodForPath,
   parseSitemapLastmods,
   pathsForRenamedSpots,
@@ -78,16 +89,6 @@ const PUBLIC_ROUTES = [
   ["/", 1],
   ["/pilgrimage/anime", 0.9],
   ["/pilgrimage/locations", 0.9],
-  ["/game", 0.85],
-  ["/game/anime", 0.85],
-  ["/game/anime-tuxun", 0.8],
-  ["/game/tuxun", 0.7],
-  ["/game/foreign", 0.7],
-  ["/game/solo", 0.7],
-  ["/game/history-year", 0.6],
-  ["/game/history-tuxun", 0.6],
-  ["/character", 0.6],
-  ["/privacy", 0.4],
 ];
 
 function subjectIdFromQuestion(question) {
@@ -355,6 +356,12 @@ async function main() {
     }
   }
 
+  const tierA = await loadTierASpotIds();
+  const mergeMap = await loadSameWorkMergeMap();
+  validateIndexQualityData(spots, tierA, mergeMap);
+  applySameWorkMerges(spots, mergeMap);
+  flattenRedirectChains(spots);
+
   const visibleSpots = Object.values(spots).filter((spot) => !spot.redirectTo);
   const bocchiSubjectIds = new Set(
     subjects
@@ -521,6 +528,23 @@ async function main() {
   for (const location of locations) {
     location.isCoastal = municipalityTouchesSea(placeBySlug.get(location.slug));
   }
+
+  annotateSpotIndexQuality(spots, tierA);
+  annotateWorkAndLocationIndexQuality(animes, locations, spots, tierA);
+  const indexQuality = countIndexQualityReport(
+    spots,
+    animes,
+    locations,
+    tierA,
+    mergeMap,
+  );
+  const shrinkLastmodPaths = indexShrinkLastmodPaths({
+    mergeMap,
+    spots,
+    animes,
+    locations,
+    tierA,
+  });
 
   /** @type {Record<string, string>} */
   const locationRedirects = {};
@@ -758,25 +782,30 @@ async function main() {
     priority,
     zhTw: pilgrimageSitemapPath(route),
   }));
-  canonicalPaths.push(rightsSitemapItem());
   for (const anime of animes) {
+    if (!anime.indexable) continue;
     canonicalPaths.push({
       path: `/pilgrimage/anime/${anime.slug}`,
       priority: 0.75,
       zhTw: true,
     });
   }
-  for (const location of indexableLocations(locations)) {
+  for (const location of locations) {
+    if (!location.indexable) continue;
     canonicalPaths.push({
       path: `/pilgrimage/locations/${location.slug}`,
       priority: 0.7,
       zhTw: true,
     });
   }
+  const spotSitemapLocaleList = spotSitemapLocales();
   for (const spot of visibleSpots) {
+    if (!spot.indexable) continue;
     canonicalPaths.push({
       path: `/pilgrimage/spots/${encodeURIComponent(spot.id)}`,
       priority: 0.6,
+      locales: spotSitemapLocaleList,
+      includeZh: false,
       zhTw: true,
     });
   }
@@ -878,6 +907,11 @@ async function main() {
   const unchangedFallback = SITEMAP_BASELINE_LASTMOD;
   const sitemapChunks = chunkSitemapPaths(canonicalPaths);
   await mkdir(SITEMAP_DIR, { recursive: true });
+  for (const file of sitemapFiles) {
+    if (/^\d+\.xml$/u.test(file)) {
+      await unlink(path.join(SITEMAP_DIR, file));
+    }
+  }
   const sitemapUrls = [];
   for (let file = 0; file < sitemapChunks.length; file += 1) {
     const chunk = sitemapChunks[file];
@@ -894,9 +928,15 @@ async function main() {
           contentChangedOn: step1LastmodOn,
           affiliatePilot: affiliatePilotPaths,
           affiliatePilotOn: SITEMAP_AFFILIATE_PILOT_LASTMOD,
+          indexShrink: shrinkLastmodPaths,
+          indexShrinkOn: SITEMAP_INDEX_SHRINK_LASTMOD,
           fallback: unchangedFallback,
         }),
-        { zhTw: Boolean(item.zhTw) },
+        {
+          zhTw: Boolean(item.zhTw),
+          includeZh: item.includeZh,
+          locales: item.locales,
+        },
       ),
     );
     const xml = buildUrlSetXml(entries);
@@ -951,6 +991,7 @@ async function main() {
       locations: Object.keys(redirectMap.locations).length,
       spots: Object.keys(redirectMap.spots).length,
     },
+    indexQuality,
   };
 
   const nav = {
@@ -1029,6 +1070,7 @@ async function main() {
         sitemap: report.sitemap,
         zhTw: report.zhTw,
         mergedGroupCount: report.anime.mergedGroups,
+        indexQuality: report.indexQuality,
       },
       null,
       2,

@@ -91,28 +91,55 @@ export function localizedPageMetadata(
  * Pilgrimage hreflang. zh-Hant and zh-TW are added only when that URL has a
  * Traditional page. Other pilgrimage URLs keep zh/ja/en/x-default.
  */
+export interface PilgrimageSeoOptions {
+  indexable?: boolean;
+  includeZh?: boolean;
+}
+
+const NOINDEX_FOLLOW = {
+  index: false,
+  follow: true,
+  googleBot: { index: false, follow: true },
+} as const;
+
 export function pilgrimagePageMetadata(
   locale: PilgrimageLocale,
   path: string,
   title: string,
   description: string,
   includeZhTw: boolean,
+  options: PilgrimageSeoOptions = {},
 ): Metadata {
   const canonical = withPilgrimageLocale(path, locale);
-  const languages: Record<string, string> = localeAlternates(path);
-  if (includeZhTw) {
-    const zhTwUrl = absoluteUrl(withPilgrimageLocale(path, "zh-tw"));
-    Object.assign(languages, traditionalChineseAlternates(zhTwUrl));
-  }
+  const indexable = options.indexable !== false;
+  const includeZh = options.includeZh !== false;
+
   const metadata: Metadata = {
     alternates: {
       canonical,
-      languages,
     },
     openGraph: {
       url: canonical,
     },
   };
+
+  if (indexable) {
+    const languages: Record<string, string> = includeZh
+      ? localeAlternates(path)
+      : {
+          ja: absoluteUrl(withPilgrimageLocale(path, "ja")),
+          en: absoluteUrl(withPilgrimageLocale(path, "en")),
+          "x-default": absoluteUrl(withPilgrimageLocale(path, "en")),
+        };
+    if (includeZhTw) {
+      const zhTwUrl = absoluteUrl(withPilgrimageLocale(path, "zh-tw"));
+      Object.assign(languages, traditionalChineseAlternates(zhTwUrl));
+    }
+    metadata.alternates = { canonical, languages };
+  } else {
+    metadata.robots = NOINDEX_FOLLOW;
+  }
+
   if (title.trim()) {
     metadata.title = { absolute: title };
     metadata.openGraph = { ...metadata.openGraph, title };
@@ -124,6 +151,11 @@ export function pilgrimagePageMetadata(
     metadata.twitter = { ...metadata.twitter, description };
   }
   return metadata;
+}
+
+/** noindex,follow for game hub and subpages (see GAME_HUB_INDEXABLE). */
+export function gameNoindexMetadata(): Metadata {
+  return { robots: NOINDEX_FOLLOW };
 }
 
 /**

@@ -136,12 +136,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const fields = spotSeoFields(spot, locale);
   const seo = spotPageSeo(locale, spot, fields);
   const path = `/pilgrimage/spots/${id}`;
+  const spotIndexable = locale !== "zh" && spot.indexable === true;
   const metadata = pilgrimagePageMetadata(
     locale,
     path,
     seo.title,
     seo.description,
-    true,
+    spotIndexable,
+    { indexable: spotIndexable, includeZh: false },
   );
   const og = loadSpotOg(locale, spot.id);
   if (og.status !== "ready") return metadata;
@@ -168,6 +170,17 @@ export default async function PilgrimageSpotPage({ params }: Props) {
   const directionsUrl = googleMapsDirectionsUrl(spot.lat, spot.lng);
   const streetViewUrl = googleStreetViewUrl(spot.lat, spot.lng);
   const samePlace = samePlaceSections(spot, locale);
+  const mergedScenes = (spot.mergedFrom ?? []).flatMap((mergedId) => {
+    const merged = getSpotById(mergedId);
+    if (!merged) return [];
+    return [
+      {
+        id: mergedId,
+        title: pickLocalizedText(merged.title, locale),
+        episode: pickMaybeLocalizedText(merged.episodeContext, locale),
+      },
+    ];
+  });
 
   const affiliateInput = {
     pageType: "spot" as const,
@@ -266,6 +279,27 @@ export default async function PilgrimageSpotPage({ params }: Props) {
                 {copy.episode}
               </h3>
               <p className="mt-2 text-sm text-pink-50/75">{episode}</p>
+            </section>
+          ) : null}
+
+          {mergedScenes.length > 0 ? (
+            <section className="mt-6" data-testid="merged-scenes">
+              <h3 className="text-xs font-black tracking-[0.16em] text-cyan-100/70 uppercase">
+                {copy.mergedScenes}
+              </h3>
+              <ul className="mt-2 grid gap-2 text-sm leading-6 text-pink-50/75">
+                {mergedScenes.map((scene) => (
+                  <li
+                    key={scene.id}
+                    className="rounded-lg bg-white/5 px-3 py-2"
+                  >
+                    <p className="font-semibold text-pink-100">{scene.title}</p>
+                    {scene.episode ? (
+                      <p className="mt-1 text-pink-50/70">{scene.episode}</p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
 
