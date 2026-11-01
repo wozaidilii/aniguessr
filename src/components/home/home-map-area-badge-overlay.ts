@@ -9,6 +9,7 @@ import {
   formatAreaBadgeCount,
   homeMapAreaBadgeZoomBand,
   placeAreaBadgeCenters,
+  placePrefectureBadgeCenters,
   type HomeMapAreaBadgeKind,
   type AxisRect,
 } from "~/lib/home-map-area-badge-format";
@@ -215,11 +216,18 @@ export class HomeMapAreaBadgeOverlay {
       })
       .filter((value): value is NonNullable<typeof value> => value !== null);
 
-    const placed = placeAreaBadgeCenters(
-      candidates.map(({ id, count, x, y }) => ({ id, count, x, y })),
-      obstacles,
-      viewportInset,
-    );
+    const placed =
+      kind === "pref"
+        ? placePrefectureBadgeCenters(
+            candidates.map(({ id, count, x, y }) => ({ id, count, x, y })),
+            obstacles,
+            viewportInset,
+          )
+        : placeAreaBadgeCenters(
+            candidates.map(({ id, count, x, y }) => ({ id, count, x, y })),
+            obstacles,
+            viewportInset,
+          );
     const placedIds = new Set(placed.map((item) => item.id));
     const labelById = new Map(candidates.map((item) => [item.id, item.label]));
 
