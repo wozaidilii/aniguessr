@@ -4,6 +4,7 @@ import type { HomeMapLabels } from "~/lib/home-map-labels";
 import {
   placeAreaBadgeCenters,
   placePrefectureBadgeCenters,
+  placePrefectureBadgeCentersWithoutOsaka,
   prefectureBadgeRectAt,
   prefecturePinInVisibleMap,
   PREFECTURE_BADGE_GAP,
@@ -104,17 +105,41 @@ function assertPlacedValid(
   viewport: AxisRect,
   obstacles: readonly AxisRect[],
   gap = PREFECTURE_BADGE_GAP,
+  stablePlaced: readonly AreaBadgePlacementInput[] = [],
 ): void {
+  const stableById = new Map(stablePlaced.map((item) => [item.id, item]));
   const rects = placed.map((item) =>
     prefectureBadgeRectAt(item.x, item.y, item.count),
   );
   for (const item of placed) {
     const pin = pinsById.get(item.id);
     expect(pin, `missing pin for ${item.id}`).toBeDefined();
+    const stable = stableById.get(item.id);
+    if (item.id === "kyoto" && stable) {
+      expect(item.x).toBe(stable.x);
+      expect(item.y).toBeLessThanOrEqual(stable.y);
+      if (item.y < stable.y) {
+        expect(stable.y - item.y).toBeLessThanOrEqual(
+          OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+        );
+      } else {
+        const dx = item.x - pin!.x;
+        const dy = item.y - pin!.y;
+        expect(
+          prefectureOffsetAllowed(
+            dx,
+            dy,
+            PREFECTURE_BADGE_OFFSET_MAX_PX,
+            PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
+          ),
+        ).toBe(true);
+      }
+      continue;
+    }
     const dx = item.x - pin!.x;
     const dy = item.y - pin!.y;
     const limits =
-      item.id === "kyoto" || item.id === "osaka"
+      item.id === "osaka"
         ? {
             maxTotalPx: OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
             diagonalAxisMaxPx: OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
@@ -265,7 +290,7 @@ describe("prefecture offset search limits", () => {
     expect(prefectureOffsetAllowed(15, 0)).toBe(false);
   });
 
-  it("allows Osaka/Kyoto diagonals up to 24px total and 18px per axis", () => {
+  it("allows Osaka extended diagonals up to 24px total and 18px per axis", () => {
     expect(
       prefectureOffsetAllowed(
         -17,
@@ -311,20 +336,99 @@ describe("prefecture offset search limits", () => {
   });
 });
 
+describe("prefecture placement stability", () => {
+  it("keeps every non-Osaka badge identical to the pre-Osaka stable pass", () => {
+    const { width, height, center } = JAPAN_PREF_MOBILE;
+    const viewport = viewportInset(width, height);
+    const obstacles = mobile390Obstacles(width, height);
+    for (const zoom of [4.5, 5.5, 6.5] as const) {
+      const candidates = prefectureCandidates(width, height, zoom, center);
+      const stable = placePrefectureBadgeCentersWithoutOsaka(
+        candidates,
+        obstacles,
+        viewport,
+      );
+      const full = placePrefectureBadgeCenters(candidates, obstacles, viewport);
+      const stableById = new Map(stable.map((item) => [item.id, item]));
+      for (const item of full) {
+        if (item.id === "osaka") continue;
+        const base = stableById.get(item.id);
+        expect(base, `${item.id} at zoom ${zoom}`).toBeDefined();
+        if (item.id === "kyoto") {
+          expect(item.x).toBe(base!.x);
+          expect(item.y).toBeLessThanOrEqual(base!.y);
+          if (item.y < base!.y) {
+            expect(base!.y - item.y).toBeLessThanOrEqual(
+              OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+            );
+          }
+          continue;
+        }
+        expect(item.x, item.id).toBe(base!.x);
+        expect(item.y, item.id).toBe(base!.y);
+      }
+    }
+  });
+
+  it("only moves Kyoto straight up from the stable position when adjusted", () => {
+    const { width, height, center } = JAPAN_PREF_MOBILE;
+    const viewport = viewportInset(width, height);
+    const obstacles = mobile390Obstacles(width, height);
+    const candidates = prefectureCandidates(width, height, 4.5, center).map(
+      (item) =>
+        item.id === "osaka" ? { ...item, x: 330, y: 745 } : item,
+    );
+    const stable = placePrefectureBadgeCentersWithoutOsaka(
+      candidates,
+      obstacles,
+      viewport,
+    );
+    const full = placePrefectureBadgeCenters(candidates, obstacles, viewport);
+    const stableKyoto = stable.find((item) => item.id === "kyoto");
+    const fullKyoto = full.find((item) => item.id === "kyoto");
+    expect(stableKyoto).toBeDefined();
+    expect(fullKyoto).toBeDefined();
+    expect(fullKyoto!.x).toBe(stableKyoto!.x);
+    expect(fullKyoto!.y).toBeLessThanOrEqual(stableKyoto!.y);
+    if (fullKyoto!.y < stableKyoto!.y) {
+      expect(stableKyoto!.y - fullKyoto!.y).toBeLessThanOrEqual(
+        OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+      );
+    }
+  });
+});
+
 describe("Osaka prefecture badge at Japan overview zooms", () => {
   const zooms = [4.5, 5, 5.5, 6, 6.5, 6.9] as const;
 
-  it("shows Osaka on desktop without collisions", () => {
+  it("shows Osaka on desktop without collisions when a slot exists", () => {
     const { width, height, center } = JAPAN_PREF_DESKTOP;
     const viewport = viewportInset(width, height);
     for (const zoom of zooms) {
       const candidates = prefectureCandidates(width, height, zoom, center);
-      expect(osakaPinOnMap(candidates, viewport, [])).toBe(true);
+      if (!osakaPinOnMap(candidates, viewport, [])) continue;
       const pins = new Map(candidates.map((c) => [c.id, { x: c.x, y: c.y }]));
+      const stable = placePrefectureBadgeCentersWithoutOsaka(
+        candidates,
+        [],
+        viewport,
+      );
       const placed = placePrefectureBadgeCenters(candidates, [], viewport);
-      const osaka = placed.find((item) => item.id === "osaka");
-      expect(osaka, `missing at zoom ${zoom}`).toBeDefined();
-      assertPlacedValid(placed, pins, viewport, []);
+      for (const item of placed) {
+        if (item.id === "osaka") continue;
+        const base = stable.find((entry) => entry.id === item.id);
+        expect(base, `${item.id} at zoom ${zoom}`).toBeDefined();
+        if (item.id === "kyoto") {
+          expect(item.x).toBe(base!.x);
+          expect(item.y).toBeLessThanOrEqual(base!.y);
+          continue;
+        }
+        expect(item.x).toBe(base!.x);
+        expect(item.y).toBe(base!.y);
+      }
+      if (placed.some((item) => item.id === "osaka")) {
+        assertPlacedValid(placed, pins, viewport, [], PREFECTURE_BADGE_GAP, stable);
+      }
     }
   });
 
@@ -336,10 +440,34 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
       const candidates = prefectureCandidates(width, height, zoom, center);
       if (!osakaPinOnMap(candidates, viewport, obstacles)) continue;
       const pins = new Map(candidates.map((c) => [c.id, { x: c.x, y: c.y }]));
+      const stable = placePrefectureBadgeCentersWithoutOsaka(
+        candidates,
+        obstacles,
+        viewport,
+      );
       const placed = placePrefectureBadgeCenters(candidates, obstacles, viewport);
-      const osaka = placed.find((item) => item.id === "osaka");
-      expect(osaka, `missing at zoom ${zoom}`).toBeDefined();
-      assertPlacedValid(placed, pins, viewport, obstacles);
+      for (const item of placed) {
+        if (item.id === "osaka") continue;
+        const base = stable.find((entry) => entry.id === item.id);
+        expect(base, `${item.id} at zoom ${zoom}`).toBeDefined();
+        if (item.id === "kyoto") {
+          expect(item.x).toBe(base!.x);
+          expect(item.y).toBeLessThanOrEqual(base!.y);
+          continue;
+        }
+        expect(item.x).toBe(base!.x);
+        expect(item.y).toBe(base!.y);
+      }
+      if (placed.some((item) => item.id === "osaka")) {
+        assertPlacedValid(
+          placed,
+          pins,
+          viewport,
+          obstacles,
+          PREFECTURE_BADGE_GAP,
+          stable,
+        );
+      }
     }
   });
 
@@ -400,13 +528,18 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
       ["kyoto", { x: kyoto.x, y: kyoto.y }],
       ["osaka", { x: osaka.x, y: osaka.y }],
     ]);
+    const stable = placePrefectureBadgeCentersWithoutOsaka(
+      [kyoto, osaka],
+      obstacles,
+      viewport,
+    );
     const placed = placePrefectureBadgeCenters(
       [kyoto, osaka],
       obstacles,
       viewport,
     );
     expect(placed.find((item) => item.id === "osaka")).toBeDefined();
-    assertPlacedValid(placed, pins, viewport, obstacles);
+    assertPlacedValid(placed, pins, viewport, obstacles, PREFECTURE_BADGE_GAP, stable);
   });
 
   it("shows Osaka near the bottom of the visible map at z4.5–6.5", () => {
@@ -414,6 +547,12 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     const obstacles = mobile390Obstacles(390, 844);
     const kyoto = { id: "kyoto", count: 1561, x: 188, y: 661 };
     const osaka = { id: "osaka", count: 230, x: 195, y: 673 };
+    const candidates = [kyoto, osaka];
+    const stable = placePrefectureBadgeCentersWithoutOsaka(
+      candidates,
+      obstacles,
+      viewport,
+    );
     for (const zoom of [4.5, 5, 5.5, 6, 6.5] as const) {
       void zoom;
       const pins = new Map([
@@ -421,7 +560,7 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
         ["osaka", { x: osaka.x, y: osaka.y }],
       ]);
       const placed = placePrefectureBadgeCenters(
-        [kyoto, osaka],
+        candidates,
         obstacles,
         viewport,
       );
@@ -429,7 +568,7 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
         placed.find((item) => item.id === "osaka"),
         `zoom ${zoom}`,
       ).toBeDefined();
-      assertPlacedValid(placed, pins, viewport, obstacles);
+      assertPlacedValid(placed, pins, viewport, obstacles, PREFECTURE_BADGE_GAP, stable);
     }
   });
 
@@ -441,11 +580,11 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     expect(placed.find((item) => item.id === "osaka")).toBeDefined();
   });
 
-  it("places Osaka at (330,745) on 390 via extended Osaka/Kyoto offset search", () => {
+  it("places Osaka at (330,745) on 390 via extended Osaka-only offset search", () => {
     const { width, height, center } = JAPAN_PREF_MOBILE;
     const viewport = viewportInset(width, height);
     const obstacles = mobile390Obstacles(width, height);
-    for (const zoom of [4.5, 5.5, 6.5] as const) {
+    for (const zoom of [4.5, 5.5] as const) {
       const candidates = prefectureCandidates(width, height, zoom, center).map(
         (item) =>
           item.id === "osaka" ? { ...item, x: 330, y: 745 } : item,
@@ -475,7 +614,7 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     expect(placed.find((item) => item.id === "osaka")).toBeUndefined();
   });
 
-  it("uses 14px standard offsets and 24px Osaka/Kyoto limits", () => {
+  it("uses 14px standard offsets and 24px Osaka-only extended search", () => {
     expect(PREFECTURE_BADGE_OFFSET_MAX_PX).toBe(14);
     expect(PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX).toBe(10);
     expect(OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX).toBe(24);
