@@ -93,7 +93,19 @@ function createBadgeElement(
     button.style.top = `${y}px`;
     button.dataset.badgeKind = "pref";
     appendBadgeContent(button, label, locale);
-    button.addEventListener("click", () => onPrefectureZoom(label));
+    let activateFromPointer = false;
+    button.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" || event.pointerType === "touch") {
+        activateFromPointer = true;
+      }
+    });
+    button.addEventListener("click", () => {
+      onPrefectureZoom(label);
+      if (activateFromPointer) {
+        button.blur();
+        activateFromPointer = false;
+      }
+    });
     return button;
   }
   const href = areaBadgeLocationHref(label, "area", locale);

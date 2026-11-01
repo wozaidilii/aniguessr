@@ -144,6 +144,8 @@ export function placeAreaBadgeCenters(
 }
 
 /** Prefecture pills: zoom in [0, 7). Area pills: [7, 12). */
+export const HOME_MAP_AREA_BADGE_MIN_ZOOM = 7;
+
 export function homeMapAreaBadgeZoomBand(zoom: number): "pref" | "area" | "none" {
   if (zoom >= 12) return "none";
   if (zoom >= 7) return "area";

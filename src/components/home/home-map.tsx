@@ -20,9 +20,11 @@ import {
   spotCollection,
 } from "~/components/home/home-map-layers";
 import { HomeMapAreaBadgeOverlay } from "~/components/home/home-map-area-badge-overlay";
+import { homeMapAreaBadgeZoomBand } from "~/lib/home-map-area-badge-format";
 import {
-  homeMapAreaBadgeZoomBand,
-} from "~/lib/home-map-area-badge-format";
+  prefectureFocusZoom,
+  prefectureZoomBounds,
+} from "~/lib/home-map-prefecture-zoom";
 import {
   KANTO_INITIAL_CENTER,
   KANTO_INITIAL_ZOOM,
@@ -212,25 +214,29 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       return [];
     }
 
-    function zoomMapToLabelBounds(label: HomeMapLabel): void {
-      const { west, south, east, north } = label;
+    function zoomMapToPrefectureBounds(label: HomeMapLabel): void {
+      const bundle = resolveLabelBundle();
+      if (!bundle) return;
+      const box = prefectureZoomBounds(label.id, bundle.areas, label);
+      const { west, south, east, north } = box;
       if (![west, south, east, north].every(Number.isFinite)) return;
-      map.fitBounds(
-        [
-          [west, south],
-          [east, north],
-        ],
-        {
-          padding: {
-            top: homeMapTopPadding(map),
-            right: 48,
-            bottom: 48,
-            left: 48,
-          },
-          maxZoom: 14,
-          duration: prefersReducedMotion() ? 0 : 600,
-        },
+      const bounds = new maplibregl.LngLatBounds(
+        [west, south],
+        [east, north],
       );
+      const padding = {
+        top: homeMapTopPadding(map),
+        right: 48,
+        bottom: 48,
+        left: 48,
+      };
+      const camera = map.cameraForBounds(bounds, { padding, maxZoom: 14 });
+      if (!camera?.center || camera.zoom == null) return;
+      map.easeTo({
+        center: camera.center,
+        zoom: prefectureFocusZoom(camera.zoom),
+        duration: prefersReducedMotion() ? 0 : 600,
+      });
     }
 
     function ensureAreaBadgeOverlay(): void {
@@ -239,7 +245,7 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         locale,
         obstacleSelectors: BADGE_UI_OBSTACLES,
         getLabels: activeBadgeLabels,
-        onPrefectureZoom: zoomMapToLabelBounds,
+        onPrefectureZoom: zoomMapToPrefectureBounds,
       });
     }
     let googleUpgradeStarted = false;
