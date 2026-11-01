@@ -30,8 +30,6 @@ const JAPAN_PREF_MOBILE = {
   center: [136, 37] as [number, number],
 };
 
-const MOBILE_SHEET_HEIGHT = 372;
-
 function lngLatToPixel(
   lng: number,
   lat: number,
@@ -360,6 +358,16 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
         `zoom ${zoom}`,
       ).toBeDefined();
       assertPlacedValid(placed, pins, viewport, obstacles);
+    }
+  });
+
+  it("shows Osaka at x=330 when free slots exist above the sheet", () => {
+    const viewport = { left: 4, top: 4, right: 386, bottom: 840 };
+    const obstacles = mobile390Obstacles(390, 844);
+    for (const y of [730, 745] as const) {
+      const osaka = { id: "osaka", count: 230, x: 330, y };
+      const placed = placePrefectureBadgeCenters([osaka], obstacles, viewport);
+      expect(placed.find((item) => item.id === "osaka"), `y=${y}`).toBeDefined();
     }
   });
 

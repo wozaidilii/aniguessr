@@ -15,7 +15,8 @@ import {
 } from "~/lib/home-map-area-badge-format";
 import {
   attachHomeMapBadgeUiObstacleWatch,
-  resolveHomeMapBadgeUiObstacles,
+  resolveHomeMapAreaBadgeUiObstacles,
+  resolveHomeMapPrefectureBadgeUiObstacles,
 } from "~/lib/home-map-badge-ui-obstacles";
 
 export interface HomeMapAreaBadgeOverlayOptions {
@@ -110,19 +111,33 @@ function updateBadgeElement(
   x: number,
   y: number,
 ): void {
-  element.style.left = `${x}px`;
-  element.style.top = `${y}px`;
-  element.className = badgeClassName(label);
-  element.dataset.badgeKind = kind;
-  element.setAttribute("aria-label", areaBadgeAriaLabel(label, locale));
+  const left = `${x}px`;
+  const top = `${y}px`;
+  if (element.style.left !== left) element.style.left = left;
+  if (element.style.top !== top) element.style.top = top;
+  const className = badgeClassName(label);
+  if (element.className !== className) element.className = className;
+  if (element.dataset.badgeKind !== kind) element.dataset.badgeKind = kind;
+  const aria = areaBadgeAriaLabel(label, locale);
+  if (element.getAttribute("aria-label") !== aria) {
+    element.setAttribute("aria-label", aria);
+  }
   if (element instanceof HTMLAnchorElement) {
     const href = areaBadgeLocationHref(label, "area", locale);
-    if (href) element.href = href;
+    if (href && element.getAttribute("href") !== href) {
+      element.setAttribute("href", href);
+    }
   }
+  const countText = formatAreaBadgeCount(label.count);
   const countNode = element.querySelector(".ag-b-count");
-  if (countNode) countNode.textContent = formatAreaBadgeCount(label.count);
+  if (countNode && countNode.textContent !== countText) {
+    countNode.textContent = countText;
+  }
+  const tipText = areaBadgeTooltip(label, locale);
   const tipNode = element.querySelector(".ag-tip");
-  if (tipNode) tipNode.textContent = areaBadgeTooltip(label, locale);
+  if (tipNode && tipNode.textContent !== tipText) {
+    tipNode.textContent = tipText;
+  }
 }
 
 function badgeKindForElement(element: BadgeElement): HomeMapAreaBadgeKind | null {
@@ -139,8 +154,12 @@ export class HomeMapAreaBadgeOverlay {
   private readonly root: HTMLDivElement;
   private readonly getLabels: () => readonly HomeMapLabel[];
   private readonly pool = new Map<string, BadgeElement>();
-  private readonly onMove = (): void => this.sync();
+  private readonly onMove = (): void => {
+    this.sync();
+  };
   private detachObstacleWatch: (() => void) | null = null;
+  private syncDepth = 0;
+  private lastSyncKey = "";
 
   constructor(map: MapLibreMap, options: HomeMapAreaBadgeOverlayOptions) {
     this.map = map;
@@ -167,14 +186,26 @@ export class HomeMapAreaBadgeOverlay {
   }
 
   sync(): void {
+    if (this.syncDepth > 0) return;
+    this.syncDepth += 1;
+    try {
+      this.syncInner();
+    } finally {
+      this.syncDepth -= 1;
+    }
+  }
+
+  private syncInner(): void {
     const labels = this.getLabels();
     if (!labels.length) {
+      this.lastSyncKey = "";
       this.root.replaceChildren();
       this.pool.clear();
       return;
     }
     const band = homeMapAreaBadgeZoomBand(this.map.getZoom());
     if (band === "none") {
+      this.lastSyncKey = "";
       this.root.replaceChildren();
       this.pool.clear();
       return;
@@ -189,10 +220,13 @@ export class HomeMapAreaBadgeOverlay {
       right: viewport.right - margin,
       bottom: viewport.bottom - margin,
     };
-    const obstacles = resolveHomeMapBadgeUiObstacles(
-      this.map,
-      this.obstacleSelectors,
-    );
+    const obstacles =
+      kind === "pref"
+        ? resolveHomeMapPrefectureBadgeUiObstacles(
+            this.map,
+            this.obstacleSelectors,
+          )
+        : resolveHomeMapAreaBadgeUiObstacles(this.map, this.obstacleSelectors);
 
     const candidates = labels
       .map((label) => {
@@ -221,6 +255,12 @@ export class HomeMapAreaBadgeOverlay {
             viewportInset,
           );
     const placedIds = new Set(placed.map((item) => item.id));
+    const syncKey = `${kind}:${[...placedIds].sort().join(",")}:${placed.map((p) => `${p.id}@${p.x.toFixed(1)},${p.y.toFixed(1)}`).join("|")}`;
+    if (syncKey === this.lastSyncKey) {
+      return;
+    }
+    this.lastSyncKey = syncKey;
+
     const labelById = new Map(candidates.map((item) => [item.id, item.label]));
 
     for (const [id, element] of this.pool) {
