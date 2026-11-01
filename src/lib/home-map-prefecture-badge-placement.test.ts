@@ -8,6 +8,9 @@ import {
   prefecturePinInVisibleMap,
   PREFECTURE_BADGE_GAP,
   PREFECTURE_BADGE_OFFSET_MAX_PX,
+  PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
+  prefectureOffsetAllowed,
+  prefectureOffsetSearchPoints,
   OSAKA_PREFECTURE_OFFSET_MAX_PX,
   type AxisRect,
   type AreaBadgePlacementInput,
@@ -239,6 +242,34 @@ describe("placePrefectureBadgeCenters", () => {
   });
 });
 
+describe("prefecture offset search limits", () => {
+  it("allows cardinals up to 14px total distance", () => {
+    expect(prefectureOffsetAllowed(14, 0)).toBe(true);
+    expect(prefectureOffsetAllowed(0, -14)).toBe(true);
+    expect(prefectureOffsetAllowed(15, 0)).toBe(false);
+  });
+
+  it("caps diagonal moves at 10px per axis and 14px total distance", () => {
+    expect(prefectureOffsetAllowed(10, 10)).toBe(false);
+    expect(prefectureOffsetAllowed(10, 7)).toBe(true);
+    expect(prefectureOffsetAllowed(-17, -15)).toBe(false);
+    expect(PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX).toBe(10);
+  });
+
+  it("orders search points by Euclidean distance", () => {
+    const points = prefectureOffsetSearchPoints();
+    let last = 0;
+    for (const { dx, dy } of points) {
+      expect(prefectureOffsetAllowed(dx, dy)).toBe(true);
+      const dist = Math.hypot(dx, dy);
+      expect(dist).toBeLessThanOrEqual(PREFECTURE_BADGE_OFFSET_MAX_PX);
+      expect(dist + 1e-9).toBeGreaterThanOrEqual(last);
+      last = dist;
+    }
+    expect(points.some(({ dx, dy }) => dx === 7 && dy === 7)).toBe(true);
+  });
+});
+
 describe("Osaka prefecture badge at Japan overview zooms", () => {
   const zooms = [4.5, 5, 5.5, 6, 6.5, 6.9] as const;
 
@@ -361,17 +392,35 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     }
   });
 
-  it("shows Osaka at x=330 when free slots exist above the sheet", () => {
+  it("shows Osaka at x=330 when a cardinal slot exists above the sheet", () => {
     const viewport = { left: 4, top: 4, right: 386, bottom: 840 };
     const obstacles = mobile390Obstacles(390, 844);
-    for (const y of [730, 745] as const) {
-      const osaka = { id: "osaka", count: 230, x: 330, y };
-      const placed = placePrefectureBadgeCenters([osaka], obstacles, viewport);
-      expect(placed.find((item) => item.id === "osaka"), `y=${y}`).toBeDefined();
-    }
+    const osaka = { id: "osaka", count: 230, x: 330, y: 730 };
+    const placed = placePrefectureBadgeCenters([osaka], obstacles, viewport);
+    expect(placed.find((item) => item.id === "osaka")).toBeDefined();
   });
 
-  it("drops Osaka when no obstacle-free candidate exists within 32px of the pin", () => {
+  it("may drop Osaka at (330,745) on 390 when free slots exceed 14px offset", () => {
+    const { width, height, center } = JAPAN_PREF_MOBILE;
+    const viewport = viewportInset(width, height);
+    const obstacles = mobile390Obstacles(width, height);
+    const byZoom = new Map<number, boolean>();
+    for (const zoom of [4.5, 5.5, 6.5] as const) {
+      const candidates = prefectureCandidates(width, height, zoom, center).map(
+        (item) =>
+          item.id === "osaka" ? { ...item, x: 330, y: 745 } : item,
+      );
+      const placed = placePrefectureBadgeCenters(
+        candidates,
+        obstacles,
+        viewport,
+      );
+      byZoom.set(zoom, Boolean(placed.find((item) => item.id === "osaka")));
+    }
+    expect(byZoom.get(6.5)).toBe(false);
+  });
+
+  it("drops Osaka when no obstacle-free candidate exists within 14px offset search", () => {
     const viewport = viewportInset(390, 844);
     const obstacles = mobile390Obstacles(390, 844);
     const kyoto = { id: "kyoto", count: 1561, x: 188, y: 700 };
@@ -384,8 +433,9 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     expect(placed.find((item) => item.id === "osaka")).toBeUndefined();
   });
 
-  it("uses 14px outward search before Osaka/Kyoto pairing", () => {
+  it("uses 14px offset search and 32px Kyoto/Osaka pairing cap", () => {
     expect(PREFECTURE_BADGE_OFFSET_MAX_PX).toBe(14);
+    expect(PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX).toBe(10);
     expect(OSAKA_PREFECTURE_OFFSET_MAX_PX).toBe(32);
     expect(PREFECTURE_BADGE_GAP).toBe(2);
   });

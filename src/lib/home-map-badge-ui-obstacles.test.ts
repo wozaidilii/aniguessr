@@ -169,10 +169,8 @@ describe("HOME_MAP_BADGE_UI_OBSTACLE_WATCH_SELECTORS", () => {
     expect(HOME_GOOGLE_ATTRIBUTION_OBSTACLE_SELECTOR).not.toContain(
       "home-nearby-sheet",
     );
-    expect(
-      HOME_MAP_BADGE_UI_OBSTACLE_WATCH_SELECTORS.some(
-        (selector) => selector === ".home-nearby",
-      ),
-    ).toBe(false);
+    for (const selector of HOME_MAP_BADGE_UI_OBSTACLE_WATCH_SELECTORS) {
+      expect(selector).not.toBe(".home-nearby");
+    }
   });
 });
