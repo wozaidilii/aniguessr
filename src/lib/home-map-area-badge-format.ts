@@ -64,6 +64,65 @@ export function areaBadgeBoxSize(count: number): { width: number; height: number
   return { width, height };
 }
 
+function badgeTextWidthForTier(text: string, tier: AreaBadgeSizeTier): number {
+  const digitWidth = tier === "s" ? 7.25 : tier === "m" ? 7.97 : 8.45;
+  const commaWidth = tier === "s" ? 3.5 : tier === "m" ? 4 : 4.5;
+  let width = 0;
+  for (const ch of text) {
+    width += ch === "," ? commaWidth : digitWidth;
+  }
+  return width;
+}
+
+/** Border-box outer size for prefecture badges (matches .ag-b tier CSS). */
+export function prefectureBadgeBoxSize(count: number): {
+  width: number;
+  height: number;
+} {
+  const tier = areaBadgeSizeTier(count);
+  const height = tier === "s" ? 26 : tier === "m" ? 32 : 38;
+  const horizontalPad = tier === "s" ? 12 : tier === "m" ? 14 : 16;
+  const textWidth = badgeTextWidthForTier(formatAreaBadgeCount(count), tier);
+  const width = Math.max(
+    height,
+    horizontalPad + textWidth + BADGE_BORDER_PX * 2,
+  );
+  return { width, height };
+}
+
+export function prefecturePinInViewport(
+  pinX: number,
+  pinY: number,
+  viewport: AxisRect,
+): boolean {
+  return (
+    pinX >= viewport.left &&
+    pinX <= viewport.right &&
+    pinY >= viewport.top &&
+    pinY <= viewport.bottom
+  );
+}
+
+export function prefecturePinInVisibleMap(
+  pinX: number,
+  pinY: number,
+  viewport: AxisRect,
+  obstacles: readonly AxisRect[] = [],
+): boolean {
+  if (!prefecturePinInViewport(pinX, pinY, viewport)) return false;
+  for (const obstacle of obstacles) {
+    if (
+      pinX >= obstacle.left &&
+      pinX <= obstacle.right &&
+      pinY >= obstacle.top &&
+      pinY <= obstacle.bottom
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export interface AreaBadgePlacementInput {
   id: string;
   count: number;
@@ -79,8 +138,38 @@ export interface AxisRect {
 }
 
 const BADGE_GAP = 3;
+export const PREFECTURE_BADGE_GAP = 2;
 export const PREFECTURE_BADGE_OFFSET_MAX_PX = 14;
 const OSAKA_KYOTO_PAIR_OFFSET_MAX_PX = 32;
+const BADGE_BORDER_PX = 1.5;
+
+/** Neighbours evicted before dropping Osaka when space is tight (lowest priority first). */
+const OSAKA_EVICTION_PREF_IDS: readonly string[] = [
+  "nara",
+  "okayama",
+  "wakayama",
+  "hyogo",
+  "shiga",
+  "mie",
+  "tokushima",
+  "kagawa",
+  "ehime",
+  "kochi",
+  "tottori",
+  "shimane",
+  "gifu",
+  "aichi",
+  "fukui",
+  "ishikawa",
+  "toyama",
+  "nagasaki",
+  "saga",
+  "oita",
+  "kumamoto",
+  "miyazaki",
+  "kagoshima",
+  "fukuoka",
+];
 
 const PREF_OFFSET_DIRECTIONS: ReadonlyArray<{ dx: number; dy: number }> = [
   { dx: 0, dy: -1 },
@@ -110,7 +199,23 @@ export function badgeRectAt(centerX: number, centerY: number, count: number): Ax
   };
 }
 
-function badgeBlockedAt(
+export function prefectureBadgeRectAt(
+  centerX: number,
+  centerY: number,
+  count: number,
+): AxisRect {
+  const { width, height } = prefectureBadgeBoxSize(count);
+  const halfW = width / 2;
+  const halfH = height / 2;
+  return {
+    left: centerX - halfW,
+    top: centerY - halfH,
+    right: centerX + halfW,
+    bottom: centerY + halfH,
+  };
+}
+
+function prefectureBadgeBlockedAt(
   centerX: number,
   centerY: number,
   count: number,
@@ -119,7 +224,7 @@ function badgeBlockedAt(
   placedRects: readonly AxisRect[],
   gap: number,
 ): boolean {
-  const rect = badgeRectAt(centerX, centerY, count);
+  const rect = prefectureBadgeRectAt(centerX, centerY, count);
   if (
     rect.left < viewport.left ||
     rect.top < viewport.top ||
@@ -137,25 +242,16 @@ function badgeBlockedAt(
   return false;
 }
 
-function clampBadgeCenterIntoViewport(
+function prefectureOffsetWithin(
+  pinX: number,
+  pinY: number,
   centerX: number,
   centerY: number,
-  count: number,
-  viewport: AxisRect,
-): { x: number; y: number } {
-  const { width, height } = areaBadgeBoxSize(count);
-  const halfW = width / 2;
-  const halfH = height / 2;
-  return {
-    x: Math.min(
-      Math.max(centerX, viewport.left + halfW),
-      viewport.right - halfW,
-    ),
-    y: Math.min(
-      Math.max(centerY, viewport.top + halfH),
-      viewport.bottom - halfH,
-    ),
-  };
+  maxPx: number,
+): boolean {
+  return (
+    Math.abs(centerX - pinX) + Math.abs(centerY - pinY) <= maxPx
+  );
 }
 
 function findPrefectureBadgePosition(
@@ -165,44 +261,46 @@ function findPrefectureBadgePosition(
   placedRects: readonly AxisRect[],
   gap: number,
 ): { x: number; y: number } | null {
-  const tryAt = (x: number, y: number): { x: number; y: number } | null =>
-    badgeBlockedAt(x, y, candidate.count, viewport, obstacles, placedRects, gap)
-      ? null
-      : { x, y };
-
-  const center = tryAt(candidate.x, candidate.y);
-  if (center) return center;
-
-  for (const { dx, dy } of PREF_OFFSET_DIRECTIONS) {
-    for (let step = 1; step <= PREFECTURE_BADGE_OFFSET_MAX_PX; step += 1) {
-      const offset = tryAt(
-        candidate.x + dx * step,
-        candidate.y + dy * step,
-      );
-      if (offset) return offset;
-    }
+  const { x: pinX, y: pinY } = candidate;
+  if (!prefecturePinInVisibleMap(pinX, pinY, viewport, obstacles)) {
+    return null;
   }
 
-  const snapped = clampBadgeCenterIntoViewport(
-    candidate.x,
-    candidate.y,
-    candidate.count,
-    viewport,
-  );
-  if (
-    (snapped.x !== candidate.x || snapped.y !== candidate.y) &&
-    !badgeBlockedAt(
-      snapped.x,
-      snapped.y,
+  const tryAt = (x: number, y: number): { x: number; y: number } | null => {
+    if (
+      !prefectureOffsetWithin(
+        pinX,
+        pinY,
+        x,
+        y,
+        PREFECTURE_BADGE_OFFSET_MAX_PX,
+      )
+    ) {
+      return null;
+    }
+    return prefectureBadgeBlockedAt(
+      x,
+      y,
       candidate.count,
       viewport,
       obstacles,
       placedRects,
       gap,
     )
-  ) {
-    return snapped;
+      ? null
+      : { x, y };
+  };
+
+  const center = tryAt(pinX, pinY);
+  if (center) return center;
+
+  for (const { dx, dy } of PREF_OFFSET_DIRECTIONS) {
+    for (let step = 1; step <= PREFECTURE_BADGE_OFFSET_MAX_PX; step += 1) {
+      const offset = tryAt(pinX + dx * step, pinY + dy * step);
+      if (offset) return offset;
+    }
   }
+
   return null;
 }
 
@@ -221,30 +319,56 @@ function tryOsakaKyotoPrefecturePairing(
   const otherRects = placedRects.filter((_, index) => index !== kyotoIndex);
 
   for (let delta = 1; delta <= OSAKA_KYOTO_PAIR_OFFSET_MAX_PX; delta += 1) {
-    const kyotoAnchor = { ...kyoto, x: kyoto.x, y: kyoto.y - delta };
-    const kyotoPos = findPrefectureBadgePosition(
-      kyotoAnchor,
-      viewport,
-      obstacles,
-      otherRects,
-      gap,
-    );
-    if (!kyotoPos) continue;
-    const kyotoRect = badgeRectAt(kyotoPos.x, kyotoPos.y, kyoto.count);
-    const osakaAnchor = { ...osaka, x: osaka.x, y: osaka.y + delta };
-    const osakaPos = findPrefectureBadgePosition(
-      osakaAnchor,
-      viewport,
-      obstacles,
-      [...otherRects, kyotoRect],
-      gap,
-    );
-    if (!osakaPos) continue;
-    placed[kyotoIndex] = { ...kyoto, ...kyotoPos };
-    placedRects[kyotoIndex] = kyotoRect;
-    placed.push({ ...osaka, ...osakaPos });
-    placedRects.push(badgeRectAt(osakaPos.x, osakaPos.y, osaka.count));
-    return true;
+    for (const osakaSign of [1, -1] as const) {
+      const forcedKyoto = {
+        x: kyoto.x,
+        y: kyoto.y - delta,
+      };
+      if (
+        !prefecturePinInVisibleMap(kyoto.x, kyoto.y, viewport, obstacles) ||
+        prefectureBadgeBlockedAt(
+          forcedKyoto.x,
+          forcedKyoto.y,
+          kyoto.count,
+          viewport,
+          obstacles,
+          otherRects,
+          gap,
+        )
+      ) {
+        continue;
+      }
+      const kyotoRect = prefectureBadgeRectAt(
+        forcedKyoto.x,
+        forcedKyoto.y,
+        kyoto.count,
+      );
+      const forcedOsaka = {
+        x: osaka.x,
+        y: osaka.y + osakaSign * delta,
+      };
+      if (
+        !prefecturePinInVisibleMap(osaka.x, osaka.y, viewport, obstacles) ||
+        prefectureBadgeBlockedAt(
+          forcedOsaka.x,
+          forcedOsaka.y,
+          osaka.count,
+          viewport,
+          obstacles,
+          [...otherRects, kyotoRect],
+          gap,
+        )
+      ) {
+        continue;
+      }
+      placed[kyotoIndex] = { ...kyoto, ...forcedKyoto };
+      placedRects[kyotoIndex] = kyotoRect;
+      placed.push({ ...osaka, ...forcedOsaka });
+      placedRects.push(
+        prefectureBadgeRectAt(forcedOsaka.x, forcedOsaka.y, osaka.count),
+      );
+      return true;
+    }
   }
   return false;
 }
@@ -259,7 +383,9 @@ function tryOsakaPrefectureFallback(
 ): boolean {
   const commitOsaka = (position: { x: number; y: number }): void => {
     placed.push({ ...osaka, ...position });
-    placedRects.push(badgeRectAt(position.x, position.y, osaka.count));
+    placedRects.push(
+      prefectureBadgeRectAt(position.x, position.y, osaka.count),
+    );
   };
 
   if (
@@ -290,7 +416,49 @@ function tryOsakaPrefectureFallback(
     return true;
   }
 
-  return false;
+  const evictOrder = new Map(
+    OSAKA_EVICTION_PREF_IDS.map((id, index) => [id, index]),
+  );
+  while (true) {
+    let evictIndex = -1;
+    let evictRank = Number.POSITIVE_INFINITY;
+    let evictCount = Number.POSITIVE_INFINITY;
+    for (let index = 0; index < placed.length; index += 1) {
+      const item = placed[index];
+      if (!item) continue;
+      const listedRank = evictOrder.get(item.id);
+      if (listedRank === undefined && item.count >= osaka.count) continue;
+      const rank = listedRank ?? 10_000 + item.count;
+      if (
+        rank < evictRank ||
+        (rank === evictRank && item.count < evictCount)
+      ) {
+        evictIndex = index;
+        evictRank = rank;
+        evictCount = item.count;
+      }
+    }
+    if (evictIndex < 0) return false;
+    placed.splice(evictIndex, 1);
+    placedRects.splice(evictIndex, 1);
+    const retry = tryPlaceOsakaNow();
+    if (retry) {
+      commitOsaka(retry);
+      return true;
+    }
+    if (
+      tryOsakaKyotoPrefecturePairing(
+        osaka,
+        placed,
+        placedRects,
+        viewport,
+        obstacles,
+        gap,
+      )
+    ) {
+      return true;
+    }
+  }
 }
 
 /** Greedy placement: highest count first, 3px gap, skip on collision. */
@@ -340,7 +508,7 @@ export function placePrefectureBadgeCenters(
   candidates: readonly AreaBadgePlacementInput[],
   obstacles: readonly AxisRect[],
   viewport: AxisRect,
-  gap = BADGE_GAP,
+  gap = PREFECTURE_BADGE_GAP,
 ): AreaBadgePlacementInput[] {
   const sorted = [...candidates].sort((a, b) => b.count - a.count);
   const placed: AreaBadgePlacementInput[] = [];
@@ -357,7 +525,7 @@ export function placePrefectureBadgeCenters(
     if (position) {
       placed.push({ ...candidate, ...position });
       placedRects.push(
-        badgeRectAt(position.x, position.y, candidate.count),
+        prefectureBadgeRectAt(position.x, position.y, candidate.count),
       );
       continue;
     }
