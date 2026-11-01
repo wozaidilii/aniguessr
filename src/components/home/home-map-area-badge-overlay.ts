@@ -13,6 +13,10 @@ import {
   type HomeMapAreaBadgeKind,
   type AxisRect,
 } from "~/lib/home-map-area-badge-format";
+import {
+  attachHomeMapBadgeUiObstacleWatch,
+  resolveHomeMapBadgeUiObstacles,
+} from "~/lib/home-map-badge-ui-obstacles";
 
 export interface HomeMapAreaBadgeOverlayOptions {
   locale: HomeLocale;
@@ -32,28 +36,6 @@ function containerRect(map: MapLibreMap): AxisRect {
     right: rect.width,
     bottom: rect.height,
   };
-}
-
-function obstacleRects(
-  map: MapLibreMap,
-  selectors: readonly string[],
-): AxisRect[] {
-  const container = map.getContainer().getBoundingClientRect();
-  const rects: AxisRect[] = [];
-  for (const selector of selectors) {
-    for (const node of document.querySelectorAll(selector)) {
-      if (!(node instanceof HTMLElement)) continue;
-      const rect = node.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) continue;
-      rects.push({
-        left: rect.left - container.left,
-        top: rect.top - container.top,
-        right: rect.right - container.left,
-        bottom: rect.bottom - container.top,
-      });
-    }
-  }
-  return rects;
 }
 
 function appendBadgeContent(
@@ -158,6 +140,7 @@ export class HomeMapAreaBadgeOverlay {
   private readonly getLabels: () => readonly HomeMapLabel[];
   private readonly pool = new Map<string, BadgeElement>();
   private readonly onMove = (): void => this.sync();
+  private detachObstacleWatch: (() => void) | null = null;
 
   constructor(map: MapLibreMap, options: HomeMapAreaBadgeOverlayOptions) {
     this.map = map;
@@ -171,6 +154,12 @@ export class HomeMapAreaBadgeOverlay {
     map.on("moveend", this.onMove);
     map.on("zoomend", this.onMove);
     map.on("resize", this.onMove);
+    const watchRoot =
+      map.getContainer().closest(".home-map") ?? map.getContainer();
+    this.detachObstacleWatch = attachHomeMapBadgeUiObstacleWatch(
+      watchRoot,
+      this.onMove,
+    );
   }
 
   setLabels(_labels: readonly HomeMapLabel[]): void {
@@ -200,7 +189,10 @@ export class HomeMapAreaBadgeOverlay {
       right: viewport.right - margin,
       bottom: viewport.bottom - margin,
     };
-    const obstacles = obstacleRects(this.map, this.obstacleSelectors);
+    const obstacles = resolveHomeMapBadgeUiObstacles(
+      this.map,
+      this.obstacleSelectors,
+    );
 
     const candidates = labels
       .map((label) => {
@@ -264,6 +256,8 @@ export class HomeMapAreaBadgeOverlay {
     this.map.off("moveend", this.onMove);
     this.map.off("zoomend", this.onMove);
     this.map.off("resize", this.onMove);
+    this.detachObstacleWatch?.();
+    this.detachObstacleWatch = null;
     this.root.remove();
     this.pool.clear();
   }
