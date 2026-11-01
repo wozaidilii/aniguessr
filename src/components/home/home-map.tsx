@@ -13,22 +13,22 @@ import {
   type HomeOriginDetail,
 } from "~/components/home/home-events";
 import {
-  HOME_AREA_SOURCE,
   HOME_CLUSTER_SOURCE,
   HOME_DOTS_SOURCE,
-  HOME_PILL_LAYER_IDS,
-  HOME_PREF_SOURCE,
   installHomeMapLayers,
-  labelCollection,
   setHomeGeoJson,
   spotCollection,
 } from "~/components/home/home-map-layers";
+import { HomeMapAreaBadgeOverlay } from "~/components/home/home-map-area-badge-overlay";
+import {
+  homeMapAreaBadgeZoomBand,
+} from "~/lib/home-map-area-badge-format";
 import {
   KANTO_INITIAL_CENTER,
   KANTO_INITIAL_ZOOM,
   KANTO_SHONAN_BOUNDS,
 } from "~/lib/home-map-bounds";
-import { loadHomeMapLabels, type HomeMapLabels } from "~/lib/home-map-labels";
+import { loadHomeMapLabels, type HomeMapLabel, type HomeMapLabels } from "~/lib/home-map-labels";
 import {
   HOME_IDEOGRAPH_FONT,
   tuneHomeMapStyle,
@@ -180,8 +180,48 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     let nearbyBoundsReady = false;
     let boundsPublishTimer = 0;
     let activeBasemap: HomeMapBasemapKind = "openfreemap";
-    let mapInteractionsBound = false;
+    let areaBadgeOverlay: HomeMapAreaBadgeOverlay | null = null;
+
+    const BADGE_UI_OBSTACLES = [
+      ".home-map-searchstack",
+      ".home-chip-scrim",
+      ".home-work-search",
+      ".home-nearby",
+      ".home-map-tools",
+      ".maplibregl-ctrl-attrib",
+      ".google-map-tiles-attribution",
+    ] as const;
+
+    function resolveLabelBundle(): HomeMapLabels | null {
+      if (!labelsReady) return null;
+      if (focusedId && catalogReady) {
+        return aggregateFocusedLabels(
+          labelsReady,
+          catalogReady.spots.filter((spot) => spot.subjectId === focusedId),
+        );
+      }
+      return labelsReady;
+    }
+
+    function activeBadgeLabels(): HomeMapLabel[] {
+      const bundle = resolveLabelBundle();
+      if (!bundle) return [];
+      const band = homeMapAreaBadgeZoomBand(map.getZoom());
+      if (band === "pref") return [...bundle.prefectures];
+      if (band === "area") return [...bundle.areas];
+      return [];
+    }
+
+    function ensureAreaBadgeOverlay(): void {
+      if (areaBadgeOverlay) return;
+      areaBadgeOverlay = new HomeMapAreaBadgeOverlay(map, {
+        locale,
+        obstacleSelectors: BADGE_UI_OBSTACLES,
+        getLabels: activeBadgeLabels,
+      });
+    }
     let googleUpgradeStarted = false;
+    let mapInteractionsBound = false;
     let detachQuotaMonitor: (() => void) | undefined;
     const attemptGoogleBasemap = shouldAttemptGoogleMapTilesBasemap();
     if (attemptGoogleBasemap) {
@@ -318,35 +358,6 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
         map.on("mouseleave", "home-clusters", () => pointCursor(""));
         map.on("mouseenter", "home-points", () => pointCursor("pointer"));
         map.on("mouseleave", "home-points", () => pointCursor(""));
-        for (const layerId of HOME_PILL_LAYER_IDS) {
-          map.on("mouseenter", layerId, () => pointCursor("pointer"));
-          map.on("mouseleave", layerId, () => pointCursor(""));
-          map.on("click", layerId, (event) => {
-            const props = event.features?.[0]?.properties;
-            if (!props) return;
-            const west = Number(props.west);
-            const south = Number(props.south);
-            const east = Number(props.east);
-            const north = Number(props.north);
-            if (![west, south, east, north].every(Number.isFinite)) return;
-            map.fitBounds(
-              [
-                [west, south],
-                [east, north],
-              ],
-              {
-                padding: {
-                  top: homeMapTopPadding(map),
-                  right: 48,
-                  bottom: 48,
-                  left: 48,
-                },
-                maxZoom: 14,
-                duration: prefersReducedMotion() ? 0 : 600,
-              },
-            );
-          });
-        }
         map.on("click", "home-clusters", (event) => {
           const feature = event.features?.[0];
           if (feature?.geometry.type !== "Point") return;
@@ -504,24 +515,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
     }
 
     function pushLabels() {
-      if (!labelsReady || !map.getSource(HOME_AREA_SOURCE)) return;
-      const labels =
-        focusedId && catalogReady
-          ? aggregateFocusedLabels(
-              labelsReady,
-              catalogReady.spots.filter((spot) => spot.subjectId === focusedId),
-            )
-          : labelsReady;
-      setHomeGeoJson(
-        map,
-        HOME_AREA_SOURCE,
-        labelCollection(labels.areas, locale),
-      );
-      setHomeGeoJson(
-        map,
-        HOME_PREF_SOURCE,
-        labelCollection(labels.prefectures, locale),
-      );
+      ensureAreaBadgeOverlay();
+      areaBadgeOverlay?.sync();
     }
 
     function showFocus() {
@@ -716,6 +711,8 @@ export function HomeMap({ locale }: { locale: HomeLocale }) {
       observer.disconnect();
       sheetObserver.disconnect();
       mountObserver.disconnect();
+      areaBadgeOverlay?.destroy();
+      areaBadgeOverlay = null;
       youRef.current?.remove();
       youRef.current = null;
       map.remove();
