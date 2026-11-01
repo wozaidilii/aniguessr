@@ -11,6 +11,8 @@ import {
   PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
   prefectureOffsetAllowed,
   prefectureOffsetSearchPoints,
+  OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+  OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
   OSAKA_PREFECTURE_OFFSET_MAX_PX,
   type AxisRect,
   type AreaBadgePlacementInput,
@@ -109,13 +111,26 @@ function assertPlacedValid(
   for (const item of placed) {
     const pin = pinsById.get(item.id);
     expect(pin, `missing pin for ${item.id}`).toBeDefined();
-    expect(
-      Math.abs(item.x - pin!.x) + Math.abs(item.y - pin!.y),
-    ).toBeLessThanOrEqual(
+    const dx = item.x - pin!.x;
+    const dy = item.y - pin!.y;
+    const limits =
       item.id === "kyoto" || item.id === "osaka"
-        ? 32
-        : PREFECTURE_BADGE_OFFSET_MAX_PX,
-    );
+        ? {
+            maxTotalPx: OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+            diagonalAxisMaxPx: OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
+          }
+        : {
+            maxTotalPx: PREFECTURE_BADGE_OFFSET_MAX_PX,
+            diagonalAxisMaxPx: PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
+          };
+    expect(
+      prefectureOffsetAllowed(
+        dx,
+        dy,
+        limits.maxTotalPx,
+        limits.diagonalAxisMaxPx,
+      ),
+    ).toBe(true);
   }
   for (const rect of rects) {
     expect(rect.left).toBeGreaterThanOrEqual(viewport.left);
@@ -192,8 +207,9 @@ describe("placePrefectureBadgeCenters", () => {
     const kyotoPlaced = placed.find((item) => item.id === "kyoto");
     expect(osakaPlaced).toBeDefined();
     expect(kyotoPlaced).toBeDefined();
-    expect(kyotoPlaced!.y).toBeLessThan(kyoto.y);
-    expect(osakaPlaced!.y).toBeGreaterThan(osaka.y);
+    expect(
+      osakaPlaced!.x !== osaka.x || osakaPlaced!.y !== osaka.y,
+    ).toBe(true);
   });
 
   it("rejects candidate positions that intersect UI obstacles", () => {
@@ -247,6 +263,31 @@ describe("prefecture offset search limits", () => {
     expect(prefectureOffsetAllowed(14, 0)).toBe(true);
     expect(prefectureOffsetAllowed(0, -14)).toBe(true);
     expect(prefectureOffsetAllowed(15, 0)).toBe(false);
+  });
+
+  it("allows Osaka/Kyoto diagonals up to 24px total and 18px per axis", () => {
+    expect(
+      prefectureOffsetAllowed(
+        -17,
+        -15,
+        OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+        OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
+      ),
+    ).toBe(true);
+    expect(
+      prefectureOffsetAllowed(
+        -17,
+        -15,
+        PREFECTURE_BADGE_OFFSET_MAX_PX,
+        PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
+      ),
+    ).toBe(false);
+    expect(
+      prefectureOffsetSearchPoints(
+        OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+        OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
+      ).some(({ dx, dy }) => dx === -17 && dy === -15),
+    ).toBe(true);
   });
 
   it("caps diagonal moves at 10px per axis and 14px total distance", () => {
@@ -400,11 +441,10 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     expect(placed.find((item) => item.id === "osaka")).toBeDefined();
   });
 
-  it("may drop Osaka at (330,745) on 390 when free slots exceed 14px offset", () => {
+  it("places Osaka at (330,745) on 390 via extended Osaka/Kyoto offset search", () => {
     const { width, height, center } = JAPAN_PREF_MOBILE;
     const viewport = viewportInset(width, height);
     const obstacles = mobile390Obstacles(width, height);
-    const byZoom = new Map<number, boolean>();
     for (const zoom of [4.5, 5.5, 6.5] as const) {
       const candidates = prefectureCandidates(width, height, zoom, center).map(
         (item) =>
@@ -415,9 +455,11 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
         obstacles,
         viewport,
       );
-      byZoom.set(zoom, Boolean(placed.find((item) => item.id === "osaka")));
+      expect(
+        placed.find((item) => item.id === "osaka"),
+        `zoom ${zoom}`,
+      ).toBeDefined();
     }
-    expect(byZoom.get(6.5)).toBe(false);
   });
 
   it("drops Osaka when no obstacle-free candidate exists within 14px offset search", () => {
@@ -433,10 +475,12 @@ describe("Osaka prefecture badge at Japan overview zooms", () => {
     expect(placed.find((item) => item.id === "osaka")).toBeUndefined();
   });
 
-  it("uses 14px offset search and 32px Kyoto/Osaka pairing cap", () => {
+  it("uses 14px standard offsets and 24px Osaka/Kyoto limits", () => {
     expect(PREFECTURE_BADGE_OFFSET_MAX_PX).toBe(14);
     expect(PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX).toBe(10);
-    expect(OSAKA_PREFECTURE_OFFSET_MAX_PX).toBe(32);
+    expect(OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX).toBe(24);
+    expect(OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX).toBe(18);
+    expect(OSAKA_PREFECTURE_OFFSET_MAX_PX).toBe(24);
     expect(PREFECTURE_BADGE_GAP).toBe(2);
   });
 });

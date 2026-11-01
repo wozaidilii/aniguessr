@@ -129,12 +129,32 @@ export interface AxisRect {
 const BADGE_GAP = 3;
 export const PREFECTURE_BADGE_GAP = 2;
 export const PREFECTURE_BADGE_OFFSET_MAX_PX = 14;
-/** Max |dx| and |dy| when both axes move (diagonal search). */
+/** Max |dx| and |dy| when both axes move (standard prefecture diagonal search). */
 export const PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX = 10;
-/** Osaka/Kyoto pairing only (not general diagonal offset search). */
-export const OSAKA_PREFECTURE_OFFSET_MAX_PX = 32;
-const OSAKA_KYOTO_PAIR_OFFSET_MAX_PX = OSAKA_PREFECTURE_OFFSET_MAX_PX;
+/** Osaka and Kyoto only: extended offset search and pairing. */
+export const OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX = 24;
+export const OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX = 18;
+/** @deprecated Use OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX. */
+export const OSAKA_PREFECTURE_OFFSET_MAX_PX = OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX;
 const BADGE_BORDER_PX = 1.5;
+
+export interface PrefectureOffsetLimits {
+  maxTotalPx: number;
+  diagonalAxisMaxPx: number;
+}
+
+export function prefectureOffsetLimitsForId(id: string): PrefectureOffsetLimits {
+  if (id === "osaka" || id === "kyoto") {
+    return {
+      maxTotalPx: OSAKA_KYOTO_PREFECTURE_OFFSET_MAX_PX,
+      diagonalAxisMaxPx: OSAKA_KYOTO_PREFECTURE_DIAGONAL_AXIS_MAX_PX,
+    };
+  }
+  return {
+    maxTotalPx: PREFECTURE_BADGE_OFFSET_MAX_PX,
+    diagonalAxisMaxPx: PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
+  };
+}
 
 /** Neighbours evicted before dropping Osaka when space is tight (lowest priority first). */
 const OSAKA_EVICTION_PREF_IDS: readonly string[] = [
@@ -166,7 +186,7 @@ const OSAKA_EVICTION_PREF_IDS: readonly string[] = [
 ];
 
 const prefOffsetSearchCache = new Map<
-  number,
+  string,
   ReadonlyArray<{ dx: number; dy: number }>
 >();
 
@@ -174,12 +194,13 @@ export function prefectureOffsetAllowed(
   dx: number,
   dy: number,
   maxTotalPx = PREFECTURE_BADGE_OFFSET_MAX_PX,
+  diagonalAxisMaxPx = PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
 ): boolean {
   if (dx === 0 && dy === 0) return true;
   if (Math.hypot(dx, dy) > maxTotalPx) return false;
   if (dx !== 0 && dy !== 0) {
-    if (Math.abs(dx) > PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX) return false;
-    if (Math.abs(dy) > PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX) return false;
+    if (Math.abs(dx) > diagonalAxisMaxPx) return false;
+    if (Math.abs(dy) > diagonalAxisMaxPx) return false;
   }
   return true;
 }
@@ -187,14 +208,18 @@ export function prefectureOffsetAllowed(
 /** Integer offsets within total/diagonal limits, nearest Euclidean distance first. */
 export function prefectureOffsetSearchPoints(
   maxTotalPx = PREFECTURE_BADGE_OFFSET_MAX_PX,
+  diagonalAxisMaxPx = PREFECTURE_BADGE_DIAGONAL_AXIS_MAX_PX,
 ): ReadonlyArray<{ dx: number; dy: number }> {
-  const cached = prefOffsetSearchCache.get(maxTotalPx);
+  const cacheKey = `${maxTotalPx}:${diagonalAxisMaxPx}`;
+  const cached = prefOffsetSearchCache.get(cacheKey);
   if (cached) return cached;
   const points: { dx: number; dy: number; dist: number }[] = [];
   for (let dx = -maxTotalPx; dx <= maxTotalPx; dx += 1) {
     for (let dy = -maxTotalPx; dy <= maxTotalPx; dy += 1) {
       if (dx === 0 && dy === 0) continue;
-      if (!prefectureOffsetAllowed(dx, dy, maxTotalPx)) continue;
+      if (!prefectureOffsetAllowed(dx, dy, maxTotalPx, diagonalAxisMaxPx)) {
+        continue;
+      }
       points.push({ dx, dy, dist: Math.hypot(dx, dy) });
     }
   }
@@ -202,7 +227,7 @@ export function prefectureOffsetSearchPoints(
     (a, b) => a.dist - b.dist || a.dx - b.dx || a.dy - b.dy,
   );
   const ordered = points.map(({ dx, dy }) => ({ dx, dy }));
-  prefOffsetSearchCache.set(maxTotalPx, ordered);
+  prefOffsetSearchCache.set(cacheKey, ordered);
   return ordered;
 }
 
@@ -275,11 +300,16 @@ function prefectureOffsetWithin(
   pinY: number,
   centerX: number,
   centerY: number,
-  maxTotalPx: number,
+  limits: PrefectureOffsetLimits,
 ): boolean {
   const dx = centerX - pinX;
   const dy = centerY - pinY;
-  return prefectureOffsetAllowed(dx, dy, maxTotalPx);
+  return prefectureOffsetAllowed(
+    dx,
+    dy,
+    limits.maxTotalPx,
+    limits.diagonalAxisMaxPx,
+  );
 }
 
 function findPrefectureBadgePosition(
@@ -288,7 +318,7 @@ function findPrefectureBadgePosition(
   obstacles: readonly AxisRect[],
   placedRects: readonly AxisRect[],
   gap: number,
-  maxOffsetPx = PREFECTURE_BADGE_OFFSET_MAX_PX,
+  limits: PrefectureOffsetLimits = prefectureOffsetLimitsForId(candidate.id),
 ): { x: number; y: number } | null {
   const { x: pinX, y: pinY } = candidate;
   if (!prefecturePinInVisibleMap(pinX, pinY, viewport, obstacles)) {
@@ -296,7 +326,7 @@ function findPrefectureBadgePosition(
   }
 
   const tryAt = (x: number, y: number): { x: number; y: number } | null => {
-    if (!prefectureOffsetWithin(pinX, pinY, x, y, maxOffsetPx)) {
+    if (!prefectureOffsetWithin(pinX, pinY, x, y, limits)) {
       return null;
     }
     return prefectureBadgeBlockedAt(
@@ -315,12 +345,27 @@ function findPrefectureBadgePosition(
   const center = tryAt(pinX, pinY);
   if (center) return center;
 
-  for (const { dx, dy } of prefectureOffsetSearchPoints(maxOffsetPx)) {
+  for (const { dx, dy } of prefectureOffsetSearchPoints(
+    limits.maxTotalPx,
+    limits.diagonalAxisMaxPx,
+  )) {
     const offset = tryAt(pinX + dx, pinY + dy);
     if (offset) return offset;
   }
 
   return null;
+}
+
+function kyotoPairingOffsetOrder(
+  offsets: readonly { dx: number; dy: number }[],
+): { dx: number; dy: number }[] {
+  return [...offsets].sort((a, b) => {
+    if (a.dy < 0 && b.dy >= 0) return -1;
+    if (b.dy < 0 && a.dy >= 0) return 1;
+    const distA = Math.hypot(a.dx, a.dy);
+    const distB = Math.hypot(b.dx, b.dy);
+    return distA - distB || a.dx - b.dx || a.dy - b.dy;
+  });
 }
 
 function tryOsakaKyotoPrefecturePairing(
@@ -332,46 +377,61 @@ function tryOsakaKyotoPrefecturePairing(
   gap: number,
   kyotoCandidate: AreaBadgePlacementInput | null = null,
 ): boolean {
+  const kyotoPin = kyotoCandidate;
+  if (!kyotoPin) return false;
   const kyotoIndex = placed.findIndex((item) => item.id === "kyoto");
-  const kyoto =
-    kyotoIndex >= 0 ? placed[kyotoIndex] : (kyotoCandidate ?? undefined);
-  if (!kyoto) return false;
   const otherRects =
     kyotoIndex >= 0
       ? placedRects.filter((_, index) => index !== kyotoIndex)
       : placedRects;
+  const limits = prefectureOffsetLimitsForId("osaka");
+  const kyotoOffsets = kyotoPairingOffsetOrder(
+    prefectureOffsetSearchPoints(
+      limits.maxTotalPx,
+      limits.diagonalAxisMaxPx,
+    ),
+  );
+  const osakaOffsets = prefectureOffsetSearchPoints(
+    limits.maxTotalPx,
+    limits.diagonalAxisMaxPx,
+  );
 
-  for (let delta = 1; delta <= OSAKA_KYOTO_PAIR_OFFSET_MAX_PX; delta += 1) {
-    for (const osakaSign of [1, -1] as const) {
-      const forcedKyoto = {
-        x: kyoto.x,
-        y: kyoto.y - delta,
-      };
-      if (
-        !prefecturePinInVisibleMap(kyoto.x, kyoto.y, viewport, obstacles) ||
-        prefectureBadgeBlockedAt(
-          forcedKyoto.x,
-          forcedKyoto.y,
-          kyoto.count,
-          viewport,
-          obstacles,
-          otherRects,
-          gap,
-        )
-      ) {
-        continue;
-      }
-      const kyotoRect = prefectureBadgeRectAt(
+  if (
+    !prefecturePinInVisibleMap(kyotoPin.x, kyotoPin.y, viewport, obstacles) ||
+    !prefecturePinInVisibleMap(osaka.x, osaka.y, viewport, obstacles)
+  ) {
+    return false;
+  }
+
+  for (const kOff of kyotoOffsets) {
+    const forcedKyoto = {
+      x: kyotoPin.x + kOff.dx,
+      y: kyotoPin.y + kOff.dy,
+    };
+    if (
+      prefectureBadgeBlockedAt(
         forcedKyoto.x,
         forcedKyoto.y,
-        kyoto.count,
-      );
+        kyotoPin.count,
+        viewport,
+        obstacles,
+        otherRects,
+        gap,
+      )
+    ) {
+      continue;
+    }
+    const kyotoRect = prefectureBadgeRectAt(
+      forcedKyoto.x,
+      forcedKyoto.y,
+      kyotoPin.count,
+    );
+    for (const oOff of osakaOffsets) {
       const forcedOsaka = {
-        x: osaka.x,
-        y: osaka.y + osakaSign * delta,
+        x: osaka.x + oOff.dx,
+        y: osaka.y + oOff.dy,
       };
       if (
-        !prefecturePinInVisibleMap(osaka.x, osaka.y, viewport, obstacles) ||
         prefectureBadgeBlockedAt(
           forcedOsaka.x,
           forcedOsaka.y,
@@ -385,10 +445,10 @@ function tryOsakaKyotoPrefecturePairing(
         continue;
       }
       if (kyotoIndex >= 0) {
-        placed[kyotoIndex] = { ...kyoto, ...forcedKyoto };
+        placed[kyotoIndex] = { ...kyotoPin, ...forcedKyoto };
         placedRects[kyotoIndex] = kyotoRect;
       } else {
-        placed.push({ ...kyoto, ...forcedKyoto });
+        placed.push({ ...kyotoPin, ...forcedKyoto });
         placedRects.push(kyotoRect);
       }
       placed.push({ ...osaka, ...forcedOsaka });
@@ -417,6 +477,23 @@ function tryOsakaPrefectureFallback(
     );
   };
 
+  const osakaLimits = prefectureOffsetLimitsForId("osaka");
+  const tryPlaceOsakaNow = (): { x: number; y: number } | null =>
+    findPrefectureBadgePosition(
+      osaka,
+      viewport,
+      obstacles,
+      placedRects,
+      gap,
+      osakaLimits,
+    );
+
+  const position = tryPlaceOsakaNow();
+  if (position) {
+    commitOsaka(position);
+    return true;
+  }
+
   if (
     tryOsakaKyotoPrefecturePairing(
       osaka,
@@ -428,22 +505,6 @@ function tryOsakaPrefectureFallback(
       kyotoCandidate,
     )
   ) {
-    return true;
-  }
-
-  const tryPlaceOsakaNow = (): { x: number; y: number } | null =>
-    findPrefectureBadgePosition(
-      osaka,
-      viewport,
-      obstacles,
-      placedRects,
-      gap,
-      PREFECTURE_BADGE_OFFSET_MAX_PX,
-    );
-
-  const position = tryPlaceOsakaNow();
-  if (position) {
-    commitOsaka(position);
     return true;
   }
 
