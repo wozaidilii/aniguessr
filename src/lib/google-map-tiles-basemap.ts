@@ -24,8 +24,8 @@ export const GOOGLE_MAP_TILES_LOGO_PATH =
 /** @deprecated Use GOOGLE_MAP_TILES_LOGO_PATH */
 export const GOOGLE_MAP_TILES_LOGO_URL = GOOGLE_MAP_TILES_LOGO_PATH;
 
-/** Bump when createSession `styles` change so old cached sessions are not reused. */
-export const GOOGLE_MAP_TILES_SESSION_STYLES_VERSION = "poi-labels-hide-v2";
+/** Bump when createSession params change so old cached sessions are not reused. */
+export const GOOGLE_MAP_TILES_SESSION_STYLES_VERSION = "poi-labels-hide-v3-hidpi";
 
 export type GoogleMapTilesStyleRule = {
   featureType?: string;
@@ -204,6 +204,8 @@ export interface GoogleMapTilesCreateSessionBody {
   mapType: "roadmap";
   language: string;
   region: string;
+  scale: "scaleFactor2x";
+  highDpi: true;
   styles: GoogleMapTilesStyleRule[];
 }
 
@@ -215,6 +217,8 @@ export function buildGoogleMapTilesCreateSessionBody(
     mapType: "roadmap",
     language,
     region,
+    scale: "scaleFactor2x",
+    highDpi: true,
     styles: googleMapTilesCreateSessionStyles(),
   };
 }

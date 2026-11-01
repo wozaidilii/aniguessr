@@ -64,6 +64,8 @@ async function probeCreateSession() {
           mapType: "roadmap",
           language: "ja",
           region: "JP",
+          scale: "scaleFactor2x",
+          highDpi: true,
         }),
       },
     );
